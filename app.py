@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -23,6 +24,8 @@ ROOT = Path(__file__).parent
 PROCESSED = ROOT / "data" / "processed"
 RESULTS = ROOT / "results"
 PY = sys.executable
+RUN_LOG = RESULTS / "run_all.log"
+RUN_PID = RESULTS / "run_all.pid"
 
 st.set_page_config(page_title="CASSANDRA — Cyber Threat Forecasting", page_icon="🔮", layout="wide")
 
@@ -78,6 +81,75 @@ def status_badge(done: bool, ready: bool = True) -> str:
     return "🔵 Ready to run"
 
 
+# ---- Unattended "run everything" support ----------------------------------
+def launch_full_run(fresh: bool, quick: bool, enhanced: bool, start: str, end: str) -> None:
+    """Start the whole pipeline as a detached background process (survives closing
+    this browser window). Output is streamed to results/run_all.log."""
+    RESULTS.mkdir(parents=True, exist_ok=True)
+    cmd = [PY, "scripts/run_all.py", "--start", start, "--end", end]
+    if fresh:
+        cmd.append("--fresh")
+    if quick:
+        cmd.append("--quick")
+    if enhanced:
+        cmd.append("--enhanced")
+    logf = open(RUN_LOG, "w", encoding="utf-8")  # noqa: SIM115 (child keeps writing)
+    if os.name == "nt":
+        flags = 0x00000008 | 0x00000200  # DETACHED_PROCESS | CREATE_NEW_PROCESS_GROUP
+        proc = subprocess.Popen(cmd, cwd=str(ROOT), stdout=logf, stderr=subprocess.STDOUT,
+                                creationflags=flags)
+    else:
+        proc = subprocess.Popen(cmd, cwd=str(ROOT), stdout=logf, stderr=subprocess.STDOUT,
+                                start_new_session=True)
+    RUN_PID.write_text(str(proc.pid))
+
+
+def full_run_state() -> tuple[str, str]:
+    """Return (state, log_text): state is none/running/done/failed."""
+    if not RUN_LOG.exists():
+        return "none", ""
+    text = RUN_LOG.read_text(errors="ignore")
+    if "ALL DONE" in text:
+        return "done", text
+    if "FAILED" in text:
+        return "failed", text
+    return "running", text
+
+
+def stop_full_run() -> None:
+    if not RUN_PID.exists():
+        return
+    pid = RUN_PID.read_text().strip()
+    if not pid:
+        return
+    if os.name == "nt":
+        subprocess.run(["taskkill", "/F", "/T", "/PID", pid], capture_output=True)
+    else:
+        import signal
+        try:
+            os.killpg(int(pid), signal.SIGTERM)
+        except Exception:  # noqa: BLE001
+            pass
+
+
+@st.fragment(run_every="5s")
+def live_full_run_log() -> None:
+    """Auto-refreshing view of the unattended run's progress."""
+    state, text = full_run_state()
+    if state == "none":
+        return
+    done = len(re.findall(r"DONE \d/5", text))
+    st.progress(min(done / 5.0, 1.0), text=f"{done} of 5 steps complete")
+    if state == "done":
+        st.success("✅ All finished! Open the **📊 Your data** and **🔮 The forecast** tabs.")
+    elif state == "failed":
+        st.error("❌ A step failed — the log below shows what happened.")
+    else:
+        st.info("⏳ Running… you can safely close this window; it keeps running in the background.")
+    lines = text.splitlines()
+    st.code("\n".join(lines[-25:]) or "(starting…)")
+
+
 # ---------------------------------------------------------------------------
 # Header
 # ---------------------------------------------------------------------------
@@ -129,6 +201,39 @@ tab_run, tab_data, tab_forecast = st.tabs(["▶️ Run the steps", "📊 Your da
 # TAB 1 — Run the steps
 # ---------------------------------------------------------------------------
 with tab_run:
+    # Run-everything (unattended)
+    with st.container(border=True):
+        st.subheader("🌙 Run everything, unattended")
+        st.write(
+            "Runs all five steps in order, then leaves the results ready for you. "
+            "Perfect for leaving overnight — **you can close this window and it keeps "
+            "running** in the background. Come back and reopen the dashboard to check on it."
+        )
+        fresh = st.checkbox(
+            "Start completely fresh — delete all downloaded data and results first",
+            value=False,
+            help="Re-downloads everything from scratch. This is the slowest option: the "
+                 "vulnerability download alone can take 30–60 minutes.",
+        )
+        if fresh:
+            st.warning(
+                "This will permanently delete everything under `data/` and `results/` and "
+                "re-download from the internet. Only the raw code and your keys are kept."
+            )
+        c_go, c_stop = st.columns([2, 1])
+        with c_go:
+            if st.button("🚀 Run the whole pipeline now", type="primary", key="runall"):
+                launch_full_run(fresh, quick, enhanced, start, end)
+                st.rerun()
+        with c_stop:
+            if st.button("⏹ Stop", key="stopall"):
+                stop_full_run()
+                st.toast("Asked the pipeline to stop.")
+        live_full_run_log()
+
+    st.divider()
+    st.caption("Prefer to go step by step? Use the buttons below (one at a time, top to bottom).")
+
     # Step 1
     with st.container(border=True):
         st.subheader(f"Step 1 — Collect the data   {status_badge(done_ingest)}")

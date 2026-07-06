@@ -19,6 +19,17 @@ each shows a green light when finished, a live progress log while running, and
 charts of your data and the final forecast. No commands, no jargon. Everything
 below is the manual/command-line equivalent.
 
+**Run everything, unattended:** the dashboard also has a **🌙 Run the whole
+pipeline now** button that runs all five steps in sequence in the background.
+Tick *Start completely fresh* to wipe all caches and re-download from scratch.
+It keeps running even if you close the browser — great for leaving overnight.
+The command-line equivalent is:
+
+```bash
+python scripts/run_all.py --fresh          # wipe everything and run all 5 steps
+python scripts/run_all.py --quick          # keep caches, quick-preview training
+```
+
 ## Requirements
 
 - Python 3.11+
@@ -145,7 +156,8 @@ paper-cyber-threatmodelling/
 │   ├── build_features.py
 │   ├── train.py
 │   ├── evaluate.py
-│   └── forecast.py
+│   ├── forecast.py
+│   └── run_all.py                 # run all steps end-to-end (--fresh to wipe & restart)
 ├── src/cassandra_threatcast/
 │   ├── data/       # NVD, EPSS, CISA KEV, SEC 8-K, BEA I-O ingestion
 │   ├── features/   # Topic mapper (TF-IDF+NMF), exposure map, HP-filter effort
