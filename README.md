@@ -2,7 +2,7 @@
 
 Bayesian hierarchical state-space model of cyber threats and systemic economic risk.
 
-Models K=8 threat topics across S=11 BEA economic sectors using latent factors with Markov regime switching, calibrated against CVE counts (NVD), exploitation probability (EPSS), CISA KEV, and SEC 8-K cybersecurity disclosures.
+Models K=8 threat topics across S=11 BEA economic sectors using latent intensity and severity factor processes with shared Markov regime switching. Four observation channels are treated as biased views of the latent state: CVE counts and severity marks (NVD/CVSS), exploitation probability (EPSS/CISA KEV), and SEC 8-K incident disclosures. Posterior draws are propagated through a BEA input–output Leontief inverse to produce predictive distributions of systemic economic loss.
 
 ## Requirements
 
@@ -61,7 +61,7 @@ python scripts/build_features.py
 
 ### 3. Train the model
 
-Runs NUTS (4 chains × 2000 samples after 1000 warmup) and saves the posterior to `results/idata.nc`.
+Runs NUTS wrapped in `DiscreteHMCGibbs` — Gibbs updates for the discrete Markov regime path, NUTS for all continuous parameters (4 chains × 2000 samples after 1000 warmup) — and saves the posterior to `results/idata.nc`.
 
 ```bash
 python scripts/train.py
@@ -101,13 +101,13 @@ pytest
 pytest --cov=cassandra_threatcast --cov-report=term-missing
 ```
 
-33 tests covering: Leontief correctness, panel aggregation, CRPS (including analytical value 1/√π for N(0,1) at 0), DM test sign/symmetry, and NumPyro model forward pass.
+44 tests covering: Leontief correctness (live BEA API smoke test), panel aggregation, CRPS (including the analytical value (√2−1)/√π ≈ 0.2337 for N(0,1) at 0), DM test sign/symmetry, the NumPyro model forward pass, and the latent severity process (with NaN-mark masking). The four BEA live tests are skipped automatically unless `BEA_API_KEY` is set.
 
 ## Project structure
 
 ```
 paper-cyber-threatmodelling/
-├── configs/default.yaml          # K=8 topics, S=11 sectors, r=3 factors, R=3 regimes
+├── configs/default.yaml          # K=8 topics, S=11 sectors, r=3 intensity + r_sigma=2 severity factors, R=3 regimes
 ├── scripts/                      # CLI entry points (run in order)
 │   ├── ingest_data.py
 │   ├── build_features.py
@@ -117,8 +117,8 @@ paper-cyber-threatmodelling/
 ├── src/cassandra_threatcast/
 │   ├── data/       # NVD, EPSS, CISA KEV, SEC 8-K, BEA I-O ingestion
 │   ├── features/   # Topic mapper (TF-IDF+NMF), exposure map, HP-filter effort
-│   ├── model/      # NumPyro generative model (factor AR + Markov regimes + Leontief)
-│   ├── inference/  # NUTS/MCMC, FFBS regime path sampler, VI fallback
+│   ├── model/      # NumPyro model (intensity + severity factor AR, Markov regimes, 4 obs channels, Leontief)
+│   ├── inference/  # NUTS + DiscreteHMCGibbs, FFBS regime path sampler, VI fallback
 │   ├── evaluation/ # CRPS, log score, DM test, PIT calibration, 5 baselines
 │   └── viz/        # Fan charts, PIT histograms, regime-prob plots, sector exposure
 └── tests/
@@ -132,7 +132,8 @@ All hyperparameters are in `configs/default.yaml`. Key settings:
 |-----------|---------|-------------|
 | `model.K` | 8 | Number of threat topics |
 | `model.S` | 11 | Number of BEA sectors |
-| `model.r` | 3 | Number of latent factors |
+| `model.r` | 3 | Number of latent intensity factors |
+| `model.r_sigma` | 2 | Number of latent severity factors |
 | `model.R` | 3 | Number of regimes |
 | `mcmc.num_chains` | 4 | MCMC chains (reduce to 1 for quick tests) |
 | `mcmc.num_samples` | 2000 | Posterior samples per chain |
