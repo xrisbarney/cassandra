@@ -56,23 +56,37 @@ def exploitation_obs(
     alpha_k: jnp.ndarray,       # (K,) intercept
     beta_k: jnp.ndarray,        # (K,) slope
     varsigma_k: jnp.ndarray,    # (K,) obs noise std
-    E_obs: jnp.ndarray | None,  # (K, T) observed logit-EPSS or None
+    E_obs: jnp.ndarray | None,  # (K, T) observed mean EPSS in [0,1], or None
 ) -> None:
     """
-    Normal likelihood on logit(E_kt).
+    Normal likelihood on the logit of the mean EPSS score.
 
-    logit_E_kt  = alpha_k + beta_k * lambda_kt   (K, T)
-    E_kt        ~ Normal(logit_E_kt, varsigma_k)
+    logit_E_kt   = alpha_k + beta_k * lambda_kt          (K, T)  -- the mean
+    logit(E_kt)  ~ Normal(logit_E_kt, varsigma_k)
+
+    The observed EPSS marks are probabilities in [0, 1]; they are logit-
+    transformed here to match the model's (unbounded) logit-scale mean. Empty
+    (topic, month) cells carry NaN and are masked out of the likelihood.
     """
-    # alpha_k: (K,) → (K, 1), beta_k: (K,) → (K, 1)
-    logit_E_kt = alpha_k[:, None] + beta_k[:, None] * lambda_kt  # (K, T)
+    logit_E_kt = alpha_k[:, None] + beta_k[:, None] * lambda_kt  # (K, T) mean
     sigma_kt = varsigma_k[:, None] * jnp.ones_like(logit_E_kt)   # (K, T)
 
-    numpyro.sample(
-        "E_obs",
-        dist.Normal(logit_E_kt, sigma_kt),
-        obs=E_obs,
-    )
+    if E_obs is None:
+        numpyro.sample("E_obs", dist.Normal(logit_E_kt, sigma_kt))
+        return
+
+    E = jnp.asarray(E_obs)
+    obs_mask = ~jnp.isnan(E)
+    # logit of the observed probability, clipped away from 0/1 to stay finite.
+    E_clip = jnp.clip(jnp.where(obs_mask, E, 0.5), 1e-4, 1.0 - 1e-4)
+    logit_E_obs = jnp.log(E_clip) - jnp.log1p(-E_clip)
+
+    with numpyro.handlers.mask(mask=obs_mask):
+        numpyro.sample(
+            "E_obs",
+            dist.Normal(logit_E_kt, sigma_kt),
+            obs=logit_E_obs,
+        )
 
 
 def severity_obs(
