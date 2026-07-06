@@ -221,6 +221,16 @@ def predict(
     x_s_j = jnp.asarray(x_s)
     M_future_j = jnp.asarray(M_future)  # (S, K, horizon)
 
+    # Latent severity sigma_k for the economic shock load in Eq. (1). The model
+    # carries no separate severity latent, so we use the observed severity marks
+    # B_{k,t} (mean CVSS base score in [0, 10]) averaged per topic and scaled to
+    # [0, 1]. Absolute scale is absorbed by the damage-function calibration.
+    B_obs = data.get("B")
+    if B_obs is not None and np.asarray(B_obs).size:
+        sigma_k = np.nan_to_num(np.nanmean(np.asarray(B_obs), axis=1) / 10.0, nan=0.5)
+    else:
+        sigma_k = np.full(K, 0.5)
+
     for i in range(n_samples):
         # Extract parameters for sample i
         mu_r_i = posterior_samples["mu_r"][i]       # (R, K)
@@ -272,8 +282,11 @@ def predict(
             rate_s = np.clip(rate_s, 1e-8, None)
             D_pred[i, :, h] = rng.poisson(rate_s)
 
-            # Economic losses
-            shock_load = jnp.asarray(rate_s / (np.array(x_s) + 1e-12))
+            # Economic shock load per Eq. (1): sum_k M_{s,k} * lambda_k * sigma_k
+            # (exposure-weighted intensity x severity). rho_s and 1/x_s are NOT
+            # applied here — rho_s belongs to the incident-disclosure channel and
+            # gross output x_s enters later via direct losses d_s = g_s * x_s.
+            shock_load = jnp.asarray(M_h @ (exp_lam * sigma_k))  # (S,)
             g_s = np.array(damage_function(shock_load, damage_params))
             d_s, ell = leontief_propagation(
                 jnp.asarray(g_s), x_s_j, Lambda_L_j
