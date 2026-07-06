@@ -1,4 +1,4 @@
-# Cyber Threat Modelling
+# CASSANDRA — Cyber Threat Modelling
 
 Bayesian hierarchical state-space model of cyber threats and systemic economic risk.
 
@@ -19,7 +19,21 @@ python -m venv .venv
 
 # 2. Install the package and dev dependencies
 pip install -e ".[dev]"
+
+# 3. Configure API keys
+cp .env.sample .env
+# Edit .env and fill in your keys (see API Keys section below)
 ```
+
+## API Keys
+
+Copy `.env.sample` to `.env` and fill in the values. The scripts load it automatically.
+
+| Variable | Required | Where to get it |
+|----------|----------|-----------------|
+| `NVD_API_KEY` | Recommended | [nvd.nist.gov/developers/request-an-api-key](https://nvd.nist.gov/developers/request-an-api-key) — free, raises rate limit from 5 req/30s to 50 req/30s |
+| `BEA_API_KEY` | Required | [apps.bea.gov/api/signup](https://apps.bea.gov/api/signup/) — free, used to fetch I-O tables automatically |
+| `SEC_USER_AGENT` | Required | Your name and email, e.g. `Jane Smith jane@example.com` — SEC fair-access policy |
 
 ## Running the pipeline
 
@@ -33,21 +47,17 @@ Pulls CVE records from NVD, EPSS scores, CISA KEV catalog, and SEC EDGAR 8-K fil
 python scripts/ingest_data.py --start 2010-01 --end 2024-12 --cache-dir data/cache/
 ```
 
-> **Note:** NVD rate-limits unauthenticated requests. For large date ranges, get a free API key at https://nvd.nist.gov/developers/request-an-api-key and set `NVD_API_KEY=<key>` in your environment.
+> **Note:** Without an NVD API key, requests are rate-limited to 5/30s — a 15-year fetch will take several hours. With a key it drops to ~30–60 minutes. The date range is automatically chunked into 119-day windows as required by the NVD API.
 
 ### 2. Build features
 
-Fits the topic model, constructs the sector exposure tensor M_skt, and estimates attacker effort e_t.
+Fits the topic model, constructs the sector exposure tensor M_skt, estimates attacker effort e_t, and fetches the BEA I-O tables automatically via the BEA API.
 
 ```bash
 python scripts/build_features.py
 ```
 
-BEA I-O tables are required for the Leontief propagation step. Place them at:
-- `data/bea/use_table.csv`
-- `data/bea/gross_output.csv`
-
-Download from the [BEA website](https://www.bea.gov/industry/input-output-accounts-data) (Use Table, Summary level).
+> BEA Use table (Summary level, 2022) is fetched automatically using `BEA_API_KEY` and cached to `data/processed/bea_use_table_2022.json`.
 
 ### 3. Train the model
 
@@ -127,3 +137,4 @@ All hyperparameters are in `configs/default.yaml`. Key settings:
 | `mcmc.num_chains` | 4 | MCMC chains (reduce to 1 for quick tests) |
 | `mcmc.num_samples` | 2000 | Posterior samples per chain |
 | `evaluation.horizons` | [1,3,6,12] | Forecast horizons in months |
+| `bea.year` | 2022 | BEA I-O table year fetched via API |
