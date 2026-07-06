@@ -108,20 +108,25 @@ def incident_obs(
     pi_st: jnp.ndarray,        # (S, T) sector baseline
     rho_s: jnp.ndarray,        # (S,) sector scaling
     D_obs: jnp.ndarray | None, # (S, T) observed 8-K counts or None
+    dispersion: jnp.ndarray | None = None,  # (S,) NegBin concentration, or None
 ) -> None:
     """
-    Poisson likelihood for 8-K cybersecurity incident disclosures.
+    Likelihood for 8-K cybersecurity incident disclosures.
 
     rate_st = rho_s * sum_k M_skt * exp(lambda_kt) + pi_st
-    D_st    ~ Poisson(rate_st)
+
+    * dispersion is None  -> D_st ~ Poisson(rate_st)                (paper-native)
+    * dispersion given     -> D_st ~ NegBinomial2(rate_st, dispersion)  (enhanced;
+      overdispersed, since mandatory 8-K disclosure counts are bursty)
 
     Parameters
     ----------
-    lambda_kt : (K, T) log-intensities.
-    M_skt     : (S, K, T) sector-topic-time exposure weights.
-    pi_st     : (S, T) sector-specific baseline disclosure rate.
-    rho_s     : (S,) sector-level scaling of cyber-to-disclosure elasticity.
-    D_obs     : (S, T) observed incident counts or None.
+    lambda_kt  : (K, T) log-intensities.
+    M_skt      : (S, K, T) sector-topic-time exposure weights.
+    pi_st      : (S, T) sector-specific baseline disclosure rate.
+    rho_s      : (S,) sector-level scaling of cyber-to-disclosure elasticity.
+    D_obs      : (S, T) observed incident counts or None.
+    dispersion : (S,) per-sector NegBin concentration, or None for Poisson.
     """
     # exp(lambda_kt): (K, T) → (1, K, T) for broadcasting with M_skt (S, K, T)
     exp_lambda = jnp.exp(lambda_kt)[None, :, :]  # (1, K, T)
@@ -135,8 +140,12 @@ def incident_obs(
     # Guard against negative rates (numerical safety)
     rate_st = jnp.clip(rate_st, 1e-8)  # positional min (JAX dropped a_min kwarg)
 
-    numpyro.sample(
-        "D_obs",
-        dist.Poisson(rate_st),
-        obs=D_obs,
-    )
+    if dispersion is None:
+        numpyro.sample("D_obs", dist.Poisson(rate_st), obs=D_obs)
+    else:
+        concentration = dispersion[:, None] * jnp.ones_like(rate_st)  # (S, T)
+        numpyro.sample(
+            "D_obs",
+            dist.NegativeBinomial2(mean=rate_st, concentration=concentration),
+            obs=D_obs,
+        )

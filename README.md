@@ -77,6 +77,17 @@ Training takes ~30–90 minutes on CPU depending on dataset length. To use VI in
 python scripts/train.py --method vi
 ```
 
+#### Model variant: paper-native vs. enhanced
+
+By default the code runs the model **exactly as specified in the paper**. An opt-in `--enhanced-mode` flag switches on a set of Claude-proposed statistical enhancements (heavy-tailed Student-t latent innovations + a Negative-Binomial incident channel) aimed at better tail-risk calibration:
+
+```bash
+python scripts/train.py --enhanced-mode          # fit the enhanced model
+python scripts/forecast.py --enhanced-mode ...    # forecast must match how it was fit
+```
+
+The two variants share all priors, latent structure, and the economic layer, so they form a clean ablation. See **[docs/MODEL_VARIANTS.md](docs/MODEL_VARIANTS.md)** for the full paper-vs-enhanced comparison table and the rationale for each change.
+
 ### 4. Evaluate
 
 Rolling-origin expanding-window evaluation against five baselines (RF, ARIMA, ETS, Naive, BSTS). Outputs CRPS/MAE/RMSE tables and Diebold-Mariano test results.
@@ -105,12 +116,13 @@ pytest
 pytest --cov=cassandra_threatcast --cov-report=term-missing
 ```
 
-44 tests covering: Leontief correctness (live BEA API smoke test), panel aggregation, CRPS (including the analytical value (√2−1)/√π ≈ 0.2337 for N(0,1) at 0), DM test sign/symmetry, the NumPyro model forward pass, and the latent severity process (with NaN-mark masking). The four BEA live tests are skipped automatically unless `BEA_API_KEY` is set.
+46 tests covering: Leontief correctness (live BEA API smoke test), panel aggregation, CRPS (including the analytical value (√2−1)/√π ≈ 0.2337 for N(0,1) at 0), DM test sign/symmetry, the NumPyro model forward pass, the latent severity process (with NaN-mark masking), and both model variants (paper-native and `--enhanced-mode`). The four BEA live tests are skipped automatically unless `BEA_API_KEY` is set.
 
 ## Project structure
 
 ```
 paper-cyber-threatmodelling/
+├── docs/MODEL_VARIANTS.md         # paper-native vs. --enhanced-mode comparison
 ├── configs/default.yaml          # K=8 topics, S=11 sectors, r=3 intensity + r_sigma=2 severity factors, R=3 regimes
 ├── scripts/                      # CLI entry points (run in order)
 │   ├── ingest_data.py
@@ -143,3 +155,5 @@ All hyperparameters are in `configs/default.yaml`. Key settings:
 | `mcmc.num_samples` | 2000 | Posterior samples per chain |
 | `evaluation.horizons` | [1,3,6,12] | Forecast horizons in months |
 | `bea.year` | 2022 | BEA I-O table year fetched via API |
+| `enhanced.enabled` | false | Enhanced model variant (also set by `--enhanced-mode`) — see [docs/MODEL_VARIANTS.md](docs/MODEL_VARIANTS.md) |
+| `enhanced.student_t_df` | 4.0 | Student-t d.o.f. for heavy-tailed innovations (enhanced only) |

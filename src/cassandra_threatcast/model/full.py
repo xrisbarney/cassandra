@@ -55,6 +55,19 @@ def full_model(data: dict, config: dict) -> None:
     r: int = int(model_cfg["r"])
     R: int = int(model_cfg["R"])
 
+    # Enhanced mode (opt-in, --enhanced-mode): heavy-tailed latent innovations
+    # (Student-t) and an overdispersed Negative-Binomial incident channel.
+    # Default is the paper-native model (Gaussian innovations, Poisson incidents).
+    enh_cfg = config.get("enhanced", {})
+    enhanced: bool = bool(enh_cfg.get("enabled", False))
+    student_t_df: float = float(enh_cfg.get("student_t_df", 4.0))
+
+    def _innovation(name, loc, scale):
+        """Latent innovation: Student-t in enhanced mode, else Normal."""
+        if enhanced:
+            return numpyro.sample(name, dist.StudentT(student_t_df, loc, scale))
+        return numpyro.sample(name, dist.Normal(loc, scale))
+
     T: int = int(data["e_t"].shape[0])
 
     e_t = jnp.asarray(data["e_t"])          # (T,)
@@ -127,20 +140,20 @@ def full_model(data: dict, config: dict) -> None:
         f_prev, z_prev, h_prev = carry  # (r,), (), (r_sig,)
 
         z_t = numpyro.sample("z_t", dist.Categorical(probs=Pi[z_prev]))
-        eps = numpyro.sample("eps_f", dist.Normal(jnp.zeros(r), jnp.ones(r)))
+        eps = _innovation("eps_f", jnp.zeros(r), jnp.ones(r))
 
         Phi_t = Phi_r[z_t]           # (r, r)
         Q_chol_t = jnp.diag(Q_r[z_t])  # (r, r)
         f_t = Phi_t @ f_prev + Q_chol_t @ eps  # (r,)
 
         mean_eta = mu_r[z_t] + f_t @ Gamma.T  # (K,)
-        eta_noise = numpyro.sample("eta_noise", dist.Normal(jnp.zeros(K), tau_k))
+        eta_noise = _innovation("eta_noise", jnp.zeros(K), tau_k)
         eta_t = mean_eta + eta_noise  # (K,)
 
         # Severity factor evolution and log-severity (shares the regime z_t).
-        xi_h = numpyro.sample("xi_h", dist.Normal(jnp.zeros(r_sig), jnp.ones(r_sig)))
+        xi_h = _innovation("xi_h", jnp.zeros(r_sig), jnp.ones(r_sig))
         h_t = A_h @ h_prev + jnp.diag(Q_h) @ xi_h  # (r_sig,)
-        v_zeta = numpyro.sample("v_zeta", dist.Normal(jnp.zeros(K), omega_k))
+        v_zeta = _innovation("v_zeta", jnp.zeros(K), omega_k)
         zeta_t = nu_r[z_t] + h_t @ Psi.T + v_zeta  # (K,)
 
         return (f_t, z_t, h_t), (f_t, z_t, eta_t, h_t, zeta_t)
@@ -207,7 +220,11 @@ def full_model(data: dict, config: dict) -> None:
     exploitation_obs(lambda_kt, alpha_k, beta_k, varsigma_k, E_obs)
 
     D_obs = jnp.asarray(data["D"]) if data.get("D") is not None else None
-    incident_obs(lambda_kt, M_skt, pi_st, rho_s, D_obs)
+    if enhanced:
+        phi_D = numpyro.sample("phi_D", dist.HalfNormal(10.0 * jnp.ones(S)))  # (S,) NegBin dispersion
+        incident_obs(lambda_kt, M_skt, pi_st, rho_s, D_obs, dispersion=phi_D)
+    else:
+        incident_obs(lambda_kt, M_skt, pi_st, rho_s, D_obs)
 
     B_obs = jnp.asarray(data["B"]) if data.get("B") is not None else None
     severity_obs(zeta_kt, kappa_k, B_obs)
@@ -225,6 +242,8 @@ def predict(
     x_s: np.ndarray,
     M_future: np.ndarray,        # (S, K, horizon)
     damage_params: "DamageFunctionParams",
+    enhanced: bool = False,
+    student_t_df: float = 4.0,
 ) -> dict:
     """
     Generate h-step-ahead predictive draws.
@@ -236,6 +255,9 @@ def predict(
       4. Compute g_s via damage_function
       5. Compute ell via leontief_propagation
 
+    Set ``enhanced=True`` (matching how the model was fit) to draw latent
+    innovations from Student-t and incident counts from Negative Binomial.
+
     Returns
     -------
     dict with keys:
@@ -246,6 +268,12 @@ def predict(
         ell_agg     : (n_samples, horizon)
     """
     rng = np.random.default_rng(seed=42)
+
+    def _draw(size):
+        """Innovation draw: Student-t in enhanced mode, else standard normal."""
+        if enhanced:
+            return rng.standard_t(student_t_df, size)
+        return rng.standard_normal(size)
 
     n_samples = next(iter(posterior_samples.values())).shape[0]
     K = posterior_samples["tau_k"].shape[-1]
@@ -297,14 +325,14 @@ def predict(
             z_curr = int(rng.choice(R, p=z_probs / z_probs.sum()))
 
             # Factor update
-            eps = rng.standard_normal(r)
+            eps = _draw(r)
             Q_chol = np.diag(np.array(Q_r_i[z_curr]))
             Phi = np.array(Phi_r_i[z_curr])
             f_curr = Phi @ f_last + Q_chol @ eps
 
             # Log-intensity
             mean_eta = np.array(mu_r_i[z_curr]) + f_curr @ np.array(Gamma_i).T  # (K,)
-            eta_noise = rng.standard_normal(K) * np.array(tau_k_i)
+            eta_noise = _draw(K) * np.array(tau_k_i)
             eta_h = mean_eta + eta_noise  # (K,)
 
             lambda_pred[i, :, h] = eta_h
@@ -322,13 +350,18 @@ def predict(
             rho_arr = np.array(rho_s_i)           # (S,)
             rate_s = rho_arr * (M_h @ exp_lam)    # (S,)
             rate_s = np.clip(rate_s, 1e-8, None)
-            D_pred[i, :, h] = rng.poisson(rate_s)
+            if enhanced and "phi_D" in posterior_samples:
+                phi_D_i = np.array(posterior_samples["phi_D"][i])       # (S,)
+                p_nb_D = phi_D_i / (phi_D_i + rate_s)
+                D_pred[i, :, h] = rng.negative_binomial(phi_D_i, p_nb_D)
+            else:
+                D_pred[i, :, h] = rng.poisson(rate_s)
 
             # Severity forecast: evolve the severity factor and draw log-severity
             # (shares the regime z_curr), then sigma_k = exp(zeta_k).
-            xi_h = rng.standard_normal(r_sig)
+            xi_h = _draw(r_sig)
             h_curr = A_h_i @ h_last + np.diag(Q_h_i) @ xi_h        # (r_sig,)
-            v_zeta = rng.standard_normal(K) * omega_k_i           # (K,)
+            v_zeta = _draw(K) * omega_k_i                          # (K,)
             zeta_h = np.array(nu_r_i[z_curr]) + h_curr @ Psi_i.T + v_zeta  # (K,)
             sigma_h = np.exp(zeta_h)                              # (K,) latent severity
 

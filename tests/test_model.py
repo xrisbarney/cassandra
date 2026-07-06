@@ -114,6 +114,43 @@ def test_full_model_has_severity_process():
     assert bool(np.all(np.isfinite(np.asarray(samples["zeta_t"]))))
 
 
+def test_enhanced_mode_uses_negbin_and_runs():
+    """Enhanced mode adds the NegBin dispersion param and still forward-passes."""
+    import jax
+    from numpyro.infer import Predictive
+    from cassandra_threatcast.model.full import full_model
+
+    K, S, T, r, R = 3, 2, 12, 2, 2
+    data   = make_synthetic_data(K, S, T, r, R)
+    config = {
+        "model": {"K": K, "S": S, "r": r, "R": R, "r_sigma": 2},
+        "enhanced": {"enabled": True, "student_t_df": 4.0},
+    }
+
+    rng = jax.random.PRNGKey(13)
+    samples = Predictive(full_model, num_samples=3)(rng, data=data, config=config)
+
+    # Enhanced-only parameter present, observation sites intact.
+    assert "phi_D" in samples, f"missing phi_D; keys={list(samples.keys())}"
+    assert "D_obs" in samples and "B_obs" in samples
+    assert bool(np.all(np.isfinite(np.asarray(samples["zeta_t"]))))
+
+
+def test_native_mode_has_no_negbin_param():
+    """Paper-native mode must NOT introduce the enhanced-only phi_D parameter."""
+    import jax
+    from numpyro.infer import Predictive
+    from cassandra_threatcast.model.full import full_model
+
+    K, S, T, r, R = 3, 2, 10, 2, 2
+    data   = make_synthetic_data(K, S, T, r, R)
+    config = {"model": {"K": K, "S": S, "r": r, "R": R}}  # no 'enhanced' block
+
+    rng = jax.random.PRNGKey(14)
+    samples = Predictive(full_model, num_samples=2)(rng, data=data, config=config)
+    assert "phi_D" not in samples
+
+
 def test_severity_obs_masks_missing_marks():
     """severity_obs must tolerate NaN severity marks (empty topic-months)."""
     import jax

@@ -41,3 +41,11 @@ damage:
   shape_prior_beta: 1.0
   scale_prior_alpha: 1.0
   scale_prior_beta: 2.0
+
+# Enhanced mode: Claude-proposed statistical enhancements beyond the paper's
+# native specification. Off by default (paper-native). Enable with the
+# --enhanced-mode flag on train.py / forecast.py, or set enabled: true here.
+# See docs/MODEL_VARIANTS.md for the paper-vs-enhanced comparison.
+enhanced:
+  enabled: false
+  student_t_df: 4.0   # degrees of freedom for heavy-tailed latent innovations

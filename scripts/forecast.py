@@ -68,6 +68,11 @@ def parse_args() -> argparse.Namespace:
         "--n-samples", type=int, default=None,
         help="Number of posterior samples to draw (default: all).",
     )
+    parser.add_argument(
+        "--enhanced-mode", action="store_true",
+        help="Match a model fitted with --enhanced-mode (Student-t innovations, "
+             "Negative-Binomial incidents) when generating forecasts.",
+    )
     return parser.parse_args()
 
 
@@ -209,19 +214,37 @@ def main() -> None:
         sys.exit(1)
 
     # --- Generate forecasts -------------------------------------------------
+    enhanced = args.enhanced_mode or bool(config.get("enhanced", {}).get("enabled", False))
+    student_t_df = float(config.get("enhanced", {}).get("student_t_df", 4.0))
+    print(f"      Model variant: {'ENHANCED' if enhanced else 'paper-native'}")
+    out = None
     try:
         from cassandra_threatcast.model import full as full_module
-        from cassandra_threatcast.inference import nuts as nuts_module
-        pred_N = nuts_module.predict(
-            idata=idata,
-            model=full_module.full_model,
-            data=data_dict,
-            config=config,
-            forecast_horizon=args.horizon,
-            seed=args.seed,
-        )   # (n_samples, K, horizon)
+        from cassandra_threatcast.model.economic import DamageFunctionParams
+
+        # Flatten posterior (chain, draw, ...) -> (sample, ...)
+        post = {k: np.asarray(v) for k, v in idata.posterior.items()}
+        post = {k: v.reshape((-1,) + v.shape[2:]) for k, v in post.items()}
+
+        # Future exposure: hold the last observed month constant over the horizon.
+        M_future = np.repeat(M_skt[:, :, -1:], args.horizon, axis=2)  # (S, K, horizon)
+
+        # Damage-function parameters (calibrated params if provided, else defaults).
+        dmg = config.get("damage_params", {})
+        damage_params = DamageFunctionParams(
+            shape=np.full(S, float(dmg.get("shape", 2.0))),
+            scale=np.full(S, float(dmg.get("scale", 1.0))),
+            max_damage=np.full(S, float(dmg.get("max_damage", 0.5))),
+        )
+
+        out = full_module.predict(
+            post, data_dict, args.horizon,
+            Lambda_L, x_s, M_future, damage_params,
+            enhanced=enhanced, student_t_df=student_t_df,
+        )
+        pred_N = out["N_pred"]   # (n_samples, K, horizon) forecast CVE counts
     except Exception as exc:
-        warnings.warn(f"nuts_module.predict failed: {exc}. "
+        warnings.warn(f"full_module.predict failed: {exc}. "
                       "Attempting to use posterior_predictive from idata.")
         if hasattr(idata, "posterior_predictive") and "N_obs" in idata.posterior_predictive:
             N_pp = np.array(idata.posterior_predictive["N_obs"])
@@ -237,19 +260,16 @@ def main() -> None:
     n_samples, _K, _H = pred_N.shape
     print(f"      pred_N shape: {pred_N.shape}  (n_samples={n_samples}, K={_K}, H={_H})")
 
-    # Attempt to get economic loss samples
-    try:
-        from cassandra_threatcast.model import economic as econ_module
-        loss_samples = econ_module.compute_loss_samples(
-            pred_N, data_dict, config
-        )  # (n_samples, S, horizon)
-    except Exception as exc:
-        warnings.warn(f"Economic loss computation failed: {exc}. Using proxy losses.")
-        # Proxy: loss proportional to CVE count * mean sector output fraction
-        loss_samples = pred_N.sum(axis=1, keepdims=True) * (x_s.mean() * 1e-5)
-        loss_samples = np.broadcast_to(
-            loss_samples, (n_samples, S, args.horizon)
-        ).copy()
+    # Economic loss samples: prefer the losses computed inside predict()
+    # (damage function + Leontief propagation + severity), else fall back.
+    if out is not None:
+        loss_samples = out["ell_pred"]                       # (n_samples, S, horizon)
+        if args.n_samples is not None:
+            loss_samples = loss_samples[: args.n_samples]
+    else:
+        warnings.warn("predict() unavailable; using proxy losses.")
+        proxy = pred_N.sum(axis=1, keepdims=True) * (x_s.mean() * 1e-5)
+        loss_samples = np.broadcast_to(proxy, (n_samples, S, args.horizon)).copy()
 
     # --- Save quantile CSV --------------------------------------------------
     print("[3/4] Saving forecast outputs ...")

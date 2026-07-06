@@ -76,6 +76,12 @@ def parse_args() -> argparse.Namespace:
         "--method", choices=["nuts", "vi"], default="nuts",
         help="Inference method: 'nuts' (MCMC, default) or 'vi' (variational).",
     )
+    parser.add_argument(
+        "--enhanced-mode", action="store_true",
+        help="Use Claude's enhanced model (Student-t latent innovations, "
+             "Negative-Binomial incident channel) instead of the paper-native "
+             "model. See docs/MODEL_VARIANTS.md.",
+    )
     return parser.parse_args()
 
 
@@ -135,6 +141,13 @@ def main() -> None:
     # MCMC settings live in config["mcmc"]; CLI flags override them.  We write
     # the resolved values back into config["mcmc"] because run_nuts reads them
     # from there (it takes only (model, data, config)).
+    # Enhanced mode: CLI flag overrides the config default.
+    if args.enhanced_mode:
+        config.setdefault("enhanced", {})["enabled"] = True
+    mode = "ENHANCED (Student-t + NegBin)" if config.get("enhanced", {}).get("enabled") \
+        else "paper-native"
+    print(f"      Model variant: {mode}")
+
     mcmc_cfg = config.setdefault("mcmc", {})
     if args.num_warmup is not None:
         mcmc_cfg["num_warmup"] = args.num_warmup
