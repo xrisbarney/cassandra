@@ -129,7 +129,7 @@ def main() -> None:
     # -------------------------------------------------------------------------
     print("[4/4] Computing Leontief inverse from BEA I-O table ...")
     try:
-        A = bea_io.get_technical_coefficients(year=args.bea_year, n_sectors=S)
+        A = bea_io.get_technical_coefficients(year=args.bea_year, n_sectors=S, cache_dir=args.data_dir)
         Lambda_L = bea_io.leontief_inverse(A)
         print(f"      Leontief inverse shape={Lambda_L.shape}  "
               f"spectral_radius_A={np.max(np.abs(np.linalg.eigvals(A))):.4f}")
@@ -146,7 +146,7 @@ def main() -> None:
         x_s = np.array(config["model"]["sector_output"], dtype=float)
     else:
         try:
-            x_s = bea_io.get_sector_output(year=args.bea_year, n_sectors=S)
+            x_s = bea_io.get_sector_output(year=args.bea_year, n_sectors=S, cache_dir=args.data_dir)
         except Exception:
             x_s = np.ones(S) * 1e12   # placeholder: $1 trillion each
 

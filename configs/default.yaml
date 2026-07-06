@@ -29,8 +29,7 @@ apis:
   sec_efts_url: "https://efts.sec.gov/LATEST/search-index?q=%22cybersecurity+incident%22+%22Item+1.05%22&dateRange=custom&startdt={start}&enddt={end}&forms=8-K"
 
 bea:
-  use_table_path: "data/bea/use_table.csv"
-  gross_output_path: "data/bea/gross_output.csv"
+  year: 2022        # BEA I-O table year to use (fetched via API)
 
 effort:
   method: "hp_filter"
