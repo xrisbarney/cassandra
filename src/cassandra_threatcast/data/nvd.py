@@ -23,7 +23,8 @@ logger = logging.getLogger(__name__)
 _NVD_BASE_URL = "https://services.nvd.nist.gov/rest/json/cves/2.0"
 _RESULTS_PER_PAGE = 2000
 _INITIAL_BACKOFF = 6.0  # NVD recommends ≥6 s between requests without API key
-_MAX_RETRIES = 5
+_MAX_RETRIES = 8
+_REQUEST_TIMEOUT = 120  # seconds; NVD can be slow for full 2000-record pages
 
 
 def _cache_path(cache_dir: str, start_date: str, end_date: str) -> Path:
@@ -180,7 +181,7 @@ def _get_with_backoff(
     backoff = base_delay
     for attempt in range(_MAX_RETRIES):
         try:
-            response = session.get(url, params=params, timeout=60)
+            response = session.get(url, params=params, timeout=_REQUEST_TIMEOUT)
             if response.status_code == 200:
                 return response.json()
             if response.status_code == 429:
@@ -201,8 +202,20 @@ def _get_with_backoff(
                 backoff *= 2
                 continue
             response.raise_for_status()
-        except requests.exceptions.ConnectionError as exc:
-            logger.warning("NVD connection error (attempt %d): %s", attempt + 1, exc)
+        except (
+            requests.exceptions.ConnectionError,
+            requests.exceptions.Timeout,
+            requests.exceptions.ChunkedEncodingError,
+            requests.exceptions.JSONDecodeError,
+        ) as exc:
+            # Transient network faults: dropped/incomplete responses, read
+            # timeouts, or a truncated body that fails JSON parsing. Retry with
+            # exponential backoff. (Genuine 4xx errors fall through
+            # raise_for_status above and are not retried.)
+            logger.warning(
+                "NVD network error (attempt %d/%d): %s",
+                attempt + 1, _MAX_RETRIES, exc,
+            )
             time.sleep(backoff)
             backoff *= 2
 
