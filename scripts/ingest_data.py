@@ -132,7 +132,8 @@ def main() -> None:
 
     # --- Build panel --------------------------------------------------------
     print("[6/6] Building monthly panel arrays ...")
-    sector_map = config.get("sector_map", {str(i): i for i in range(S)})
+    # Map 2-digit NAICS (from SEC filers' SIC codes) to model sector indices.
+    sector_map = config.get("sector_map") or sec_8k.NAICS2_TO_SECTOR
 
     # Pass the full ISO dates (start_dt/end_dt) used for fetching, NOT the bare
     # YYYY-MM strings — build_panel forwards these to fetch_cves, whose date

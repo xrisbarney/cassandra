@@ -32,43 +32,67 @@ _INTER_REQUEST_DELAY = 0.11  # SEC fair-access: â‰¤10 req/s
 
 
 # ---------------------------------------------------------------------------
-# SIC â†’ NAICS 2-digit mapping (top 20 SIC codes relevant to cyber incidents)
+# SIC -> NAICS 2-digit mapping by SIC division ranges. SIC codes have a fixed
+# block structure, so range mapping covers essentially every filer (vastly more
+# than a handful of hardcoded codes).
 # ---------------------------------------------------------------------------
-_SIC_TO_NAICS2: dict[int, int] = {
-    # Technology & Software
-    7372: 51,  # Prepackaged Software â†’ Information
-    7371: 51,  # Computer Programming, Data Processing
-    7374: 51,  # Computer Processing and Data Preparation
-    7379: 51,  # Services-Computer Related Services
-    7375: 51,  # Computer Rental and Leasing
-    # Telecommunications
-    4813: 51,  # Telephone Communications
-    4899: 51,  # Communications Services, NEC
-    4812: 51,  # Radiotelephone Communications
-    # Finance
-    6020: 52,  # State commercial banks â†’ Finance & Insurance
-    6022: 52,  # State commercial banks, Federal Reserve members
-    6021: 52,  # National commercial banks
-    6159: 52,  # Federal-Sponsored Credit Agencies
-    6211: 52,  # Security Brokers, Dealers, Flotation Companies
-    6282: 52,  # Investment Advice
-    # Healthcare
-    8011: 62,  # Offices and Clinics Of Doctors Of Medicine â†’ Health Care
-    8049: 62,  # Offices of Other Health Practitioners
-    8099: 62,  # Health Services, NEC
-    # Retail
-    5961: 44,  # Catalog, Mail-Order Houses â†’ Retail Trade
-    5734: 44,  # Computer and Computer Software Stores
-    # Manufacturing
-    3577: 33,  # Computer Peripheral Equipment â†’ Manufacturing
-}
+def _sic_to_naics2(sic: int | None) -> int:
+    """Map a 4-digit SIC code to a 2-digit NAICS sector via SIC divisions."""
+    if sic is None:
+        return _DEFAULT_NAICS2
+    if 100 <= sic <= 999:
+        return 11            # Agriculture, forestry, fishing
+    if 1000 <= sic <= 1499:
+        return 21            # Mining
+    if 1500 <= sic <= 1799:
+        return 23            # Construction
+    if 2000 <= sic <= 3999:
+        return 31            # Manufacturing
+    if 4000 <= sic <= 4799:
+        return 48            # Transportation
+    if 4800 <= sic <= 4899:
+        return 51            # Communications -> Information
+    if 4900 <= sic <= 4999:
+        return 22            # Electric, gas & sanitary -> Utilities
+    if 5000 <= sic <= 5199:
+        return 42            # Wholesale Trade
+    if 5200 <= sic <= 5999:
+        return 44            # Retail Trade
+    if 6000 <= sic <= 6799:
+        return 52            # Finance, insurance & real estate
+    if 7000 <= sic <= 8999:
+        return 54            # Services -> Professional
+    if 9100 <= sic <= 9999:
+        return 92            # Public administration -> Government
+    return _DEFAULT_NAICS2
 
 _DEFAULT_NAICS2 = 99  # Unknown / unclassified
 
 
+# 2-digit NAICS sector -> model sector index (0..10), matching the 11-sector
+# BEA aggregation used elsewhere. Unmapped codes (e.g. 99 unclassified) are
+# dropped from the incident panel rather than forced into a sector.
+NAICS2_TO_SECTOR: dict[int, int] = {
+    11: 0,                      # Agriculture
+    21: 1,                      # Mining
+    22: 2,                      # Utilities
+    23: 3,                      # Construction
+    31: 4, 32: 4, 33: 4,        # Manufacturing
+    42: 5,                      # Wholesale Trade
+    44: 6, 45: 6,               # Retail Trade
+    48: 7, 49: 7,               # Transportation & Warehousing
+    52: 8, 53: 8,               # Finance, Insurance & Real Estate
+    51: 9, 54: 9, 55: 9, 56: 9, # Information + Professional/Admin services
+    61: 9, 62: 9, 71: 9, 72: 9, 81: 9,  # Education, Health, Leisure, Other
+    92: 10,                     # Government
+}
+
+
 def _cache_path(cache_dir: str, start_date: str, end_date: str) -> Path:
-    key = hashlib.md5(f"sec8k-{start_date}-{end_date}".encode()).hexdigest()
-    return Path(cache_dir) / f"sec_8k_{key}.json"
+    # Cache key includes a schema version: bump it whenever the parsed record
+    # schema changes, so stale caches from an older parser are not reused.
+    key = hashlib.md5(f"sec8k-v2-{start_date}-{end_date}".encode()).hexdigest()
+    return Path(cache_dir) / f"sec_8k_v2_{key}.json"
 
 
 def _user_agent() -> str:
@@ -227,7 +251,7 @@ def enrich_with_naics(df: pd.DataFrame, cache_dir: str) -> pd.DataFrame:
 
     for cik_str in unique_ciks:
         if cik_str in inline_sic:
-            cik_to_naics[cik_str] = _SIC_TO_NAICS2.get(inline_sic[cik_str], _DEFAULT_NAICS2)
+            cik_to_naics[cik_str] = _sic_to_naics2(inline_sic[cik_str])
             continue
 
         try:
@@ -261,7 +285,7 @@ def enrich_with_naics(df: pd.DataFrame, cache_dir: str) -> pd.DataFrame:
         except (ValueError, TypeError):
             sic = None
 
-        naics2 = _SIC_TO_NAICS2.get(sic, _DEFAULT_NAICS2) if sic is not None else _DEFAULT_NAICS2
+        naics2 = _sic_to_naics2(sic)
         cik_to_naics[cik_str] = naics2
 
     result = df.copy()
@@ -290,13 +314,18 @@ def aggregate_monthly(df: pd.DataFrame, sector_map: dict) -> np.ndarray:
         S = len(set(sector_map.values())) if sector_map else 0
         return np.zeros((S, 0), dtype=np.int64)
 
+    S = len(set(sector_map.values()))
+
     work = df.copy()
-    work["month"] = pd.to_datetime(work["filed_date"]).dt.to_period("M")
+    filed = pd.to_datetime(work["filed_date"], errors="coerce", utc=True).dt.tz_localize(None)
+    work["month"] = filed.dt.to_period("M")
     work["sector"] = work["naics_2digit"].map(sector_map)
-    work.dropna(subset=["sector"], inplace=True)
+    # Drop rows with an unparseable filing date or an unmapped sector.
+    work = work.dropna(subset=["month", "sector"])
+    if work.empty:
+        return np.zeros((S, 0), dtype=np.int64)
     work["sector"] = work["sector"].astype(int)
 
-    S = len(set(sector_map.values()))
     all_months = pd.period_range(start=work["month"].min(), end=work["month"].max(), freq="M")
     T = len(all_months)
     month_index = {m: i for i, m in enumerate(all_months)}
