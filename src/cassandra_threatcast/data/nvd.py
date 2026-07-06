@@ -75,8 +75,29 @@ def fetch_cves(start_date: str, end_date: str, cache_dir: str) -> pd.DataFrame:
     return df
 
 
+_NVD_MAX_WINDOW_DAYS = 119  # NVD API 2.0 hard limit is 120 days per request
+
+
+def _date_windows(start_date: str, end_date: str) -> list[tuple[str, str]]:
+    """Split [start_date, end_date] into ≤119-day chunks required by NVD API."""
+    from datetime import date, timedelta
+    start = date.fromisoformat(start_date)
+    end = date.fromisoformat(end_date)
+    windows: list[tuple[str, str]] = []
+    cursor = start
+    while cursor <= end:
+        window_end = min(cursor + timedelta(days=_NVD_MAX_WINDOW_DAYS - 1), end)
+        windows.append((cursor.isoformat(), window_end.isoformat()))
+        cursor = window_end + timedelta(days=1)
+    return windows
+
+
 def _fetch_all_pages(start_date: str, end_date: str) -> list[dict]:
-    """Page through the NVD API and return all raw CVE vulnerability items."""
+    """Page through the NVD API and return all raw CVE vulnerability items.
+
+    Splits the full date range into ≤119-day windows to stay within the
+    NVD API 2.0 limit of 120 days per pubStartDate/pubEndDate request.
+    """
     api_key = os.environ.get("NVD_API_KEY")
     headers: dict[str, str] = {}
     if api_key:
@@ -88,29 +109,35 @@ def _fetch_all_pages(start_date: str, end_date: str) -> list[dict]:
     session = requests.Session()
     session.headers.update(headers)
 
-    start_index = 0
+    windows = _date_windows(start_date, end_date)
+    logger.info("NVD: %d date windows to fetch", len(windows))
+
     all_items: list[dict] = []
 
-    while True:
-        params: dict[str, Any] = {
-            "pubStartDate": f"{start_date}T00:00:00.000",
-            "pubEndDate": f"{end_date}T23:59:59.999",
-            "resultsPerPage": _RESULTS_PER_PAGE,
-            "startIndex": start_index,
-        }
+    for win_start, win_end in windows:
+        start_index = 0
+        logger.info("NVD window: %s → %s", win_start, win_end)
 
-        data = _get_with_backoff(session, _NVD_BASE_URL, params, inter_request_delay)
-        vulnerabilities = data.get("vulnerabilities", [])
-        all_items.extend(vulnerabilities)
+        while True:
+            params: dict[str, Any] = {
+                "pubStartDate": f"{win_start}T00:00:00.000",
+                "pubEndDate": f"{win_end}T23:59:59.999",
+                "resultsPerPage": _RESULTS_PER_PAGE,
+                "startIndex": start_index,
+            }
 
-        total_results = data.get("totalResults", 0)
-        start_index += len(vulnerabilities)
-        logger.debug("NVD: fetched %d / %d", start_index, total_results)
+            data = _get_with_backoff(session, _NVD_BASE_URL, params, inter_request_delay)
+            vulnerabilities = data.get("vulnerabilities", [])
+            all_items.extend(vulnerabilities)
 
-        if start_index >= total_results or not vulnerabilities:
-            break
+            total_results = data.get("totalResults", 0)
+            start_index += len(vulnerabilities)
+            logger.debug("NVD: window %s–%s fetched %d / %d", win_start, win_end, start_index, total_results)
 
-        time.sleep(inter_request_delay)
+            if start_index >= total_results or not vulnerabilities:
+                break
+
+            time.sleep(inter_request_delay)
 
     return all_items
 
