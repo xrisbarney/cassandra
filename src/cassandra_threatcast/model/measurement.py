@@ -32,7 +32,10 @@ def vulnerability_obs(
     # Broadcast e_t across topics: e_t is (T,), lambda_kt is (K, T)
     log_mu_kt = lambda_kt + e_t[None, :]  # (K, T)
 
-    mu_kt = jnp.exp(log_mu_kt)  # (K, T)
+    # Clamp before exp: guards against overflow (mu -> inf makes the NegBin rate
+    # concentration/mu collapse to 0, which is an invalid Gamma rate). exp(30) is
+    # already an implausibly large monthly count, so this never bites real data.
+    mu_kt = jnp.exp(jnp.clip(log_mu_kt, -30.0, 30.0))  # (K, T)
 
     # NumPyro's NegativeBinomial2 uses mean + concentration parameterisation.
     # concentration = psi_k (total_count in the overdispersion sense).
@@ -129,7 +132,7 @@ def incident_obs(
     dispersion : (S,) per-sector NegBin concentration, or None for Poisson.
     """
     # exp(lambda_kt): (K, T) → (1, K, T) for broadcasting with M_skt (S, K, T)
-    exp_lambda = jnp.exp(lambda_kt)[None, :, :]  # (1, K, T)
+    exp_lambda = jnp.exp(jnp.clip(lambda_kt, -30.0, 30.0))[None, :, :]  # (1, K, T)
 
     # Weighted sum over topics: (S, T)
     weighted_sum = jnp.sum(M_skt * exp_lambda, axis=1)  # (S, T)

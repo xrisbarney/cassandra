@@ -91,7 +91,10 @@ def full_model(data: dict, config: dict) -> None:
         dist.Normal(jnp.zeros((R, r, r)), 0.3 * jnp.ones((R, r, r))),
     )
     tril_mask = jnp.tril(jnp.ones((r, r)))
-    Phi_r = deterministic("Phi_r", Phi_raw * tril_mask[None, :, :])  # (R, r, r)
+    # tanh bounds every entry (hence the diagonal = eigenvalues of a triangular
+    # matrix) to (-1, 1), guaranteeing a stationary AR so factors cannot explode
+    # over long series (T can be ~180 months).
+    Phi_r = deterministic("Phi_r", jnp.tanh(Phi_raw) * tril_mask[None, :, :])  # (R, r, r)
 
     Q_r = numpyro.sample(
         "Q_r",
@@ -127,7 +130,7 @@ def full_model(data: dict, config: dict) -> None:
         "A_h_raw",
         dist.Normal(jnp.zeros((r_sig, r_sig)), 0.3 * jnp.ones((r_sig, r_sig))),
     )
-    A_h = deterministic("A_h", A_h_raw * tril_sig)  # (r_sig, r_sig) lower-tri
+    A_h = deterministic("A_h", jnp.tanh(A_h_raw) * tril_sig)  # (r_sig, r_sig) stationary
     Q_h = numpyro.sample("Q_h", dist.HalfNormal(0.5 * jnp.ones(r_sig)))   # (r_sig,)
     omega_k = numpyro.sample("omega_k", dist.HalfNormal(0.5 * jnp.ones(K)))  # (K,) idiosyncratic
     kappa_k = numpyro.sample("kappa_k", dist.HalfNormal(0.5 * jnp.ones(K)))  # (K,) severity meas. noise
@@ -333,7 +336,7 @@ def predict(
             # Log-intensity
             mean_eta = np.array(mu_r_i[z_curr]) + f_curr @ np.array(Gamma_i).T  # (K,)
             eta_noise = _draw(K) * np.array(tau_k_i)
-            eta_h = mean_eta + eta_noise  # (K,)
+            eta_h = np.clip(mean_eta + eta_noise, -30.0, 30.0)  # (K,), clamp vs overflow
 
             lambda_pred[i, :, h] = eta_h
 
@@ -362,7 +365,7 @@ def predict(
             xi_h = _draw(r_sig)
             h_curr = A_h_i @ h_last + np.diag(Q_h_i) @ xi_h        # (r_sig,)
             v_zeta = _draw(K) * omega_k_i                          # (K,)
-            zeta_h = np.array(nu_r_i[z_curr]) + h_curr @ Psi_i.T + v_zeta  # (K,)
+            zeta_h = np.clip(np.array(nu_r_i[z_curr]) + h_curr @ Psi_i.T + v_zeta, -30.0, 30.0)  # (K,)
             sigma_h = np.exp(zeta_h)                              # (K,) latent severity
 
             # Economic shock load per Eq. (1): sum_k M_{s,k} * lambda_k * sigma_k

@@ -16,6 +16,7 @@ tqdm>=4.66
 arviz>=0.18
 pmdarima>=2.0
 python-dotenv>=1.0
+streamlit>=1.36
 pytest>=8.0
 black>=24.0
 ruff>=0.4

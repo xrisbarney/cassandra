@@ -149,38 +149,59 @@ def build_exposure_map(
 
     M = np.zeros((S, K, T), dtype=np.float64)
 
-    for row_idx, (_, row) in enumerate(cve_df.iterrows()):
-        date_val = row.get("date", None)
-        if date_val not in date_index:
+    # Pre-resolve the per-row month index and topic as arrays (vectorized), then
+    # iterate rows with itertuples (far faster than iterrows) only for the CPE
+    # parsing, which is inherently variable-length per CVE. A small vendor->sector
+    # cache avoids recomputing the lookup for repeated vendors.
+    dates_arr = cve_df["date"].map(date_index).to_numpy()   # NaN where out of range
+    cpe_arr = cve_df["cpe"].to_numpy()
+    topics = np.asarray(topic_assignments)
+
+    vendor_sector_cache: dict[str, int] = {}
+
+    # Accumulate contributions as flat index lists for a single np.add.at call.
+    idx_s: list[int] = []
+    idx_k: list[int] = []
+    idx_t: list[int] = []
+    vals: list[float] = []
+
+    n = len(cpe_arr)
+    for i in range(n):
+        t = dates_arr[i]
+        if t != t:  # NaN -> date outside panel range
             continue
-        t = date_index[date_val]
-        k = int(topic_assignments[row_idx])
+        t = int(t)
+        k = int(topics[i])
         if k < 0 or k >= K:
             continue
 
-        cpe_raw = row.get("cpe", "")
+        cpe_raw = cpe_arr[i]
         if isinstance(cpe_raw, str):
             cpe_list = [c.strip() for c in cpe_raw.split(";") if c.strip()]
         elif isinstance(cpe_raw, (list, tuple)):
-            cpe_list = list(cpe_raw)
+            cpe_list = cpe_raw
         else:
             cpe_list = []
 
         sectors_hit: set[int] = set()
         for cpe_str in cpe_list:
-            vendor = _extract_cpe_vendor(cpe_str)
-            if vendor:
-                s = _lookup_sector(vendor)
-                if 0 <= s < S:
-                    sectors_hit.add(s)
+            s = vendor_sector_cache.get(cpe_str)
+            if s is None:
+                vendor = _extract_cpe_vendor(cpe_str)
+                s = _lookup_sector(vendor) if vendor else -1
+                vendor_sector_cache[cpe_str] = s
+            if 0 <= s < S:
+                sectors_hit.add(s)
 
         if not sectors_hit:
-            # Distribute uniformly across all sectors
-            sectors_hit = set(range(S))
+            sectors_hit = set(range(S))  # unknown vendor -> spread uniformly
 
         weight = 1.0 / len(sectors_hit)
         for s in sectors_hit:
-            M[s, k, t] += weight
+            idx_s.append(s); idx_k.append(k); idx_t.append(t); vals.append(weight)
+
+    if vals:
+        np.add.at(M, (np.array(idx_s), np.array(idx_k), np.array(idx_t)), np.array(vals))
 
     # Normalise each (t) slice so columns (over s) sum to 1
     for t in range(T):

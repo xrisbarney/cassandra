@@ -4,6 +4,21 @@ Bayesian hierarchical state-space model of cyber threats and systemic economic r
 
 Models K=8 threat topics across S=11 BEA economic sectors using latent intensity and severity factor processes with shared Markov regime switching. Four observation channels are treated as biased views of the latent state: CVE counts and severity marks (NVD/CVSS), exploitation probability (EPSS/CISA KEV), and SEC 8-K incident disclosures. Posterior draws are propagated through a BEA input–output Leontief inverse to produce predictive distributions of systemic economic loss.
 
+## 🔮 Easiest way to use it: the dashboard
+
+If you'd rather not use the command line, run the guided visual dashboard:
+
+```bash
+pip install -e ".[dashboard]"    # one-time: installs the dashboard
+streamlit run app.py
+```
+
+A page opens in your browser with **five buttons**, one per step (Collect data →
+Prepare inputs → Train → Check accuracy → Forecast). Click them top to bottom;
+each shows a green light when finished, a live progress log while running, and
+charts of your data and the final forecast. No commands, no jargon. Everything
+below is the manual/command-line equivalent.
+
 ## Requirements
 
 - Python 3.11+
@@ -122,6 +137,7 @@ pytest --cov=cassandra_threatcast --cov-report=term-missing
 
 ```
 paper-cyber-threatmodelling/
+├── app.py                         # 🔮 guided Streamlit dashboard (streamlit run app.py)
 ├── docs/MODEL_VARIANTS.md         # paper-native vs. --enhanced-mode comparison
 ├── configs/default.yaml          # K=8 topics, S=11 sectors, r=3 intensity + r_sigma=2 severity factors, R=3 regimes
 ├── scripts/                      # CLI entry points (run in order)
