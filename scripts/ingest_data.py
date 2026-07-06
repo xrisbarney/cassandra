@@ -157,7 +157,9 @@ def main() -> None:
         from cassandra_threatcast.features.exposure_map import build_exposure_map
         if len(cve_df) > 0 and len(topic_assignments) == len(cve_df):
             exp_df = cve_df.copy()
-            exp_df["date"] = pd.to_datetime(exp_df["published_date"]).dt.to_period("M")
+            exp_df["date"] = pd.to_datetime(
+                exp_df["published_date"], utc=True
+            ).dt.tz_localize(None).dt.to_period("M")
             exp_df["cpe"] = exp_df["cpe_list"]
             M_skt = build_exposure_map(
                 exp_df, S=S, K=K,

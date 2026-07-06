@@ -324,7 +324,9 @@ def aggregate_monthly(
     K = int(topic_assignments.max()) + 1
     work = df[["published_date", "cvss_base_score"]].copy()
     work["topic"] = topic_assignments
-    work["month"] = work["published_date"].dt.to_period("M")
+    work["month"] = pd.to_datetime(
+        work["published_date"], utc=True
+    ).dt.tz_localize(None).dt.to_period("M")
 
     all_months = pd.period_range(
         start=work["month"].min(), end=work["month"].max(), freq="M"

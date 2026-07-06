@@ -203,9 +203,10 @@ def _align_kt(
     T: int,
 ) -> tuple[np.ndarray, np.ndarray]:
     """Align (K, T_src) arrays produced by NVD aggregation to the panel's (K, T)."""
+    _pub = pd.to_datetime(cve_df["published_date"], utc=True).dt.tz_localize(None)
     src_months = pd.period_range(
-        start=cve_df["published_date"].min().to_period("M"),
-        end=cve_df["published_date"].max().to_period("M"),
+        start=_pub.min().to_period("M"),
+        end=_pub.max().to_period("M"),
         freq="M",
     )
     N_out = np.zeros((K, T), dtype=np.int64)
@@ -231,9 +232,10 @@ def _align_kt_int(
     T: int,
 ) -> np.ndarray:
     """Align a single (K, T_src) integer array to the panel's (K, T)."""
+    _pub = pd.to_datetime(cve_df["published_date"], utc=True).dt.tz_localize(None)
     src_months = pd.period_range(
-        start=cve_df["published_date"].min().to_period("M"),
-        end=cve_df["published_date"].max().to_period("M"),
+        start=_pub.min().to_period("M"),
+        end=_pub.max().to_period("M"),
         freq="M",
     )
     out = np.zeros((K, T), dtype=np.int64)

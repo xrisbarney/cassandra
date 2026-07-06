@@ -141,7 +141,9 @@ def merge_with_topics(
 
     work = cve_df[["published_date"]].copy()
     work["topic"] = topic_assignments
-    work["month"] = work["published_date"].dt.to_period("M")
+    work["month"] = pd.to_datetime(
+        work["published_date"], utc=True
+    ).dt.tz_localize(None).dt.to_period("M")
     work["in_kev"] = work.index.isin(kev_set).astype(int)
 
     all_months = pd.period_range(
