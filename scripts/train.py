@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+from dotenv import load_dotenv
+load_dotenv()
+
 """
 Train the full Bayesian hierarchical state-space model via NUTS.
 
