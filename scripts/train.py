@@ -217,8 +217,18 @@ def main() -> None:
     # --- Save ---------------------------------------------------------------
     print("[3/3] Saving InferenceData ...")
     out_path = os.path.join(args.output_dir, "idata.nc")
-    idata.to_netcdf(out_path)
-    print(f"      Saved to {out_path}")
+    try:
+        idata.to_netcdf(out_path)
+        print(f"      Saved to {out_path}")
+    except (ValueError, ImportError) as exc:
+        # No netCDF backend (netCDF4 / h5netcdf) installed — fall back to a
+        # pickle so a long sampling run is never lost. forecast.py loads either.
+        import pickle
+        pkl_path = os.path.join(args.output_dir, "idata.pkl")
+        with open(pkl_path, "wb") as fh:
+            pickle.dump(idata, fh)
+        print(f"      netCDF backend unavailable ({exc}).")
+        print(f"      Saved to {pkl_path} instead (install h5netcdf for .nc).")
 
     # --- Summary ------------------------------------------------------------
     try:

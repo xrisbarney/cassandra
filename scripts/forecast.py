@@ -208,7 +208,13 @@ def main() -> None:
     print("[2/4] Loading InferenceData and generating posterior predictive ...")
     try:
         import arviz as az
-        idata = az.from_netcdf(args.idata)
+        pkl_path = os.path.splitext(args.idata)[0] + ".pkl"
+        if not os.path.exists(args.idata) and os.path.exists(pkl_path):
+            import pickle
+            with open(pkl_path, "rb") as fh:
+                idata = pickle.load(fh)
+        else:
+            idata = az.from_netcdf(args.idata)
     except Exception as exc:
         print(f"Error loading idata: {exc}")
         sys.exit(1)
