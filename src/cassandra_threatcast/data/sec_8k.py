@@ -1,4 +1,4 @@
-"""SEC EDGAR 8-K cybersecurity incident filing client.
+﻿"""SEC EDGAR 8-K cybersecurity incident filing client.
 
 Queries EDGAR Full-Text Search (EFTS) for 8-K filings disclosing cybersecurity
 incidents under Item 1.05, enriches filings with NAICS sector codes, and
@@ -29,15 +29,15 @@ _EFTS_URL = (
 _EDGAR_COMPANY_URL = "https://data.sec.gov/submissions/CIK{cik:010d}.json"
 _PAGE_SIZE = 40  # EFTS default page size cap
 _REQUEST_TIMEOUT = 30
-_INTER_REQUEST_DELAY = 0.11  # SEC fair-access: ≤10 req/s
+_INTER_REQUEST_DELAY = 0.11  # SEC fair-access: â‰¤10 req/s
 
 
 # ---------------------------------------------------------------------------
-# SIC → NAICS 2-digit mapping (top 20 SIC codes relevant to cyber incidents)
+# SIC â†’ NAICS 2-digit mapping (top 20 SIC codes relevant to cyber incidents)
 # ---------------------------------------------------------------------------
 _SIC_TO_NAICS2: dict[int, int] = {
     # Technology & Software
-    7372: 51,  # Prepackaged Software → Information
+    7372: 51,  # Prepackaged Software â†’ Information
     7371: 51,  # Computer Programming, Data Processing
     7374: 51,  # Computer Processing and Data Preparation
     7379: 51,  # Services-Computer Related Services
@@ -47,21 +47,21 @@ _SIC_TO_NAICS2: dict[int, int] = {
     4899: 51,  # Communications Services, NEC
     4812: 51,  # Radiotelephone Communications
     # Finance
-    6020: 52,  # State commercial banks → Finance & Insurance
+    6020: 52,  # State commercial banks â†’ Finance & Insurance
     6022: 52,  # State commercial banks, Federal Reserve members
     6021: 52,  # National commercial banks
     6159: 52,  # Federal-Sponsored Credit Agencies
     6211: 52,  # Security Brokers, Dealers, Flotation Companies
     6282: 52,  # Investment Advice
     # Healthcare
-    8011: 62,  # Offices and Clinics Of Doctors Of Medicine → Health Care
+    8011: 62,  # Offices and Clinics Of Doctors Of Medicine â†’ Health Care
     8049: 62,  # Offices of Other Health Practitioners
     8099: 62,  # Health Services, NEC
     # Retail
-    5961: 44,  # Catalog, Mail-Order Houses → Retail Trade
+    5961: 44,  # Catalog, Mail-Order Houses â†’ Retail Trade
     5734: 44,  # Computer and Computer Software Stores
     # Manufacturing
-    3577: 33,  # Computer Peripheral Equipment → Manufacturing
+    3577: 33,  # Computer Peripheral Equipment â†’ Manufacturing
 }
 
 _DEFAULT_NAICS2 = 99  # Unknown / unclassified
@@ -80,7 +80,7 @@ def _user_agent() -> str:
             "SEC fair-access policy requires a valid User-Agent. "
             'Set it to e.g. "MyOrg myemail@example.com".'
         )
-        return "cyberthreats-research contact@example.com"
+        return "cassandra_threatcast-research contact@example.com"
     return agent
 
 

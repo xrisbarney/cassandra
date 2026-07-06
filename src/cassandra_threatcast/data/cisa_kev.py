@@ -1,4 +1,4 @@
-"""CISA Known Exploited Vulnerabilities (KEV) catalog client.
+﻿"""CISA Known Exploited Vulnerabilities (KEV) catalog client.
 
 Downloads the KEV JSON feed, caches it locally, and computes per-topic
 monthly exploitation counts for use in the threat-panel.
@@ -120,7 +120,7 @@ def merge_with_topics(
     kev_df:
         DataFrame returned by :func:`fetch_kev`.  Must have ``cve_id`` column.
     cve_df:
-        DataFrame returned by :func:`~cyberthreats.data.nvd.fetch_cves`.
+        DataFrame returned by :func:`~cassandra_threatcast.data.nvd.fetch_cves`.
         Index is ``cve_id``; must have ``published_date`` column.
     topic_assignments:
         Integer array of length ``len(cve_df)`` with values in ``0 .. K-1``.

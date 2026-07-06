@@ -1,4 +1,4 @@
-"""Tests for data ingestion and feature utilities."""
+﻿"""Tests for data ingestion and feature utilities."""
 import numpy as np
 import pandas as pd
 import pytest
@@ -7,9 +7,9 @@ import os
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
-from cyberthreats.data.bea_io import leontief_inverse, get_default_sector_labels
-from cyberthreats.data.nvd import aggregate_monthly
-from cyberthreats.features.effort import estimate_effort
+from cassandra_threatcast.data.bea_io import leontief_inverse, get_default_sector_labels
+from cassandra_threatcast.data.nvd import aggregate_monthly
+from cassandra_threatcast.features.effort import estimate_effort
 
 
 # ---------------------------------------------------------------------------

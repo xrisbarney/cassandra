@@ -1,4 +1,4 @@
-"""Data pipeline orchestrator.
+﻿"""Data pipeline orchestrator.
 
 Builds the full threat-panel dictionary by calling NVD, EPSS, CISA KEV, and
 SEC 8-K data modules, then saving / loading the result to / from disk.
@@ -53,13 +53,13 @@ def build_panel(
     Returns
     -------
     dict with keys:
-        - ``N``  : np.ndarray (K, T) – monthly CVE counts per topic
-        - ``B``  : np.ndarray (K, T) – monthly mean CVSS score per topic
-        - ``E``  : np.ndarray (K, T) – monthly mean EPSS score per topic
-        - ``KEV``: np.ndarray (K, T) – monthly KEV exploitation count per topic
-        - ``D``  : np.ndarray (S, T) – monthly 8-K disclosures per sector
-        - ``dates``: list[pd.Period] – monthly period labels (length T)
-        - ``metadata``: dict – source-level record counts and status flags
+        - ``N``  : np.ndarray (K, T) â€“ monthly CVE counts per topic
+        - ``B``  : np.ndarray (K, T) â€“ monthly mean CVSS score per topic
+        - ``E``  : np.ndarray (K, T) â€“ monthly mean EPSS score per topic
+        - ``KEV``: np.ndarray (K, T) â€“ monthly KEV exploitation count per topic
+        - ``D``  : np.ndarray (S, T) â€“ monthly 8-K disclosures per sector
+        - ``dates``: list[pd.Period] â€“ monthly period labels (length T)
+        - ``metadata``: dict â€“ source-level record counts and status flags
     """
     all_months = pd.period_range(start=start, end=end, freq="M")
     T = len(all_months)
@@ -74,7 +74,7 @@ def build_panel(
     cve_df: pd.DataFrame = pd.DataFrame()
 
     try:
-        from cyberthreats.data.nvd import fetch_cves, aggregate_monthly as nvd_agg
+        from cassandra_threatcast.data.nvd import fetch_cves, aggregate_monthly as nvd_agg
 
         cve_df = fetch_cves(start, end, cache_dir)
         metadata["nvd_cve_count"] = len(cve_df)
@@ -105,7 +105,7 @@ def build_panel(
     E_kt = np.full((K, T), np.nan, dtype=np.float64)
 
     try:
-        from cyberthreats.data.epss import fetch_epss_range, aggregate_monthly as epss_agg
+        from cassandra_threatcast.data.epss import fetch_epss_range, aggregate_monthly as epss_agg
 
         epss_df = fetch_epss_range(start, end, cache_dir)
         metadata["epss_record_count"] = len(epss_df)
@@ -130,7 +130,7 @@ def build_panel(
     KEV_kt = np.zeros((K, T), dtype=np.int64)
 
     try:
-        from cyberthreats.data.cisa_kev import fetch_kev, merge_with_topics
+        from cassandra_threatcast.data.cisa_kev import fetch_kev, merge_with_topics
 
         kev_df = fetch_kev(cache_dir)
         metadata["kev_entry_count"] = len(kev_df)
@@ -154,7 +154,7 @@ def build_panel(
     D_st = np.zeros((S, T), dtype=np.int64)
 
     try:
-        from cyberthreats.data.sec_8k import (
+        from cassandra_threatcast.data.sec_8k import (
             fetch_8k_cyber,
             enrich_with_naics,
             aggregate_monthly as sec_agg,
@@ -185,7 +185,7 @@ def build_panel(
 
 
 # ---------------------------------------------------------------------------
-# Alignment helpers — map module-internal time axes to the panel's month range
+# Alignment helpers â€” map module-internal time axes to the panel's month range
 # ---------------------------------------------------------------------------
 
 def _align_kt(

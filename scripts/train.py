@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -13,8 +13,8 @@ Usage:
 
 The script:
   1. Loads the processed panel and derived features from --data-dir.
-  2. Assembles the data dict expected by cyberthreats.model.full.full_model.
-  3. Runs NUTS via cyberthreats.inference.nuts.run_nuts.
+  2. Assembles the data dict expected by cassandra_threatcast.model.full.full_model.
+  3. Runs NUTS via cassandra_threatcast.inference.nuts.run_nuts.
   4. Saves the resulting ArviZ InferenceData to <output_dir>/idata.nc.
   5. Prints a posterior summary for key parameters.
 """
@@ -27,9 +27,9 @@ import numpy as np
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
-from cyberthreats.data import pipeline
-from cyberthreats.model import full as full_module
-from cyberthreats.inference import nuts as nuts_module
+from cassandra_threatcast.data import pipeline
+from cassandra_threatcast.model import full as full_module
+from cassandra_threatcast.inference import nuts as nuts_module
 
 
 # ---------------------------------------------------------------------------

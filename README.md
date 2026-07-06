@@ -88,7 +88,7 @@ Figures are saved to `results/figures/`.
 ```bash
 pytest
 # or with coverage
-pytest --cov=cyberthreats --cov-report=term-missing
+pytest --cov=cassandra_threatcast --cov-report=term-missing
 ```
 
 33 tests covering: Leontief correctness, panel aggregation, CRPS (including analytical value 1/√π for N(0,1) at 0), DM test sign/symmetry, and NumPyro model forward pass.
@@ -104,7 +104,7 @@ paper-cyber-threatmodelling/
 │   ├── train.py
 │   ├── evaluate.py
 │   └── forecast.py
-├── src/cyberthreats/
+├── src/cassandra_threatcast/
 │   ├── data/       # NVD, EPSS, CISA KEV, SEC 8-K, BEA I-O ingestion
 │   ├── features/   # Topic mapper (TF-IDF+NMF), exposure map, HP-filter effort
 │   ├── model/      # NumPyro generative model (factor AR + Markov regimes + Leontief)

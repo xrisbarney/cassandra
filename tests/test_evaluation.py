@@ -1,4 +1,4 @@
-"""Tests for forecast evaluation utilities."""
+﻿"""Tests for forecast evaluation utilities."""
 import numpy as np
 import pytest
 import sys
@@ -6,9 +6,9 @@ import os
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
-from cyberthreats.evaluation.scoring import crps_ensemble, mae, rmse
-from cyberthreats.evaluation.dm_test import dm_test
-from cyberthreats.evaluation.calibration import pit_values, coverage, pit_ks_test
+from cassandra_threatcast.evaluation.scoring import crps_ensemble, mae, rmse
+from cassandra_threatcast.evaluation.dm_test import dm_test
+from cassandra_threatcast.evaluation.calibration import pit_values, coverage, pit_ks_test
 
 
 # ---------------------------------------------------------------------------
@@ -40,7 +40,7 @@ def test_crps_ordering():
 
 def test_crps_analytical():
     """
-    CRPS of N(0, 1) evaluated at y = 0 equals 1/sqrt(pi) ≈ 0.5642.
+    CRPS of N(0, 1) evaluated at y = 0 equals 1/sqrt(pi) â‰ˆ 0.5642.
 
     This follows from the analytical formula for the Normal distribution:
         CRPS(N(mu, sigma), y) = sigma * (z*(2*Phi(z)-1) + 2*phi(z) - 1/sqrt(pi))
@@ -167,7 +167,7 @@ def test_pit_biased_model():
     rng = np.random.default_rng(10)
     n = 500
     obs     = rng.standard_normal(n)
-    # Samples centred at +3 — deliberately wrong
+    # Samples centred at +3 â€” deliberately wrong
     samples = rng.normal(3.0, 1.0, (n, 500))
     pit_vals = pit_values(obs, samples)
     stat, pval = pit_ks_test(pit_vals)

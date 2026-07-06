@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -27,8 +27,8 @@ import pandas as pd
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
-from cyberthreats.data import bea_io, pipeline
-from cyberthreats.features import exposure_map as em, effort
+from cassandra_threatcast.data import bea_io, pipeline
+from cassandra_threatcast.features import exposure_map as em, effort
 
 
 # ---------------------------------------------------------------------------
@@ -93,7 +93,7 @@ def main() -> None:
     # 2.  Sector-topic exposure map M_skt
     # -------------------------------------------------------------------------
     print("[2/4] Computing exposure map M_skt ...")
-    # exposure_map.compute returns (S, K, T) — the fraction of topic-k CVE
+    # exposure_map.compute returns (S, K, T) â€” the fraction of topic-k CVE
     # volume that sector s is exposed to at time t, derived from 8-K filings
     # and NAICS-to-sector mapping stored in the panel.
     if hasattr(em, "compute"):

@@ -1,4 +1,4 @@
-"""
+﻿"""
 full.py
 =======
 Combined NumPyro model: latent dynamics + all three measurement likelihoods,
@@ -14,8 +14,8 @@ import numpyro.distributions as dist
 from numpyro.contrib.control_flow import scan
 from numpyro.primitives import deterministic
 
-from cyberthreats.model.measurement import vulnerability_obs, exploitation_obs, incident_obs
-from cyberthreats.model.economic import (
+from cassandra_threatcast.model.measurement import vulnerability_obs, exploitation_obs, incident_obs
+from cassandra_threatcast.model.economic import (
     DamageFunctionParams,
     damage_function,
     leontief_propagation,
@@ -121,7 +121,7 @@ def full_model(data: dict, config: dict) -> None:
     deterministic("z_t", z_seq)
     deterministic("eta_t", eta_seq)
 
-    # lambda_kt: (K, T) — transpose from (T, K)
+    # lambda_kt: (K, T) â€” transpose from (T, K)
     lambda_kt = eta_seq.T  # (K, T)
 
     # ------------------------------------------------------------------ #

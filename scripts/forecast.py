@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -29,8 +29,8 @@ import pandas as pd
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
-from cyberthreats.data import pipeline
-from cyberthreats.viz.plots import plot_threat_forecast, plot_loss_distribution, save_figure
+from cassandra_threatcast.data import pipeline
+from cassandra_threatcast.viz.plots import plot_threat_forecast, plot_loss_distribution, save_figure
 
 
 # ---------------------------------------------------------------------------
@@ -210,8 +210,8 @@ def main() -> None:
 
     # --- Generate forecasts -------------------------------------------------
     try:
-        from cyberthreats.model import full as full_module
-        from cyberthreats.inference import nuts as nuts_module
+        from cassandra_threatcast.model import full as full_module
+        from cassandra_threatcast.inference import nuts as nuts_module
         pred_N = nuts_module.predict(
             idata=idata,
             model=full_module.full_model,
@@ -239,7 +239,7 @@ def main() -> None:
 
     # Attempt to get economic loss samples
     try:
-        from cyberthreats.model import economic as econ_module
+        from cassandra_threatcast.model import economic as econ_module
         loss_samples = econ_module.compute_loss_samples(
             pred_N, data_dict, config
         )  # (n_samples, S, horizon)

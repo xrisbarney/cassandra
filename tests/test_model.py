@@ -1,4 +1,4 @@
-"""Tests for the Bayesian model components."""
+﻿"""Tests for the Bayesian model components."""
 import numpy as np
 import pytest
 import sys
@@ -36,7 +36,7 @@ def test_full_model_forward_pass():
     """full_model can be traced by NumPyro's Predictive without raising."""
     import jax
     from numpyro.infer import Predictive
-    from cyberthreats.model.full import full_model
+    from cassandra_threatcast.model.full import full_model
 
     K, S, T, r, R = 3, 2, 12, 2, 2
     data   = make_synthetic_data(K, S, T, r, R)
@@ -54,7 +54,7 @@ def test_full_model_contains_observables():
     """Prior predictive must contain at least one observation site."""
     import jax
     from numpyro.infer import Predictive
-    from cyberthreats.model.full import full_model
+    from cassandra_threatcast.model.full import full_model
 
     K, S, T, r, R = 3, 2, 12, 2, 2
     data   = make_synthetic_data(K, S, T, r, R)
@@ -76,7 +76,7 @@ def test_full_model_sample_shapes():
     """Prior predictive samples have correct batch dimension."""
     import jax
     from numpyro.infer import Predictive
-    from cyberthreats.model.full import full_model
+    from cassandra_threatcast.model.full import full_model
 
     K, S, T, r, R = 3, 2, 12, 2, 2
     data   = make_synthetic_data(K, S, T, r, R)
@@ -101,7 +101,7 @@ def test_latent_dynamics_shapes():
     """latent_dynamics_model produces eta_t of shape (n_samples, T, K)."""
     import jax
     from numpyro.infer import Predictive
-    from cyberthreats.model.latent import latent_dynamics_model
+    from cassandra_threatcast.model.latent import latent_dynamics_model
 
     K, r, R, T = 3, 2, 2, 10
     rng  = jax.random.PRNGKey(2)
@@ -121,7 +121,7 @@ def test_latent_dynamics_finite():
     """Prior draws of eta_t must be finite."""
     import jax
     from numpyro.infer import Predictive
-    from cyberthreats.model.latent import latent_dynamics_model
+    from cassandra_threatcast.model.latent import latent_dynamics_model
 
     K, r, R, T = 4, 2, 3, 20
     rng  = jax.random.PRNGKey(3)
@@ -139,7 +139,7 @@ def test_latent_dynamics_finite():
 def test_damage_function_monotone():
     """damage_function is non-decreasing in shock_load for each sector."""
     import jax.numpy as jnp
-    from cyberthreats.model.economic import damage_function, DamageFunctionParams
+    from cassandra_threatcast.model.economic import damage_function, DamageFunctionParams
 
     S = 3
     params = DamageFunctionParams(
@@ -164,7 +164,7 @@ def test_damage_function_monotone():
 def test_damage_function_zero_load():
     """damage_function returns 0 when shock_load is 0."""
     import jax.numpy as jnp
-    from cyberthreats.model.economic import damage_function, DamageFunctionParams
+    from cassandra_threatcast.model.economic import damage_function, DamageFunctionParams
 
     S = 2
     params = DamageFunctionParams(
@@ -179,7 +179,7 @@ def test_damage_function_zero_load():
 def test_damage_function_bounded():
     """damage_function output <= max_damage for all loads."""
     import jax.numpy as jnp
-    from cyberthreats.model.economic import damage_function, DamageFunctionParams
+    from cassandra_threatcast.model.economic import damage_function, DamageFunctionParams
 
     S = 4
     max_damage = np.array([0.5, 0.7, 0.6, 0.9])
@@ -202,7 +202,7 @@ def test_damage_function_bounded():
 def test_leontief_propagation_identity():
     """leontief_propagation with identity Lambda_L returns d_s = g_s * x_s."""
     import jax.numpy as jnp
-    from cyberthreats.model.economic import leontief_propagation
+    from cassandra_threatcast.model.economic import leontief_propagation
 
     S = 4
     g_s = jnp.array([0.10, 0.20, 0.05, 0.15])
@@ -218,7 +218,7 @@ def test_leontief_propagation_identity():
 def test_leontief_propagation_amplification():
     """With off-diagonal Lambda_L > 0, aggregate loss >= sum of direct losses."""
     import jax.numpy as jnp
-    from cyberthreats.model.economic import leontief_propagation
+    from cassandra_threatcast.model.economic import leontief_propagation
 
     S = 3
     g_s = jnp.array([0.1, 0.1, 0.1])

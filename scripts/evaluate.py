@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -30,11 +30,11 @@ import pandas as pd
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
-from cyberthreats.data import pipeline
-from cyberthreats.evaluation.scoring import crps_ensemble, mae, rmse
-from cyberthreats.evaluation.calibration import calibration_report
-from cyberthreats.evaluation.dm_test import dm_table
-from cyberthreats.evaluation.baselines import run_all_baselines
+from cassandra_threatcast.data import pipeline
+from cassandra_threatcast.evaluation.scoring import crps_ensemble, mae, rmse
+from cassandra_threatcast.evaluation.calibration import calibration_report
+from cassandra_threatcast.evaluation.dm_test import dm_table
+from cassandra_threatcast.evaluation.baselines import run_all_baselines
 
 
 # ---------------------------------------------------------------------------
@@ -115,8 +115,8 @@ def _get_full_model_predictive(
     were already generated during training.
     """
     try:
-        from cyberthreats.model import full as full_module
-        from cyberthreats.inference import nuts as nuts_module
+        from cassandra_threatcast.model import full as full_module
+        from cassandra_threatcast.inference import nuts as nuts_module
         pred = nuts_module.predict(
             idata=idata,
             model=full_module.full_model,
@@ -283,7 +283,7 @@ def main() -> None:
     print("[4/4] Aggregating scores and running DM tests ...")
 
     if not all_scores:
-        print("      No scores collected — exiting.")
+        print("      No scores collected â€” exiting.")
         return
 
     scores_df = pd.concat(all_scores, ignore_index=True)
@@ -316,7 +316,7 @@ def main() -> None:
     # Use the last fold only for calibration diagnostics
     print("\nCalibration report (last fold) ...")
     try:
-        from cyberthreats.evaluation.calibration import calibration_report as cal_report
+        from cassandra_threatcast.evaluation.calibration import calibration_report as cal_report
         if idata is not None:
             train_T_last = fold_starts[-1] if fold_starts else T - 12
             horizon_last = min(12, T - train_T_last)

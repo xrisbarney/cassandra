@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 """
 Ingest all data sources and save processed arrays.
 
@@ -21,8 +21,8 @@ import pandas as pd
 # Allow running from the repo root without installing the package
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
-from cyberthreats.data import nvd, epss, cisa_kev, sec_8k, bea_io, pipeline
-from cyberthreats.features import topic_map as tm
+from cassandra_threatcast.data import nvd, epss, cisa_kev, sec_8k, bea_io, pipeline
+from cassandra_threatcast.features import topic_map as tm
 
 
 # ---------------------------------------------------------------------------
