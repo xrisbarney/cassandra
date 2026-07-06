@@ -47,7 +47,9 @@ Pulls CVE records from NVD, EPSS scores, CISA KEV catalog, and SEC EDGAR 8-K fil
 python scripts/ingest_data.py --start 2010-01 --end 2024-12 --cache-dir data/cache/
 ```
 
-> **Note:** Without an NVD API key, requests are rate-limited to 5/30s — a 15-year fetch will take several hours. With a key it drops to ~30–60 minutes. The date range is automatically chunked into 119-day windows as required by the NVD API.
+> **Note:** Without an NVD API key, requests are rate-limited to 5/30s — a 15-year fetch will take several hours. With a key it drops to ~30–60 minutes. The date range is automatically chunked into 119-day windows as required by the NVD API, and each window is cached so an interrupted run resumes where it stopped.
+
+> **EPSS coverage:** EPSS scores exist only from **2021-04-14** onward (the EPSS v1 launch). Months earlier than that are skipped automatically without issuing requests. One mid-month snapshot is fetched per month — each daily EPSS file already contains the full CVE catalog — so this channel is fast. Pre-2022 (EPSS v1) files carry scores but no percentile column; that is handled transparently.
 
 ### 2. Build features
 
@@ -60,6 +62,8 @@ python scripts/build_features.py
 > BEA Use table (Summary level, 2022) is fetched automatically using `BEA_API_KEY` and cached to `data/processed/bea_use_table_2022.json`.
 
 ### 3. Train the model
+
+> **"Training" here means Bayesian posterior inference, not machine-learning weight-fitting.** The model defines a posterior `p(parameters, latent states | data) ∝ likelihood × prior` that has no closed form for a state-space model of this complexity (regime switching, factor dynamics, hierarchical priors, non-conjugate likelihoods). `train.py` therefore *approximates* that posterior by drawing samples via MCMC (NUTS, with Gibbs updates for the discrete regime path) — or, optionally, variational inference. This is exactly the inference procedure the model's mathematics prescribes; every downstream output (predictive distributions, loss VaR/ES, regime probabilities, CRPS scores) is a functional of this posterior. Nothing here is trained by gradient descent on a loss.
 
 Runs NUTS wrapped in `DiscreteHMCGibbs` — Gibbs updates for the discrete Markov regime path, NUTS for all continuous parameters (4 chains × 2000 samples after 1000 warmup) — and saves the posterior to `results/idata.nc`.
 

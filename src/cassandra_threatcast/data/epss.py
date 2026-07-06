@@ -1,7 +1,14 @@
 """Exploit Prediction Scoring System (EPSS) data client.
 
-Downloads EPSS daily score files from cyentia.com, caches them locally,
-and aggregates per-topic mean EPSS scores into a (K, T) monthly panel.
+Downloads EPSS daily score files from the official EPSS data host, caches them
+locally, and aggregates per-topic mean EPSS scores into a (K, T) monthly panel.
+
+Each daily file contains the full CVE catalog with its score as of that date,
+so a single mid-month snapshot fully populates one month of the panel; the
+range fetcher therefore samples one representative day per month rather than
+downloading all ~365 days per year. EPSS scores only exist from 2021-04-14
+onward (the EPSS v1 launch); earlier dates do not exist on the server and are
+skipped without issuing requests.
 """
 
 from __future__ import annotations
@@ -17,7 +24,8 @@ import requests
 
 logger = logging.getLogger(__name__)
 
-_EPSS_BASE_URL = "https://epss.cyentia.com/epss_scores-{date}.csv.gz"
+_EPSS_BASE_URL = "https://epss.empiricalsecurity.com/epss_scores-{date}.csv.gz"
+_EPSS_START = pd.Timestamp("2021-04-14")  # first date EPSS daily scores exist
 _REQUEST_TIMEOUT = 60
 
 
@@ -37,11 +45,11 @@ def fetch_epss(date: str, cache_dir: str) -> pd.DataFrame:
         Columns: cve_id, epss_score, percentile.
     """
     Path(cache_dir).mkdir(parents=True, exist_ok=True)
-    cache_file = Path(cache_dir) / f"epss_{date}.parquet"
+    cache_file = Path(cache_dir) / f"epss_{date}.csv"
 
     if cache_file.exists():
         logger.debug("EPSS cache hit: %s", cache_file)
-        return pd.read_parquet(cache_file)
+        return pd.read_csv(cache_file, dtype={"cve_id": str})
 
     url = _EPSS_BASE_URL.format(date=date)
     logger.info("Downloading EPSS scores from %s", url)
@@ -67,23 +75,32 @@ def fetch_epss(date: str, cache_dir: str) -> pd.DataFrame:
     lines = [line for line in raw.splitlines() if not line.startswith("#")]
     csv_text = "\n".join(lines)
 
-    df = pd.read_csv(
-        io.StringIO(csv_text),
-        dtype={"cve": str, "epss": float, "percentile": float},
-    )
+    df = pd.read_csv(io.StringIO(csv_text))
     df.rename(
         columns={"cve": "cve_id", "epss": "epss_score"},
         inplace=True,
     )
+    # EPSS v1 files (2021-04 .. early 2022) have no "percentile" column; it was
+    # added in EPSS v2. Fill it with NaN so the schema is stable across versions.
+    if "percentile" not in df.columns:
+        df["percentile"] = np.nan
+    df["cve_id"] = df["cve_id"].astype(str)
+    df["epss_score"] = pd.to_numeric(df["epss_score"], errors="coerce")
+    df["percentile"] = pd.to_numeric(df["percentile"], errors="coerce")
     df = df[["cve_id", "epss_score", "percentile"]].copy()
     df.drop_duplicates(subset=["cve_id"], inplace=True)
-    df.to_parquet(cache_file, index=False)
+    df.to_csv(cache_file, index=False)
     logger.info("Cached %d EPSS records for %s", len(df), date)
     return df
 
 
 def fetch_epss_range(start_date: str, end_date: str, cache_dir: str) -> pd.DataFrame:
-    """Fetch EPSS scores for every day in [*start_date*, *end_date*].
+    """Fetch EPSS scores at one representative snapshot per month in the range.
+
+    EPSS daily files each contain the full CVE catalog, so one mid-month
+    snapshot suffices for a monthly panel. The range is clamped to the EPSS
+    availability window (scores exist only from 2021-04-14); months entirely
+    before that date are skipped without issuing any HTTP requests.
 
     Parameters
     ----------
@@ -99,23 +116,43 @@ def fetch_epss_range(start_date: str, end_date: str, cache_dir: str) -> pd.DataF
     pd.DataFrame
         Columns: cve_id, epss_score, percentile, date (datetime.date).
     """
-    date_range = pd.date_range(start=start_date, end=end_date, freq="D")
-    frames: list[pd.DataFrame] = []
+    empty = pd.DataFrame(columns=["cve_id", "epss_score", "percentile", "date"])
+    start = pd.Timestamp(start_date)
+    end = pd.Timestamp(end_date)
 
-    for ts in date_range:
-        date_str = ts.strftime("%Y-%m-%d")
+    if end < _EPSS_START:
+        logger.warning(
+            "EPSS scores start %s; requested range [%s, %s] is entirely earlier — "
+            "no EPSS data available.",
+            _EPSS_START.date(), start.date(), end.date(),
+        )
+        return empty
+
+    eff_start = max(start, _EPSS_START)
+    if eff_start > start:
+        logger.info(
+            "EPSS scores start %s; clamping EPSS fetch start from %s to %s.",
+            _EPSS_START.date(), start.date(), eff_start.date(),
+        )
+
+    frames: list[pd.DataFrame] = []
+    for period in pd.period_range(start=eff_start, end=end, freq="M"):
+        # Mid-month snapshot (15th), clamped into [eff_start, end].
+        target = period.to_timestamp() + pd.Timedelta(days=14)
+        target = min(max(target, eff_start), end)
+        date_str = target.strftime("%Y-%m-%d")
+
         day_df = fetch_epss(date_str, cache_dir)
         if day_df.empty:
             continue
         day_df = day_df.copy()
-        day_df["date"] = ts.date()
+        day_df["date"] = target.date()
         frames.append(day_df)
 
     if not frames:
-        return pd.DataFrame(columns=["cve_id", "epss_score", "percentile", "date"])
+        return empty
 
-    combined = pd.concat(frames, ignore_index=True)
-    return combined
+    return pd.concat(frames, ignore_index=True)
 
 
 def aggregate_monthly(
