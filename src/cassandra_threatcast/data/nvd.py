@@ -110,13 +110,15 @@ def _fetch_all_pages(start_date: str, end_date: str) -> list[dict]:
     session.headers.update(headers)
 
     windows = _date_windows(start_date, end_date)
-    logger.info("NVD: %d date windows to fetch", len(windows))
+    n_windows = len(windows)
+    print(f"  NVD: {n_windows} windows × ≤{_NVD_MAX_WINDOW_DAYS} days  "
+          f"(API key: {'yes' if api_key else 'NO — slow mode, ~6 s/request'})")
 
     all_items: list[dict] = []
 
-    for win_start, win_end in windows:
+    for i, (win_start, win_end) in enumerate(windows, 1):
         start_index = 0
-        logger.info("NVD window: %s → %s", win_start, win_end)
+        print(f"  [{i:>2}/{n_windows}] {win_start} → {win_end}", end="", flush=True)
 
         while True:
             params: dict[str, Any] = {
@@ -132,13 +134,15 @@ def _fetch_all_pages(start_date: str, end_date: str) -> list[dict]:
 
             total_results = data.get("totalResults", 0)
             start_index += len(vulnerabilities)
-            logger.debug("NVD: window %s–%s fetched %d / %d", win_start, win_end, start_index, total_results)
 
             if start_index >= total_results or not vulnerabilities:
+                print(f"  ({total_results} CVEs)", flush=True)
                 break
 
+            print(f"  {start_index}/{total_results}", end="", flush=True)
             time.sleep(inter_request_delay)
 
+    print(f"  NVD total: {len(all_items):,} CVEs fetched across all windows.")
     return all_items
 
 

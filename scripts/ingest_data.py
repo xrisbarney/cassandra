@@ -8,6 +8,7 @@ Usage:
         --config configs/default.yaml
 """
 import argparse
+import logging
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -17,6 +18,12 @@ import sys
 import yaml
 import numpy as np
 import pandas as pd
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+    datefmt="%H:%M:%S",
+)
 
 # Allow running from the repo root without installing the package
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
