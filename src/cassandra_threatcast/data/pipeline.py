@@ -61,6 +61,12 @@ def build_panel(
         - ``dates``: list[pd.Period] â€“ monthly period labels (length T)
         - ``metadata``: dict â€“ source-level record counts and status flags
     """
+    # Normalize to full ISO dates. fetch_cves' window logic requires YYYY-MM-DD
+    # (date.fromisoformat rejects a bare "YYYY-MM"); a malformed date here would
+    # silently zero out the entire NVD-derived panel. Idempotent for full dates.
+    start = pd.Timestamp(start).strftime("%Y-%m-%d")
+    end = pd.Timestamp(end).strftime("%Y-%m-%d")
+
     all_months = pd.period_range(start=start, end=end, freq="M")
     T = len(all_months)
     dates = list(all_months)

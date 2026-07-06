@@ -134,9 +134,12 @@ def main() -> None:
     print("[6/6] Building monthly panel arrays ...")
     sector_map = config.get("sector_map", {str(i): i for i in range(S)})
 
+    # Pass the full ISO dates (start_dt/end_dt) used for fetching, NOT the bare
+    # YYYY-MM strings — build_panel forwards these to fetch_cves, whose date
+    # parsing requires YYYY-MM-DD, and matching the fetch dates reuses the cache.
     panel = pipeline.build_panel(
-        start=args.start,
-        end=args.end,
+        start=start_dt,
+        end=end_dt,
         cache_dir=args.cache_dir,
         topic_assignments=topic_assignments,
         sector_map=sector_map,
@@ -145,6 +148,29 @@ def main() -> None:
     )
 
     pipeline.save_panel(panel, args.output_dir)
+
+    # --- Exposure map M_skt (needs CVE-level CPE data) ----------------------
+    # Built here (not in build_features) because it requires the raw cve_df with
+    # CPE strings and the per-CVE topic assignments, which only exist at ingest.
+    try:
+        from cassandra_threatcast.features.exposure_map import build_exposure_map
+        if len(cve_df) > 0 and len(topic_assignments) == len(cve_df):
+            exp_df = cve_df.copy()
+            exp_df["date"] = pd.to_datetime(exp_df["published_date"]).dt.to_period("M")
+            exp_df["cpe"] = exp_df["cpe_list"]
+            M_skt = build_exposure_map(
+                exp_df, S=S, K=K,
+                topic_assignments=np.asarray(topic_assignments),
+                dates=panel["dates"],
+            )
+            np.save(os.path.join(args.output_dir, "M_skt.npy"), M_skt)
+            frac_uniform = float(np.mean(np.isclose(M_skt, 1.0 / S)))
+            print(f"      Exposure map M_skt saved: shape={M_skt.shape}  "
+                  f"({frac_uniform:.0%} of cells at uniform fallback)")
+        else:
+            print("      Skipping exposure map (no aligned CVE data).")
+    except Exception as exc:
+        print(f"      Warning: exposure map build failed ({exc}).")
 
     # --- Summary ------------------------------------------------------------
     print("\nDone.  Panel saved to:", args.output_dir)

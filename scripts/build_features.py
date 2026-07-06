@@ -92,21 +92,20 @@ def main() -> None:
     # -------------------------------------------------------------------------
     # 2.  Sector-topic exposure map M_skt
     # -------------------------------------------------------------------------
-    print("[2/4] Computing exposure map M_skt ...")
-    # exposure_map.compute returns (S, K, T) â€” the fraction of topic-k CVE
-    # volume that sector s is exposed to at time t, derived from 8-K filings
-    # and NAICS-to-sector mapping stored in the panel.
-    if hasattr(em, "compute"):
-        M_skt = em.compute(panel, K=K, S=S)
+    print("[2/4] Loading exposure map M_skt ...")
+    # M_skt is built by ingest_data.py from CVE-level CPE data (which is not
+    # available here). Load it if present; otherwise fall back to a uniform map.
+    m_path = os.path.join(args.data_dir, "M_skt.npy")
+    if os.path.exists(m_path):
+        M_skt = np.load(m_path)
+        print(f"      Loaded M_skt from {m_path}")
     else:
-        # Fallback: uniform exposure across sectors
-        print("      Warning: exposure_map.compute not found; using uniform prior.")
-        M_raw = np.ones((S, K, T)) / S   # uniform
-        # Normalise so columns sum to 1 across sectors
-        M_skt = M_raw / M_raw.sum(axis=0, keepdims=True)
+        print("      Warning: M_skt.npy not found (run ingest_data.py first); "
+              "using uniform exposure prior.")
+        M_skt = np.ones((S, K, T)) / S
 
     print(f"      M_skt shape={M_skt.shape}  "
-          f"row-sum min={M_skt.sum(axis=0).min():.3f}  "
+          f"col-sum min={M_skt.sum(axis=0).min():.3f}  "
           f"max={M_skt.sum(axis=0).max():.3f}")
 
     np.save(os.path.join(args.output_dir, "M_skt.npy"), M_skt)
@@ -151,8 +150,9 @@ def main() -> None:
             x_s = np.ones(S) * 1e12   # placeholder: $1 trillion each
 
     np.save(os.path.join(args.output_dir, "x_s.npy"), x_s)
+    # BEA gross output is in millions of dollars; /1e6 -> trillions.
     print(f"      x_s shape={x_s.shape}  "
-          f"total output = ${x_s.sum() / 1e12:.2f} trillion")
+          f"total output = ${x_s.sum() / 1e6:.2f} trillion")
 
     # -------------------------------------------------------------------------
     # Done

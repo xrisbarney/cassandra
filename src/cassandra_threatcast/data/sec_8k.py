@@ -23,8 +23,7 @@ logger = logging.getLogger(__name__)
 
 _EFTS_URL = (
     "https://efts.sec.gov/LATEST/search-index"
-    "?q=%22cybersecurity+incident%22+%22Item+1.05%22"
-    "&dateRange=custom&startdt={start}&enddt={end}&forms=8-K"
+    "?q=%22Item+1.05%22&forms=8-K&startdt={start}&enddt={end}"
 )
 _EDGAR_COMPANY_URL = "https://data.sec.gov/submissions/CIK{cik:010d}.json"
 _PAGE_SIZE = 40  # EFTS default page size cap
@@ -155,15 +154,19 @@ def _fetch_all_efts_hits(start_date: str, end_date: str) -> list[dict]:
 
         for hit in hits:
             src: dict[str, Any] = hit.get("_source", {})
+            ciks = src.get("ciks") or [""]
+            sics = src.get("sics") or []
+            names = src.get("display_names") or [""]
             all_records.append(
                 {
-                    "cik": str(src.get("entity_id", src.get("cik", ""))).zfill(10),
-                    "company_name": src.get("display_names", [""])[0]
-                    if src.get("display_names")
-                    else src.get("entity_name", ""),
-                    "filed_date": src.get("file_date", src.get("period_of_report", "")),
-                    "accession_number": src.get("accession_no", ""),
-                    "form_type": src.get("form_type", "8-K"),
+                    "cik": str(ciks[0]).zfill(10),
+                    "company_name": names[0],
+                    "filed_date": src.get("file_date", ""),
+                    "accession_number": src.get("adsh", ""),
+                    "form_type": src.get("form", "8-K"),
+                    # SIC is returned inline by EFTS — capture it so enrich_with_naics
+                    # can skip a per-company API call.
+                    "sic": int(sics[0]) if sics and str(sics[0]).isdigit() else None,
                 }
             )
 
@@ -214,7 +217,19 @@ def enrich_with_naics(df: pd.DataFrame, cache_dir: str) -> pd.DataFrame:
     cik_to_naics: dict[str, int] = {}
     unique_ciks = df["cik"].unique()
 
+    # SIC codes returned inline by EFTS avoid a per-company API round-trip.
+    inline_sic: dict[str, int] = {}
+    if "sic" in df.columns:
+        for _, row in df.iterrows():
+            s = row.get("sic")
+            if s is not None and not (isinstance(s, float) and np.isnan(s)):
+                inline_sic[str(row["cik"])] = int(s)
+
     for cik_str in unique_ciks:
+        if cik_str in inline_sic:
+            cik_to_naics[cik_str] = _SIC_TO_NAICS2.get(inline_sic[cik_str], _DEFAULT_NAICS2)
+            continue
+
         try:
             cik_int = int(cik_str)
         except (ValueError, TypeError):
