@@ -9,6 +9,7 @@ import jax
 import jax.numpy as jnp
 import numpyro
 from numpyro.infer import MCMC, NUTS, SVI, Trace_ELBO, DiscreteHMCGibbs
+from numpyro.infer.initialization import init_to_median
 from numpyro.infer.autoguide import AutoLowRankMultivariateNormal
 from numpyro.optim import ClippedAdam
 import arviz as az
@@ -49,6 +50,7 @@ def run_nuts(model, data: dict, config: dict) -> az.InferenceData:
         target_accept_prob=target_accept_prob,
         max_tree_depth=max_tree_depth,
         find_heuristic_step_size=True,
+        init_strategy=init_to_median,
     )
     kernel = DiscreteHMCGibbs(inner_kernel, modified=True)
 

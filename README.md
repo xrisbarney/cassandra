@@ -30,6 +30,22 @@ python scripts/run_all.py --fresh          # wipe everything and run all 5 steps
 python scripts/run_all.py --quick          # keep caches, quick-preview training
 ```
 
+## ⚠️ Model corrections vs. the paper
+
+Making the model sample revealed issues in the paper's stated specification that
+**require manuscript changes** — the model as written in Section 3 is not
+identified and will not sample (NUTS step size collapses to ~1e-10):
+
+1. The factor loadings **Γ** (Eq. 3) and severity loadings **Ψ** are not
+   identified (rotation/scale/sign freedom) — the code imposes the standard
+   positive-lower-triangular constraint.
+2. The reporting propensity **π** (Eq. 8) is over-parameterized as free per
+   sector-*month* on a near-empty channel — the code uses one baseline per
+   sector.
+
+These fix the sampling geometry (step size ~1e-10 → ~1e-2). **See
+[docs/PAPER_NOTES.md](docs/PAPER_NOTES.md) for the exact equations to update.**
+
 ## Requirements
 
 - Python 3.11+
@@ -149,6 +165,7 @@ pytest --cov=cassandra_threatcast --cov-report=term-missing
 ```
 paper-cyber-threatmodelling/
 ├── app.py                         # 🔮 guided Streamlit dashboard (streamlit run app.py)
+├── docs/PAPER_NOTES.md            # ⚠️ model corrections vs. the paper (identifiability, π)
 ├── docs/MODEL_VARIANTS.md         # paper-native vs. --enhanced-mode comparison
 ├── configs/default.yaml          # K=8 topics, S=11 sectors, r=3 intensity + r_sigma=2 severity factors, R=3 regimes
 ├── scripts/                      # CLI entry points (run in order)

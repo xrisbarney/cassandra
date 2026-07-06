@@ -28,6 +28,21 @@ from cassandra_threatcast.model.economic import (
 
 
 # ---------------------------------------------------------------------------
+# Identifiability helper
+# ---------------------------------------------------------------------------
+def _positive_lower_triangular(raw: jnp.ndarray, d: int) -> jnp.ndarray:
+    """Impose the standard factor-model identification constraint on a (K, d)
+    loading matrix: the top d x d block is lower-triangular with a positive
+    diagonal (rows below are free). This removes the rotation/scale/sign
+    indeterminacy between the loadings and the latent factors that otherwise
+    leaves the posterior non-identified (flat ridges -> terrible HMC mixing)."""
+    lower = jnp.tril(jnp.ones((d, d)))
+    top = raw[:d] * lower
+    top = top.at[jnp.diag_indices(d)].set(jax.nn.softplus(jnp.diagonal(raw[:d])))
+    return jnp.concatenate([top, raw[d:]], axis=0)
+
+
+# ---------------------------------------------------------------------------
 # Full combined model
 # ---------------------------------------------------------------------------
 
@@ -81,10 +96,12 @@ def full_model(data: dict, config: dict) -> None:
         dist.Normal(jnp.zeros((R, K)), 2.0 * jnp.ones((R, K))),
     )  # (R, K)
 
-    Gamma = numpyro.sample(
-        "Gamma",
+    Gamma_raw = numpyro.sample(
+        "Gamma_raw",
         dist.Normal(jnp.zeros((K, r)), jnp.ones((K, r))),
     )  # (K, r)
+    # Identified loadings: positive-lower-triangular top block (see helper).
+    Gamma = deterministic("Gamma", _positive_lower_triangular(Gamma_raw, r))  # (K, r)
 
     Phi_raw = numpyro.sample(
         "Phi_raw",
@@ -122,10 +139,12 @@ def full_model(data: dict, config: dict) -> None:
         "nu_r",
         dist.Normal(1.5 * jnp.ones((R, K)), 1.0 * jnp.ones((R, K))),
     )  # (R, K) regime-dependent severity level (log-CVSS scale)
-    Psi = numpyro.sample(
-        "Psi",
+    Psi_raw = numpyro.sample(
+        "Psi_raw",
         dist.Normal(jnp.zeros((K, r_sig)), jnp.ones((K, r_sig))),
-    )  # (K, r_sig) severity factor loadings
+    )  # (K, r_sig)
+    # Same identifiability constraint for the severity loadings.
+    Psi = deterministic("Psi", _positive_lower_triangular(Psi_raw, r_sig))  # (K, r_sig)
     A_h_raw = numpyro.sample(
         "A_h_raw",
         dist.Normal(jnp.zeros((r_sig, r_sig)), 0.3 * jnp.ones((r_sig, r_sig))),
@@ -150,14 +169,16 @@ def full_model(data: dict, config: dict) -> None:
         f_t = Phi_t @ f_prev + Q_chol_t @ eps  # (r,)
 
         mean_eta = mu_r[z_t] + f_t @ Gamma.T  # (K,)
-        eta_noise = _innovation("eta_noise", jnp.zeros(K), tau_k)
-        eta_t = mean_eta + eta_noise  # (K,)
+        # Non-centered idiosyncratic noise (eps ~ N(0,1), scaled by tau_k) to
+        # avoid the funnel geometry of sampling eta_noise ~ N(0, tau_k) directly.
+        eps_eta = _innovation("eps_eta", jnp.zeros(K), jnp.ones(K))
+        eta_t = mean_eta + tau_k * eps_eta  # (K,)
 
         # Severity factor evolution and log-severity (shares the regime z_t).
         xi_h = _innovation("xi_h", jnp.zeros(r_sig), jnp.ones(r_sig))
         h_t = A_h @ h_prev + jnp.diag(Q_h) @ xi_h  # (r_sig,)
-        v_zeta = _innovation("v_zeta", jnp.zeros(K), omega_k)
-        zeta_t = nu_r[z_t] + h_t @ Psi.T + v_zeta  # (K,)
+        eps_v = _innovation("eps_v", jnp.zeros(K), jnp.ones(K))  # non-centered
+        zeta_t = nu_r[z_t] + h_t @ Psi.T + omega_k * eps_v  # (K,)
 
         return (f_t, z_t, h_t), (f_t, z_t, eta_t, h_t, zeta_t)
 
@@ -208,10 +229,15 @@ def full_model(data: dict, config: dict) -> None:
         dist.HalfNormal(jnp.ones(S)),
     )  # (S,) sector scaling
 
-    pi_st = numpyro.sample(
-        "pi_st",
-        dist.HalfNormal(0.5 * jnp.ones((S, T))),
-    )  # (S, T) sector baseline
+    # Sector-specific baseline disclosure rate. One parameter per sector (S),
+    # constant over time, rather than one per sector-month (S*T ~ 2000 nuisance
+    # parameters). The incident channel is ~99% zeros, so per-month baselines
+    # were pinned against zero and destroyed the sampling geometry (step size
+    # collapse). Broadcast over T when forming the Poisson rate.
+    pi_s = numpyro.sample(
+        "pi_s",
+        dist.HalfNormal(0.5 * jnp.ones(S)),
+    )  # (S,) sector baseline
 
     # ------------------------------------------------------------------ #
     # 3. Observation likelihoods
@@ -223,6 +249,7 @@ def full_model(data: dict, config: dict) -> None:
     exploitation_obs(lambda_kt, alpha_k, beta_k, varsigma_k, E_obs)
 
     D_obs = jnp.asarray(data["D"]) if data.get("D") is not None else None
+    pi_st = pi_s[:, None]  # (S, 1) broadcasts over months
     if enhanced:
         phi_D = numpyro.sample("phi_D", dist.HalfNormal(10.0 * jnp.ones(S)))  # (S,) NegBin dispersion
         incident_obs(lambda_kt, M_skt, pi_st, rho_s, D_obs, dispersion=phi_D)
@@ -247,6 +274,7 @@ def predict(
     damage_params: "DamageFunctionParams",
     enhanced: bool = False,
     student_t_df: float = 4.0,
+    start_t: int | None = None,  # forecast from this time index (default: series end)
 ) -> dict:
     """
     Generate h-step-ahead predictive draws.
@@ -317,10 +345,12 @@ def predict(
         Q_h_i = np.array(posterior_samples["Q_h"][i])        # (r_sig,)
         omega_k_i = np.array(posterior_samples["omega_k"][i])  # (K,)
 
-        # Last factor, regime, and severity factor from posterior
-        f_last = np.array(posterior_samples["f_t"][i, -1, :])   # (r,)
-        z_last = int(posterior_samples["z_t"][i, -1])
-        h_last = np.array(posterior_samples["h_t"][i, -1, :])   # (r_sig,)
+        # Latent state to forecast from: the series end by default, or the state
+        # at start_t-1 when evaluating a forecast issued at time start_t.
+        s_idx = -1 if start_t is None else start_t - 1
+        f_last = np.array(posterior_samples["f_t"][i, s_idx, :])   # (r,)
+        z_last = int(posterior_samples["z_t"][i, s_idx])
+        h_last = np.array(posterior_samples["h_t"][i, s_idx, :])   # (r_sig,)
 
         for h in range(horizon):
             # Regime transition

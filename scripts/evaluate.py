@@ -114,30 +114,38 @@ def _get_full_model_predictive(
     otherwise falls back to extracting posterior_predictive samples that
     were already generated during training.
     """
-    try:
-        from cassandra_threatcast.model import full as full_module
-        from cassandra_threatcast.inference import nuts as nuts_module
-        pred = nuts_module.predict(
-            idata=idata,
-            model=full_module.full_model,
-            data=data,
-            config=config,
-            forecast_horizon=horizon,
-            seed=0,
-        )
-        return pred  # (n_samples, K, horizon)
-    except Exception as exc:
-        warnings.warn(f"nuts_module.predict failed: {exc}. "
-                      "Falling back to posterior_predictive if available.")
+    from cassandra_threatcast.model import full as full_module
+    from cassandra_threatcast.model.economic import DamageFunctionParams
 
-    # Fallback: slice posterior_predictive stored during training
-    if hasattr(idata, "posterior_predictive") and "N_obs" in idata.posterior_predictive:
-        N_pred = np.array(idata.posterior_predictive["N_obs"])
-        # Shape: (chain, draw, K, T)  -> flatten chains
-        N_pred = N_pred.reshape(-1, *N_pred.shape[2:])
-        return N_pred[:, :, train_T : train_T + horizon]
+    S = int(config["model"]["S"])
+    # Flatten posterior (chain, draw, ...) -> (sample, ...)
+    post = {k: np.asarray(v) for k, v in idata.posterior.items()}
+    post = {k: v.reshape((-1,) + v.shape[2:]) for k, v in post.items()}
 
-    raise RuntimeError("Cannot obtain posterior predictive samples.")
+    # Exposure for the forecast window [train_T, train_T + horizon).
+    M = np.asarray(data["M_skt"])
+    if train_T + horizon <= M.shape[2]:
+        M_future = M[:, :, train_T : train_T + horizon]
+    else:  # hold the last observed exposure if we run past the panel
+        M_future = np.repeat(M[:, :, -1:], horizon, axis=2)
+
+    dmg = config.get("damage_params", {})
+    damage_params = DamageFunctionParams(
+        shape=np.full(S, float(dmg.get("shape", 2.0))),
+        scale=np.full(S, float(dmg.get("scale", 1.0))),
+        max_damage=np.full(S, float(dmg.get("max_damage", 0.5))),
+    )
+    enhanced = bool(config.get("enhanced", {}).get("enabled", False))
+    student_t_df = float(config.get("enhanced", {}).get("student_t_df", 4.0))
+
+    out = full_module.predict(
+        post, data, horizon,
+        np.asarray(data["Lambda_L"]), np.asarray(data["x_s"]),
+        M_future, damage_params,
+        enhanced=enhanced, student_t_df=student_t_df,
+        start_t=train_T,   # forecast issued at the fold boundary
+    )
+    return out["N_pred"]  # (n_samples, K, horizon)
 
 
 # ---------------------------------------------------------------------------
