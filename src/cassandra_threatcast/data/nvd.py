@@ -58,7 +58,7 @@ def fetch_cves(start_date: str, end_date: str, cache_dir: str) -> pd.DataFrame:
         with cache_file.open() as fh:
             raw_items: list[dict] = json.load(fh)
     else:
-        raw_items = _fetch_all_pages(start_date, end_date)
+        raw_items = _fetch_all_pages(start_date, end_date, cache_dir)
         with cache_file.open("w") as fh:
             json.dump(raw_items, fh)
         logger.info("Cached %d CVE items to %s", len(raw_items), cache_file)
@@ -92,11 +92,18 @@ def _date_windows(start_date: str, end_date: str) -> list[tuple[str, str]]:
     return windows
 
 
-def _fetch_all_pages(start_date: str, end_date: str) -> list[dict]:
+def _window_cache_path(cache_dir: str, win_start: str, win_end: str) -> Path:
+    return Path(cache_dir) / f"nvd_window_{win_start}_{win_end}.json"
+
+
+def _fetch_all_pages(start_date: str, end_date: str, cache_dir: str) -> list[dict]:
     """Page through the NVD API and return all raw CVE vulnerability items.
 
     Splits the full date range into ≤119-day windows to stay within the
-    NVD API 2.0 limit of 120 days per pubStartDate/pubEndDate request.
+    NVD API 2.0 limit of 120 days per pubStartDate/pubEndDate request.  Each
+    window is cached to ``nvd_window_<start>_<end>.json`` as soon as it
+    completes, so a crash or interruption loses at most one window and a
+    re-run resumes from where it stopped.
     """
     api_key = os.environ.get("NVD_API_KEY")
     headers: dict[str, str] = {}
@@ -117,7 +124,19 @@ def _fetch_all_pages(start_date: str, end_date: str) -> list[dict]:
     all_items: list[dict] = []
 
     for i, (win_start, win_end) in enumerate(windows, 1):
+        win_cache = _window_cache_path(cache_dir, win_start, win_end)
+
+        # Resume: skip windows already fetched in a prior (possibly crashed) run.
+        if win_cache.exists():
+            with win_cache.open() as fh:
+                window_items = json.load(fh)
+            all_items.extend(window_items)
+            print(f"  [{i:>2}/{n_windows}] {win_start} → {win_end}  "
+                  f"({len(window_items)} CVEs, cached)", flush=True)
+            continue
+
         start_index = 0
+        window_items: list[dict] = []
         print(f"  [{i:>2}/{n_windows}] {win_start} → {win_end}", end="", flush=True)
 
         while True:
@@ -130,7 +149,7 @@ def _fetch_all_pages(start_date: str, end_date: str) -> list[dict]:
 
             data = _get_with_backoff(session, _NVD_BASE_URL, params, inter_request_delay)
             vulnerabilities = data.get("vulnerabilities", [])
-            all_items.extend(vulnerabilities)
+            window_items.extend(vulnerabilities)
 
             total_results = data.get("totalResults", 0)
             start_index += len(vulnerabilities)
@@ -141,6 +160,11 @@ def _fetch_all_pages(start_date: str, end_date: str) -> list[dict]:
 
             print(f"  {start_index}/{total_results}", end="", flush=True)
             time.sleep(inter_request_delay)
+
+        # Persist this window immediately (crash-safe / resumable).
+        with win_cache.open("w") as fh:
+            json.dump(window_items, fh)
+        all_items.extend(window_items)
 
     print(f"  NVD total: {len(all_items):,} CVEs fetched across all windows.")
     return all_items

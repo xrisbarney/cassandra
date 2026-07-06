@@ -30,6 +30,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 from cassandra_threatcast.data import pipeline
 from cassandra_threatcast.model import full as full_module
 from cassandra_threatcast.inference import nuts as nuts_module
+from cassandra_threatcast.inference import vi as vi_module
 
 
 # ---------------------------------------------------------------------------
@@ -70,6 +71,10 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--train-end", type=int, default=None,
         help="Last time index (exclusive) for training.  Default: full series.",
+    )
+    parser.add_argument(
+        "--method", choices=["nuts", "vi"], default="nuts",
+        help="Inference method: 'nuts' (MCMC, default) or 'vi' (variational).",
     )
     return parser.parse_args()
 
@@ -127,10 +132,21 @@ def main() -> None:
     with open(args.config) as fh:
         config = yaml.safe_load(fh)
 
-    inf_cfg = config.get("inference", {})
-    num_warmup  = args.num_warmup  or inf_cfg.get("num_warmup",  1000)
-    num_samples = args.num_samples or inf_cfg.get("num_samples", 1000)
-    num_chains  = args.num_chains  or inf_cfg.get("num_chains",  4)
+    # MCMC settings live in config["mcmc"]; CLI flags override them.  We write
+    # the resolved values back into config["mcmc"] because run_nuts reads them
+    # from there (it takes only (model, data, config)).
+    mcmc_cfg = config.setdefault("mcmc", {})
+    if args.num_warmup is not None:
+        mcmc_cfg["num_warmup"] = args.num_warmup
+    if args.num_samples is not None:
+        mcmc_cfg["num_samples"] = args.num_samples
+    if args.num_chains is not None:
+        mcmc_cfg["num_chains"] = args.num_chains
+    mcmc_cfg["seed"] = args.seed
+
+    num_warmup  = int(mcmc_cfg.get("num_warmup", 1000))
+    num_samples = int(mcmc_cfg.get("num_samples", 1000))
+    num_chains  = int(mcmc_cfg.get("num_chains", 4))
 
     os.makedirs(args.output_dir, exist_ok=True)
 
@@ -156,23 +172,34 @@ def main() -> None:
     print(f"      N total counts: {data['N'].sum():.0f}  "
           f"D total counts: {data['D'].sum():.0f}")
 
-    # --- Run NUTS -----------------------------------------------------------
-    print(f"[2/3] Running NUTS  (warmup={num_warmup}  samples={num_samples}  "
-          f"chains={num_chains}) ...")
+    # --- Run inference ------------------------------------------------------
     t0 = time.time()
 
-    idata = nuts_module.run_nuts(
-        model=full_module.full_model,
-        data=data,
-        config=config,
-        num_warmup=num_warmup,
-        num_samples=num_samples,
-        num_chains=num_chains,
-        seed=args.seed,
-    )
+    if args.method == "nuts":
+        print(f"[2/3] Running NUTS  (warmup={num_warmup}  samples={num_samples}  "
+              f"chains={num_chains}) ...")
+        idata = nuts_module.run_nuts(full_module.full_model, data, config)
+    else:
+        svi_cfg = config.get("svi", {})
+        num_steps = int(svi_cfg.get("num_steps", 30000))
+        lr = float(svi_cfg.get("learning_rate", 1e-3))
+        print(f"[2/3] Running VI  (steps={num_steps}  lr={lr}) ...")
+        guide, params, losses = vi_module.train_vi(
+            full_module.full_model, data, config,
+            num_steps=num_steps, learning_rate=lr, seed=args.seed,
+        )
+        samples = vi_module.vi_predictive_samples(
+            guide, params, full_module.full_model, data,
+            n_samples=num_samples, seed=args.seed,
+        )
+        # Wrap the VI posterior draws in an InferenceData (add a chain dim) so
+        # downstream scripts consume NUTS and VI output identically.
+        import arviz as az
+        posterior = {k: np.asarray(v)[np.newaxis, ...] for k, v in samples.items()}
+        idata = az.from_dict(posterior=posterior)
 
     elapsed = time.time() - t0
-    print(f"      NUTS completed in {elapsed / 60:.1f} min.")
+    print(f"      {args.method.upper()} completed in {elapsed / 60:.1f} min.")
 
     # --- Save ---------------------------------------------------------------
     print("[3/3] Saving InferenceData ...")

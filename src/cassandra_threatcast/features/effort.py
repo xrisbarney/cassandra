@@ -21,7 +21,7 @@ def estimate_effort(
     Parameters
     ----------
     N_raw : 1-D array of length T with raw monthly CVE counts.
-    method : 'hp_filter' or 'state_space'.
+    method : one of 'hp_filter', 'state_space', 'moving_avg', 'log_diff'.
     hp_lambda : smoothing parameter for the HP filter (default 1600 for quarterly;
                 use 129600 for monthly data as a rule-of-thumb, but 1600 is kept
                 as default to match the function signature).
@@ -47,8 +47,19 @@ def estimate_effort(
         if e_raw.shape[0] != T:
             # Some versions return (n_states, T)
             e_raw = e_raw[:T]
+    elif method == "moving_avg":
+        # Centered moving-average trend of log counts (window ≈ 1 year).
+        window = min(12, T) if T > 0 else 1
+        kernel = np.ones(window) / window
+        e_raw = np.convolve(log_N, kernel, mode="same")
+    elif method == "log_diff":
+        # Month-over-month log growth as an effort proxy; prepend to keep length T.
+        e_raw = np.diff(log_N, prepend=log_N[0])
     else:
-        raise ValueError(f"method must be 'hp_filter' or 'state_space', got {method!r}")
+        raise ValueError(
+            "method must be one of 'hp_filter', 'state_space', 'moving_avg', "
+            f"'log_diff', got {method!r}"
+        )
 
     # Normalise to mean 0, std 1
     mu = e_raw.mean()

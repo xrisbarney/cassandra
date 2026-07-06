@@ -8,7 +8,7 @@ from __future__ import annotations
 import jax
 import jax.numpy as jnp
 import numpyro
-from numpyro.infer import MCMC, NUTS, SVI, Trace_ELBO
+from numpyro.infer import MCMC, NUTS, SVI, Trace_ELBO, DiscreteHMCGibbs
 from numpyro.infer.autoguide import AutoLowRankMultivariateNormal
 from numpyro.optim import ClippedAdam
 import arviz as az
@@ -40,12 +40,17 @@ def run_nuts(model, data: dict, config: dict) -> az.InferenceData:
     max_tree_depth = int(mcmc_cfg.get("max_tree_depth", 10))
     target_accept_prob = float(mcmc_cfg.get("target_accept_prob", 0.8))
 
-    kernel = NUTS(
+    # The model contains a discrete latent regime path (z_t, z_init) via the
+    # Markov regime-switching component. Plain NUTS cannot sample discrete
+    # latents, so we wrap it in DiscreteHMCGibbs: Gibbs updates for the
+    # discrete regimes, NUTS for all continuous parameters.
+    inner_kernel = NUTS(
         model,
         target_accept_prob=target_accept_prob,
         max_tree_depth=max_tree_depth,
         find_heuristic_step_size=True,
     )
+    kernel = DiscreteHMCGibbs(inner_kernel, modified=True)
 
     mcmc = MCMC(
         kernel,

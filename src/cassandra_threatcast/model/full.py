@@ -118,7 +118,8 @@ def full_model(data: dict, config: dict) -> None:
     # f_seq: (T, r), z_seq: (T,), eta_seq: (T, K)
 
     deterministic("f_t", f_seq)
-    deterministic("z_t", z_seq)
+    # "z_t" is already recorded by scan as a sampled (T,) site; re-declaring it
+    # as deterministic duplicates the site name and crashes the model.
     deterministic("eta_t", eta_seq)
 
     # lambda_kt: (K, T) â€” transpose from (T, K)

@@ -103,7 +103,7 @@ def incident_obs(
     rate_st = rho_s[:, None] * weighted_sum + pi_st  # (S, T)
 
     # Guard against negative rates (numerical safety)
-    rate_st = jnp.clip(rate_st, a_min=1e-8)
+    rate_st = jnp.clip(rate_st, 1e-8)  # positional min (JAX dropped a_min kwarg)
 
     numpyro.sample(
         "D_obs",

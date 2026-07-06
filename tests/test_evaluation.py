@@ -40,18 +40,19 @@ def test_crps_ordering():
 
 def test_crps_analytical():
     """
-    CRPS of N(0, 1) evaluated at y = 0 equals 1/sqrt(pi) â‰ˆ 0.5642.
+    CRPS of N(0, 1) evaluated at y = 0 equals (sqrt(2) - 1)/sqrt(pi) ~= 0.2337.
 
-    This follows from the analytical formula for the Normal distribution:
+    From the analytical formula for the Normal distribution:
         CRPS(N(mu, sigma), y) = sigma * (z*(2*Phi(z)-1) + 2*phi(z) - 1/sqrt(pi))
-    where z = (y - mu)/sigma.  At y = mu = 0, sigma = 1 this reduces to 1/sqrt(pi).
+    where z = (y - mu)/sigma.  At y = mu = 0, sigma = 1 this is
+        2*phi(0) - 1/sqrt(pi) = sqrt(2/pi) - 1/sqrt(pi) = (sqrt(2) - 1)/sqrt(pi).
     """
     rng = np.random.default_rng(42)
     n_samples = 100_000
     obs = np.array([0.0])
     samples = rng.standard_normal((1, n_samples))
     crps_val = crps_ensemble(obs, samples)
-    expected = 1.0 / np.sqrt(np.pi)
+    expected = (np.sqrt(2.0) - 1.0) / np.sqrt(np.pi)
     np.testing.assert_allclose(float(crps_val[0]), expected, atol=0.01)
 
 

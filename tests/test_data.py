@@ -26,7 +26,7 @@ def test_leontief_identity():
 def test_leontief_raises_on_unstable():
     """leontief_inverse raises ValueError when the spectral radius of A >= 1."""
     A = 2.0 * np.eye(5)   # spectral radius = 2
-    with pytest.raises(ValueError, match="spectral radius"):
+    with pytest.raises(ValueError, match="(?i)spectral radius"):
         leontief_inverse(A)
 
 
@@ -90,7 +90,9 @@ def test_aggregate_monthly_nonneg():
     topic_assignments = rng.integers(0, K, len(df))
     N_kt, B_kt = aggregate_monthly(df, topic_assignments)
     assert np.all(N_kt >= 0)
-    assert np.all(B_kt >= 0)
+    # Empty (topic, month) cells carry NaN mean severity by design; where a
+    # severity is defined it must be a non-negative CVSS score.
+    assert np.all(B_kt[~np.isnan(B_kt)] >= 0)
 
 
 def test_aggregate_monthly_total_counts():

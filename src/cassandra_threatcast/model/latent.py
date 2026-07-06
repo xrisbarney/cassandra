@@ -168,7 +168,9 @@ def latent_dynamics_model(
     # f_seq: (T, r), z_seq: (T,), eta_seq: (T, K)
 
     deterministic("f_t", f_seq)
-    deterministic("z_t", z_seq)
+    # NOTE: "z_t" is already recorded by scan as a sampled site of shape (T,);
+    # re-declaring it as deterministic here would duplicate the site name and
+    # crash the model. The regime path is available under "z_t" downstream.
 
     # Optionally condition on observed log-intensities
     if observed_eta is not None:

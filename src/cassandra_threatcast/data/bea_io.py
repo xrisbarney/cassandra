@@ -1,8 +1,14 @@
 """BEA Input-Output table utilities.
 
-Fetches Use tables from the BEA API (InputOutput dataset), aggregates to
-the model's S-sector classification, and computes technical coefficients
-and the Leontief inverse for systemic risk propagation analysis.
+Fetches the Summary Use table (TableID 259, "Use of Commodities by Industries")
+from the BEA API, aggregates the ~71 BEA summary industries into the model's
+11-sector classification, and computes technical coefficients and the Leontief
+inverse for systemic risk propagation.
+
+The parsing logic here was validated against the live BEA API (2022 Summary
+Use table): gross output is read from the ``T018`` ("Total industry output")
+row, ``F*`` columns are final demand, and ``T*``/``V*`` rows/columns are
+totals and value added — all excluded from the intermediate-use matrix.
 """
 
 from __future__ import annotations
@@ -19,50 +25,62 @@ import requests
 logger = logging.getLogger(__name__)
 
 _BEA_API_URL = "https://apps.bea.gov/api/data"
-# Summary-level Use table (before redefinitions) — most recent stable year
-_DEFAULT_TABLE_ID = "259"
+_DEFAULT_TABLE_ID = "259"       # Use of Commodities by Industries – Summary
 _DEFAULT_YEAR = 2022
+_GROSS_OUTPUT_ROW = "T018"      # "Total industry output (basic prices)"
 
 # ---------------------------------------------------------------------------
-# 11-sector aggregation mapping
-# BEA RowCode/ColCode 2-digit NAICS prefix → sector index 0..10
+# 11-sector aggregation
 # ---------------------------------------------------------------------------
 _DEFAULT_SECTOR_LABELS = [
-    "Agriculture",        # 0
-    "Mining",             # 1
-    "Utilities",          # 2
-    "Construction",       # 3
-    "Manufacturing",      # 4
-    "Wholesale Trade",    # 5
-    "Retail Trade",       # 6
-    "Transportation",     # 7
-    "Finance & Real Estate",  # 8
-    "Professional Services",  # 9
-    "Government",         # 10
+    "Agriculture",             # 0
+    "Mining",                  # 1
+    "Utilities",               # 2
+    "Construction",            # 3
+    "Manufacturing",           # 4
+    "Wholesale Trade",         # 5
+    "Retail Trade",            # 6
+    "Transportation",          # 7
+    "Finance",                 # 8  (includes insurance & real estate)
+    "Professional Services",   # 9
+    "Government",              # 10
 ]
 
+# Explicit BEA summary industry/commodity code → sector index (validated
+# against the 2022 Summary Use table's 71 real industry codes).
 _CODE_TO_SECTOR: dict[str, int] = {
-    "11": 0,              # Agriculture, forestry, fishing, hunting
-    "21": 1,              # Mining
-    "22": 2,              # Utilities
-    "23": 3,              # Construction
-    "31": 4, "32": 4, "33": 4,  # Manufacturing
-    "42": 5,              # Wholesale Trade
-    "44": 6, "45": 6,    # Retail Trade
-    "48": 7, "49": 7,    # Transportation & Warehousing
-    "51": 9,              # Information → Professional Services
-    "52": 8, "53": 8,    # Finance & Insurance, Real Estate
-    "54": 9, "55": 9, "56": 9,  # Professional & Business Services
-    "61": 9,              # Educational Services
-    "62": 9,              # Health Care
-    "71": 9,              # Arts & Entertainment
-    "72": 9,              # Accommodation & Food
-    "81": 9,              # Other Services
-    "92": 10,             # Government
+    # Agriculture
+    "111CA": 0, "113FF": 0,
+    # Mining
+    "211": 1, "212": 1, "213": 1,
+    # Utilities
+    "22": 2,
+    # Construction
+    "23": 3,
+    # Manufacturing
+    "311FT": 4, "313TT": 4, "315AL": 4, "321": 4, "322": 4, "323": 4,
+    "324": 4, "325": 4, "326": 4, "327": 4, "331": 4, "332": 4, "333": 4,
+    "334": 4, "335": 4, "3361MV": 4, "3364OT": 4, "337": 4, "339": 4,
+    # Wholesale Trade
+    "42": 5,
+    # Retail Trade
+    "441": 6, "445": 6, "452": 6, "4A0": 6,
+    # Transportation & Warehousing
+    "481": 7, "482": 7, "483": 7, "484": 7, "485": 7, "486": 7,
+    "487OS": 7, "493": 7,
+    # Finance, Insurance & Real Estate
+    "521CI": 8, "523": 8, "524": 8, "525": 8, "532RL": 8, "HS": 8, "ORE": 8,
+    # Professional / Information / Education / Health / Leisure / Other
+    "511": 9, "512": 9, "513": 9, "514": 9, "5411": 9, "5412OP": 9,
+    "5415": 9, "55": 9, "561": 9, "562": 9, "61": 9, "621": 9, "622": 9,
+    "623": 9, "624": 9, "711AS": 9, "713": 9, "721": 9, "722": 9, "81": 9,
+    # Government
+    "GFE": 10, "GFGD": 10, "GFGN": 10, "GSLE": 10, "GSLG": 10,
 }
 
 
 def get_default_sector_labels() -> list[str]:
+    """Return the 11 model sector labels (always length 11)."""
     return list(_DEFAULT_SECTOR_LABELS)
 
 
@@ -75,7 +93,7 @@ def _cache_path(cache_dir: str, year: int) -> Path:
 
 
 def _fetch_raw_api(year: int, cache_dir: str) -> list[dict]:
-    """Fetch the BEA Summary Use table for *year* and return raw row list."""
+    """Fetch the BEA Summary Use table rows for *year* (cached by year)."""
     api_key = os.environ.get("BEA_API_KEY")
     if not api_key:
         raise EnvironmentError(
@@ -105,77 +123,76 @@ def _fetch_raw_api(year: int, cache_dir: str) -> list[dict]:
     resp.raise_for_status()
     payload = resp.json()
 
-    # Surface any BEA API-level error messages
-    if "Error" in payload.get("BEAAPI", {}):
-        raise RuntimeError(f"BEA API error: {payload['BEAAPI']['Error']}")
+    beaapi = payload.get("BEAAPI", {})
+    if "Error" in beaapi:
+        raise RuntimeError(f"BEA API error: {beaapi['Error']}")
 
-    rows: list[dict] = payload["BEAAPI"]["Results"]["Data"]
+    # Results may be a dict or a single-element list depending on the request.
+    results = beaapi["Results"]
+    if isinstance(results, list):
+        rows = results[0]["Data"]
+    else:
+        rows = results["Data"]
+
+    if not rows:
+        raise RuntimeError(f"BEA API returned no data for year {year}, TableID {_DEFAULT_TABLE_ID}")
+
     with cache_file.open("w") as fh:
         json.dump(rows, fh)
     logger.info("Cached %d BEA rows to %s", len(rows), cache_file)
     return rows
 
 
-# ---------------------------------------------------------------------------
-# Parsing & aggregation
-# ---------------------------------------------------------------------------
-
 def _parse_value(val: str) -> float:
-    """Parse BEA data value string (may contain commas) to float."""
+    """Parse a BEA DataValue string (may contain commas) to float."""
     try:
         return float(str(val).replace(",", "").strip())
     except (ValueError, TypeError):
         return 0.0
 
 
-def _code_prefix(code: str) -> str:
-    """Return first 2 characters of a BEA industry code."""
-    return str(code).strip()[:2]
+def _build_use_and_output(rows: list[dict], n_sectors: int) -> tuple[np.ndarray, np.ndarray]:
+    """Aggregate raw BEA rows into a sector×sector use matrix and output vector.
 
-
-def _build_use_matrix(rows: list[dict], n_sectors: int) -> tuple[np.ndarray, np.ndarray]:
-    """Build (n_sectors × n_sectors) intermediate-use matrix and gross output vector.
+    Only cells whose row (commodity) and column (industry) codes both map to
+    a model sector are counted as intermediate use; ``F*`` (final demand),
+    ``T*`` (totals) and ``V*`` (value added) codes are excluded automatically
+    because they are absent from :data:`_CODE_TO_SECTOR`.
 
     Returns
     -------
     U : np.ndarray, shape (n_sectors, n_sectors)
-        Intermediate use: U[i, j] = commodity i used by industry j.
-    x : np.ndarray, shape (n_sectors,)
-        Gross output by sector (from the Total Industry Output row).
+        Intermediate use, aggregated to sectors.  U[s, t] = commodity from
+        sector s used by industry sector t.
+    g : np.ndarray, shape (n_sectors,)
+        Gross output per sector, from the ``T018`` row.
     """
     U = np.zeros((n_sectors, n_sectors), dtype=float)
-    x = np.zeros(n_sectors, dtype=float)
+    g = np.zeros(n_sectors, dtype=float)
 
     for row in rows:
-        row_code = _code_prefix(row.get("RowCode", ""))
-        col_code = _code_prefix(row.get("ColCode", ""))
-        row_type = str(row.get("RowType", "")).strip()
-        col_type = str(row.get("ColType", "")).strip()
+        row_code = str(row.get("RowCode", "")).strip()
+        col_code = str(row.get("ColCode", "")).strip()
         value = _parse_value(row.get("DataValue", 0))
 
-        # Gross output row: ColType="I" (industry column), special RowCode "T017"
-        # or RowDescr containing "Total industry output"
-        row_descr = str(row.get("RowDescr", "")).lower()
-        if "total industry output" in row_descr and col_type == "I":
-            s = _CODE_TO_SECTOR.get(col_code)
-            if s is not None and s < n_sectors:
-                x[s] += value
+        # Gross output: the T018 row gives total output for each industry column.
+        if row_code == _GROSS_OUTPUT_ROW:
+            s_col = _CODE_TO_SECTOR.get(col_code)
+            if s_col is not None and s_col < n_sectors:
+                g[s_col] += value
             continue
 
-        # Intermediate use: both row and column are industries
-        if row_type != "I" or col_type != "I":
-            continue
-
+        # Intermediate use: both axes must be real (mapped) sectors.
         s_row = _CODE_TO_SECTOR.get(row_code)
         s_col = _CODE_TO_SECTOR.get(col_code)
         if s_row is not None and s_col is not None and s_row < n_sectors and s_col < n_sectors:
             U[s_row, s_col] += value
 
-    return U, x
+    return U, g
 
 
 # ---------------------------------------------------------------------------
-# Public API (called by build_features.py)
+# Public API (called by scripts/build_features.py)
 # ---------------------------------------------------------------------------
 
 def get_technical_coefficients(
@@ -183,32 +200,40 @@ def get_technical_coefficients(
     n_sectors: int = 11,
     cache_dir: str = "data/cache",
 ) -> np.ndarray:
-    """Fetch BEA Use table and return the direct-requirements matrix A.
+    """Fetch the BEA Use table and return the direct-requirements matrix A.
+
+    A[i, j] = dollars of sector-i input per dollar of sector-j gross output.
 
     Parameters
     ----------
     year : int
-        BEA I-O table year.  Defaults to 2022 (most recent Summary table).
+        BEA I-O table year (default 2022, the most recent Summary table).
     n_sectors : int
-        Number of sectors in the model.
+        Number of model sectors (default 11).
     cache_dir : str
-        Directory used to cache raw API responses.
+        Directory used to cache the raw API response.
 
     Returns
     -------
     A : np.ndarray, shape (n_sectors, n_sectors)
-        Technical coefficient matrix.  A[i, j] = intermediate input from
-        sector i per dollar of output in sector j.
     """
     rows = _fetch_raw_api(year, cache_dir)
-    U, x = _build_use_matrix(rows, n_sectors)
+    U, g = _build_use_and_output(rows, n_sectors)
 
-    x_safe = np.where(x == 0, np.nan, x)
-    A = U / x_safe[np.newaxis, :]
-    A = np.nan_to_num(A, nan=0.0)
+    if not np.any(U):
+        raise RuntimeError(
+            "BEA Use matrix is all zeros — the code→sector mapping likely does "
+            "not match this table year's industry codes. Check _CODE_TO_SECTOR."
+        )
+
+    g_safe = np.where(g == 0, np.nan, g)
+    A = np.nan_to_num(U / g_safe[np.newaxis, :], nan=0.0)
 
     rho = float(np.max(np.abs(np.linalg.eigvals(A))))
-    logger.info("A matrix: shape=%s  spectral_radius=%.4f", A.shape, rho)
+    logger.info(
+        "BEA A matrix: shape=%s  nonzero=%d/%d  spectral_radius=%.4f",
+        A.shape, int((A > 0).sum()), A.size, rho,
+    )
     return A
 
 
@@ -217,30 +242,33 @@ def get_sector_output(
     n_sectors: int = 11,
     cache_dir: str = "data/cache",
 ) -> np.ndarray:
-    """Return gross output by sector (millions of dollars) from BEA Use table.
+    """Return gross output by sector (millions of current dollars).
 
     Parameters
     ----------
     year : int
         BEA I-O table year.
     n_sectors : int
-        Number of sectors in the model.
+        Number of model sectors.
     cache_dir : str
-        Directory used to cache raw API responses.
+        Directory used to cache the raw API response.
 
     Returns
     -------
     x_s : np.ndarray, shape (n_sectors,)
-        Gross output in millions of current dollars.
     """
     rows = _fetch_raw_api(year, cache_dir)
-    _, x = _build_use_matrix(rows, n_sectors)
-    logger.info("Gross output: total = $%.1f trillion", x.sum() / 1e6)
-    return x
+    _, g = _build_use_and_output(rows, n_sectors)
+    if not np.any(g):
+        raise RuntimeError(
+            f"No gross-output ({_GROSS_OUTPUT_ROW}) values parsed from BEA table."
+        )
+    logger.info("BEA gross output: total = $%.2f trillion", g.sum() / 1e6)
+    return g
 
 
 # ---------------------------------------------------------------------------
-# Core linear algebra (unchanged)
+# Core linear algebra
 # ---------------------------------------------------------------------------
 
 def leontief_inverse(A: np.ndarray) -> np.ndarray:
@@ -249,7 +277,8 @@ def leontief_inverse(A: np.ndarray) -> np.ndarray:
     Raises
     ------
     ValueError
-        If spectral radius of A ≥ 1 (non-productive economy).
+        If the spectral radius of *A* is ≥ 1 (non-productive economy; the
+        series I + A + A² + … diverges).
     """
     rho = float(np.max(np.abs(np.linalg.eigvals(A))))
     if rho >= 1.0:
@@ -263,11 +292,11 @@ def leontief_inverse(A: np.ndarray) -> np.ndarray:
 
 
 # ---------------------------------------------------------------------------
-# File-based loaders (kept as fallback if someone has local CSVs)
+# File-based loaders (fallback for local CSV/Excel copies of BEA tables)
 # ---------------------------------------------------------------------------
 
 def load_use_table(path: str) -> tuple[np.ndarray, list[str]]:
-    """Load a BEA Use table from a local CSV/Excel file."""
+    """Load a BEA Use table from a local CSV/Excel file and return (A, labels)."""
     fpath = Path(path)
     if not fpath.exists():
         raise FileNotFoundError(f"BEA Use table not found: {path}")
@@ -291,7 +320,7 @@ def load_use_table(path: str) -> tuple[np.ndarray, list[str]]:
 
 
 def load_gross_output(path: str) -> tuple[np.ndarray, list[str]]:
-    """Load BEA gross output from a local CSV/Excel file."""
+    """Load BEA gross output from a local CSV/Excel file and return (x_s, labels)."""
     fpath = Path(path)
     if not fpath.exists():
         raise FileNotFoundError(f"BEA gross output file not found: {path}")

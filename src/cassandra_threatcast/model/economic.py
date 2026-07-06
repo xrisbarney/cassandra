@@ -80,16 +80,24 @@ def damage_function(
     """
     Maps per-sector shock loads to fraction of output disrupted.
 
-    phi_s(load_s) = max_damage_s * sigmoid((load_s - scale_s) * shape_s)
+    phi_s(load_s) = max_damage_s * (sigmoid(z) - sigmoid(z0)) / (1 - sigmoid(z0))
+    where z = (load_s - scale_s) * shape_s and z0 = (0 - scale_s) * shape_s.
 
-    Returns g_s of shape (S,).
+    The sigmoid is anchored at z0 so that a zero shock load yields zero
+    disruption (phi_s(0) = 0) while phi_s(inf) -> max_damage_s.  A raw sigmoid
+    would report a spurious non-zero damage floor at zero load, biasing
+    systemic-risk estimates upward.
+
+    Returns g_s of shape (S,), monotone non-decreasing and bounded in
+    [0, max_damage] for non-negative loads.
     """
     shape = jnp.asarray(params.shape)      # (S,)
     scale = jnp.asarray(params.scale)      # (S,)
     max_damage = jnp.asarray(params.max_damage)  # (S,)
 
-    logit = (shock_load - scale) * shape
-    g_s = max_damage * jax_sigmoid(logit)
+    s = jax_sigmoid((shock_load - scale) * shape)
+    s0 = jax_sigmoid((0.0 - scale) * shape)   # sigmoid value at zero load
+    g_s = max_damage * (s - s0) / jnp.clip(1.0 - s0, 1e-8, None)
     return g_s
 
 
