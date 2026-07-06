@@ -93,6 +93,48 @@ def test_full_model_sample_shapes():
         )
 
 
+def test_full_model_has_severity_process():
+    """Prior predictive exposes the latent severity process and its B channel."""
+    import jax
+    from numpyro.infer import Predictive
+    from cassandra_threatcast.model.full import full_model
+
+    K, S, T, r, R = 3, 2, 12, 2, 2
+    data   = make_synthetic_data(K, S, T, r, R)
+    config = {"model": {"K": K, "S": S, "r": r, "R": R, "r_sigma": 2}}
+
+    rng = jax.random.PRNGKey(7)
+    samples = Predictive(full_model, num_samples=3)(rng, data=data, config=config)
+
+    # Severity latent (zeta_t), factor path (h_t), and the B observation channel.
+    assert "zeta_t" in samples, f"missing zeta_t; keys={list(samples.keys())}"
+    assert "B_obs" in samples, f"missing B_obs; keys={list(samples.keys())}"
+    # zeta_t is (n_samples, T, K)
+    assert samples["zeta_t"].shape == (3, T, K)
+    assert bool(np.all(np.isfinite(np.asarray(samples["zeta_t"]))))
+
+
+def test_severity_obs_masks_missing_marks():
+    """severity_obs must tolerate NaN severity marks (empty topic-months)."""
+    import jax
+    import jax.numpy as jnp
+    from numpyro.infer import Predictive
+    from cassandra_threatcast.model.full import full_model
+
+    K, S, T, r, R = 3, 2, 10, 2, 2
+    data = make_synthetic_data(K, S, T, r, R)
+    B = np.asarray(data["B"]).copy()
+    B[:, 0] = np.nan            # first month has no CVEs for any topic
+    B[1, 3] = np.nan            # scattered gap
+    data["B"] = B
+    config = {"model": {"K": K, "S": S, "r": r, "R": R, "r_sigma": 2}}
+
+    rng = jax.random.PRNGKey(11)
+    # Must not raise despite NaNs in the observed severity marks.
+    samples = Predictive(full_model, num_samples=2)(rng, data=data, config=config)
+    assert "B_obs" in samples
+
+
 # ---------------------------------------------------------------------------
 # latent_dynamics_model
 # ---------------------------------------------------------------------------

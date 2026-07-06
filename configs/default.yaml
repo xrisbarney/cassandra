@@ -1,7 +1,8 @@
 model:
   K: 8             # number of threat topics
   S: 11            # number of sectors (matching BEA I-O summary level)
-  r: 3             # number of latent factors
+  r: 3             # number of latent intensity factors
+  r_sigma: 2       # number of latent severity factors
   R: 3             # number of regimes
   vi_rank: 10      # rank for low-rank variational approximation
 

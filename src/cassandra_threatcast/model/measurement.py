@@ -72,6 +72,36 @@ def exploitation_obs(
     )
 
 
+def severity_obs(
+    zeta_kt: jnp.ndarray,       # (K, T) latent log-severity
+    kappa_k: jnp.ndarray,       # (K,) measurement-noise std
+    B_obs: jnp.ndarray | None,  # (K, T) observed mean-CVSS marks or None
+) -> None:
+    """
+    LogNormal likelihood for the mean-CVSS severity marks B_kt.
+
+    log B_kt ~ Normal(zeta_kt, kappa_k),  so sigma_kt = exp(zeta_kt) is the
+    latent severity on the CVSS scale.
+
+    Empty (topic, month) cells carry NaN in B (no CVEs that month); those
+    entries are masked out of the likelihood so they contribute nothing.
+    """
+    scale_kt = kappa_k[:, None] * jnp.ones_like(zeta_kt)  # (K, T)
+
+    if B_obs is None:
+        numpyro.sample("B_obs", dist.LogNormal(zeta_kt, scale_kt))
+        return
+
+    B = jnp.asarray(B_obs)
+    obs_mask = ~jnp.isnan(B)
+    # Replace missing / non-positive marks with a dummy positive value; the mask
+    # zeroes their contribution to the log-density.
+    B_safe = jnp.clip(jnp.where(obs_mask, B, 1.0), 0.1, 10.0)
+
+    with numpyro.handlers.mask(mask=obs_mask):
+        numpyro.sample("B_obs", dist.LogNormal(zeta_kt, scale_kt), obs=B_safe)
+
+
 def incident_obs(
     lambda_kt: jnp.ndarray,    # (K, T)
     M_skt: jnp.ndarray,        # (S, K, T) exposure map

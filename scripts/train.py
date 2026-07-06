@@ -112,7 +112,7 @@ def assemble_data(panel: dict, data_dir: str, config: dict) -> dict:
 
     return {
         "N":        panel["N"].astype(float),        # (K, T)
-        "B":        panel.get("B", np.zeros((K, T))).astype(float),  # (K, T)
+        "B":        panel.get("B", np.full((K, T), np.nan)).astype(float),  # (K, T); NaN = unobserved
         "E":        panel.get("E", np.zeros((K, T))).astype(float),  # (K, T)
         "D":        panel["D"].astype(float),        # (S, T)
         "M_skt":    M_skt.astype(float),             # (S, K, T)

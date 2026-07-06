@@ -14,7 +14,12 @@ import numpyro.distributions as dist
 from numpyro.contrib.control_flow import scan
 from numpyro.primitives import deterministic
 
-from cassandra_threatcast.model.measurement import vulnerability_obs, exploitation_obs, incident_obs
+from cassandra_threatcast.model.measurement import (
+    vulnerability_obs,
+    exploitation_obs,
+    incident_obs,
+    severity_obs,
+)
 from cassandra_threatcast.model.economic import (
     DamageFunctionParams,
     damage_function,
@@ -90,11 +95,36 @@ def full_model(data: dict, config: dict) -> None:
         dist.HalfNormal(0.5 * jnp.ones(K)),
     )  # (K,)
 
+    # ------------------------------------------------------------------ #
+    # 1b. Latent severity process priors (log sigma_{k,t}), analogous to the
+    #     intensity: regime-dependent level + lower-dimensional AR factors.
+    # ------------------------------------------------------------------ #
+    r_sig: int = int(model_cfg.get("r_sigma", r))
+    tril_sig = jnp.tril(jnp.ones((r_sig, r_sig)))
+
+    nu_r = numpyro.sample(
+        "nu_r",
+        dist.Normal(1.5 * jnp.ones((R, K)), 1.0 * jnp.ones((R, K))),
+    )  # (R, K) regime-dependent severity level (log-CVSS scale)
+    Psi = numpyro.sample(
+        "Psi",
+        dist.Normal(jnp.zeros((K, r_sig)), jnp.ones((K, r_sig))),
+    )  # (K, r_sig) severity factor loadings
+    A_h_raw = numpyro.sample(
+        "A_h_raw",
+        dist.Normal(jnp.zeros((r_sig, r_sig)), 0.3 * jnp.ones((r_sig, r_sig))),
+    )
+    A_h = deterministic("A_h", A_h_raw * tril_sig)  # (r_sig, r_sig) lower-tri
+    Q_h = numpyro.sample("Q_h", dist.HalfNormal(0.5 * jnp.ones(r_sig)))   # (r_sig,)
+    omega_k = numpyro.sample("omega_k", dist.HalfNormal(0.5 * jnp.ones(K)))  # (K,) idiosyncratic
+    kappa_k = numpyro.sample("kappa_k", dist.HalfNormal(0.5 * jnp.ones(K)))  # (K,) severity meas. noise
+
     f_init = numpyro.sample("f_init", dist.Normal(jnp.zeros(r), jnp.ones(r)))
     z_init = numpyro.sample("z_init", dist.Categorical(probs=jnp.ones(R) / R))
+    h_init = numpyro.sample("h_init", dist.Normal(jnp.zeros(r_sig), jnp.ones(r_sig)))
 
     def _latent_step(carry, _):
-        f_prev, z_prev = carry  # (r,), ()
+        f_prev, z_prev, h_prev = carry  # (r,), (), (r_sig,)
 
         z_t = numpyro.sample("z_t", dist.Categorical(probs=Pi[z_prev]))
         eps = numpyro.sample("eps_f", dist.Normal(jnp.zeros(r), jnp.ones(r)))
@@ -107,23 +137,32 @@ def full_model(data: dict, config: dict) -> None:
         eta_noise = numpyro.sample("eta_noise", dist.Normal(jnp.zeros(K), tau_k))
         eta_t = mean_eta + eta_noise  # (K,)
 
-        return (f_t, z_t), (f_t, z_t, eta_t)
+        # Severity factor evolution and log-severity (shares the regime z_t).
+        xi_h = numpyro.sample("xi_h", dist.Normal(jnp.zeros(r_sig), jnp.ones(r_sig)))
+        h_t = A_h @ h_prev + jnp.diag(Q_h) @ xi_h  # (r_sig,)
+        v_zeta = numpyro.sample("v_zeta", dist.Normal(jnp.zeros(K), omega_k))
+        zeta_t = nu_r[z_t] + h_t @ Psi.T + v_zeta  # (K,)
 
-    _, (f_seq, z_seq, eta_seq) = scan(
+        return (f_t, z_t, h_t), (f_t, z_t, eta_t, h_t, zeta_t)
+
+    _, (f_seq, z_seq, eta_seq, h_seq, zeta_seq) = scan(
         _latent_step,
-        (f_init, z_init),
+        (f_init, z_init, h_init),
         xs=None,
         length=T,
     )
-    # f_seq: (T, r), z_seq: (T,), eta_seq: (T, K)
+    # f_seq: (T, r), z_seq: (T,), eta_seq: (T, K), h_seq: (T, r_sig), zeta_seq: (T, K)
 
     deterministic("f_t", f_seq)
     # "z_t" is already recorded by scan as a sampled (T,) site; re-declaring it
     # as deterministic duplicates the site name and crashes the model.
     deterministic("eta_t", eta_seq)
+    deterministic("h_t", h_seq)
+    deterministic("zeta_t", zeta_seq)
 
-    # lambda_kt: (K, T) â€” transpose from (T, K)
-    lambda_kt = eta_seq.T  # (K, T)
+    # transpose (T, K) -> (K, T)
+    lambda_kt = eta_seq.T   # (K, T) log-intensities
+    zeta_kt = zeta_seq.T    # (K, T) log-severity
 
     # ------------------------------------------------------------------ #
     # 2. Measurement parameters
@@ -169,6 +208,9 @@ def full_model(data: dict, config: dict) -> None:
 
     D_obs = jnp.asarray(data["D"]) if data.get("D") is not None else None
     incident_obs(lambda_kt, M_skt, pi_st, rho_s, D_obs)
+
+    B_obs = jnp.asarray(data["B"]) if data.get("B") is not None else None
+    severity_obs(zeta_kt, kappa_k, B_obs)
 
 
 # ---------------------------------------------------------------------------
@@ -221,15 +263,7 @@ def predict(
     x_s_j = jnp.asarray(x_s)
     M_future_j = jnp.asarray(M_future)  # (S, K, horizon)
 
-    # Latent severity sigma_k for the economic shock load in Eq. (1). The model
-    # carries no separate severity latent, so we use the observed severity marks
-    # B_{k,t} (mean CVSS base score in [0, 10]) averaged per topic and scaled to
-    # [0, 1]. Absolute scale is absorbed by the damage-function calibration.
-    B_obs = data.get("B")
-    if B_obs is not None and np.asarray(B_obs).size:
-        sigma_k = np.nan_to_num(np.nanmean(np.asarray(B_obs), axis=1) / 10.0, nan=0.5)
-    else:
-        sigma_k = np.full(K, 0.5)
+    r_sig = posterior_samples["h_init"].shape[-1]
 
     for i in range(n_samples):
         # Extract parameters for sample i
@@ -245,9 +279,17 @@ def predict(
         varsigma_k_i = posterior_samples["varsigma_k"][i]  # (K,)
         rho_s_i = posterior_samples["rho_s"][i]      # (S,)
 
-        # Last factor and regime from posterior
+        # Severity-process parameters for sample i
+        nu_r_i = posterior_samples["nu_r"][i]        # (R, K)
+        Psi_i = np.array(posterior_samples["Psi"][i])        # (K, r_sig)
+        A_h_i = np.array(posterior_samples["A_h"][i])        # (r_sig, r_sig)
+        Q_h_i = np.array(posterior_samples["Q_h"][i])        # (r_sig,)
+        omega_k_i = np.array(posterior_samples["omega_k"][i])  # (K,)
+
+        # Last factor, regime, and severity factor from posterior
         f_last = np.array(posterior_samples["f_t"][i, -1, :])   # (r,)
         z_last = int(posterior_samples["z_t"][i, -1])
+        h_last = np.array(posterior_samples["h_t"][i, -1, :])   # (r_sig,)
 
         for h in range(horizon):
             # Regime transition
@@ -282,11 +324,19 @@ def predict(
             rate_s = np.clip(rate_s, 1e-8, None)
             D_pred[i, :, h] = rng.poisson(rate_s)
 
+            # Severity forecast: evolve the severity factor and draw log-severity
+            # (shares the regime z_curr), then sigma_k = exp(zeta_k).
+            xi_h = rng.standard_normal(r_sig)
+            h_curr = A_h_i @ h_last + np.diag(Q_h_i) @ xi_h        # (r_sig,)
+            v_zeta = rng.standard_normal(K) * omega_k_i           # (K,)
+            zeta_h = np.array(nu_r_i[z_curr]) + h_curr @ Psi_i.T + v_zeta  # (K,)
+            sigma_h = np.exp(zeta_h)                              # (K,) latent severity
+
             # Economic shock load per Eq. (1): sum_k M_{s,k} * lambda_k * sigma_k
             # (exposure-weighted intensity x severity). rho_s and 1/x_s are NOT
             # applied here — rho_s belongs to the incident-disclosure channel and
             # gross output x_s enters later via direct losses d_s = g_s * x_s.
-            shock_load = jnp.asarray(M_h @ (exp_lam * sigma_k))  # (S,)
+            shock_load = jnp.asarray(M_h @ (exp_lam * sigma_h))  # (S,)
             g_s = np.array(damage_function(shock_load, damage_params))
             d_s, ell = leontief_propagation(
                 jnp.asarray(g_s), x_s_j, Lambda_L_j
@@ -295,6 +345,7 @@ def predict(
             ell_agg[i, h] = float(jnp.sum(ell))
 
             f_last = f_curr
+            h_last = h_curr
             z_last = z_curr
 
     return {
