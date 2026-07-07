@@ -84,6 +84,30 @@ def get_default_sector_labels() -> list[str]:
     return list(_DEFAULT_SECTOR_LABELS)
 
 
+# One-sentence description + example constituent industries per sector, for
+# UI tooltips/glossaries -- written from the actual NAICS groupings in
+# _CODE_TO_SECTOR above, not just the short label name.
+_SECTOR_DESCRIPTIONS = [
+    "Farming, forestry, fishing, and hunting -- crop and animal production, logging, commercial fishing.",
+    "Extraction of oil, gas, coal, metal ores, and other minerals.",
+    "Electric power, natural gas, water, and sewage/waste systems.",
+    "Building construction, heavy and civil engineering, and specialty trade contractors.",
+    "Production of physical goods: food, textiles, chemicals, machinery, electronics, vehicles, and more -- the broadest sector here.",
+    "Businesses that sell goods in bulk to retailers, other businesses, or institutions, rather than directly to consumers.",
+    "Businesses selling goods directly to consumers, in stores or online.",
+    "Moving people and goods by air, rail, water, truck, and transit, plus postal/courier and warehousing.",
+    "Banking, securities and investment firms, insurance carriers, and real estate/rental services.",
+    "A broad catch-all: professional/scientific/technical services, information and media, education, health care, arts and entertainment, and other services.",
+    "Federal, state, and local government agencies and government enterprises.",
+]
+
+
+def get_sector_descriptions() -> list[str]:
+    """Return a one-sentence description per sector (always length 11,
+    aligned index-for-index with get_default_sector_labels())."""
+    return list(_SECTOR_DESCRIPTIONS)
+
+
 # ---------------------------------------------------------------------------
 # BEA API fetch & cache
 # ---------------------------------------------------------------------------

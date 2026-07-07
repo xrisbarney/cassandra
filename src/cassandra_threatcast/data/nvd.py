@@ -49,7 +49,13 @@ def fetch_cves(start_date: str, end_date: str, cache_dir: str) -> pd.DataFrame:
     pd.DataFrame
         One row per CVE with columns: cve_id, published_date,
         last_modified_date, cvss_base_score, cvss_version, cvss_vector,
-        cpe_list, description.
+        cpe_list, description. CVEs with ``vulnStatus == "Rejected"`` are
+        dropped: a rejected CVE is a formal MITRE/CNA determination that the
+        ID does not correspond to a real vulnerability (duplicate, withdrawn,
+        assigned in error, ...), and its description is boilerplate rejection
+        text ("DO NOT USE THIS CANDIDATE NUMBER...") rather than vulnerability
+        content -- counting it as an incident or feeding it into topic
+        modeling only adds noise.
     """
     Path(cache_dir).mkdir(parents=True, exist_ok=True)
     cache_file = _cache_path(cache_dir, start_date, end_date)
@@ -68,6 +74,12 @@ def fetch_cves(start_date: str, end_date: str, cache_dir: str) -> pd.DataFrame:
     df = pd.DataFrame(records)
     if df.empty:
         return df
+
+    n_before = len(df)
+    df = df[df["vuln_status"] != "Rejected"].copy()
+    n_rejected = n_before - len(df)
+    if n_rejected:
+        logger.info("Dropped %d rejected CVE record(s) (not real vulnerabilities)", n_rejected)
 
     df["published_date"] = pd.to_datetime(df["published_date"], utc=True)
     df["last_modified_date"] = pd.to_datetime(df["last_modified_date"], utc=True)
@@ -155,6 +167,13 @@ def _fetch_all_pages(start_date: str, end_date: str, cache_dir: str) -> list[dic
                 "pubEndDate": f"{win_end}T23:59:59.999",
                 "resultsPerPage": _RESULTS_PER_PAGE,
                 "startIndex": start_index,
+                # Server-side filter: excludes CVEs formally marked Rejected
+                # (not real vulnerabilities) so we never fetch/cache/pay
+                # pagination cost for them. fetch_cves() also filters
+                # client-side below, since this only helps *new* fetches --
+                # window files cached before this parameter was added can
+                # still contain Rejected records.
+                "noRejected": "",
             }
 
             data = _get_with_backoff(session, _NVD_BASE_URL, params, inter_request_delay)
@@ -255,6 +274,7 @@ def _parse_cve_item(item: dict) -> dict:
     cve_id: str = cve.get("id", "")
     published_date: str = cve.get("published", "")
     last_modified_date: str = cve.get("lastModified", "")
+    vuln_status: str = cve.get("vulnStatus", "")
 
     # --- CVSS score: prefer CVSSv3.1 > CVSSv3.0 > CVSSv2 ---
     cvss_base_score: float | None = None
@@ -305,6 +325,7 @@ def _parse_cve_item(item: dict) -> dict:
         "cvss_vector": cvss_vector,
         "cpe_list": cpe_list,
         "description": description,
+        "vuln_status": vuln_status,
     }
 
 

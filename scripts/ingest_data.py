@@ -8,6 +8,7 @@ Usage:
         --config configs/default.yaml
 """
 import argparse
+import json
 import logging
 
 from dotenv import load_dotenv
@@ -41,6 +42,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
 from cassandra_threatcast.data import nvd, epss, cisa_kev, sec_8k, bea_io, pipeline
 from cassandra_threatcast.features import topic_map as tm
+from cassandra_threatcast.llm.deepseek import label_topics
 
 
 # ---------------------------------------------------------------------------
@@ -112,6 +114,22 @@ def main() -> None:
     with open(mapper_path, "wb") as fh:
         pickle.dump(mapper, fh)
     print(f"      Topic mapper saved to {mapper_path}")
+
+    # Optional: ask DeepSeek for an analyst-recognizable name per topic (e.g.
+    # "SQL Injection" instead of "Sql / Injection / Php"). The raw top-words
+    # label is data-driven but can still read as noise for topics that don't
+    # cleanly resolve to one category; an LLM given the full top-word list
+    # can usually name the underlying concept even then. Skipped silently if
+    # DEEPSEEK_API_KEY isn't set.
+    top_words_per_topic = [mapper.top_words(k, n_words=15) for k in range(K)]
+    llm_names = label_topics(top_words_per_topic)
+    if llm_names:
+        names_path = os.path.join(args.output_dir, "topic_names.json")
+        with open(names_path, "w", encoding="utf-8") as fh:
+            json.dump({str(k): name for k, name in enumerate(llm_names) if name}, fh, indent=2)
+        print(f"      AI-generated topic names -> {names_path}")
+    else:
+        print("      (Set DEEPSEEK_API_KEY in .env for AI-generated topic names.)")
 
     # --- EPSS ---------------------------------------------------------------
     print("[3/6] Fetching EPSS scores ...")

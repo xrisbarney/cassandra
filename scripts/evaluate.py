@@ -24,6 +24,8 @@ import argparse
 import os
 import sys
 import warnings
+from concurrent.futures import ProcessPoolExecutor, as_completed
+
 import yaml
 import numpy as np
 import pandas as pd
@@ -156,6 +158,111 @@ def _get_full_model_predictive(
     return out["N_pred"]  # (n_samples, K, horizon)
 
 
+def _evaluate_fold(
+    fold_idx: int,
+    train_T: int,
+    horizons: list[int],
+    N_kt: np.ndarray,
+    D_st: np.ndarray,
+    panel: dict,
+    M_skt: np.ndarray,
+    e_t: np.ndarray,
+    Lambda_L: np.ndarray,
+    x_s: np.ndarray,
+    idata,
+    config: dict,
+) -> tuple[list[pd.DataFrame], dict[str, list[float]]]:
+    """Evaluate one rolling-origin fold (full model + all baselines).
+
+    Every fold trains/predicts on its own [0, train_T) / [train_T,
+    train_T+horizon) split and seeds its baseline-noise RNG with its own
+    fold_idx, so folds share no mutable state -- safe to run in any order or
+    in parallel processes with bit-identical results to the sequential loop.
+    Kept as a module-level function (not a closure) so it can be pickled and
+    sent to worker processes by ProcessPoolExecutor.
+    """
+    T, K = N_kt.shape[1], N_kt.shape[0]
+    avail_h = T - train_T
+    fold_horizons = [h for h in horizons if h <= avail_h]
+    fold_scores: list[pd.DataFrame] = []
+    fold_dm_crps: dict[str, list[float]] = {}
+    if not fold_horizons:
+        return fold_scores, fold_dm_crps
+
+    horizon = max(fold_horizons)
+    obs_test_N = N_kt[:, train_T : train_T + horizon]   # (K, horizon)
+
+    print(f"  Fold {fold_idx + 1}: train_T={train_T}  horizon={horizon}", flush=True)
+
+    # --- Full model predictive ------------------------------------------
+    if idata is not None:
+        try:
+            data_dict = {
+                "N": N_kt, "D": D_st,
+                "B": panel.get("B", np.zeros_like(N_kt)),
+                "E": panel.get("E", np.zeros_like(N_kt)),
+                "M_skt": M_skt, "e_t": e_t,
+                "x_s": x_s, "Lambda_L": Lambda_L,
+            }
+            full_pred = _get_full_model_predictive(
+                idata, data_dict, config, train_T, horizon
+            )   # (n_samples, K, horizon)
+
+            scores_full = _scores_from_predictive(obs_test_N, full_pred, fold_horizons)
+            scores_full["model"] = "FullModel"
+            scores_full["fold"] = fold_idx
+            fold_scores.append(scores_full)
+
+            flat_crps = _crps_series(
+                obs_test_N.ravel(),
+                full_pred.reshape(full_pred.shape[0], -1),
+            )
+            fold_dm_crps.setdefault("FullModel", []).extend(flat_crps.tolist())
+
+        except Exception as exc:
+            warnings.warn(f"  Full model evaluation failed at fold {fold_idx}: {exc}")
+
+    # --- Baselines -------------------------------------------------------
+    train_panel_N = N_kt[:, :train_T]
+    try:
+        baseline_results = run_all_baselines(
+            panel=train_panel_N,
+            horizons=fold_horizons,
+            quantiles=[0.1, 0.5, 0.9],
+            test_T=horizon,
+            seed=fold_idx * 100,  # *100 margin so each baseline's internal +1/+2 offset can't collide across folds
+        )
+    except Exception as exc:
+        warnings.warn(f"  Baselines failed at fold {fold_idx}: {exc}")
+        baseline_results = {}
+
+    for bname, bres in baseline_results.items():
+        preds_q = bres["predictions"]   # (K, horizon, 3)
+        median_pred = preds_q[:, :, 1]   # (K, horizon)
+        iqr = preds_q[:, :, 2] - preds_q[:, :, 0]   # (K, horizon)
+        sigma = iqr / (2 * 0.6745)
+        n_sim = 500
+        rng = np.random.default_rng(fold_idx)
+        sim_samples = (
+            median_pred[np.newaxis, :, :]
+            + rng.standard_normal((n_sim, K, horizon)) * sigma[np.newaxis, :, :]
+        )
+        sim_samples = np.maximum(sim_samples, 0.0)
+
+        scores_b = _scores_from_predictive(obs_test_N, sim_samples, fold_horizons)
+        scores_b["model"] = bname
+        scores_b["fold"] = fold_idx
+        fold_scores.append(scores_b)
+
+        flat_crps_b = _crps_series(
+            obs_test_N.ravel(),
+            sim_samples.reshape(n_sim, -1),
+        )
+        fold_dm_crps.setdefault(bname, []).extend(flat_crps_b.tolist())
+
+    return fold_scores, fold_dm_crps
+
+
 # ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
@@ -221,89 +328,36 @@ def main() -> None:
     print(f"[3/4] Running {len(fold_starts)} evaluation folds ...")
     print(f"      Horizons: {horizons}  T={T}  test_T={test_T}")
 
+    n_workers = min(len(fold_starts), os.cpu_count() or 1)
+    print(f"      Using {n_workers} worker process(es) (folds are independent)")
+
     all_scores: list[pd.DataFrame] = []
     dm_crps_series: dict[str, list[float]] = {}  # model -> flat CRPS list
 
-    for fold_idx, train_T in enumerate(fold_starts):
-        avail_h = T - train_T
-        fold_horizons = [h for h in horizons if h <= avail_h]
-        if not fold_horizons:
-            continue
+    fold_args = [
+        (fold_idx, train_T, horizons, N_kt, D_st, panel, M_skt, e_t, Lambda_L, x_s, idata, config)
+        for fold_idx, train_T in enumerate(fold_starts)
+    ]
 
-        horizon = max(fold_horizons)
-        obs_test_N = N_kt[:, train_T : train_T + horizon]   # (K, horizon)
-
-        print(f"  Fold {fold_idx + 1}/{len(fold_starts)}: "
-              f"train_T={train_T}  horizon={horizon}")
-
-        # --- Full model predictive ------------------------------------------
-        if idata is not None:
-            try:
-                data_dict = {
-                    "N": N_kt, "D": D_st,
-                    "B": panel.get("B", np.zeros_like(N_kt)),
-                    "E": panel.get("E", np.zeros_like(N_kt)),
-                    "M_skt": M_skt, "e_t": e_t,
-                    "x_s": x_s, "Lambda_L": Lambda_L,
-                }
-                full_pred = _get_full_model_predictive(
-                    idata, data_dict, config, train_T, horizon
-                )   # (n_samples, K, horizon)
-
-                scores_full = _scores_from_predictive(obs_test_N, full_pred, fold_horizons)
-                scores_full["model"] = "FullModel"
-                scores_full["fold"] = fold_idx
-                all_scores.append(scores_full)
-
-                # Accumulate flat CRPS for DM test
-                flat_crps = _crps_series(
-                    obs_test_N.ravel(),
-                    full_pred.reshape(full_pred.shape[0], -1),
-                )
-                dm_crps_series.setdefault("FullModel", []).extend(flat_crps.tolist())
-
-            except Exception as exc:
-                warnings.warn(f"  Full model evaluation failed at fold {fold_idx}: {exc}")
-
-        # --- Baselines -------------------------------------------------------
-        train_panel_N = N_kt[:, :train_T]
-        try:
-            baseline_results = run_all_baselines(
-                panel=train_panel_N,
-                horizons=fold_horizons,
-                quantiles=[0.1, 0.5, 0.9],
-                test_T=horizon,
-            )
-        except Exception as exc:
-            warnings.warn(f"  Baselines failed at fold {fold_idx}: {exc}")
-            baseline_results = {}
-
-        for bname, bres in baseline_results.items():
-            preds_q = bres["predictions"]   # (K, horizon, 3)
-            # Use the median (quantile index 1) as point forecast
-            median_pred = preds_q[:, :, 1]   # (K, horizon)
-            # Simulate samples by adding Gaussian noise around the median
-            # scaled by the IQR from the quantile predictions
-            iqr = preds_q[:, :, 2] - preds_q[:, :, 0]   # (K, horizon)
-            sigma = iqr / (2 * 0.6745)
-            n_sim = 500
-            rng = np.random.default_rng(fold_idx)
-            sim_samples = (
-                median_pred[np.newaxis, :, :]
-                + rng.standard_normal((n_sim, K, horizon)) * sigma[np.newaxis, :, :]
-            )
-            sim_samples = np.maximum(sim_samples, 0.0)
-
-            scores_b = _scores_from_predictive(obs_test_N, sim_samples, fold_horizons)
-            scores_b["model"] = bname
-            scores_b["fold"]  = fold_idx
-            all_scores.append(scores_b)
-
-            flat_crps_b = _crps_series(
-                obs_test_N.ravel(),
-                sim_samples.reshape(n_sim, -1),
-            )
-            dm_crps_series.setdefault(bname, []).extend(flat_crps_b.tolist())
+    if n_workers > 1:
+        with ProcessPoolExecutor(max_workers=n_workers) as executor:
+            futures = {executor.submit(_evaluate_fold, *a): a[0] for a in fold_args}
+            for future in as_completed(futures):
+                fold_idx = futures[future]
+                try:
+                    fold_scores, fold_dm_crps = future.result()
+                except Exception as exc:  # noqa: BLE001 -- one fold's crash shouldn't sink the rest
+                    warnings.warn(f"  Fold {fold_idx} failed entirely: {exc}")
+                    continue
+                all_scores.extend(fold_scores)
+                for name, vals in fold_dm_crps.items():
+                    dm_crps_series.setdefault(name, []).extend(vals)
+    else:
+        for a in fold_args:
+            fold_scores, fold_dm_crps = _evaluate_fold(*a)
+            all_scores.extend(fold_scores)
+            for name, vals in fold_dm_crps.items():
+                dm_crps_series.setdefault(name, []).extend(vals)
 
     # --- Aggregate scores ---------------------------------------------------
     print("[4/4] Aggregating scores and running DM tests ...")

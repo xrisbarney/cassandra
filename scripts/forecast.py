@@ -39,6 +39,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
 from cassandra_threatcast.data import pipeline
 from cassandra_threatcast.data.bea_io import get_default_sector_labels
+from cassandra_threatcast.features.topic_map import load_topic_labels
 from cassandra_threatcast.viz.plots import plot_threat_forecast, plot_loss_distribution, save_figure
 
 
@@ -94,7 +95,13 @@ def _quantile_df(
     topic_labels: list[str],
     quantiles: list[float] = [0.05, 0.10, 0.25, 0.50, 0.75, 0.90, 0.95],
 ) -> pd.DataFrame:
-    """Convert predictive samples to a tidy quantile DataFrame."""
+    """Convert predictive samples to a tidy quantile DataFrame.
+
+    Value columns (``mean_cves_per_month``, ``q05_cves_per_month``, ...) are
+    counts of new CVEs published that month for that topic -- a MONTHLY
+    figure (unlike the loss table's horizon-cumulative totals), made explicit
+    via the column name suffix.
+    """
     records = []
     K, H = pred_samples.shape[1], pred_samples.shape[2]
     for k in range(K):
@@ -103,87 +110,55 @@ def _quantile_df(
                 "topic": k,
                 "topic_label": topic_labels[k] if k < len(topic_labels) else f"Topic {k}",
                 "date": str(date),
-                "mean": float(np.mean(pred_samples[:, k, hi])),
+                "mean_cves_per_month": float(np.mean(pred_samples[:, k, hi])),
             }
             for q in quantiles:
-                row[f"q{int(q * 100):02d}"] = float(np.quantile(pred_samples[:, k, hi], q))
+                row[f"q{int(q * 100):02d}_cves_per_month"] = float(np.quantile(pred_samples[:, k, hi], q))
             records.append(row)
     return pd.DataFrame(records)
 
 
-def _humanize_topic_label(raw: str) -> str:
-    """Turn a WikiTopicMapper label like 'topic4:sql_injection_sql-injection'
-    into a human-readable 'Sql / Injection / Sql Injection'."""
-    label = raw.split(":", 1)[-1] if ":" in raw else raw
-    words = [w.replace("-", " ").strip() for w in label.split("_") if w.strip()]
-    return " / ".join(w.title() for w in words) or raw
-
-
-def _load_topic_labels(data_dir: str, K: int) -> list[str]:
-    """Load human-readable topic labels from the fitted topic mapper's top
-    words, falling back to generic 'Topic N' names if unavailable."""
-    mapper_path = os.path.join(data_dir, "topic_mapper.pkl")
-    fallback = [f"Topic {k}" for k in range(K)]
-    if not os.path.exists(mapper_path):
-        return fallback
-    try:
-        import pickle
-        with open(mapper_path, "rb") as fh:
-            mapper = pickle.load(fh)
-        raw_labels = mapper.get_topic_labels()
-        return [_humanize_topic_label(lbl) for lbl in raw_labels]
-    except Exception as exc:  # noqa: BLE001 -- cosmetic only, never fatal
-        warnings.warn(f"Could not load topic labels from {mapper_path}: {exc}")
-        return fallback
 
 
 def _loss_summary_df(
     loss_samples: np.ndarray,  # (n_samples,) or (n_samples, S, T_pred)
     dates_pred: list,
     sector_names: list[str],
+    horizon_months: int,
     alpha: float = 0.05,
 ) -> pd.DataFrame:
-    """Summarise the posterior loss distribution."""
+    """Summarise the posterior loss distribution.
+
+    All value columns are in USD and are TOTALS ACCUMULATED OVER THE WHOLE
+    forecast horizon (summed across months), not a monthly figure -- this is
+    made explicit in the column names (``_usd_total``) and via the
+    ``horizon_months`` column, since a bare "mean"/"VaR95" column is easy to
+    misread as a monthly run-rate.
+    """
+    var_pct = int((1 - alpha) * 100)
+
+    def _row(scope: str, vals: np.ndarray) -> dict:
+        return {
+            "scope": scope,
+            "horizon_months": horizon_months,
+            "mean_usd_total": float(np.mean(vals)),
+            "sd_usd_total": float(np.std(vals)),
+            f"VaR{var_pct}_usd_total": float(np.quantile(vals, 1 - alpha)),
+            f"ES{var_pct}_usd_total": float(np.mean(vals[vals >= np.quantile(vals, 1 - alpha)])),
+            "q05_usd_total": float(np.quantile(vals, 0.05)),
+            "q50_usd_total": float(np.quantile(vals, 0.50)),
+            "q95_usd_total": float(np.quantile(vals, 0.95)),
+        }
+
     if loss_samples.ndim == 1:
         # Aggregate across all sectors/time already done
-        agg = loss_samples
-        records = [{
-            "scope": "aggregate",
-            "mean":  float(np.mean(agg)),
-            "sd":    float(np.std(agg)),
-            f"VaR{int((1-alpha)*100)}":  float(np.quantile(agg, 1 - alpha)),
-            f"ES{int((1-alpha)*100)}":   float(np.mean(agg[agg >= np.quantile(agg, 1 - alpha)])),
-            "q05": float(np.quantile(agg, 0.05)),
-            "q50": float(np.quantile(agg, 0.50)),
-            "q95": float(np.quantile(agg, 0.95)),
-        }]
+        records = [_row("aggregate", loss_samples)]
     elif loss_samples.ndim == 3:
         # (n_samples, S, T_pred)  -> aggregate over time, then per-sector + total
         loss_agg_time = loss_samples.sum(axis=-1)   # (n_samples, S)
         loss_total    = loss_agg_time.sum(axis=-1)  # (n_samples,)
-        records = []
-        for s, name in enumerate(sector_names):
-            col = loss_agg_time[:, s]
-            records.append({
-                "scope": name,
-                "mean":  float(np.mean(col)),
-                "sd":    float(np.std(col)),
-                f"VaR{int((1-alpha)*100)}":  float(np.quantile(col, 1 - alpha)),
-                f"ES{int((1-alpha)*100)}":   float(np.mean(col[col >= np.quantile(col, 1 - alpha)])),
-                "q05": float(np.quantile(col, 0.05)),
-                "q50": float(np.quantile(col, 0.50)),
-                "q95": float(np.quantile(col, 0.95)),
-            })
-        records.append({
-            "scope": "aggregate",
-            "mean":  float(np.mean(loss_total)),
-            "sd":    float(np.std(loss_total)),
-            f"VaR{int((1-alpha)*100)}":  float(np.quantile(loss_total, 1 - alpha)),
-            f"ES{int((1-alpha)*100)}":   float(np.mean(loss_total[loss_total >= np.quantile(loss_total, 1 - alpha)])),
-            "q05": float(np.quantile(loss_total, 0.05)),
-            "q50": float(np.quantile(loss_total, 0.50)),
-            "q95": float(np.quantile(loss_total, 0.95)),
-        })
+        records = [_row(name, loss_agg_time[:, s]) for s, name in enumerate(sector_names)]
+        records.append(_row("aggregate", loss_total))
     else:
         raise ValueError(f"Unexpected loss_samples shape: {loss_samples.shape}")
 
@@ -203,7 +178,7 @@ def main() -> None:
 
     K = config["model"]["K"]
     S = config["model"]["S"]
-    topic_labels = config.get("topic_labels") or _load_topic_labels(args.data_dir, K)
+    topic_labels = config.get("topic_labels") or load_topic_labels(args.data_dir, K)
     sector_names = config.get("sector_names") or get_default_sector_labels()[:S]
 
     # --- Load panel ---------------------------------------------------------
@@ -326,12 +301,14 @@ def main() -> None:
     q_df = _quantile_df(pred_N, pred_dates, topic_labels)
     q_path = os.path.join(args.output_dir, "forecast_quantiles.csv")
     q_df.to_csv(q_path, index=False)
-    print(f"      Predictive quantiles -> {q_path}")
+    print(f"      Predictive quantiles -> {q_path}  (CVE counts per month, per topic)")
 
-    loss_df = _loss_summary_df(loss_samples, pred_dates, sector_names)
+    loss_df = _loss_summary_df(loss_samples, pred_dates, sector_names, horizon_months=args.horizon)
     loss_path = os.path.join(args.output_dir, "loss_distribution.csv")
     loss_df.to_csv(loss_path, index=False)
     print(f"      Loss distribution   -> {loss_path}")
+    print(f"      (All figures in USD, TOTAL accumulated over the "
+          f"{args.horizon}-month forecast horizon -- not a monthly rate)")
     print(loss_df.to_string(index=False))
 
     # --- Plain-English summary (optional, needs DEEPSEEK_API_KEY) -----------
@@ -374,9 +351,12 @@ def main() -> None:
 
     print(f"      {K} fan charts saved to {fig_dir}/")
 
-    # Loss distribution figure
+    # Loss distribution figure. plot_loss_distribution's `units` argument is
+    # only a label -- it does not scale the data -- so the raw-dollar totals
+    # (hundreds of millions here) must be pre-scaled to match, or the axis
+    # would show e.g. "404643266.25 $ billions" instead of "0.40 $ billions".
     agg_loss = loss_samples.sum(axis=(1, 2)) if loss_samples.ndim == 3 else loss_samples
-    fig_loss = plot_loss_distribution(agg_loss, units="$ billions")
+    fig_loss = plot_loss_distribution(agg_loss / 1e9, units=f"$ billions, total over {args.horizon} months")
     loss_fig_path = os.path.join(fig_dir, "loss_distribution.png")
     save_figure(fig_loss, loss_fig_path, dpi=200)
     print(f"      Loss distribution figure -> {loss_fig_path}")

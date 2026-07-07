@@ -126,6 +126,7 @@ class ArimaBaseline:
         horizon: int,
         quantiles: list = [0.1, 0.5, 0.9],
         n_bootstrap: int = 500,
+        seed: int = 0,
     ) -> np.ndarray:
         """
         Returns (n_series, horizon, n_quantiles).
@@ -135,6 +136,7 @@ class ArimaBaseline:
         """
         n_series = len(self.models)
         results = np.zeros((n_series, horizon, len(quantiles)))
+        rng = np.random.default_rng(seed)
 
         for i, model in self.models.items():
             fc, conf = model.predict(
@@ -143,7 +145,7 @@ class ArimaBaseline:
             for h in range(horizon):
                 # 90% PI: conf[h, 0] = lower (5th pct), conf[h, 1] = upper (95th pct)
                 sigma = max((conf[h, 1] - conf[h, 0]) / (2.0 * 1.645), 1e-6)
-                samples = np.random.normal(fc[h], sigma, n_bootstrap)
+                samples = rng.normal(fc[h], sigma, n_bootstrap)
                 for qi, q in enumerate(quantiles):
                     results[i, h, qi] = np.quantile(samples, q)
 
@@ -197,6 +199,7 @@ class EtsBaseline:
         horizon: int,
         quantiles: list = [0.1, 0.5, 0.9],
         n_bootstrap: int = 500,
+        seed: int = 0,
     ) -> np.ndarray:
         """
         Returns (n_series, horizon, n_quantiles).
@@ -206,6 +209,7 @@ class EtsBaseline:
         """
         n_series = len(self.models)
         results = np.zeros((n_series, horizon, len(quantiles)))
+        rng = np.random.default_rng(seed)
 
         for i, model in self.models.items():
             fc = model.forecast(horizon)
@@ -216,7 +220,7 @@ class EtsBaseline:
 
             for h in range(horizon):
                 scale = resid_std * np.sqrt(h + 1)
-                samples = np.random.normal(fc[h], scale, n_bootstrap)
+                samples = rng.normal(fc[h], scale, n_bootstrap)
                 samples = np.maximum(samples, 0.0)
                 for qi, q in enumerate(quantiles):
                     results[i, h, qi] = np.quantile(samples, q)
@@ -245,10 +249,12 @@ class NaiveBaseline:
         horizon: int,
         quantiles: list = [0.1, 0.5, 0.9],
         n_bootstrap: int = 500,
+        seed: int = 0,
     ) -> np.ndarray:
         """Returns (n_series, horizon, n_quantiles)."""
         n_series = self.panel.shape[0]
         results = np.zeros((n_series, horizon, len(quantiles)))
+        rng = np.random.default_rng(seed)
 
         for i in range(n_series):
             series = self.panel[i]
@@ -270,7 +276,7 @@ class NaiveBaseline:
                 point = series[idx] if abs(idx) <= T else float(np.mean(series))
                 # Noise grows with the number of full seasonal cycles
                 scale = resid_std * np.sqrt(h // self.seasonal_period + 1)
-                samples = np.random.normal(point, scale, n_bootstrap)
+                samples = rng.normal(point, scale, n_bootstrap)
                 samples = np.maximum(samples, 0.0)
                 for qi, q in enumerate(quantiles):
                     results[i, h, qi] = np.quantile(samples, q)
@@ -384,6 +390,7 @@ def run_all_baselines(
     horizons: list[int],
     quantiles: list[float] = [0.1, 0.5, 0.9],
     test_T: int = 12,
+    seed: int = 0,
 ) -> dict:
     """
     Fit all baselines on panel[:, :-test_T] and predict for test_T steps.
@@ -394,6 +401,11 @@ def run_all_baselines(
     horizons  : list of horizon lengths (informational; stored in results)
     quantiles : quantile levels to forecast
     test_T    : number of held-out time steps
+    seed      : RNG seed for baselines' bootstrap quantile sampling (ETS,
+                Naive, ARIMA -- RF's predictive spread comes from its trees,
+                not bootstrap noise, so it ignores this). Each baseline gets
+                a distinct seed (seed, seed+1, seed+2) so their bootstrap
+                draws aren't identical to each other.
 
     Returns
     -------
@@ -414,7 +426,7 @@ def run_all_baselines(
     # --- ETS ---
     try:
         ets = EtsBaseline().fit(train)
-        preds = ets.predict_quantiles(test_T, quantiles)
+        preds = ets.predict_quantiles(test_T, quantiles, seed=seed)
         results["ETS"] = {"predictions": preds, "name": "ETS"}
     except Exception as e:
         print(f"Warning: ETS baseline failed: {e}")
@@ -422,7 +434,7 @@ def run_all_baselines(
     # --- Naive ---
     try:
         naive = NaiveBaseline().fit(train)
-        preds = naive.predict_quantiles(test_T, quantiles)
+        preds = naive.predict_quantiles(test_T, quantiles, seed=seed + 1)
         results["Naive"] = {"predictions": preds, "name": "Naive"}
     except Exception as e:
         print(f"Warning: Naive baseline failed: {e}")
@@ -430,7 +442,7 @@ def run_all_baselines(
     # --- ARIMA ---
     try:
         arima = ArimaBaseline().fit(train)
-        preds = arima.predict_quantiles(test_T, quantiles)
+        preds = arima.predict_quantiles(test_T, quantiles, seed=seed + 2)
         results["ARIMA"] = {"predictions": preds, "name": "ARIMA"}
     except Exception as e:
         print(f"Warning: ARIMA baseline failed: {e}")

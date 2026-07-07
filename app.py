@@ -10,6 +10,7 @@ Each step is a button. You do not need to touch the command line.
 """
 from __future__ import annotations
 
+import html
 import json
 import os
 import re
@@ -18,7 +19,11 @@ import sys
 from pathlib import Path
 
 import numpy as np
+import pandas as pd
 import streamlit as st
+
+from cassandra_threatcast.data.bea_io import get_default_sector_labels, get_sector_descriptions
+from cassandra_threatcast.features.topic_map import load_topic_labels
 
 ROOT = Path(__file__).parent
 PROCESSED = ROOT / "data" / "processed"
@@ -27,7 +32,49 @@ PY = sys.executable
 RUN_LOG = RESULTS / "run_all.log"
 RUN_PID = RESULTS / "run_all.pid"
 
+SECTOR_LABELS = get_default_sector_labels()
+SECTOR_DESCRIPTIONS = dict(zip(SECTOR_LABELS, get_sector_descriptions()))
+
 st.set_page_config(page_title="CASSANDRA — Cyber Threat Forecasting", page_icon="🔮", layout="wide")
+
+
+def sector_glossary_expander() -> None:
+    """Reference table of all 11 sectors and what they cover, for anyone who
+    wants to browse definitions instead of hovering over each name."""
+    with st.expander("ℹ️ What do these sectors mean?"):
+        for name in SECTOR_LABELS:
+            st.markdown(f"**{name}** — {SECTOR_DESCRIPTIONS[name]}")
+
+
+def _sector_table_html(df: pd.DataFrame, name_col: str = "scope") -> str:
+    """Render a small DataFrame as an HTML table with a native hover tooltip
+    (title attribute) on any cell whose value is a known sector name."""
+    header = "".join(
+        f"<th style='padding:4px 10px;text-align:left;border-bottom:1px solid rgba(128,128,128,0.4)'>{html.escape(str(c))}</th>"
+        for c in df.columns
+    )
+    rows = []
+    for _, row in df.iterrows():
+        cells = []
+        for c in df.columns:
+            val = row[c]
+            if c == name_col and val in SECTOR_DESCRIPTIONS:
+                cells.append(
+                    "<td style='padding:4px 10px;'>"
+                    f"<span title=\"{html.escape(SECTOR_DESCRIPTIONS[val])}\" "
+                    "style='border-bottom:1px dotted currentColor;cursor:help;'>"
+                    f"{html.escape(str(val))}</span></td>"
+                )
+            elif isinstance(val, float):
+                cells.append(f"<td style='padding:4px 10px;text-align:right;'>{val:,.0f}</td>")
+            else:
+                weight = "font-weight:600;" if c == name_col else ""
+                cells.append(f"<td style='padding:4px 10px;{weight}'>{html.escape(str(val))}</td>")
+        rows.append("<tr>" + "".join(cells) + "</tr>")
+    return (
+        "<div style='overflow-x:auto;'><table style='width:100%;border-collapse:collapse;font-size:0.9em;'>"
+        f"<thead><tr>{header}</tr></thead><tbody>{''.join(rows)}</tbody></table></div>"
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -339,21 +386,29 @@ with tab_data:
 
         st.markdown("#### Activity by threat category")
         st.caption("Darker means more vulnerabilities that month for that category.")
-        fig2, ax2 = plt.subplots(figsize=(9, 3))
+        topic_labels = load_topic_labels(str(PROCESSED), N.shape[0])
+        fig2, ax2 = plt.subplots(figsize=(9, 3.5))
         im = ax2.imshow(N, aspect="auto", cmap="magma", interpolation="nearest")
-        ax2.set_xlabel("Month"); ax2.set_ylabel("Threat category")
+        ax2.set_xlabel("Month")
+        ax2.set_yticks(range(len(topic_labels)))
+        ax2.set_yticklabels(topic_labels, fontsize=8)
         fig2.colorbar(im, ax=ax2, label="Vulnerabilities")
         st.pyplot(fig2)
 
         D = PROCESSED / "D.npy"
         if D.exists() and np.nansum(np.load(D)) > 0:
             st.markdown("#### Disclosed company incidents by sector")
+            st.caption("Hover a sector name below for what it covers.")
             Dd = np.load(D)
-            fig3, ax3 = plt.subplots(figsize=(9, 2.6))
+            sector_names_chart = SECTOR_LABELS[: Dd.shape[0]]
+            fig3, ax3 = plt.subplots(figsize=(9, 3.2))
             ax3.bar(range(Dd.shape[0]), np.nansum(Dd, axis=1), color="#0d9488")
-            ax3.set_xlabel("Economic sector"); ax3.set_ylabel("Incidents")
+            ax3.set_xticks(range(Dd.shape[0]))
+            ax3.set_xticklabels(sector_names_chart, rotation=45, ha="right", fontsize=8)
+            ax3.set_ylabel("Incidents")
             ax3.spines[["top", "right"]].set_visible(False)
             st.pyplot(fig3)
+            sector_glossary_expander()
 
 # ---------------------------------------------------------------------------
 # TAB 3 — The forecast
@@ -362,8 +417,6 @@ with tab_forecast:
     if not done_forecast:
         st.info("No forecast yet. Finish **Step 5 — Forecast the future** to see results here.")
     else:
-        import pandas as pd
-
         forecast_dir = RESULTS / "forecasts"
 
         summary_path = forecast_dir / "summary.txt"
@@ -378,15 +431,31 @@ with tab_forecast:
             )
 
         st.markdown("#### Threat forecast (next months)")
-        st.caption("Predicted vulnerability activity per category, with an uncertainty range.")
+        st.caption(
+            "Predicted new vulnerabilities **per month**, by category, with an "
+            "uncertainty range. `topic_label` is an automatically-derived "
+            "category name (AI-assisted where available) — categories the "
+            "model couldn't confidently name are labeled 'Miscellaneous "
+            "Vulnerabilities' rather than guessing."
+        )
         q = pd.read_csv(forecast_dir / "forecast_quantiles.csv")
         st.dataframe(q, use_container_width=True, height=260)
 
         loss_path = forecast_dir / "loss_distribution.csv"
         if loss_path.exists():
             st.markdown("#### Possible economic losses")
-            st.caption("The model's range of plausible economy-wide losses from cyber incidents.")
-            st.dataframe(pd.read_csv(loss_path), use_container_width=True, height=260)
+            loss_preview = pd.read_csv(loss_path)
+            horizon_note = ""
+            if "horizon_months" in loss_preview.columns and len(loss_preview):
+                horizon_note = f" over the next {int(loss_preview['horizon_months'].iloc[0])} months"
+            st.caption(
+                f"All figures are in **US dollars, totaled{horizon_note}** "
+                "(not a monthly rate) — the model's range of plausible "
+                "economy-wide losses from cyber incidents. Hover a sector "
+                "name for what it covers."
+            )
+            st.markdown(_sector_table_html(loss_preview), unsafe_allow_html=True)
+            sector_glossary_expander()
 
         fig_dir = forecast_dir / "figures"
         if fig_dir.exists():

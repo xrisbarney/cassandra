@@ -7,7 +7,23 @@ from __future__ import annotations
 
 import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.feature_extraction import text as sk_text
 from sklearn.decomposition import NMF, LatentDirichletAllocation
+
+# CVE descriptions share a lot of near-universal report-writing boilerplate
+# ("This vulnerability allows a remote attacker to...", CVSS-derived
+# exploitability phrasing, vendor-advisory templates) that carries no
+# discriminative signal for the vulnerability TYPE and otherwise dominates
+# several NMF topics outright (e.g. a topic whose top words are just
+# 'oracle', 'cvss', 'access', 'attacks' -- Oracle's Critical Patch Update
+# advisory template, not a real threat category). These are added on top of
+# sklearn's standard English stopword list.
+_CVE_BOILERPLATE_STOPWORDS = [
+    "vulnerability", "vulnerabilities", "allows", "allow", "could", "may",
+    "attacker", "attackers", "successful", "cvss", "score", "affected",
+    "version", "versions", "prior", "due", "via", "using", "needed", "lead",
+    "oracle", "exploitation", "result", "results",
+]
 
 # ---------------------------------------------------------------------------
 # Seed vocabulary for 8 canonical threat topics
@@ -83,7 +99,7 @@ class WikiTopicMapper:
 
         self.vectorizer = TfidfVectorizer(
             max_features=self.max_features,
-            stop_words="english",
+            stop_words=list(sk_text.ENGLISH_STOP_WORDS.union(_CVE_BOILERPLATE_STOPWORDS)),
             ngram_range=(1, 2),
             min_df=2,
             sublinear_tf=True,
@@ -144,12 +160,67 @@ class WikiTopicMapper:
         top_indices = np.argsort(topic_row)[::-1][:n_words]
         return [feature_names[i] for i in top_indices]
 
-    def get_topic_labels(self) -> list[str]:
-        """Return a human-readable label per topic based on its top 3 words."""
+    def get_topic_labels(self, n_display: int = 3) -> list[str]:
+        """Return a human-readable label per topic from its top words.
+
+        Because top_words() returns both unigrams and bigrams, the naive top-N
+        often repeats the same concept twice (e.g. 'needed', 'privileges
+        needed', 'execution privileges' all share tokens) which reads as
+        garbled rather than informative. This greedily picks the top
+        *n_display* candidates whose word tokens don't overlap with any
+        already-chosen candidate, so each slot in the label contributes a
+        genuinely distinct word/concept.
+        """
         self._check_fitted()
         labels: list[str] = []
         for k in range(self.n_topics):
-            words = self.top_words(k, n_words=3)
-            label = "_".join(w.replace(" ", "-") for w in words)
+            candidates = self.top_words(k, n_words=max(10, n_display * 3))
+            selected: list[str] = []
+            seen_tokens: set[str] = set()
+            for word in candidates:
+                tokens = set(word.replace("-", " ").split())
+                if tokens & seen_tokens:
+                    continue
+                selected.append(word)
+                seen_tokens |= tokens
+                if len(selected) == n_display:
+                    break
+            label = " / ".join(w.replace("-", " ").title() for w in selected)
             labels.append(f"topic{k}:{label}")
         return labels
+
+
+def load_topic_labels(data_dir: str, K: int) -> list[str]:
+    """Load topic labels for display, preferring AI-generated names
+    (``topic_names.json``, e.g. 'SQL Injection') over the raw top-words
+    label (e.g. 'Sql / Injection / Php') for any topic that has one, and
+    falling back to generic 'Topic N' names if nothing is available.
+
+    Shared by scripts/forecast.py and app.py so both show the same names.
+    """
+    import json
+    import os
+    import pickle
+
+    fallback = [f"Topic {k}" for k in range(K)]
+
+    word_labels = fallback
+    mapper_path = os.path.join(data_dir, "topic_mapper.pkl")
+    if os.path.exists(mapper_path):
+        try:
+            with open(mapper_path, "rb") as fh:
+                mapper = pickle.load(fh)
+            word_labels = [lbl.split(":", 1)[-1] for lbl in mapper.get_topic_labels()]
+        except Exception:  # noqa: BLE001 -- cosmetic only, never fatal
+            pass
+
+    ai_names: dict[str, str] = {}
+    names_path = os.path.join(data_dir, "topic_names.json")
+    if os.path.exists(names_path):
+        try:
+            with open(names_path, encoding="utf-8") as fh:
+                ai_names = json.load(fh)
+        except Exception:  # noqa: BLE001 -- cosmetic only, never fatal
+            pass
+
+    return [ai_names.get(str(k), word_labels[k] if k < len(word_labels) else f"Topic {k}") for k in range(K)]

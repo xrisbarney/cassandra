@@ -35,6 +35,18 @@ if sys.platform == "win32":
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
+# Must run before the first jax/numpyro import (including transitively, via
+# the cassandra_threatcast imports below) -- JAX locks in its device count
+# the moment its backend initializes. Without this, num_chains > 1 with
+# chain_method="parallel" silently falls back to running chains SEQUENTIALLY
+# on this machine's single visible CPU device (confirmed: NumPyro just prints
+# a UserWarning and eats the 4x-plus slowdown). This creates `cpu_count()`
+# virtual CPU devices so multiple chains genuinely run in parallel, which
+# also means R-hat/ESS convergence diagnostics become meaningful (they are
+# NaN with a single chain).
+import numpyro
+numpyro.set_host_device_count(os.cpu_count() or 1)
+
 from cassandra_threatcast.data import pipeline
 from cassandra_threatcast.model import full as full_module
 from cassandra_threatcast.inference import nuts as nuts_module
