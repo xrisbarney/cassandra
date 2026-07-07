@@ -119,8 +119,8 @@ def _fetch_all_pages(start_date: str, end_date: str, cache_dir: str) -> list[dic
 
     windows = _date_windows(start_date, end_date)
     n_windows = len(windows)
-    print(f"  NVD: {n_windows} windows × ≤{_NVD_MAX_WINDOW_DAYS} days  "
-          f"(API key: {'yes' if api_key else 'NO — slow mode, ~6 s/request'})")
+    print(f"  NVD: {n_windows} windows x <= {_NVD_MAX_WINDOW_DAYS} days  "
+          f"(API key: {'yes' if api_key else 'NO - slow mode, ~6 s/request'})")
 
     all_items: list[dict] = []
 
@@ -132,13 +132,13 @@ def _fetch_all_pages(start_date: str, end_date: str, cache_dir: str) -> list[dic
             with win_cache.open() as fh:
                 window_items = json.load(fh)
             all_items.extend(window_items)
-            print(f"  [{i:>2}/{n_windows}] {win_start} → {win_end}  "
+            print(f"  [{i:>2}/{n_windows}] {win_start} -> {win_end}  "
                   f"({len(window_items)} CVEs, cached)", flush=True)
             continue
 
         start_index = 0
         window_items: list[dict] = []
-        print(f"  [{i:>2}/{n_windows}] {win_start} → {win_end}", end="", flush=True)
+        print(f"  [{i:>2}/{n_windows}] {win_start} -> {win_end}", end="", flush=True)
 
         while True:
             params: dict[str, Any] = {

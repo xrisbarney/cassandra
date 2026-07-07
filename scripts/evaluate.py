@@ -28,6 +28,14 @@ import yaml
 import numpy as np
 import pandas as pd
 
+# Force UTF-8 stdout/stderr: Windows' default console codepage cannot encode
+# many Unicode characters, which raises UnicodeEncodeError and kills the
+# process -- especially when output is redirected to a log file.
+if sys.platform == "win32":
+    import io
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
+    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding="utf-8", errors="replace")
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
 from cassandra_threatcast.data import pipeline
@@ -301,7 +309,7 @@ def main() -> None:
     print("[4/4] Aggregating scores and running DM tests ...")
 
     if not all_scores:
-        print("      No scores collected â€” exiting.")
+        print("      No scores collected -- exiting.")
         return
 
     scores_df = pd.concat(all_scores, ignore_index=True)

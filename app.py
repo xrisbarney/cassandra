@@ -55,7 +55,7 @@ def run_step(cmd: list[str], title: str) -> bool:
         try:
             proc = subprocess.Popen(
                 cmd, cwd=str(ROOT), stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-                text=True, bufsize=1,
+                text=True, bufsize=1, encoding="utf-8", errors="replace",
             )
             assert proc.stdout is not None
             for line in proc.stdout:
@@ -94,13 +94,14 @@ def launch_full_run(fresh: bool, quick: bool, enhanced: bool, start: str, end: s
     if enhanced:
         cmd.append("--enhanced")
     logf = open(RUN_LOG, "w", encoding="utf-8")  # noqa: SIM115 (child keeps writing)
+    child_env = {**os.environ, "PYTHONUTF8": "1"}  # belt-and-suspenders; run_all.py also sets this
     if os.name == "nt":
         flags = 0x00000008 | 0x00000200  # DETACHED_PROCESS | CREATE_NEW_PROCESS_GROUP
         proc = subprocess.Popen(cmd, cwd=str(ROOT), stdout=logf, stderr=subprocess.STDOUT,
-                                creationflags=flags)
+                                env=child_env, creationflags=flags)
     else:
         proc = subprocess.Popen(cmd, cwd=str(ROOT), stdout=logf, stderr=subprocess.STDOUT,
-                                start_new_session=True)
+                                env=child_env, start_new_session=True)
     RUN_PID.write_text(str(proc.pid))
 
 

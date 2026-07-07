@@ -88,7 +88,7 @@ def plot_threat_forecast(
     ax.axvline(obs_dates[-1], color="grey", lw=0.8, ls=":", alpha=0.7)
 
     ax.set_title(
-        f"Topic {topic_k}: {topic_label} â€” CVE Count Forecast", fontsize=11
+        f"Topic {topic_k}: {topic_label} - CVE Count Forecast", fontsize=11
     )
     ax.set_xlabel("Month")
     ax.set_ylabel("CVE Count")
@@ -140,7 +140,7 @@ def plot_pit_histogram(
     ax.set_xlim(0, 1)
     ax.set_xlabel("PIT value")
     ax.set_ylabel("Density")
-    ax.set_title(f"PIT Histogram â€” {channel_name}")
+    ax.set_title(f"PIT Histogram - {channel_name}")
     ax.legend(fontsize=8)
     ax.grid(True, alpha=0.3)
     plt.tight_layout()

@@ -19,6 +19,17 @@ import yaml
 import numpy as np
 import pandas as pd
 
+# Force UTF-8 stdout/stderr: Windows' default console codepage (e.g. cp1252)
+# cannot encode many Unicode characters (arrows, em-dashes, etc.), which
+# raises UnicodeEncodeError and kills the process the moment such a
+# character is printed -- especially when output is redirected to a log
+# file (as the dashboard and run_all.py both do). This must happen before
+# any other code prints anything.
+if sys.platform == "win32":
+    import io
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
+    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding="utf-8", errors="replace")
+
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
