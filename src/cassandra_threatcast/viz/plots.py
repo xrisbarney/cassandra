@@ -54,6 +54,11 @@ def plot_threat_forecast(
     if pred_dates is None:
         pred_dates = dates[len(obs) :]
 
+    # matplotlib has no native support for pandas Period objects (only
+    # Timestamp/datetime64); the panel stores monthly Periods, so convert.
+    obs_dates = [d.to_timestamp() if isinstance(d, pd.Period) else d for d in obs_dates]
+    pred_dates = [d.to_timestamp() if isinstance(d, pd.Period) else d for d in pred_dates]
+
     T_pred = predictive.shape[-1]
     if len(pred_dates) != T_pred:
         # Silently trim to the shorter of the two

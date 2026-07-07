@@ -46,6 +46,18 @@ identified and will not sample (NUTS step size collapses to ~1e-10):
 These fix the sampling geometry (step size ~1e-10 → ~1e-2). **See
 [docs/PAPER_NOTES.md](docs/PAPER_NOTES.md) for the exact equations to update.**
 
+**Residual sampling variability.** Even with the fixes above, NUTS (wrapped in
+`DiscreteHMCGibbs` for the discrete regime path) does not adapt successfully
+for every random seed on the real data — warmup step-size adaptation
+occasionally collapses to numerical underflow for reasons that appear to be
+seed-specific HMC trajectory chaos rather than a further fixable defect (see
+docs/PAPER_NOTES.md for what was tried). `train.py` automatically retries
+with a new seed (up to 6 attempts) when this happens and prints a warning if
+it doesn't recover — if you see that warning, do not trust the resulting
+posterior; increase `_MAX_ADAPTATION_RETRIES` in
+`src/cassandra_threatcast/inference/nuts.py`, increase `--num-warmup`, or try
+a different `mcmc.seed`.
+
 ## Requirements
 
 - Python 3.11+

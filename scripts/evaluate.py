@@ -182,11 +182,21 @@ def main() -> None:
     x_s      = _load("x_s.npy",      np.ones(S) * 1e12)
 
     # --- Load InferenceData -------------------------------------------------
+    # Prefer the pickle (written unconditionally by train.py, guaranteed
+    # complete) over the .nc file, which some xarray/arviz version
+    # combinations can leave empty/corrupt for a large InferenceData.
     print("[2/4] Loading InferenceData ...")
     try:
-        import arviz as az
-        idata = az.from_netcdf(args.idata)
-        print("      InferenceData loaded.")
+        pkl_path = os.path.splitext(args.idata)[0] + ".pkl"
+        if os.path.exists(pkl_path):
+            import pickle
+            with open(pkl_path, "rb") as fh:
+                idata = pickle.load(fh)
+            print("      InferenceData loaded (pickle).")
+        else:
+            import arviz as az
+            idata = az.from_netcdf(args.idata)
+            print("      InferenceData loaded (netCDF).")
     except Exception as exc:
         print(f"      Warning: Could not load idata ({exc}).")
         idata = None

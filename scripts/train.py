@@ -215,20 +215,32 @@ def main() -> None:
     print(f"      {args.method.upper()} completed in {elapsed / 60:.1f} min.")
 
     # --- Save ---------------------------------------------------------------
+    # A pickle is ALWAYS written first: it is the reliable, guaranteed-complete
+    # save. netCDF (.nc) is attempted second, best-effort, purely as a portable
+    #/inspectable secondary copy — some xarray/arviz version combinations have
+    # been observed to silently produce a 0-byte or truncated .nc file for a
+    # large, multi-group InferenceData without raising, which would otherwise
+    # lose a long (multi-hour) sampling run outright.
     print("[3/3] Saving InferenceData ...")
     out_path = os.path.join(args.output_dir, "idata.nc")
+    pkl_path = os.path.join(args.output_dir, "idata.pkl")
+
+    import pickle
+    with open(pkl_path, "wb") as fh:
+        pickle.dump(idata, fh)
+    print(f"      Saved to {pkl_path} (primary)")
+
     try:
         idata.to_netcdf(out_path)
-        print(f"      Saved to {out_path}")
-    except (ValueError, ImportError) as exc:
-        # No netCDF backend (netCDF4 / h5netcdf) installed — fall back to a
-        # pickle so a long sampling run is never lost. forecast.py loads either.
-        import pickle
-        pkl_path = os.path.join(args.output_dir, "idata.pkl")
-        with open(pkl_path, "wb") as fh:
-            pickle.dump(idata, fh)
-        print(f"      netCDF backend unavailable ({exc}).")
-        print(f"      Saved to {pkl_path} instead (install h5netcdf for .nc).")
+        if not os.path.exists(out_path) or os.path.getsize(out_path) < 1024:
+            if os.path.exists(out_path):
+                os.remove(out_path)
+            print("      netCDF write produced an empty/corrupt file; "
+                  "skipped (the .pkl above is complete and authoritative).")
+        else:
+            print(f"      Saved to {out_path} (secondary)")
+    except Exception as exc:  # noqa: BLE001 — never fail the run over the secondary copy
+        print(f"      netCDF save skipped ({exc}); the .pkl above is complete and authoritative.")
 
     # --- Summary ------------------------------------------------------------
     try:

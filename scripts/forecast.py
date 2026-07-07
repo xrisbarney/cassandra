@@ -200,16 +200,25 @@ def main() -> None:
     obs_dates  = dates_all[:T]
     pred_dates = dates_all[T : T + args.horizon]
     if len(pred_dates) < args.horizon:
-        # Extend with synthetic indices if dates array is too short
+        # The panel's date list only covers the observed T months, so the
+        # forecast horizon always needs new future labels appended here.
+        n_missing = args.horizon - len(pred_dates)
         last = dates_all[-1] if dates_all else T - 1
-        pred_dates = list(pred_dates) + list(range(int(last) + 1, int(last) + 1 + args.horizon - len(pred_dates)))
+        if isinstance(last, pd.Period):
+            future = pd.period_range(start=last + 1, periods=n_missing, freq=last.freq)
+            pred_dates = list(pred_dates) + list(future)
+        else:
+            pred_dates = list(pred_dates) + list(range(int(last) + 1, int(last) + 1 + n_missing))
 
     # --- Load InferenceData -------------------------------------------------
+    # The pickle (written unconditionally by train.py) is preferred: it is the
+    # guaranteed-complete save. The .nc file is a best-effort secondary copy
+    # that some xarray/arviz version combinations can leave empty/corrupt.
     print("[2/4] Loading InferenceData and generating posterior predictive ...")
     try:
         import arviz as az
         pkl_path = os.path.splitext(args.idata)[0] + ".pkl"
-        if not os.path.exists(args.idata) and os.path.exists(pkl_path):
+        if os.path.exists(pkl_path):
             import pickle
             with open(pkl_path, "rb") as fh:
                 idata = pickle.load(fh)

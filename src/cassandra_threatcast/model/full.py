@@ -30,6 +30,25 @@ from cassandra_threatcast.model.economic import (
 # ---------------------------------------------------------------------------
 # Identifiability helper
 # ---------------------------------------------------------------------------
+_SCALE_FLOOR = 0.02  # minimum value for latent-dynamics noise scales
+
+
+def _floored_scale(name: str, base_scale: jnp.ndarray, shape: tuple) -> jnp.ndarray:
+    """Sample a HalfNormal(base_scale) scale, floored away from exact zero.
+
+    An unfloored HalfNormal scale can wander arbitrarily close to 0, making the
+    corresponding state-transition conditionally near-deterministic (infinite
+    curvature in that direction). NUTS/HMC cannot integrate through such a
+    ridge at any finite step size, so its warmup step-size adaptation collapses
+    to the numerical floor (~1e-38, float32's smallest normal value) and the
+    resulting "samples" do not move — a silent, catastrophic failure mode with
+    no exception raised. This floor keeps the scale strictly positive while
+    leaving the practical prior essentially unchanged elsewhere.
+    """
+    raw = numpyro.sample(f"{name}_raw", dist.HalfNormal(base_scale * jnp.ones(shape)))
+    return deterministic(name, _SCALE_FLOOR + raw)
+
+
 def _positive_lower_triangular(raw: jnp.ndarray, d: int) -> jnp.ndarray:
     """Impose the standard factor-model identification constraint on a (K, d)
     loading matrix: the top d x d block is lower-triangular with a positive
@@ -91,9 +110,15 @@ def full_model(data: dict, config: dict) -> None:
     # ------------------------------------------------------------------ #
     # 1. Latent dynamics priors
     # ------------------------------------------------------------------ #
+    # Real CVE-topic counts span several orders of magnitude across topics
+    # (e.g. mean ~25/month vs. ~450/month), so mu_r must be able to sit far
+    # from 0 for high-volume topics; a tight prior forces a many-sigma stretch
+    # that (combined with 0-initialized warmup) destabilizes NUTS's step-size
+    # adaptation. sd=5 keeps this weakly informative while accommodating the
+    # observed dynamic range.
     mu_r = numpyro.sample(
         "mu_r",
-        dist.Normal(jnp.zeros((R, K)), 2.0 * jnp.ones((R, K))),
+        dist.Normal(jnp.zeros((R, K)), 5.0 * jnp.ones((R, K))),
     )  # (R, K)
 
     Gamma_raw = numpyro.sample(
@@ -113,20 +138,14 @@ def full_model(data: dict, config: dict) -> None:
     # over long series (T can be ~180 months).
     Phi_r = deterministic("Phi_r", jnp.tanh(Phi_raw) * tril_mask[None, :, :])  # (R, r, r)
 
-    Q_r = numpyro.sample(
-        "Q_r",
-        dist.HalfNormal(0.5 * jnp.ones((R, r))),
-    )  # (R, r)
+    Q_r = _floored_scale("Q_r", 0.5, (R, r))  # (R, r)
 
     Pi = numpyro.sample(
         "Pi",
         dist.Dirichlet(2.0 * jnp.ones((R, R))),
     )  # (R, R)
 
-    tau_k = numpyro.sample(
-        "tau_k",
-        dist.HalfNormal(0.5 * jnp.ones(K)),
-    )  # (K,)
+    tau_k = _floored_scale("tau_k", 0.5, (K,))  # (K,)
 
     # ------------------------------------------------------------------ #
     # 1b. Latent severity process priors (log sigma_{k,t}), analogous to the
@@ -150,9 +169,9 @@ def full_model(data: dict, config: dict) -> None:
         dist.Normal(jnp.zeros((r_sig, r_sig)), 0.3 * jnp.ones((r_sig, r_sig))),
     )
     A_h = deterministic("A_h", jnp.tanh(A_h_raw) * tril_sig)  # (r_sig, r_sig) stationary
-    Q_h = numpyro.sample("Q_h", dist.HalfNormal(0.5 * jnp.ones(r_sig)))   # (r_sig,)
-    omega_k = numpyro.sample("omega_k", dist.HalfNormal(0.5 * jnp.ones(K)))  # (K,) idiosyncratic
-    kappa_k = numpyro.sample("kappa_k", dist.HalfNormal(0.5 * jnp.ones(K)))  # (K,) severity meas. noise
+    Q_h = _floored_scale("Q_h", 0.5, (r_sig,))         # (r_sig,)
+    omega_k = _floored_scale("omega_k", 0.5, (K,))     # (K,) idiosyncratic
+    kappa_k = _floored_scale("kappa_k", 0.5, (K,))     # (K,) severity meas. noise
 
     f_init = numpyro.sample("f_init", dist.Normal(jnp.zeros(r), jnp.ones(r)))
     z_init = numpyro.sample("z_init", dist.Categorical(probs=jnp.ones(R) / R))
@@ -219,10 +238,7 @@ def full_model(data: dict, config: dict) -> None:
         dist.Normal(jnp.zeros(K), jnp.ones(K)),
     )  # (K,) EPSS slope
 
-    varsigma_k = numpyro.sample(
-        "varsigma_k",
-        dist.HalfNormal(jnp.ones(K)),
-    )  # (K,) EPSS obs noise
+    varsigma_k = _floored_scale("varsigma_k", 1.0, (K,))  # (K,) EPSS obs noise
 
     rho_s = numpyro.sample(
         "rho_s",
