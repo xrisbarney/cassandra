@@ -11,7 +11,7 @@ import jax
 import jax.numpy as jnp
 import numpy as np
 import numpyro
-from numpyro.infer import MCMC, NUTS, SVI, Trace_ELBO, DiscreteHMCGibbs
+from numpyro.infer import MCMC, NUTS, SVI, Trace_ELBO
 from numpyro.infer.initialization import init_to_median
 from numpyro.infer.autoguide import AutoLowRankMultivariateNormal
 from numpyro.optim import ClippedAdam
@@ -21,8 +21,10 @@ import arviz as az
 # chain is not moving) and the resulting "samples" are not usable draws from
 # the posterior. HMC trajectories are chaotic — the same model/data/seed
 # family can occasionally adapt into a degenerate region depending on tiny
-# floating-point differences, especially with the discrete regime Gibbs
-# updates in play. Retrying with a different seed reliably escapes this.
+# floating-point differences. This has not been observed with the current
+# model (the discrete regime is marginalized analytically via the HMM
+# forward algorithm rather than sampled with DiscreteHMCGibbs -- see
+# docs/PAPER_NOTES.md), but the retry loop is kept as a cheap safety net.
 _MIN_USABLE_STEP_SIZE = 1e-6
 _MAX_ADAPTATION_RETRIES = 6
 
@@ -61,27 +63,18 @@ def _build_mcmc(model, mcmc_cfg: dict, data: dict, R: int) -> MCMC:
     max_tree_depth = int(mcmc_cfg.get("max_tree_depth", 10))
     target_accept_prob = float(mcmc_cfg.get("target_accept_prob", 0.8))
 
-    # The model contains a discrete latent regime path (z_t, z_init) via the
-    # Markov regime-switching component. Plain NUTS cannot sample discrete
-    # latents, so we wrap it in DiscreteHMCGibbs: Gibbs updates for the
-    # discrete regimes, NUTS for all continuous parameters.
-    #
-    # This combination (NUTS + discrete Gibbs on a regime-switching factor
-    # model) has been observed to occasionally collapse warmup's step-size
-    # adaptation to numerical underflow on real data, seemingly as a property
-    # of a specific PRNG trajectory rather than a fixable structural defect —
-    # it happens for some seeds and not others, and is not reliably prevented
-    # by any single intervention we tried (see docs/PAPER_NOTES.md). The
-    # run_nuts() retry loop below is the actual safety net: it detects a
-    # collapsed step size and retries with a new seed.
-    inner_kernel = NUTS(
+    # The model's discrete latent regime path (z_t) is marginalized
+    # analytically inside the model via the HMM forward algorithm (see
+    # full_model in model/full.py and docs/PAPER_NOTES.md), rather than
+    # sampled with DiscreteHMCGibbs. Plain NUTS therefore samples the entire
+    # (continuous) parameter space directly.
+    kernel = NUTS(
         model,
         target_accept_prob=target_accept_prob,
         max_tree_depth=max_tree_depth,
         find_heuristic_step_size=True,
         init_strategy=_data_informed_init_strategy(data, R),
     )
-    kernel = DiscreteHMCGibbs(inner_kernel, modified=True)
 
     return MCMC(
         kernel,
@@ -93,17 +86,15 @@ def _build_mcmc(model, mcmc_cfg: dict, data: dict, R: int) -> MCMC:
     )
 
 
-_STEP_SIZE_FIELD = "hmc_state.adapt_state.step_size"
+_STEP_SIZE_FIELD = "adapt_state.step_size"
 
 
 def _adapted_step_size(mcmc: MCMC) -> float | None:
     """Mean adapted NUTS step size across sampling-phase draws, or None.
 
-    DiscreteHMCGibbs wraps the inner NUTS kernel's state inside an
-    HMCGibbsState (state.hmc_state.adapt_state.step_size); this nested path
-    must be requested explicitly via extra_fields when calling mcmc.run — it
-    is NOT carried over into az.from_numpyro's sample_stats for this kernel
-    combination, so checking idata.sample_stats silently finds nothing.
+    This must be requested explicitly via extra_fields when calling
+    mcmc.run — it is NOT carried over into az.from_numpyro's sample_stats,
+    so checking idata.sample_stats silently finds nothing.
     """
     try:
         extra = mcmc.get_extra_fields()

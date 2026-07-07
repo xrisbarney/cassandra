@@ -32,12 +32,13 @@ import pandas as pd
 # process -- especially when output is redirected to a log file.
 if sys.platform == "win32":
     import io
-    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
-    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding="utf-8", errors="replace")
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace", line_buffering=True)
+    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding="utf-8", errors="replace", line_buffering=True)
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
 from cassandra_threatcast.data import pipeline
+from cassandra_threatcast.data.bea_io import get_default_sector_labels
 from cassandra_threatcast.viz.plots import plot_threat_forecast, plot_loss_distribution, save_figure
 
 
@@ -110,6 +111,32 @@ def _quantile_df(
     return pd.DataFrame(records)
 
 
+def _humanize_topic_label(raw: str) -> str:
+    """Turn a WikiTopicMapper label like 'topic4:sql_injection_sql-injection'
+    into a human-readable 'Sql / Injection / Sql Injection'."""
+    label = raw.split(":", 1)[-1] if ":" in raw else raw
+    words = [w.replace("-", " ").strip() for w in label.split("_") if w.strip()]
+    return " / ".join(w.title() for w in words) or raw
+
+
+def _load_topic_labels(data_dir: str, K: int) -> list[str]:
+    """Load human-readable topic labels from the fitted topic mapper's top
+    words, falling back to generic 'Topic N' names if unavailable."""
+    mapper_path = os.path.join(data_dir, "topic_mapper.pkl")
+    fallback = [f"Topic {k}" for k in range(K)]
+    if not os.path.exists(mapper_path):
+        return fallback
+    try:
+        import pickle
+        with open(mapper_path, "rb") as fh:
+            mapper = pickle.load(fh)
+        raw_labels = mapper.get_topic_labels()
+        return [_humanize_topic_label(lbl) for lbl in raw_labels]
+    except Exception as exc:  # noqa: BLE001 -- cosmetic only, never fatal
+        warnings.warn(f"Could not load topic labels from {mapper_path}: {exc}")
+        return fallback
+
+
 def _loss_summary_df(
     loss_samples: np.ndarray,  # (n_samples,) or (n_samples, S, T_pred)
     dates_pred: list,
@@ -176,8 +203,8 @@ def main() -> None:
 
     K = config["model"]["K"]
     S = config["model"]["S"]
-    topic_labels = config.get("topic_labels", [f"Topic {k}" for k in range(K)])
-    sector_names = config.get("sector_names", [f"Sector {s}" for s in range(S)])
+    topic_labels = config.get("topic_labels") or _load_topic_labels(args.data_dir, K)
+    sector_names = config.get("sector_names") or get_default_sector_labels()[:S]
 
     # --- Load panel ---------------------------------------------------------
     print("[1/4] Loading panel ...")
@@ -306,6 +333,22 @@ def main() -> None:
     loss_df.to_csv(loss_path, index=False)
     print(f"      Loss distribution   -> {loss_path}")
     print(loss_df.to_string(index=False))
+
+    # --- Plain-English summary (optional, needs DEEPSEEK_API_KEY) -----------
+    from cassandra_threatcast.llm.deepseek import explain_forecast
+    summary = explain_forecast(q_df, loss_df)
+    if summary:
+        print("\n" + "=" * 70)
+        print("SUMMARY")
+        print("=" * 70)
+        print(summary)
+        summary_path = os.path.join(args.output_dir, "summary.txt")
+        with open(summary_path, "w", encoding="utf-8") as fh:
+            fh.write(summary)
+        print(f"\n      Summary -> {summary_path}")
+    else:
+        print("\n      (Set DEEPSEEK_API_KEY in .env to get an AI-generated "
+              "plain-English summary here and in the dashboard.)")
 
     # --- Fan-chart figures --------------------------------------------------
     print("[4/4] Saving fan-chart figures ...")

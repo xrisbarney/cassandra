@@ -193,8 +193,8 @@ quick = run_mode.startswith("Quick")
 done_ingest = panel_has_data()
 done_features = artifact_exists(PROCESSED / "M_skt.npy", PROCESSED / "e_t.npy", PROCESSED / "Lambda_L.npy")
 done_train = artifact_exists(RESULTS / "idata.nc")
-done_eval = artifact_exists(RESULTS / "scores.csv")
-done_forecast = artifact_exists(RESULTS / "forecast_quantiles.csv")
+done_eval = artifact_exists(RESULTS / "evaluation" / "scores.csv")
+done_forecast = artifact_exists(RESULTS / "forecasts" / "forecast_quantiles.csv")
 
 tab_run, tab_data, tab_forecast = st.tabs(["▶️ Run the steps", "📊 Your data", "🔮 The forecast"])
 
@@ -364,18 +364,31 @@ with tab_forecast:
     else:
         import pandas as pd
 
+        forecast_dir = RESULTS / "forecasts"
+
+        summary_path = forecast_dir / "summary.txt"
+        if summary_path.exists():
+            st.markdown("#### What this means")
+            st.info(summary_path.read_text(encoding="utf-8"))
+        else:
+            st.caption(
+                "Tip: set `DEEPSEEK_API_KEY` in your `.env` file and re-run "
+                "**Step 5 — Forecast the future** to get an AI-generated "
+                "plain-English summary here."
+            )
+
         st.markdown("#### Threat forecast (next months)")
         st.caption("Predicted vulnerability activity per category, with an uncertainty range.")
-        q = pd.read_csv(RESULTS / "forecast_quantiles.csv")
+        q = pd.read_csv(forecast_dir / "forecast_quantiles.csv")
         st.dataframe(q, use_container_width=True, height=260)
 
-        loss_path = RESULTS / "loss_distribution.csv"
+        loss_path = forecast_dir / "loss_distribution.csv"
         if loss_path.exists():
             st.markdown("#### Possible economic losses")
             st.caption("The model's range of plausible economy-wide losses from cyber incidents.")
             st.dataframe(pd.read_csv(loss_path), use_container_width=True, height=260)
 
-        fig_dir = RESULTS / "figures"
+        fig_dir = forecast_dir / "figures"
         if fig_dir.exists():
             imgs = sorted(fig_dir.glob("*.png"))
             if imgs:

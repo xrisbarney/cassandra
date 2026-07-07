@@ -43,20 +43,20 @@ identified and will not sample (NUTS step size collapses to ~1e-10):
    sector-*month* on a near-empty channel — the code uses one baseline per
    sector.
 
-These fix the sampling geometry (step size ~1e-10 → ~1e-2). **See
-[docs/PAPER_NOTES.md](docs/PAPER_NOTES.md) for the exact equations to update.**
+3. The discrete regime path **z_t** is marginalized analytically (a standard
+   HMM forward algorithm inside the scan, injected via `numpyro.factor`)
+   instead of being Gibbs-sampled with `DiscreteHMCGibbs`, which NumPyro's own
+   docs flag as an `[EXPERIMENTAL INTERFACE]` and which was empirically
+   unreliable on the real data (frequent warmup step-size collapse). A
+   consequence: the factor/severity AR *transition* dynamics are now
+   regime-constant — only the emission *means* switch by regime
+   ("Markov-switching mean" rather than the paper's full
+   Markov-switching-VAR). Plain `NUTS` now samples the whole model.
 
-**Residual sampling variability.** Even with the fixes above, NUTS (wrapped in
-`DiscreteHMCGibbs` for the discrete regime path) does not adapt successfully
-for every random seed on the real data — warmup step-size adaptation
-occasionally collapses to numerical underflow for reasons that appear to be
-seed-specific HMC trajectory chaos rather than a further fixable defect (see
-docs/PAPER_NOTES.md for what was tried). `train.py` automatically retries
-with a new seed (up to 6 attempts) when this happens and prints a warning if
-it doesn't recover — if you see that warning, do not trust the resulting
-posterior; increase `_MAX_ADAPTATION_RETRIES` in
-`src/cassandra_threatcast/inference/nuts.py`, increase `--num-warmup`, or try
-a different `mcmc.seed`.
+These fix the sampling geometry (step size ~1e-10 → ~1e-2, with no collapse
+observed at real scale after fix 3). **See
+[docs/PAPER_NOTES.md](docs/PAPER_NOTES.md) for the exact equations to
+update.**
 
 ## Requirements
 
@@ -117,9 +117,9 @@ python scripts/build_features.py
 
 ### 3. Train the model
 
-> **"Training" here means Bayesian posterior inference, not machine-learning weight-fitting.** The model defines a posterior `p(parameters, latent states | data) ∝ likelihood × prior` that has no closed form for a state-space model of this complexity (regime switching, factor dynamics, hierarchical priors, non-conjugate likelihoods). `train.py` therefore *approximates* that posterior by drawing samples via MCMC (NUTS, with Gibbs updates for the discrete regime path) — or, optionally, variational inference. This is exactly the inference procedure the model's mathematics prescribes; every downstream output (predictive distributions, loss VaR/ES, regime probabilities, CRPS scores) is a functional of this posterior. Nothing here is trained by gradient descent on a loss.
+> **"Training" here means Bayesian posterior inference, not machine-learning weight-fitting.** The model defines a posterior `p(parameters, latent states | data) ∝ likelihood × prior` that has no closed form for a state-space model of this complexity (regime switching, factor dynamics, hierarchical priors, non-conjugate likelihoods). `train.py` therefore *approximates* that posterior by drawing samples via MCMC (NUTS, with the discrete regime path marginalized analytically inside the model) — or, optionally, variational inference. This is exactly the inference procedure the model's mathematics prescribes; every downstream output (predictive distributions, loss VaR/ES, regime probabilities, CRPS scores) is a functional of this posterior. Nothing here is trained by gradient descent on a loss.
 
-Runs NUTS wrapped in `DiscreteHMCGibbs` — Gibbs updates for the discrete Markov regime path, NUTS for all continuous parameters (4 chains × 2000 samples after 1000 warmup) — and saves the posterior to `results/idata.nc`.
+Runs plain NUTS — the discrete Markov regime path is marginalized analytically via an HMM forward algorithm inside the model rather than Gibbs-sampled (4 chains × 2000 samples after 1000 warmup) — and saves the posterior to `results/idata.nc`.
 
 ```bash
 python scripts/train.py
@@ -177,7 +177,7 @@ pytest --cov=cassandra_threatcast --cov-report=term-missing
 ```
 paper-cyber-threatmodelling/
 ├── app.py                         # 🔮 guided Streamlit dashboard (streamlit run app.py)
-├── docs/PAPER_NOTES.md            # ⚠️ model corrections vs. the paper (identifiability, π)
+├── docs/PAPER_NOTES.md            # ⚠️ model corrections vs. the paper (identifiability, π, regime marginalization)
 ├── docs/MODEL_VARIANTS.md         # paper-native vs. --enhanced-mode comparison
 ├── configs/default.yaml          # K=8 topics, S=11 sectors, r=3 intensity + r_sigma=2 severity factors, R=3 regimes
 ├── scripts/                      # CLI entry points (run in order)
@@ -191,7 +191,7 @@ paper-cyber-threatmodelling/
 │   ├── data/       # NVD, EPSS, CISA KEV, SEC 8-K, BEA I-O ingestion
 │   ├── features/   # Topic mapper (TF-IDF+NMF), exposure map, HP-filter effort
 │   ├── model/      # NumPyro model (intensity + severity factor AR, Markov regimes, 4 obs channels, Leontief)
-│   ├── inference/  # NUTS + DiscreteHMCGibbs, FFBS regime path sampler, VI fallback
+│   ├── inference/  # plain NUTS (regime path marginalized in-model), FFBS terminal-regime recovery, VI fallback
 │   ├── evaluation/ # CRPS, log score, DM test, PIT calibration, 5 baselines
 │   └── viz/        # Fan charts, PIT histograms, regime-prob plots, sector exposure
 └── tests/

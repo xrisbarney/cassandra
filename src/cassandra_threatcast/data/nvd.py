@@ -129,12 +129,21 @@ def _fetch_all_pages(start_date: str, end_date: str, cache_dir: str) -> list[dic
 
         # Resume: skip windows already fetched in a prior (possibly crashed) run.
         if win_cache.exists():
-            with win_cache.open() as fh:
-                window_items = json.load(fh)
-            all_items.extend(window_items)
-            print(f"  [{i:>2}/{n_windows}] {win_start} -> {win_end}  "
-                  f"({len(window_items)} CVEs, cached)", flush=True)
-            continue
+            try:
+                with win_cache.open() as fh:
+                    window_items = json.load(fh)
+            except json.JSONDecodeError:
+                # The cache file itself was left truncated by an earlier crash
+                # mid-write. Treat it like a missing window and refetch rather
+                # than propagating the corruption forever.
+                print(f"  [{i:>2}/{n_windows}] {win_start} -> {win_end}  "
+                      f"(cache corrupt, refetching)", flush=True)
+                win_cache.unlink()
+            else:
+                all_items.extend(window_items)
+                print(f"  [{i:>2}/{n_windows}] {win_start} -> {win_end}  "
+                      f"({len(window_items)} CVEs, cached)", flush=True)
+                continue
 
         start_index = 0
         window_items: list[dict] = []
@@ -162,9 +171,13 @@ def _fetch_all_pages(start_date: str, end_date: str, cache_dir: str) -> list[dic
             print(f"  {start_index}/{total_results}", end="", flush=True)
             time.sleep(inter_request_delay)
 
-        # Persist this window immediately (crash-safe / resumable).
-        with win_cache.open("w") as fh:
+        # Persist this window immediately (crash-safe / resumable). Written to
+        # a temp file and atomically renamed so a crash mid-write can never
+        # leave a truncated, corrupt cache file at the final path.
+        tmp_cache = win_cache.with_suffix(win_cache.suffix + ".tmp")
+        with tmp_cache.open("w") as fh:
             json.dump(window_items, fh)
+        os.replace(tmp_cache, win_cache)
         all_items.extend(window_items)
 
     print(f"  NVD total: {len(all_items):,} CVEs fetched across all windows.")

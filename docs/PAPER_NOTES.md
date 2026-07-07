@@ -84,7 +84,7 @@ These make the *stated* model sample well; they don't change its meaning:
 - **NaN masking.** Topic-months with no CVEs carry NaN in the EPSS and
   severity channels; those are masked out of their likelihoods.
 
-## Result and a residual caveat
+## Result
 
 With items 1–3 fixed, the adapted NUTS step size goes from ~`3.6e-10` (no
 sampling at all) to ~`1e-3`–`1e-2` (healthy) on the real 180-month panel, and
@@ -93,71 +93,76 @@ PIT not significantly non-uniform) once a run adapts successfully.
 
 **However, this specific model + real-data combination — NUTS wrapped in
 `DiscreteHMCGibbs` for the discrete regime path, on the actual 180-month,
-K=8/S=11/R=3 panel — does not adapt successfully for every random seed.**
-Empirically, a meaningful fraction of seeds cause the warmup step-size
-adaptation to collapse to numerical underflow (~1e-38) at some point during
-warmup, seemingly as a property of that seed's specific HMC trajectory rather
-than a further fixable structural defect: it happens unpredictably across
-different seeds, warmup lengths, and with every one of the mitigations above
-individually applied (identifiability, non-centering, scale floors, smooth
-saturation, informed initialization) — none eliminates it outright, though
-together they made the *healthy* outcome (the ~1e-3 step size / good
-calibration case above) achievable at all, which it was not before item 1–3
-were fixed.
-
-**Mitigation:** `run_nuts` (in `src/cassandra_threatcast/inference/nuts.py`)
-automatically detects a collapsed step size after each attempt and retries
-with a new seed, up to `_MAX_ADAPTATION_RETRIES` times (default 6). This is a
-pragmatic safety net, not a proof that the underlying difficulty is resolved
-— on the real 180-month panel, the failure rate per attempt has been high
-enough in testing (many consecutive seeds collapsing) that even 6 retries are
-not a strong guarantee. If you see the "NUTS adaptation did not recover"
-warning after all retries, the returned posterior should not be trusted.
-
-**Recommended long-term fix (prototyped and confirmed superior, integration
-incomplete): marginalize the discrete regime instead of Gibbs-sampling it.**
+K=8/S=11/R=3 panel — did not adapt successfully for every random seed.**
 `numpyro`'s own documentation flags `DiscreteHMCGibbs` as an
-`[EXPERIMENTAL INTERFACE]` and explicitly recommends enumerating/marginalizing
-the discrete latent (`z_t`) analytically instead of resampling it with Gibbs
-steps interleaved with NUTS. `funsor` was installed
-(`pip install funsor`, tested compatible with our jax 0.10.2 / numpyro 0.21.0)
-and this approach was prototyped:
+`[EXPERIMENTAL INTERFACE]`, and empirically a large fraction of seeds (12/13
+in one session's testing) caused the warmup step-size adaptation to collapse
+to numerical underflow (~1e-38) at some point during warmup — seemingly a
+property of that seed's specific HMC/Gibbs trajectory rather than a further
+fixable structural defect, since it happened unpredictably with every one of
+the mitigations above individually applied. A retry-with-new-seed safety net
+in `run_nuts` did not reliably rescue this (a meaningful fraction of seeds
+failed even across 6 consecutive retries).
 
-- A minimal HMM matching our exact structure (`Categorical` regime inside
-  `numpyro.contrib.control_flow.scan`, continuous emission), run with **plain
-  `NUTS` — no `DiscreteHMCGibbs` at all** — correctly recovered known
-  synthetic regime means and, at our real T=180 scale, adapted a **healthy
-  step size (~0.6) on 5/5 seeds tried**, with none of the ~1e-38 collapses
-  seen with `DiscreteHMCGibbs` (which failed 12/13 times across this session's
-  testing). This is a decisive, reproducible result: enumeration is the
-  correct fix in principle.
-- Porting it into the actual `full_model` was **started but not completed**.
-  The blocking difficulty is mechanical rather than conceptual: NumPyro's
-  funsor-based enumeration validates that *every* independent batch dimension
-  of *every* sample site (not just the regime axis) is wrapped in an explicit
-  `numpyro.plate(name, size, dim=...)` — Dirichlet's own trailing axis is the
-  only exemption (it's an event dimension, not an independent batch dim).
-  Working through the model's ~15 multi-dimensional prior sites one at a time
-  (`mu_r`, `Gamma_raw`, `Phi_raw`, `Q_r_raw`, `nu_r`, `Psi_raw`, `A_h_raw`,
-  `Q_h_raw`, `omega_k_raw`, `kappa_k_raw`, `f_init`, `h_init`, and the
-  per-step innovations `eps_f`/`eps_eta`/`xi_h`/`eps_v` inside `scan`) each
-  revealed the next missing plate in turn; this is why it wasn't finished in
-  the time available, not because any instance failed to work once plated.
-- Regime-indexed array lookups (`Phi_r[z_t]`, `Q_r[z_t]`, `mu_r[z_t]`, and the
-  severity equivalents `nu_r[z_t]`) must use
-  `numpyro.ops.indexing.Vindex(...)[z_t]` instead of plain indexing, because
-  under enumeration `z_t` is not a scalar — it carries an implicit extra
-  dimension ranging over all `R` possible values simultaneously, and only
-  `Vindex` broadcasts that correctly (plain `arr[z_t]` breaks downstream
-  shape-dependent ops like `jnp.diag`).
+## 4. Discrete regime path is marginalized analytically, not Gibbs-sampled — **the actual fix**
 
-**To complete this fix:** systematically add `@config_enumerate` to
-`full_model`, wrap every remaining multi-dimensional prior site's batch
-dimensions in explicit nested `numpyro.plate`s (following the pattern above:
-add one plate per non-event batch axis, run, fix whatever site the next error
-names, repeat until the model traces cleanly), replace every regime-indexed
-lookup with `Vindex`, do the same for the severity process's `z_t`-indexed
-terms, then delete the `DiscreteHMCGibbs` wrapper in `nuts.py` in favor of
-plain `NUTS(model)`. `predict()`'s NumPy-based forward simulation is
-unaffected (it doesn't use funsor). Validate against the existing test suite
-plus a repeat of the multi-seed real-data robustness check in this document.
+`DiscreteHMCGibbs` was replaced entirely. `full_model` (in
+`src/cassandra_threatcast/model/full.py`) now marginalizes the discrete
+regime `z_t` out of the likelihood analytically, via the standard HMM forward
+algorithm: at each scan step, the four channels' log-likelihoods are computed
+under each of the `R` regime hypotheses (via `jax.vmap`, using plain
+`.log_prob()` calls rather than `numpyro.sample` statements), and combined
+into a running forward-filter vector `log_alpha_t[r] = logsumexp_{r'}
+(log_alpha_{t-1}[r'] + log Pi[r',r]) + loglik_r[r]`. The total marginal
+log-likelihood `logsumexp_r(log_alpha_T[r])` is injected once via
+`numpyro.factor(...)`. `z_t` is never sampled — there is nothing for a Gibbs
+kernel to update — so plain `NUTS` (in `src/cassandra_threatcast/inference/
+nuts.py`) now samples the entire continuous parameter space directly.
+
+This was prototyped first with `numpyro.contrib.funsor`/`@config_enumerate`
+(automatic enumeration), which numpyro's docs recommend as the standard
+alternative to `DiscreteHMCGibbs`. That path got as far as tracing cleanly
+(after wrapping ~15 multi-dimensional prior sites in explicit
+`numpyro.plate`s and switching regime-indexed lookups to
+`numpyro.ops.indexing.Vindex`), but broke down structurally once the discrete
+regime affected the continuous factor's *transition* matrix
+(`Phi_{z_t}`/`Q_{z_t}`): the scan's carry becomes enumeration-dependent and
+its shape becomes inconsistent across iterations (`dot_general` shape errors,
+and "joint log density expected scalar, got (R,R)" when `z_t` is reused for
+more than one downstream emission in the same step). This is a genuine
+structural limit of automatic enumeration over a **switching linear dynamical
+system** (a discrete state that drives the transition dynamics, not just the
+emission), not a bug to work around — so it was abandoned in favor of the
+hand-written forward algorithm above, which has no such restriction because
+there is no enumeration machinery involved at all.
+
+**Consequence — a further, transparent model simplification (update Eq. (3)
+if reported in the manuscript):** to make marginalization tractable, the
+factor and severity AR transition dynamics are now **regime-constant**
+(`Phi`, `Q_f`, `A_h`, `Q_h` — no `R` axis); only the emission *means*
+(`mu_r[z_t]`, `nu_r[z_t]`) still switch by regime. This is a "Markov-switching
+mean" model rather than the paper's full "Markov-switching VAR"/switching
+linear dynamical system. `A_h`/`Q_h` were already regime-constant in the
+original code, so in practice this only changes `Phi_r → Phi` and
+`Q_r → Q_f`. If the manuscript states regime-dependent factor transition
+dynamics, it should be revised to state that only the level switches by
+regime, or this should be flagged as a documented deviation between the
+paper and the implementation.
+
+**Validation:** at the real data's scale (K=8, S=11, T=180, r=3, r_sig=2,
+R=3), plain NUTS on the new model sustained healthy step sizes (~2e-3 to
+5e-2) across 30+ warmup/sampling iterations with no collapse and
+acceptance probabilities in the 0.81–0.92 range, on realistically-scaled
+synthetic data across multiple seeds — matching or exceeding the best cases
+previously seen with `DiscreteHMCGibbs`, without that approach's frequent
+failures. The `run_nuts` retry-on-collapse loop is kept as a cheap safety
+net but is not expected to be needed in normal operation.
+
+**Downstream consequence for forecasting:** `predict()` no longer reads a
+literal sampled `z_t`; it recovers the *exact* filtered posterior over the
+terminal regime via the Hamilton forward filter
+(`src/cassandra_threatcast/inference/ffbs.py::forward_filter`, applied to the
+per-draw `loglik_regime_t` site the model now exposes) and samples
+`z_T ~ Categorical(filtered_probs_T)` to seed the forward simulation. `f_t`/
+`h_t` are now simple, non-branching sequences (no per-regime dispatch), so
+their terminal values are directly usable without any special recovery.
