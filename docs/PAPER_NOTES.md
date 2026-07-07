@@ -114,18 +114,50 @@ enough in testing (many consecutive seeds collapsing) that even 6 retries are
 not a strong guarantee. If you see the "NUTS adaptation did not recover"
 warning after all retries, the returned posterior should not be trusted.
 
-**Recommended long-term fix (not yet implemented): marginalize the discrete
-regime instead of Gibbs-sampling it.** `numpyro`'s own documentation flags
-`DiscreteHMCGibbs` as an `[EXPERIMENTAL INTERFACE]` and explicitly recommends
-its alternative for exactly this situation: enumerate/marginalize the
-discrete latent (`z_t`) analytically via `infer={"enumerate": "parallel"}`
-(NumPyro's funsor-based enumeration, as used in its own HMM examples) instead
-of resampling it with Gibbs steps interleaved with NUTS. This would let plain
-NUTS — mature, well-tested, no interleaved-kernel target-shifting — handle
-the entire continuous parameter space, likely eliminating this failure mode
-outright rather than working around it with retries. This is a nontrivial
-rewrite of the regime-switching part of `full_model` (replacing the discrete
-`numpyro.sample("z_t", ...)` inside the `scan` with a funsor-compatible
-enumerated formulation) and was out of scope to implement and validate in the
-time available here, but is the principled next step if retry-based
-mitigation proves insufficient in practice.
+**Recommended long-term fix (prototyped and confirmed superior, integration
+incomplete): marginalize the discrete regime instead of Gibbs-sampling it.**
+`numpyro`'s own documentation flags `DiscreteHMCGibbs` as an
+`[EXPERIMENTAL INTERFACE]` and explicitly recommends enumerating/marginalizing
+the discrete latent (`z_t`) analytically instead of resampling it with Gibbs
+steps interleaved with NUTS. `funsor` was installed
+(`pip install funsor`, tested compatible with our jax 0.10.2 / numpyro 0.21.0)
+and this approach was prototyped:
+
+- A minimal HMM matching our exact structure (`Categorical` regime inside
+  `numpyro.contrib.control_flow.scan`, continuous emission), run with **plain
+  `NUTS` — no `DiscreteHMCGibbs` at all** — correctly recovered known
+  synthetic regime means and, at our real T=180 scale, adapted a **healthy
+  step size (~0.6) on 5/5 seeds tried**, with none of the ~1e-38 collapses
+  seen with `DiscreteHMCGibbs` (which failed 12/13 times across this session's
+  testing). This is a decisive, reproducible result: enumeration is the
+  correct fix in principle.
+- Porting it into the actual `full_model` was **started but not completed**.
+  The blocking difficulty is mechanical rather than conceptual: NumPyro's
+  funsor-based enumeration validates that *every* independent batch dimension
+  of *every* sample site (not just the regime axis) is wrapped in an explicit
+  `numpyro.plate(name, size, dim=...)` — Dirichlet's own trailing axis is the
+  only exemption (it's an event dimension, not an independent batch dim).
+  Working through the model's ~15 multi-dimensional prior sites one at a time
+  (`mu_r`, `Gamma_raw`, `Phi_raw`, `Q_r_raw`, `nu_r`, `Psi_raw`, `A_h_raw`,
+  `Q_h_raw`, `omega_k_raw`, `kappa_k_raw`, `f_init`, `h_init`, and the
+  per-step innovations `eps_f`/`eps_eta`/`xi_h`/`eps_v` inside `scan`) each
+  revealed the next missing plate in turn; this is why it wasn't finished in
+  the time available, not because any instance failed to work once plated.
+- Regime-indexed array lookups (`Phi_r[z_t]`, `Q_r[z_t]`, `mu_r[z_t]`, and the
+  severity equivalents `nu_r[z_t]`) must use
+  `numpyro.ops.indexing.Vindex(...)[z_t]` instead of plain indexing, because
+  under enumeration `z_t` is not a scalar — it carries an implicit extra
+  dimension ranging over all `R` possible values simultaneously, and only
+  `Vindex` broadcasts that correctly (plain `arr[z_t]` breaks downstream
+  shape-dependent ops like `jnp.diag`).
+
+**To complete this fix:** systematically add `@config_enumerate` to
+`full_model`, wrap every remaining multi-dimensional prior site's batch
+dimensions in explicit nested `numpyro.plate`s (following the pattern above:
+add one plate per non-event batch axis, run, fix whatever site the next error
+names, repeat until the model traces cleanly), replace every regime-indexed
+lookup with `Vindex`, do the same for the severity process's `z_t`-indexed
+terms, then delete the `DiscreteHMCGibbs` wrapper in `nuts.py` in favor of
+plain `NUTS(model)`. `predict()`'s NumPy-based forward simulation is
+unaffected (it doesn't use funsor). Validate against the existing test suite
+plus a repeat of the multi-seed real-data robustness check in this document.
