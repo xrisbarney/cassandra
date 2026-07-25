@@ -1,0 +1,340 @@
+[run_all] PIPELINE STARTING
+[run_all] START 1/5 Collect data
+[1/6] Fetching NVD CVEs from 2010-01 to 2024-12 ...
+11:48:34 [INFO] cassandra_threatcast.data.nvd: NVD cache hit: data\cache\nvd_8b3bd5beee440b0ea4abeac7fa0eac01.json
+11:49:07 [INFO] cassandra_threatcast.data.nvd: Dropped 14181 rejected CVE record(s) (not real vulnerabilities)
+      220,684 CVEs fetched.
+[2/6] Fitting topic model (K=8) ...
+      Topic mapper saved to data/processed/topic_mapper.pkl
+      AI-generated topic names -> data/processed/topic_names.json
+[3/6] Fetching EPSS scores ...
+11:50:22 [INFO] cassandra_threatcast.data.epss: EPSS scores start 2021-04-14; clamping EPSS fetch start from 2010-01-01 to 2021-04-14.
+      8,188,824 EPSS records fetched.
+[4/6] Fetching CISA KEV catalog ...
+11:50:34 [INFO] cassandra_threatcast.data.cisa_kev: CISA KEV cache hit: data\cache\cisa_kev.json
+11:50:34 [INFO] cassandra_threatcast.data.cisa_kev: Loaded 1631 KEV entries
+      1,631 KEV entries fetched.
+[5/6] Fetching SEC 8-K cyber-disclosure filings ...
+11:50:34 [INFO] cassandra_threatcast.data.sec_8k: SEC 8-K cache hit: data\cache\sec_8k_v2_9b24270cb0c3dd77016e0db1c1c309f6.json
+      47 8-K filings fetched.
+[6/6] Building monthly panel arrays ...
+11:50:34 [INFO] cassandra_threatcast.data.nvd: NVD cache hit: data\cache\nvd_8b3bd5beee440b0ea4abeac7fa0eac01.json
+11:51:11 [INFO] cassandra_threatcast.data.nvd: Dropped 14181 rejected CVE record(s) (not real vulnerabilities)
+11:51:15 [INFO] cassandra_threatcast.data.epss: EPSS scores start 2021-04-14; clamping EPSS fetch start from 2010-01-01 to 2021-04-14.
+11:51:33 [INFO] cassandra_threatcast.data.cisa_kev: CISA KEV cache hit: data\cache\cisa_kev.json
+11:51:33 [INFO] cassandra_threatcast.data.cisa_kev: Loaded 1631 KEV entries
+11:51:34 [INFO] cassandra_threatcast.data.sec_8k: SEC 8-K cache hit: data\cache\sec_8k_v2_9b24270cb0c3dd77016e0db1c1c309f6.json
+11:51:34 [INFO] cassandra_threatcast.data.pipeline: Saved N.npy  shape=(8, 180)
+11:51:34 [INFO] cassandra_threatcast.data.pipeline: Saved B.npy  shape=(8, 180)
+11:51:34 [INFO] cassandra_threatcast.data.pipeline: Saved E.npy  shape=(8, 180)
+11:51:34 [INFO] cassandra_threatcast.data.pipeline: Saved KEV.npy  shape=(8, 180)
+11:51:34 [INFO] cassandra_threatcast.data.pipeline: Saved D.npy  shape=(11, 180)
+11:51:34 [INFO] cassandra_threatcast.data.pipeline: Saved panel metadata to data\processed\panel_meta.json
+      Exposure map M_skt saved: shape=(11, 8, 180)  (4% of cells at uniform fallback)
+
+Done.  Panel saved to: data/processed/
+  N          shape = (8, 180)  mean = 153.253  max = 1758.000
+  B          shape = (8, 180)  mean = nan  max = nan
+  E          shape = (8, 180)  mean = nan  max = nan
+  KEV        shape = (8, 180)  mean = 0.919  max = 22.000
+  D          shape = (11, 180)  mean = 0.024  max = 4.000
+[run_all] DONE 1/5 Collect data in 3.7 min
+[run_all] START 2/5 Prepare inputs
+[1/4] Loading processed panel ...
+      N shape=(8, 180)  D shape=(11, 180)  T=180
+[2/4] Loading exposure map M_skt ...
+      Loaded M_skt from data/processed/M_skt.npy
+      M_skt shape=(11, 8, 180)  col-sum min=1.000  max=1.000
+[3/4] Estimating reporting-effort index e_t ...
+      e_t: mean=0.0000  std=1.0000  min=-1.3749  max=1.8524
+[4/4] Computing Leontief inverse from BEA I-O table ...
+      Leontief inverse shape=(11, 11)  spectral_radius_A=0.5192
+      x_s shape=(11,)  total output = $36.87 trillion
+
+Done.  Feature arrays written to: data/processed/
+  M_skt.npy            shape=(11, 8, 180)
+  e_t.npy              shape=(180,)
+  Lambda_L.npy         shape=(11, 11)
+  x_s.npy              shape=(11,)
+[run_all] DONE 2/5 Prepare inputs in 0.1 min
+[run_all] START 3/5 Train the model
+      Model variant: paper-native
+[1/3] Loading panel and features ...
+      K=8  S=11  T=180  r=3  R=3
+      N total counts: 220684  D total counts: 47
+[2/3] Running NUTS  (warmup=1000  samples=2000  chains=4) ...
+  0%|          | 0/3000 [00:00<?, ?it/s]Compiling.. :   0%|          | 0/3000 [00:00<?, ?it/s]
+  0%|          | 0/3000 [00:00<?, ?it/s][A
+Compiling.. :   0%|          | 0/3000 [00:00<?, ?it/s][A
+
+  0%|          | 0/3000 [00:00<?, ?it/s][A[A
+
+Compiling.. :   0%|          | 0/3000 [00:00<?, ?it/s][A[A
+
+
+  0%|          | 0/3000 [00:00<?, ?it/s][A[A[A
+
+
+Compiling.. :   0%|          | 0/3000 [00:00<?, ?it/s][A[A[ARunning chain 0:   0%|          | 0/3000 [00:48<?, ?it/s]
+Running chain 1:   0%|          | 0/3000 [00:48<?, ?it/s][A
+
+Running chain 2:   0%|          | 0/3000 [00:48<?, ?it/s][A[A
+
+
+Running chain 3:   0%|          | 0/3000 [00:48<?, ?it/s][A[A[A
+
+Running chain 2:   5%|▌         | 150/3000 [30:06<9:16:36, 11.72s/it][A[ARunning chain 0:   5%|▌         | 150/3000 [30:55<9:32:08, 12.05s/it]
+
+
+Running chain 3:   5%|▌         | 150/3000 [31:03<9:34:54, 12.10s/it][A[A[A
+Running chain 1:   5%|▌         | 150/3000 [31:35<9:45:02, 12.32s/it][A
+
+Running chain 2:  10%|█         | 300/3000 [59:40<8:50:13, 11.78s/it][A[A
+
+
+Running chain 3:  10%|█         | 300/3000 [1:01:12<9:03:28, 12.08s/it][A[A[ARunning chain 0:  10%|█         | 300/3000 [1:01:35<9:08:01, 12.18s/it]
+Running chain 1:  10%|█         | 300/3000 [1:01:43<9:07:12, 12.16s/it][A
+Running chain 1:  15%|█▌        | 450/3000 [1:36:03<9:07:21, 12.88s/it][A
+
+
+Running chain 3:  15%|█▌        | 450/3000 [1:36:50<9:15:25, 13.07s/it][A[A[A
+
+Running chain 2:  15%|█▌        | 450/3000 [1:37:03<9:22:20, 13.23s/it][A[ARunning chain 0:  15%|█▌        | 450/3000 [1:38:04<9:24:25, 13.28s/it]
+Running chain 1:  20%|██        | 600/3000 [2:10:26<8:48:56, 13.22s/it][A
+
+
+Running chain 3:  20%|██        | 600/3000 [2:11:30<8:55:25, 13.39s/it][A[A[A
+
+Running chain 2:  20%|██        | 600/3000 [2:14:25<9:16:17, 13.91s/it][A[ARunning chain 0:  20%|██        | 600/3000 [2:14:43<9:12:58, 13.82s/it]
+Running chain 1:  25%|██▌       | 750/3000 [2:47:08<8:35:37, 13.75s/it][A
+
+
+Running chain 3:  25%|██▌       | 750/3000 [2:47:30<8:35:39, 13.75s/it][A[A[A
+
+Running chain 2:  25%|██▌       | 750/3000 [2:51:38<8:54:49, 14.26s/it][A[ARunning chain 0:  25%|██▌       | 750/3000 [2:52:34<8:56:10, 14.30s/it]
+Running chain 1:  30%|███       | 900/3000 [3:19:21<7:50:57, 13.46s/it][A
+
+
+Running chain 3:  30%|███       | 900/3000 [3:19:46<7:51:14, 13.46s/it][A[A[A
+
+Running chain 2:  30%|███       | 900/3000 [3:24:10<8:04:18, 13.84s/it][A[ARunning chain 0:  30%|███       | 900/3000 [3:24:52<8:04:03, 13.83s/it]
+Running chain 1:  35%|███▌      | 1050/3000 [3:50:49<7:08:04, 13.17s/it][A
+
+
+Running chain 3:  35%|███▌      | 1050/3000 [3:50:56<7:06:58, 13.14s/it][A[A[A
+
+Running chain 2:  35%|███▌      | 1050/3000 [3:56:01<7:18:00, 13.48s/it][A[ARunning chain 0:  35%|███▌      | 1050/3000 [3:56:55<7:18:44, 13.50s/it]
+Running chain 1:  40%|████      | 1200/3000 [4:23:10<6:32:56, 13.10s/it][A
+
+
+Running chain 3:  40%|████      | 1200/3000 [4:23:38<6:33:36, 13.12s/it][A[A[A
+
+Running chain 2:  40%|████      | 1200/3000 [4:27:49<6:37:04, 13.24s/it][A[ARunning chain 0:  40%|████      | 1200/3000 [4:29:30<6:40:33, 13.35s/it]
+
+
+Running chain 3:  45%|████▌     | 1350/3000 [4:58:46<6:08:47, 13.41s/it][A[A[A
+Running chain 1:  45%|████▌     | 1350/3000 [5:00:36<6:16:17, 13.68s/it][A
+
+Running chain 2:  45%|████▌     | 1350/3000 [5:03:31<6:12:58, 13.56s/it][A[ARunning chain 0:  45%|████▌     | 1350/3000 [5:06:49<6:20:42, 13.84s/it]
+
+
+Running chain 3:  50%|█████     | 1500/3000 [5:31:15<5:32:03, 13.28s/it][A[A[A
+Running chain 1:  50%|█████     | 1500/3000 [5:33:41<5:38:36, 13.54s/it][A
+
+Running chain 2:  50%|█████     | 1500/3000 [5:36:26<5:36:01, 13.44s/it][A[ARunning chain 0:  50%|█████     | 1500/3000 [5:38:53<5:38:15, 13.53s/it]
+
+
+Running chain 3:  55%|█████▌    | 1650/3000 [6:03:06<4:55:06, 13.12s/it][A[A[A
+Running chain 1:  55%|█████▌    | 1650/3000 [6:06:02<5:00:35, 13.36s/it][A
+
+Running chain 2:  55%|█████▌    | 1650/3000 [6:09:55<5:02:06, 13.43s/it][A[ARunning chain 0:  55%|█████▌    | 1650/3000 [6:12:25<5:03:36, 13.49s/it]
+
+
+Running chain 3:  60%|██████    | 1800/3000 [6:36:43<4:24:18, 13.22s/it][A[A[A
+Running chain 1:  60%|██████    | 1800/3000 [6:38:44<4:25:28, 13.27s/it][A
+
+Running chain 2:  60%|██████    | 1800/3000 [6:42:45<4:26:45, 13.34s/it][A[ARunning chain 0:  60%|██████    | 1800/3000 [6:44:01<4:24:40, 13.23s/it]
+
+
+Running chain 3:  65%|██████▌   | 1950/3000 [7:08:14<3:48:03, 13.03s/it][A[A[A
+Running chain 1:  65%|██████▌   | 1950/3000 [7:10:27<3:49:11, 13.10s/it][A
+
+Running chain 2:  65%|██████▌   | 1950/3000 [7:15:16<3:51:37, 13.24s/it][A[ARunning chain 0:  65%|██████▌   | 1950/3000 [7:16:45<3:50:50, 13.19s/it]
+
+
+Running chain 3:  70%|███████   | 2100/3000 [7:39:48<3:13:38, 12.91s/it][A[A[A
+Running chain 1:  70%|███████   | 2100/3000 [7:41:52<3:14:02, 12.94s/it][A
+
+Running chain 2:  70%|███████   | 2100/3000 [7:45:51<3:14:00, 12.93s/it][A[ARunning chain 0:  70%|███████   | 2100/3000 [7:47:44<3:14:15, 12.95s/it]
+
+
+Running chain 3:  75%|███████▌  | 2250/3000 [8:10:25<2:38:51, 12.71s/it][A[A[A
+Running chain 1:  75%|███████▌  | 2250/3000 [8:13:03<2:39:57, 12.80s/it][A
+
+Running chain 2:  75%|███████▌  | 2250/3000 [8:16:41<2:39:23, 12.75s/it][A[ARunning chain 0:  75%|███████▌  | 2250/3000 [8:19:08<2:40:24, 12.83s/it]
+
+
+Running chain 3:  80%|████████  | 2400/3000 [8:47:30<2:13:30, 13.35s/it][A[A[A
+Running chain 1:  80%|████████  | 2400/3000 [8:53:11<2:17:46, 13.78s/it][A
+
+Running chain 2:  80%|████████  | 2400/3000 [8:56:21<2:16:53, 13.69s/it][A[ARunning chain 0:  80%|████████  | 2400/3000 [9:00:13<2:19:09, 13.92s/it]
+
+
+Running chain 3:  85%|████████▌ | 2550/3000 [9:22:28<1:41:33, 13.54s/it][A[A[A
+Running chain 1:  85%|████████▌ | 2550/3000 [9:28:00<1:43:39, 13.82s/it][A
+
+Running chain 2:  85%|████████▌ | 2550/3000 [9:32:44<1:44:37, 13.95s/it][A[ARunning chain 0:  85%|████████▌ | 2550/3000 [9:35:47<1:45:04, 14.01s/it]
+
+
+Running chain 3:  90%|█████████ | 2700/3000 [9:57:42<1:08:31, 13.71s/it][A[A[A
+Running chain 1:  90%|█████████ | 2700/3000 [10:02:06<1:08:50, 13.77s/it][A
+
+Running chain 2:  90%|█████████ | 2700/3000 [10:07:22<1:09:36, 13.92s/it][A[ARunning chain 0:  90%|█████████ | 2700/3000 [10:10:12<1:09:41, 13.94s/it]
+
+
+Running chain 3:  95%|█████████▌| 2850/3000 [10:30:48<33:55, 13.57s/it] [A[A[A
+Running chain 1:  95%|█████████▌| 2850/3000 [10:34:27<33:47, 13.52s/it]  [A
+
+Running chain 2:  95%|█████████▌| 2850/3000 [10:39:52<34:06, 13.64s/it]  [A[ARunning chain 0:  95%|█████████▌| 2850/3000 [10:41:58<33:55, 13.57s/it]  
+
+
+Running chain 3: 100%|██████████| 3000/3000 [11:01:50<00:00, 13.22s/it][A[A[ARunning chain 3: 100%|██████████| 3000/3000 [11:01:50<00:00, 13.24s/it]
+
+Running chain 1: 100%|██████████| 3000/3000 [11:05:55<00:00, 13.24s/it][ARunning chain 1: 100%|██████████| 3000/3000 [11:05:55<00:00, 13.32s/it]
+
+
+Running chain 2: 100%|██████████| 3000/3000 [11:09:57<00:00, 13.16s/it][A[ARunning chain 2: 100%|██████████| 3000/3000 [11:09:57<00:00, 13.40s/it]
+Running chain 0: 100%|██████████| 3000/3000 [11:10:50<00:00, 12.96s/it]Running chain 0: 100%|██████████| 3000/3000 [11:10:50<00:00, 13.42s/it]
+      NUTS completed in 671.4 min.
+[3/3] Saving InferenceData ...
+      Saved to results/idata.pkl (primary)
+      Saved to results/idata.nc (secondary)
+
+Posterior summary (selected parameters):
+                    mean     sd  eti89_lb  eti89_ub  ess_bulk  ess_tail  r_hat  mcse_mean  mcse_sd
+alpha_k[0]         1.919  2.183    -1.278     5.095     5.832    20.023  1.825      0.990    0.439
+alpha_k[1]         3.713  0.896     2.502     5.330     8.208    20.897  1.419      0.327    0.221
+alpha_k[2]        -1.518  5.729   -10.592     4.889     5.321    10.500  2.119      2.777    1.182
+alpha_k[3]         0.652  5.366    -8.842     5.549     5.060    11.102  2.254      2.660    1.507
+alpha_k[4]        -1.583  0.646    -2.614    -0.655     6.698    38.621  1.625      0.262    0.155
+alpha_k[5]        -8.149  0.562    -9.079    -7.338     6.162    16.105  1.725      0.236    0.134
+alpha_k[6]         1.430  0.842     0.184     2.877    69.331   615.332  1.051      0.099    0.070
+alpha_k[7]        -6.159  7.675   -11.525     8.046     6.163    10.721  1.728      3.813    2.258
+rho_s[0]           0.006  0.006     0.000     0.017  1865.032  1677.015  1.003      0.000    0.000
+rho_s[1]           0.012  0.009     0.001     0.030  1382.455  1417.700  1.013      0.000    0.000
+rho_s[2]           0.002  0.002     0.000     0.006  2511.432  2091.788  1.002      0.000    0.000
+rho_s[3]           0.006  0.006     0.000     0.018  2244.273  1905.912  1.001      0.000    0.000
+rho_s[4]           0.001  0.001     0.000     0.003  1035.265  1021.137  1.018      0.000    0.000
+rho_s[5]           0.015  0.010     0.003     0.034  1797.014  1797.566  1.005      0.000    0.000
+rho_s[6]           0.000  0.000     0.000     0.000  1613.425  1746.952  1.006      0.000    0.000
+rho_s[7]           0.000  0.000     0.000     0.000  1598.035  1259.821  1.001      0.000    0.000
+rho_s[8]           0.000  0.000     0.000     0.000  1975.360  1647.792  1.001      0.000    0.000
+rho_s[9]           0.001  0.001     0.000     0.002  1135.901   805.513  1.007      0.000    0.000
+rho_s[10]          0.004  0.004     0.000     0.011  2325.033  1849.151  1.004      0.000    0.000
+varsigma_k[0]      0.268  0.234     0.023     0.589     6.110    37.003  1.749      0.114    0.029
+varsigma_k[1]      0.028  0.008     0.020     0.045    21.417    38.456  1.134      0.002    0.002
+varsigma_k[2]      0.131  0.159     0.020     0.405     7.932    16.688  1.549      0.073    0.035
+varsigma_k[3]      0.026  0.006     0.020     0.037   746.485  1330.589  1.018      0.000    0.000
+varsigma_k[4]      0.270  0.176     0.044     0.550     5.662    24.139  1.929      0.081    0.036
+varsigma_k[5]      0.030  0.010     0.020     0.049    13.687    29.896  1.216      0.003    0.003
+varsigma_k[6]      0.025  0.005     0.020     0.034  1349.485  1869.532  1.006      0.000    0.000
+varsigma_k[7]      0.036  0.016     0.021     0.068    17.450    30.567  1.170      0.004    0.005
+varsigma_k_raw[0]  0.248  0.234     0.003     0.569     6.110    37.003  1.749      0.114    0.029
+varsigma_k_raw[1]  0.008  0.008     0.000     0.025    21.417    38.456  1.134      0.002    0.002
+varsigma_k_raw[2]  0.111  0.159     0.000     0.385     7.932    16.688  1.549      0.073    0.035
+varsigma_k_raw[3]  0.006  0.006     0.000     0.017   746.486  1330.589  1.018      0.000    0.000
+varsigma_k_raw[4]  0.250  0.176     0.024     0.530     5.662    24.139  1.929      0.081    0.036
+varsigma_k_raw[5]  0.010  0.010     0.000     0.029    13.687    29.896  1.216      0.003    0.003
+varsigma_k_raw[6]  0.005  0.005     0.000     0.014  1349.484  1869.532  1.006      0.000    0.000
+varsigma_k_raw[7]  0.016  0.016     0.001     0.048    17.450    30.567  1.170      0.004    0.005
+
+Done.
+[run_all] DONE 3/5 Train the model in 671.6 min
+[run_all] START 4/5 Check accuracy
+[1/4] Loading panel ...
+[2/4] Loading InferenceData ...
+      InferenceData loaded (pickle).
+[3/4] Running 16 evaluation folds ...
+      Horizons: [1, 3, 6, 12]  T=180  test_T=36
+      Using 8 worker process(es) (folds are independent)
+  Fold 1: train_T=72  horizon=12
+  Fold 2: train_T=78  horizon=12
+  Fold 3: train_T=84  horizon=12
+  Fold 4: train_T=90  horizon=12
+  Fold 5: train_T=96  horizon=12
+  Fold 6: train_T=102  horizon=12
+  Fold 7: train_T=108  horizon=12
+  Fold 8: train_T=114  horizon=12
+  Fold 9: train_T=120  horizon=12
+  Fold 10: train_T=126  horizon=12
+  Fold 11: train_T=132  horizon=12
+  Fold 12: train_T=138  horizon=12
+  Fold 13: train_T=144  horizon=12
+  Fold 14: train_T=150  horizon=12
+  Fold 15: train_T=156  horizon=12
+  Fold 16: train_T=162  horizon=12
+[4/4] Aggregating scores and running DM tests ...
+      Scores saved to results/evaluation/scores.csv
+horizon           1                                  3                                  6                                  12                        
+metric          CRPS         MAE        RMSE       CRPS         MAE        RMSE       CRPS         MAE        RMSE       CRPS         MAE        RMSE
+model                                                                                                                                                
+ARIMA      53.680664   66.150904   97.351092  55.058298   67.956675  106.632363  54.855856   67.191826  105.032896  61.166598   75.254337  118.419381
+ETS        53.411260   64.454531   95.750180  53.247910   63.195320   93.396638  56.840958   64.964038   95.596887  66.458866   74.776250  112.710829
+FullModel  82.010106  109.425781  142.852750  81.297280  107.979167  148.382826  82.696513  109.972656  151.390701  89.844812  118.305990  164.889374
+Naive      64.853251   79.546540  114.051869  64.195053   79.234932  121.098129  64.062277   79.546013  119.514118  68.416015   84.869225  130.761334
+RF         49.621888   59.715921   84.308266  51.411184   63.738978   96.497887  53.361226   66.732880  101.454684  61.878390   77.525721  119.914299
+
+DM test results (ref = FullModel):
+             dm_stat       p_value  significant_5pct       note
+model                                                          
+FullModel   0.000000  1.000000e+00             False  reference
+RF        -12.336157  2.089546e-33              True     better
+ETS       -11.400404  5.864643e-29              True     better
+Naive      -9.720182  1.030010e-21              True     better
+ARIMA     -12.346258  1.864158e-33              True     better
+      Saved to results/evaluation/dm_test.csv
+
+Calibration report (last fold) ...
+      Calibration report saved to results/evaluation/calibration.csv
+channel  alpha  coverage_nominal  coverage_empirical  interval_score  pit_ks_stat  pit_ks_pval
+      N    0.1               0.9            0.177083     2972.813021     0.877559 6.368070e-88
+      N    0.5               0.5            0.000000     1011.424479     0.877559 6.368070e-88
+
+Done.
+[run_all] DONE 4/5 Check accuracy in 38.9 min
+[run_all] START 5/5 Forecast
+[1/4] Loading panel ...
+[2/4] Loading InferenceData and generating posterior predictive ...
+      Model variant: paper-native
+      pred_N shape: (8000, 8, 12)  (n_samples=8000, K=8, H=12)
+[3/4] Saving forecast outputs ...
+      Predictive quantiles -> results/forecasts/forecast_quantiles.csv  (CVE counts per month, per topic)
+      Loss distribution   -> results/forecasts/loss_distribution.csv
+      (All figures in USD, TOTAL accumulated over the 12-month forecast horizon -- not a monthly rate)
+                scope  horizon_months  mean_usd_total  sd_usd_total  VaR95_usd_total  ES95_usd_total  q05_usd_total  q50_usd_total  q95_usd_total
+          Agriculture              12    1.214903e+07  9.272175e+04      12156301.50     12156301.50    12156301.50    12156301.50    12156301.50
+               Mining              12    1.164353e+07  8.953856e+04      11650567.50     11650567.50    11650567.50    11650567.50    11650567.50
+            Utilities              12    7.469121e+06  5.189312e+04       7473036.75      7473036.75     7473036.75     7473036.75     7473036.75
+         Construction              12    1.341146e+07  1.148064e+05      13420698.00     13420698.00    13420698.00    13420698.00    13420698.00
+        Manufacturing              12    1.002609e+08  7.034554e+05     100314336.00    100314336.00   100314336.00   100314336.00   100314336.00
+      Wholesale Trade              12    1.286571e+07  1.162049e+05      12875110.50     12875110.50    12875110.50    12875110.50    12875110.50
+         Retail Trade              12    1.054101e+07  7.771520e+04      10546698.00     10546698.00    10546698.00    10546698.00    10546698.00
+       Transportation              12    1.419560e+07  3.462066e+04      14198208.00     14198208.00    14198208.00    14198208.00    14198208.00
+              Finance              12    7.659493e+07  4.361864e+05      76625004.00     76625004.00    76625004.00    76625004.00    76625004.00
+Professional Services              12    1.194672e+08  5.784998e+05     119505432.00    119505432.00   119505432.00   119505432.00   119505432.00
+           Government              12    2.585905e+07  2.328965e+05      25877874.00     25877874.00    25877874.00    25877874.00    25877874.00
+            aggregate              12    4.044575e+08  2.471843e+06     404643266.25    404643266.25   404643266.25   404643266.25   404643266.25
+
+======================================================================
+SUMMARY
+======================================================================
+Over the next 12 months, the forecast shows that the highest monthly activity will come from remote code execution vulnerabilities, with about 2,016 new CVEs per month, followed closely by miscellaneous vulnerabilities at roughly 1,984 per month, and denial of service at around 600 per month. The fastest-growing threats are remote code execution, which rises from about 365 to 2,016 CVEs per month, miscellaneous vulnerabilities from about 1,204 to 1,984, and cross-site scripting from about 78 to 533. The total projected economic loss over the full 12-month period is approximately $404 million on average, with a median and a very tight 90% range all at $404,643,266, indicating extremely high confidence in the loss estimate. The sectors facing the most loss exposure are Professional Services, with a mean loss of about $119.5 million, Manufacturing at about $100.3 million, and Finance at about $76.6 million. The value-at-risk figures for these sectors are nearly identical to their means, reinforcing the narrow range of outcomes.
+
+      Summary -> results/forecasts/summary.txt
+[4/4] Saving fan-chart figures ...
+      8 fan charts saved to results/forecasts/figures/
+      Loss distribution figure -> results/forecasts/figures\loss_distribution.png
+
+Done.
+[run_all] DONE 5/5 Forecast in 5.7 min
+[run_all] ALL DONE in 719.9 min total.

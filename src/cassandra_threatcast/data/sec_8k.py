@@ -136,7 +136,16 @@ def fetch_8k_cyber(start_date: str, end_date: str, cache_dir: str) -> pd.DataFra
         with cache_file.open() as fh:
             records: list[dict] = json.load(fh)
     else:
-        records = _fetch_all_efts_hits(start_date, end_date)
+        records, complete = _fetch_all_efts_hits(start_date, end_date)
+        if not complete:
+            # A partial/failed fetch must never be cached: caching it would
+            # silently and permanently record "zero filings" for this date
+            # range, even after the underlying API issue is resolved.
+            raise RuntimeError(
+                f"SEC EFTS fetch for {start_date}..{end_date} did not complete "
+                f"({len(records)} partial record(s)) -- not caching. Retry once "
+                "the SEC EDGAR full-text search API is healthy."
+            )
         with cache_file.open("w") as fh:
             json.dump(records, fh)
         logger.info("Cached %d SEC 8-K records to %s", len(records), cache_file)
@@ -152,8 +161,13 @@ def fetch_8k_cyber(start_date: str, end_date: str, cache_dir: str) -> pd.DataFra
     return df
 
 
-def _fetch_all_efts_hits(start_date: str, end_date: str) -> list[dict]:
-    """Page through EFTS and return all matching filing records."""
+def _fetch_all_efts_hits(start_date: str, end_date: str) -> tuple[list[dict], bool]:
+    """Page through EFTS and return (records, complete).
+
+    complete is False if a request failed partway through pagination -- the
+    caller must not cache that as a genuine (possibly zero-result) fetch, or
+    a transient error permanently poisons the cache for that date range.
+    """
     ua = _user_agent()
     session = requests.Session()
     session.headers.update({"User-Agent": ua})
@@ -161,6 +175,7 @@ def _fetch_all_efts_hits(start_date: str, end_date: str) -> list[dict]:
     base_url = _EFTS_URL.format(start=start_date, end=end_date)
     from_index = 0
     all_records: list[dict] = []
+    complete = True
 
     while True:
         url = f"{base_url}&from={from_index}&size={_PAGE_SIZE}"
@@ -170,6 +185,7 @@ def _fetch_all_efts_hits(start_date: str, end_date: str) -> list[dict]:
             resp.raise_for_status()
         except requests.exceptions.RequestException as exc:
             logger.error("SEC EFTS request failed: %s", exc)
+            complete = False
             break
 
         payload = resp.json()
@@ -205,7 +221,7 @@ def _fetch_all_efts_hits(start_date: str, end_date: str) -> list[dict]:
 
         time.sleep(_INTER_REQUEST_DELAY)
 
-    return all_records
+    return all_records, complete
 
 
 def enrich_with_naics(df: pd.DataFrame, cache_dir: str) -> pd.DataFrame:

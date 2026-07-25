@@ -447,4 +447,21 @@ def run_all_baselines(
     except Exception as e:
         print(f"Warning: ARIMA baseline failed: {e}")
 
+    # --- BSTS-U (univariate Bayesian structural time series) ---
+    # Per-series local-linear-trend fit via NUTS. Isolates the value of the
+    # Bayesian treatment alone (no factors, no regimes) -- the BSTS-U row of
+    # the paper's comparison tables. Reduced MCMC settings keep the
+    # 16-fold x n_series sweep tractable; the model is tiny (5 params +
+    # 2 state paths), so these are ample.
+    try:
+        n_series = train.shape[0]
+        preds = np.zeros((n_series, test_T, len(quantiles)))
+        for i in range(n_series):
+            bsts = BstsUnivariate(num_warmup=300, num_samples=400).fit(
+                train[i], seed=seed + 3 + i)
+            preds[i] = np.maximum(bsts.predict_quantiles(test_T, quantiles), 0.0)
+        results["BSTS-U"] = {"predictions": preds, "name": "BSTS-U"}
+    except Exception as e:
+        print(f"Warning: BSTS-U baseline failed: {e}")
+
     return results

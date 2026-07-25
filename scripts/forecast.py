@@ -20,6 +20,7 @@ Usage:
         --horizon    12
 """
 import argparse
+import json
 import os
 import sys
 import warnings
@@ -40,7 +41,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 from cassandra_threatcast.data import pipeline
 from cassandra_threatcast.data.bea_io import get_default_sector_labels
 from cassandra_threatcast.features.topic_map import load_topic_labels
-from cassandra_threatcast.viz.plots import plot_threat_forecast, plot_loss_distribution, save_figure
+from cassandra_threatcast.viz.interactive import fan_chart, loss_distribution, save_interactive
 
 
 # ---------------------------------------------------------------------------
@@ -101,16 +102,23 @@ def _quantile_df(
     counts of new CVEs published that month for that topic -- a MONTHLY
     figure (unlike the loss table's horizon-cumulative totals), made explicit
     via the column name suffix.
+
+    The mean is a 99%-trimmed mean (top 1% of draws excluded): the log-scale
+    latent allows rare draws up to e^30, which blow the raw ensemble mean
+    orders of magnitude past the same row's q95 at long horizons (see
+    docs/PAPER_NOTES.md §7).  Quantiles are the headline summaries.
     """
     records = []
     K, H = pred_samples.shape[1], pred_samples.shape[2]
     for k in range(K):
         for hi, date in enumerate(dates_pred):
+            samp = pred_samples[:, k, hi]
+            thr = np.quantile(samp, 0.99)
             row = {
                 "topic": k,
                 "topic_label": topic_labels[k] if k < len(topic_labels) else f"Topic {k}",
                 "date": str(date),
-                "mean_cves_per_month": float(np.mean(pred_samples[:, k, hi])),
+                "mean_cves_per_month": float(samp[samp <= thr].mean()),
             }
             for q in quantiles:
                 row[f"q{int(q * 100):02d}_cves_per_month"] = float(np.quantile(pred_samples[:, k, hi], q))
@@ -254,17 +262,36 @@ def main() -> None:
         # Future exposure: hold the last observed month constant over the horizon.
         M_future = np.repeat(M_skt[:, :, -1:], args.horizon, axis=2)  # (S, K, horizon)
 
-        # Damage-function parameters (calibrated params if provided, else defaults).
-        dmg = config.get("damage_params", {})
-        damage_params = DamageFunctionParams(
-            shape=np.full(S, float(dmg.get("shape", 2.0))),
-            scale=np.full(S, float(dmg.get("scale", 1.0))),
-            max_damage=np.full(S, float(dmg.get("max_damage", 0.5))),
-        )
+        # Damage-function parameters: the event-calibrated posterior (paper
+        # §3 / Table 7, produced by scripts/calibrate_damage.py) when
+        # available, else the config defaults.
+        cal_path = os.path.join("results", "calibration", "damage_params.json")
+        if os.path.exists(cal_path):
+            with open(cal_path, encoding="utf-8") as fh:
+                dmg_cal = json.load(fh)
+            damage_params = DamageFunctionParams(
+                shape=np.asarray(dmg_cal["shape"], dtype=float),
+                scale=np.asarray(dmg_cal["scale"], dtype=float),
+                max_damage=np.asarray(dmg_cal["max_damage"], dtype=float),
+            )
+            print(f"      Damage functions: event-calibrated ({cal_path})")
+        else:
+            dmg = config.get("damage_params", {})
+            damage_params = DamageFunctionParams(
+                shape=np.full(S, float(dmg.get("shape", 2.0))),
+                scale=np.full(S, float(dmg.get("scale", 1.0))),
+                max_damage=np.full(S, float(dmg.get("max_damage", 0.5))),
+            )
+            print("      Damage functions: config defaults -- run "
+                  "scripts/calibrate_damage.py for the event-calibrated set.")
+
+        # BEA gross output arrives in $ millions; convert so every loss
+        # figure downstream is in actual dollars.
+        x_s_usd = x_s * 1e6
 
         out = full_module.predict(
             post, data_dict, args.horizon,
-            Lambda_L, x_s, M_future, damage_params,
+            Lambda_L, x_s_usd, M_future, damage_params,
             enhanced=enhanced, student_t_df=student_t_df,
         )
         pred_N = out["N_pred"]   # (n_samples, K, horizon) forecast CVE counts
@@ -311,6 +338,107 @@ def main() -> None:
           f"{args.horizon}-month forecast horizon -- not a monthly rate)")
     print(loss_df.to_string(index=False))
 
+    # --- Systemic-event probabilities P(agg loss > c)  (paper Problem 2) ----
+    agg_total = loss_samples.sum(axis=(1, 2)) if loss_samples.ndim == 3 else loss_samples
+    thresholds = config.get("evaluation", {}).get(
+        "loss_thresholds_usd", [1e9, 2e9, 5e9, 1e10, 5e10, 1e11])
+    sys_df = pd.DataFrame([
+        {"threshold_usd": float(c),
+         "prob_exceed": float(np.mean(agg_total > c)),
+         "horizon_months": args.horizon}
+        for c in thresholds
+    ])
+    sys_path = os.path.join(args.output_dir, "systemic_probs.csv")
+    sys_df.to_csv(sys_path, index=False)
+    print(f"      Systemic-event probabilities -> {sys_path}")
+    for _, row in sys_df.iterrows():
+        print(f"        P(total loss > ${row.threshold_usd/1e9:,.0f}B) = {row.prob_exceed:.1%}")
+
+    # --- Table 8: ranked sectoral exposure ----------------------------------
+    if out is not None and "g_pred" in out:
+        g_pred = out["g_pred"]                      # (n, S, H) damage fractions
+        sigma_pred = out["sigma_pred"]              # (n, K, H)
+        lam_pred = np.exp(np.clip(out["lambda_pred"], -30.0, 30.0))   # (n, K, H)
+        ell_by_sector = loss_samples.sum(axis=2)    # (n, S) horizon totals
+
+        g_mean_h = g_pred.mean(axis=2)              # (n, S) mean over horizon
+        expo_mean = g_mean_h.mean(axis=0)
+        expo_q05, expo_q95 = np.quantile(g_mean_h, [0.05, 0.95], axis=0)
+        contrib = ell_by_sector.mean(axis=0)
+        contrib_pct = 100.0 * contrib / max(contrib.sum(), 1e-12)
+
+        # Dominant threat topics per sector: mean contribution to the shock
+        # load, M_sk * E[lambda_k * sigma_k].
+        drive = (lam_pred * sigma_pred).mean(axis=(0, 2))   # (K,)
+        M_h_mean = M_future.mean(axis=2)                    # (S, K)
+        rows8 = []
+        for s in range(S):
+            weights = M_h_mean[s] * drive
+            top2 = np.argsort(weights)[::-1][:2]
+            rows8.append({
+                "sector": sector_names[s],
+                "exposure_index_mean": float(expo_mean[s]),
+                "exposure_index_q05": float(expo_q05[s]),
+                "exposure_index_q95": float(expo_q95[s]),
+                "loss_contribution_pct": float(contrib_pct[s]),
+                "dominant_threat_topics": "; ".join(
+                    topic_labels[k] if k < len(topic_labels) else f"Topic {k}"
+                    for k in top2),
+            })
+        table8 = pd.DataFrame(rows8).sort_values(
+            "loss_contribution_pct", ascending=False).reset_index(drop=True)
+        table8.index += 1
+        table8_path = os.path.join(args.output_dir, "sector_exposure.csv")
+        table8.to_csv(table8_path, index_label="rank")
+        print(f"      Sector exposure (Table 8) -> {table8_path}")
+
+    # --- Regime probabilities: the early-warning signal ---------------------
+    try:
+        from cassandra_threatcast.evaluation.sequential import batch_forward_filter
+        from cassandra_threatcast.viz.interactive import regime_area
+
+        loglik_all = np.asarray(post["loglik_regime_t"], dtype=float)
+        Pi_all = np.asarray(post["Pi"], dtype=float)
+        filtered, _ = batch_forward_filter(loglik_all, Pi_all)      # (n, T, R)
+        R = filtered.shape[-1]
+        hist_probs = filtered.mean(axis=0)                          # (T, R)
+
+        fwd_probs = []
+        p = filtered[:, -1]
+        for _h in range(args.horizon):
+            p = np.einsum("nr,nrj->nj", p, Pi_all)
+            fwd_probs.append(p.mean(axis=0))
+        fwd_probs = np.asarray(fwd_probs)                           # (H, R)
+
+        # Order regime labels by their posterior mean intensity level so
+        # "Regime 1" is always the calmest and the last is the most severe.
+        mu_level = np.asarray(post["mu_r"]).mean(axis=(0, 2))       # (R,)
+        order = np.argsort(mu_level)
+        names = ["low activity", "elevated", "high activity"][:R]
+        regime_names = [""] * R
+        for rank, r_idx in enumerate(order):
+            regime_names[r_idx] = f"Regime {rank + 1} ({names[min(rank, len(names)-1)]})"
+
+        all_dates = list(obs_dates) + list(pred_dates[: args.horizon])
+        probs_all = np.vstack([hist_probs, fwd_probs])              # (T+H, R)
+        reg_df = pd.DataFrame(probs_all, columns=regime_names)
+        reg_df.insert(0, "date", [str(d) for d in all_dates])
+        reg_df["period"] = ["history"] * len(obs_dates) + ["forecast"] * len(fwd_probs)
+        reg_path = os.path.join(args.output_dir, "regime_probs.csv")
+        reg_df.to_csv(reg_path, index=False)
+        print(f"      Regime probabilities (early-warning) -> {reg_path}")
+        print(f"        Current filtered regime: "
+              + ", ".join(f"{regime_names[r]} {hist_probs[-1, r]:.0%}" for r in range(R)))
+
+        fig_dir_reg = os.path.join(args.output_dir, "figures")
+        os.makedirs(fig_dir_reg, exist_ok=True)
+        fig_reg = regime_area(all_dates, probs_all, regime_names,
+                              forecast_start=len(obs_dates))
+        save_interactive(fig_reg, os.path.join(fig_dir_reg, "regime_probs"))
+        print(f"      Regime chart -> {fig_dir_reg}/regime_probs.html")
+    except Exception as exc:
+        warnings.warn(f"Regime-probability output failed: {exc}")
+
     # --- Plain-English summary (optional, needs DEEPSEEK_API_KEY) -----------
     from cassandra_threatcast.llm.deepseek import explain_forecast
     summary = explain_forecast(q_df, loss_df)
@@ -327,39 +455,36 @@ def main() -> None:
         print("\n      (Set DEEPSEEK_API_KEY in .env to get an AI-generated "
               "plain-English summary here and in the dashboard.)")
 
-    # --- Fan-chart figures --------------------------------------------------
-    print("[4/4] Saving fan-chart figures ...")
-    import matplotlib
-    matplotlib.use("Agg")   # non-interactive backend for scripts
-
+    # --- Interactive fan-chart figures ---------------------------------------
+    print("[4/4] Saving interactive fan-chart figures ...")
     fig_dir = os.path.join(args.output_dir, "figures")
     os.makedirs(fig_dir, exist_ok=True)
 
+    # Remove stale static PNGs so the dashboard doesn't show both eras.
+    for stale in sorted(os.listdir(fig_dir)):
+        if stale.endswith(".png"):
+            os.remove(os.path.join(fig_dir, stale))
+
     for k in range(K):
         label = topic_labels[k] if k < len(topic_labels) else f"Topic {k}"
-        fig = plot_threat_forecast(
-            topic_k=k,
+        fig = fan_chart(
             obs=N_kt[k],
-            predictive=pred_N[:, k, :],   # (n_samples, horizon)
-            dates=[],
             obs_dates=obs_dates,
+            pred_samples=pred_N[:, k, :],   # (n_samples, horizon)
             pred_dates=pred_dates[: args.horizon],
-            topic_label=label,
+            topic_label=f"{label} — topic {k:02d}",
         )
-        fig_path = os.path.join(fig_dir, f"fan_chart_topic_{k:02d}.png")
-        save_figure(fig, fig_path, dpi=200)
+        save_interactive(fig, os.path.join(fig_dir, f"fan_chart_topic_{k:02d}"))
 
-    print(f"      {K} fan charts saved to {fig_dir}/")
+    print(f"      {K} interactive fan charts (.html + .json) -> {fig_dir}/")
 
-    # Loss distribution figure. plot_loss_distribution's `units` argument is
-    # only a label -- it does not scale the data -- so the raw-dollar totals
-    # (hundreds of millions here) must be pre-scaled to match, or the axis
-    # would show e.g. "404643266.25 $ billions" instead of "0.40 $ billions".
+    # Loss distribution figure (values pre-scaled to $ billions; the units
+    # string is only an axis label).
     agg_loss = loss_samples.sum(axis=(1, 2)) if loss_samples.ndim == 3 else loss_samples
-    fig_loss = plot_loss_distribution(agg_loss / 1e9, units=f"$ billions, total over {args.horizon} months")
-    loss_fig_path = os.path.join(fig_dir, "loss_distribution.png")
-    save_figure(fig_loss, loss_fig_path, dpi=200)
-    print(f"      Loss distribution figure -> {loss_fig_path}")
+    fig_loss = loss_distribution(
+        agg_loss / 1e9, units=f"$ billions, total over {args.horizon} months")
+    save_interactive(fig_loss, os.path.join(fig_dir, "loss_distribution"))
+    print(f"      Loss distribution figure -> {fig_dir}/loss_distribution.html")
 
     print("\nDone.")
 

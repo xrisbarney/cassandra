@@ -1,0 +1,63 @@
+# Reference event set for damage-function calibration (paper §3, Table 7).
+#
+# Documented loss ranges come from public post-incident analyses; the model
+# treats [low_usd, high_usd] as a 90% interval around the (log-scale) midpoint.
+# EDIT THESE RANGES if better documentation becomes available -- the
+# calibration (scripts/calibrate_damage.py) reads this file directly.
+#
+# month:      panel month of the event (YYYY-MM)
+# sectors:    primary BEA sectors hit (informational; calibration uses the
+#             aggregate loss, matching how documented figures are reported)
+events:
+  - name: "NotPetya (US exposure)"
+    month: "2017-06"
+    sectors: ["Manufacturing", "Transportation", "Professional Services"]
+    # White-House-attributed global damage ~$10B; Welburn & Strong (2022)
+    # modelling range $3-57B; disclosed US corporate losses (Merck ~$870M,
+    # FedEx/TNT ~$400M, Mondelez ~$188M, ...) put a floor near $1.5B.
+    low_usd: 1.5e9
+    high_usd: 1.0e10
+
+  - name: "Colonial Pipeline"
+    month: "2021-05"
+    sectors: ["Utilities", "Transportation"]   # (BEA summary has no Energy sector)
+    # $4.4M ransom; five-day shutdown of ~45% of East Coast fuel supply.
+    # Public estimates of the total economic disruption span tens of
+    # millions to low billions -- the widest range in this set.
+    low_usd: 5.0e7
+    high_usd: 2.0e9
+
+  - name: "MOVEit"
+    month: "2023-06"
+    sectors: ["Professional Services", "Finance", "Government"]
+    # Cl0p mass exploitation, 2,700+ organisations; Emsisoft/IBM-cost-based
+    # estimates ~ $12B total.
+    low_usd: 5.0e9
+    high_usd: 1.5e10
+
+  - name: "Change Healthcare"
+    month: "2024-02"
+    sectors: ["Professional Services"]   # healthcare payments/claims infrastructure; nearest BEA summary bucket in this S=11 aggregation
+    # UnitedHealth reported ~$2.87B in direct 2024 costs (to ~$3.1B in later
+    # updates); provider-side losses additional.
+    low_usd: 2.4e9
+    high_usd: 3.5e9
+
+# Aggregate anchor: documented estimates of TOTAL annual US cyber losses.
+# The four events pin the damage function's response to event-scale shocks;
+# this anchor pins its overall level (max_damage), which single events leave
+# unidentified -- without it the forecast saturates at an implausible cap.
+# Range spans the White House CEA (2018) estimate of $57-109B/year for the
+# US economy, with the FBI IC3 reported-loss series (~$12.5B in 2023,
+# reported incidents only) as a hard floor and industry estimates up to
+# ~$200B as the ceiling.  EDIT as better documentation emerges.
+aggregate_anchor:
+  low_usd_per_year: 3.0e10
+  high_usd_per_year: 2.0e11
+  n_typical_months: 12      # recent months used to define a "typical" month
+
+calibration:
+  n_state_draws: 2000       # posterior draws used for event shock loads
+  num_warmup: 500
+  num_samples: 1000
+  seed: 7

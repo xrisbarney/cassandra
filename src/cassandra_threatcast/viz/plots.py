@@ -30,6 +30,7 @@ def plot_threat_forecast(
     pred_dates: Optional[list] = None,
     topic_label: str = "",
     ax: Optional[plt.Axes] = None,
+    actual: Optional[np.ndarray] = None,  # (T_pred,) real values for the forecast period, if since become known
 ) -> plt.Figure:
     """
     Fan chart with 50 % and 90 % posterior predictive bands.
@@ -43,6 +44,11 @@ def plot_threat_forecast(
                  obs_dates / pred_dates are supplied, this argument is ignored.
     topic_label: human-readable topic name
     ax         : existing Axes to draw on (optional)
+    actual     : real observed values for the forecast window, once the
+                 future has happened (e.g. backtesting a past forecast
+                 against data collected after the fact). Overlaid on top of
+                 the predictive fan so the reader can see how the forecast
+                 held up. Omit for an ordinary forward-looking forecast.
     """
     if ax is None:
         fig, ax = plt.subplots(figsize=(10, 4))
@@ -83,6 +89,11 @@ def plot_threat_forecast(
                     color=PALETTE["primary"], label="50 % CI")
     ax.plot(pred_dates, p50, color=PALETTE["primary"], lw=1.6,
             ls="--", label="Median forecast")
+
+    if actual is not None:
+        n = min(len(pred_dates), len(actual))
+        ax.plot(pred_dates[:n], actual[:n], color=PALETTE["danger"], lw=2.0,
+                marker="o", markersize=4, label="Actual", zorder=4)
 
     # Vertical separator at forecast origin
     ax.axvline(obs_dates[-1], color="grey", lw=0.8, ls=":", alpha=0.7)

@@ -107,13 +107,28 @@ class WikiTopicMapper:
         X = self.vectorizer.fit_transform(descriptions)  # (n_docs, vocab)
 
         if self.method == "nmf":
-            self.model = NMF(
-                n_components=self.n_topics,
-                init="nndsvda",
-                random_state=42,
-                max_iter=400,
-                l1_ratio=0.1,
-            )
+            if self.n_topics >= 64:
+                # Large-K (sparse-topic population) fits: full NMF at K in the
+                # hundreds/thousands is impractical on ~200k documents;
+                # MiniBatchNMF converges in minutes with equivalent quality
+                # for topic extraction.
+                from sklearn.decomposition import MiniBatchNMF
+                self.model = MiniBatchNMF(
+                    n_components=self.n_topics,
+                    init="nndsvda",
+                    random_state=42,
+                    max_iter=200,
+                    batch_size=2048,
+                    l1_ratio=0.1,
+                )
+            else:
+                self.model = NMF(
+                    n_components=self.n_topics,
+                    init="nndsvda",
+                    random_state=42,
+                    max_iter=400,
+                    l1_ratio=0.1,
+                )
             self.model.fit(X)
             self.topic_word_matrix = self.model.components_  # (K, vocab)
         else:  # lda

@@ -58,6 +58,31 @@ observed at real scale after fix 3). **See
 [docs/PAPER_NOTES.md](docs/PAPER_NOTES.md) for the exact equations to
 update.**
 
+**Also see docs/PAPER_NOTES.md §5-§6:** backtesting the model's 2025 forecast
+(trained on 2010-2024 data) against the real 2025 data that has since come in
+shows severe under-prediction (actual CVE volume ran ~3.7x the forecast
+total) and poor uncertainty calibration (90%-interval coverage of only 4.2%
+vs. a ~90% target). §5 traces the *dominant* cause to a concrete,
+easily-fixed defect — `predict()` drops the reporting-effort offset `e_t`
+(implicitly assuming it snaps from its 2024 peak back to the 15-year average
+in the forecast), which alone accounts for essentially the whole ~3.7x gap;
+AR mean-reversion and interval overconfidence are smaller, separate issues.
+§6 discusses the CVE-volume surge, assesses the "AI-accelerated discovery"
+hypothesis (plausible as one driver among several; our data can't causally
+isolate it), and catalogues model-tuning options — including why "just train
+on the last year" won't work and what to do instead.
+
+**§7 documents the two fixes now implemented:** (i) `predict()` carries the
+fitted likelihood's covariates into the forecast — the effort offset `e_t`
+(hold-last) and the baseline disclosure rate `π_s` — closing the §5 gap;
+(ii) `scripts/backtest.py` evaluates by **sequential one-step-ahead filtered
+prediction**: starting from the first panel month, the model predicts each
+month before seeing it, is scored, then updates its regime beliefs with that
+month's actual data. Under this (correct) evaluation the 90%-interval
+coverage is ~98% on the 2023–2024 test window, versus 4.2% under the old
+open-loop design. Run `python scripts/backtest.py` (or dashboard **Step 6**)
+to reproduce; interactive charts land in `results/backtest/figures/`.
+
 ## Requirements
 
 - Python 3.11+

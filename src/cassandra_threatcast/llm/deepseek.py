@@ -223,3 +223,59 @@ def label_topics(topic_top_words: list[list[str]]) -> list[str | None] | None:
         _strip_markdown(str(mapping[str(k)])).strip() if str(k) in mapping else None
         for k in range(len(topic_top_words))
     ]
+
+
+_BACKTEST_SYSTEM_PROMPT = (
+    "You explain, to a non-technical risk-officer audience, how accurate a "
+    "past cyber-threat forecast turned out to be now that the real data for "
+    "that period is in. You are given: per-topic actual-vs-predicted CVE "
+    "counts, how often the actual value fell inside the model's stated 90% "
+    "uncertainty range ('coverage' -- close to 90% is good; much lower means "
+    "the model was overconfident, much higher means it was underconfident), "
+    "and standard error metrics (CRPS/MAE/RMSE, lower is better, no fixed "
+    "'good' threshold -- only usable by comparing across topics/horizons). "
+    "Category tags (e.g. 'Sql / Injection / Php') are raw ML labels -- "
+    "paraphrase them into plain security terms, never quote them verbatim. "
+    "Write 150-200 words of plain prose (no markdown, no bold/italic "
+    "asterisks or underscores, no bullet points): say plainly whether the "
+    "forecast under- or over-predicted overall, which categories it got most "
+    "and least right, and what the coverage number implies about how much to "
+    "trust its stated uncertainty ranges going forward. Use ONLY the numbers "
+    "given -- never invent a statistic you were not given."
+)
+
+
+def explain_backtest(detail_df: pd.DataFrame, scores_df: pd.DataFrame, coverage: float) -> str | None:
+    """
+    Build a plain-English "how did the forecast do" summary from a backtest
+    comparison (scripts/backtest.py): per-topic actual-vs-predicted detail,
+    aggregate CRPS/MAE/RMSE by horizon, and the empirical 90%-interval
+    coverage rate. Returns None if DEEPSEEK_API_KEY is not set or the API
+    call fails.
+    """
+    by_topic = detail_df.groupby("topic_label").agg(
+        actual_total=("actual_cves", "sum"),
+        predicted_total=("predicted_mean_cves", "sum"),
+    )
+    by_topic["error"] = by_topic["predicted_total"] - by_topic["actual_total"]
+    over = by_topic.sort_values("error", ascending=False).head(3)
+    under = by_topic.sort_values("error").head(3)
+
+    lines = [
+        f"Empirical 90% interval coverage across all topic-months: {coverage:.1%} "
+        "(target is ~90%; well below means the model was overconfident, well "
+        "above means it was underconfident).",
+        "",
+        "Error metrics by horizon (lower is better; compare across rows, no fixed threshold):",
+        scores_df.to_string(index=False),
+        "",
+        "Categories the forecast OVER-predicted most (predicted total - actual total, summed over the period):",
+    ]
+    for label, row in over.iterrows():
+        lines.append(f"  - tag[{label}]: predicted {row['predicted_total']:.0f} vs actual {row['actual_total']:.0f}")
+    lines.append("Categories the forecast UNDER-predicted most:")
+    for label, row in under.iterrows():
+        lines.append(f"  - tag[{label}]: predicted {row['predicted_total']:.0f} vs actual {row['actual_total']:.0f}")
+
+    result = _call_deepseek(_BACKTEST_SYSTEM_PROMPT, "\n".join(lines) + "\n\nWrite the summary now.")
+    return _strip_markdown(result) if result else None

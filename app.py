@@ -156,7 +156,12 @@ def full_run_state() -> tuple[str, str]:
     """Return (state, log_text): state is none/running/done/failed."""
     if not RUN_LOG.exists():
         return "none", ""
-    text = RUN_LOG.read_text(errors="ignore")
+    # encoding="utf-8" is required here: the log is written in UTF-8 (see
+    # launch_full_run's open(..., encoding="utf-8") above), but Path.read_text()
+    # without an explicit encoding falls back to Windows' active codepage
+    # (cp1252), which mangles multi-byte UTF-8 sequences -- notably tqdm's
+    # progress-bar block characters ("█" -> "â–ˆ").
+    text = RUN_LOG.read_text(encoding="utf-8", errors="replace")
     if "ALL DONE" in text:
         return "done", text
     if "FAILED" in text:
@@ -205,7 +210,8 @@ st.title("🔮 CASSANDRA")
 st.caption("Forecasting cyber threats and their economic impact — a guided, step-by-step tool.")
 
 st.markdown(
-    "This tool builds a forecast in five steps. Do them **in order, top to bottom**. "
+    "This tool builds a forecast in five steps, plus an optional sixth once the "
+    "forecast window is in the past. Do them **in order, top to bottom**. "
     "Each step shows a green light once it has finished. You can watch the progress "
     "log as it runs — you don't need to understand it."
 )
@@ -242,6 +248,7 @@ done_features = artifact_exists(PROCESSED / "M_skt.npy", PROCESSED / "e_t.npy", 
 done_train = artifact_exists(RESULTS / "idata.nc")
 done_eval = artifact_exists(RESULTS / "evaluation" / "scores.csv")
 done_forecast = artifact_exists(RESULTS / "forecasts" / "forecast_quantiles.csv")
+done_backtest = artifact_exists(RESULTS / "backtest" / "threat_comparison.csv")
 
 tab_run, tab_data, tab_forecast = st.tabs(["▶️ Run the steps", "📊 Your data", "🔮 The forecast"])
 
@@ -357,6 +364,22 @@ with tab_run:
         if not done_train:
             st.info("Finish Step 3 first.")
 
+    # Step 6 (optional — only meaningful once the forecast window is in the past)
+    with st.container(border=True):
+        st.subheader(f"Step 6 — Check the model against reality   {status_badge(done_backtest, ready=done_train)}")
+        st.write(
+            "Replays history the way the model actually works: each month it predicts "
+            "the next month **before** seeing it, is scored against what really "
+            "happened, then updates its beliefs with that month's actual data — from "
+            "the first month of the panel onward. See the **🔮 The forecast** tab "
+            "for the comparison."
+        )
+        if st.button("Run the sequential backtest", key="b6", disabled=not done_train):
+            if run_step([PY, "scripts/backtest.py"], "Running the sequential backtest"):
+                st.rerun()
+        if not done_train:
+            st.info("Finish Step 3 first.")
+
 # ---------------------------------------------------------------------------
 # TAB 2 — Your data
 # ---------------------------------------------------------------------------
@@ -364,10 +387,12 @@ with tab_data:
     if not done_ingest:
         st.info("No data yet. Run **Step 1 — Collect the data** first.")
     else:
-        import matplotlib.pyplot as plt
+        from cassandra_threatcast.viz.interactive import (
+            activity_line, topic_heatmap, sector_bar,
+        )
 
         N = np.load(PROCESSED / "N.npy")            # (K, T)
-        meta = json.loads((PROCESSED / "panel_meta.json").read_text())
+        meta = json.loads((PROCESSED / "panel_meta.json").read_text(encoding="utf-8"))
         dates = meta.get("dates") or meta.get("metadata", {}).get("dates", [])
 
         c1, c2, c3 = st.columns(3)
@@ -375,39 +400,27 @@ with tab_data:
         c2.metric("Threat categories", f"{N.shape[0]}")
         c3.metric("Months of history", f"{N.shape[1]}")
 
+        chart_dates = dates[: N.shape[1]] if dates else [str(i) for i in range(N.shape[1])]
+
         st.markdown("#### Monthly vulnerability activity")
-        st.caption("Total new software vulnerabilities recorded each month.")
-        fig, ax = plt.subplots(figsize=(9, 3))
-        ax.plot(np.nansum(N, axis=0), color="#7c3aed")
-        ax.fill_between(range(N.shape[1]), np.nansum(N, axis=0), alpha=0.2, color="#7c3aed")
-        ax.set_xlabel("Month"); ax.set_ylabel("New vulnerabilities")
-        ax.spines[["top", "right"]].set_visible(False)
-        st.pyplot(fig)
+        st.caption("Total new software vulnerabilities recorded each month. Hover for values; drag to zoom.")
+        st.plotly_chart(activity_line(np.nansum(N, axis=0), chart_dates),
+                        use_container_width=True)
 
         st.markdown("#### Activity by threat category")
-        st.caption("Darker means more vulnerabilities that month for that category.")
+        st.caption("Darker means more vulnerabilities that month for that category. Hover any cell.")
         topic_labels = load_topic_labels(str(PROCESSED), N.shape[0])
-        fig2, ax2 = plt.subplots(figsize=(9, 3.5))
-        im = ax2.imshow(N, aspect="auto", cmap="magma", interpolation="nearest")
-        ax2.set_xlabel("Month")
-        ax2.set_yticks(range(len(topic_labels)))
-        ax2.set_yticklabels(topic_labels, fontsize=8)
-        fig2.colorbar(im, ax=ax2, label="Vulnerabilities")
-        st.pyplot(fig2)
+        st.plotly_chart(topic_heatmap(N, topic_labels, chart_dates),
+                        use_container_width=True)
 
         D = PROCESSED / "D.npy"
         if D.exists() and np.nansum(np.load(D)) > 0:
             st.markdown("#### Disclosed company incidents by sector")
-            st.caption("Hover a sector name below for what it covers.")
+            st.caption("Hover a bar for the exact count, or a sector name below for what it covers.")
             Dd = np.load(D)
             sector_names_chart = SECTOR_LABELS[: Dd.shape[0]]
-            fig3, ax3 = plt.subplots(figsize=(9, 3.2))
-            ax3.bar(range(Dd.shape[0]), np.nansum(Dd, axis=1), color="#0d9488")
-            ax3.set_xticks(range(Dd.shape[0]))
-            ax3.set_xticklabels(sector_names_chart, rotation=45, ha="right", fontsize=8)
-            ax3.set_ylabel("Incidents")
-            ax3.spines[["top", "right"]].set_visible(False)
-            st.pyplot(fig3)
+            st.plotly_chart(sector_bar(np.nansum(Dd, axis=1), sector_names_chart),
+                            use_container_width=True)
             sector_glossary_expander()
 
 # ---------------------------------------------------------------------------
@@ -457,10 +470,142 @@ with tab_forecast:
             st.markdown(_sector_table_html(loss_preview), unsafe_allow_html=True)
             sector_glossary_expander()
 
+        sys_path = forecast_dir / "systemic_probs.csv"
+        if sys_path.exists():
+            st.markdown("#### Systemic-event probabilities")
+            st.caption(
+                "The model's probability that total economy-wide losses over "
+                "the forecast horizon exceed each threshold."
+            )
+            sp = pd.read_csv(sys_path)
+            sp["threshold"] = sp["threshold_usd"].map(lambda v: f"${v/1e9:,.0f}B")
+            sp["probability"] = sp["prob_exceed"].map(lambda p: f"{p:.1%}")
+            st.dataframe(sp[["threshold", "probability"]],
+                         use_container_width=True, hide_index=True)
+
+        expo_path = forecast_dir / "sector_exposure.csv"
+        if expo_path.exists():
+            st.markdown("#### Ranked sector exposure (next 12 months)")
+            st.caption(
+                "Exposure index = expected fraction of sector output "
+                "disrupted; loss contribution = the sector's share of total "
+                "expected losses; dominant topics = the threat categories "
+                "driving that sector's exposure."
+            )
+            st.dataframe(pd.read_csv(expo_path),
+                         use_container_width=True, hide_index=True)
+
         fig_dir = forecast_dir / "figures"
         if fig_dir.exists():
-            imgs = sorted(fig_dir.glob("*.png"))
-            if imgs:
+            fig_jsons = sorted(fig_dir.glob("*.json"))
+            if fig_jsons:
+                import plotly.io as pio
                 st.markdown("#### Charts")
-                for img in imgs:
-                    st.image(str(img), caption=img.stem.replace("_", " "))
+                st.caption(
+                    "Black: observed history. Blue: forecast median with "
+                    "50%/90% credible bands. Drag the slider to zoom; hover for values."
+                )
+                for fj in fig_jsons:
+                    st.plotly_chart(
+                        pio.from_json(fj.read_text(encoding="utf-8")),
+                        use_container_width=True,
+                    )
+            else:
+                imgs = sorted(fig_dir.glob("*.png"))
+                if imgs:
+                    st.markdown("#### Charts")
+                    for img in imgs:
+                        st.image(str(img), caption=img.stem.replace("_", " "))
+
+        # --- Backtest: how did this forecast actually do? ---------------
+        backtest_dir = RESULTS / "backtest"
+        if done_backtest:
+            st.divider()
+            st.markdown("### 📏 How did the forecast do?")
+            st.caption(
+                "Sequential 1-step-ahead check: each month the model predicted the "
+                "next month **before** seeing it, was scored, then updated its "
+                "beliefs with the actual data — from the first month of the panel "
+                "onward."
+            )
+
+            bt_summary_path = backtest_dir / "backtest_summary.txt"
+            if bt_summary_path.exists():
+                st.info(bt_summary_path.read_text(encoding="utf-8"))
+
+            threat_cmp = pd.read_csv(backtest_dir / "threat_comparison.csv")
+            if "period" in threat_cmp.columns:
+                cov_src = threat_cmp[threat_cmp["period"] == "test"]
+            else:
+                cov_src = threat_cmp
+            coverage = cov_src["within_90pct_interval"].mean()
+            st.metric(
+                "90% interval coverage (test window)",
+                f"{coverage:.0%}",
+                help="Share of topic-months where the actual count fell inside the "
+                     "model's stated 90% range. Close to 90% means the model's "
+                     "uncertainty range was well-calibrated; much lower means it "
+                     "was overconfident, much higher means underconfident.",
+            )
+            st.markdown("#### Threat forecast: predicted vs. actual, by month")
+            st.dataframe(threat_cmp, use_container_width=True, height=260)
+
+            econ_bt_path = RESULTS / "calibration" / "economic_backtest.csv"
+            if econ_bt_path.exists():
+                st.markdown("#### Economic layer vs. documented events")
+                st.caption(
+                    "For each reference event, the model's pre-event 90% "
+                    "predictive loss interval against the documented loss "
+                    "range from public post-incident analyses."
+                )
+                eb = pd.read_csv(econ_bt_path)
+                for col in ["documented_low_usd", "documented_high_usd",
+                            "predictive_q05_usd", "predictive_q50_usd",
+                            "predictive_q95_usd"]:
+                    if col in eb.columns:
+                        eb[col.replace("_usd", "")] = eb[col].map(
+                            lambda v: f"${v/1e9:,.2f}B")
+                        eb = eb.drop(columns=[col])
+                st.dataframe(eb, use_container_width=True, hide_index=True)
+
+            incident_cmp_path = backtest_dir / "incident_comparison.csv"
+            if incident_cmp_path.exists():
+                incident_cmp = pd.read_csv(incident_cmp_path)
+                st.markdown("#### Disclosed incidents forecast: predicted vs. actual, by sector")
+                st.caption(
+                    "The dollar loss forecast has no routinely-collected actual-loss "
+                    "series to check against, so this — disclosed incident counts, "
+                    "one of the loss model's real inputs — is the closest available "
+                    "check on it."
+                )
+                st.markdown(_sector_table_html(incident_cmp, name_col="sector"), unsafe_allow_html=True)
+                sector_glossary_expander()
+
+            bt_fig_dir = backtest_dir / "figures"
+            if bt_fig_dir.exists():
+                fig_jsons = sorted(bt_fig_dir.glob("backtest_topic_*.json"))
+                if fig_jsons:
+                    import plotly.io as pio
+                    st.markdown("#### Predicted vs. actual, by category")
+                    st.caption(
+                        "Blue: the model's 1-month-ahead prediction (median line, "
+                        "50%/90% credible bands). Black: what actually happened. "
+                        "Drag the slider below each chart to zoom; hover for values."
+                    )
+                    for fj in fig_jsons:
+                        st.plotly_chart(
+                            pio.from_json(fj.read_text(encoding="utf-8")),
+                            use_container_width=True,
+                        )
+                else:
+                    bt_imgs = sorted(bt_fig_dir.glob("*.png"))
+                    if bt_imgs:
+                        st.markdown("#### Forecast vs. actual, by category")
+                        for img in bt_imgs:
+                            st.image(str(img), caption=img.stem.replace("_", " "))
+        elif done_forecast:
+            st.divider()
+            st.caption(
+                "Run **Step 6 — Check the model against reality** to replay history "
+                "with sequential 1-step-ahead predictions and see how the model did here."
+            )

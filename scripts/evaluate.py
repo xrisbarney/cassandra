@@ -41,7 +41,7 @@ if sys.platform == "win32":
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
 from cassandra_threatcast.data import pipeline
-from cassandra_threatcast.evaluation.scoring import crps_ensemble, mae, rmse
+from cassandra_threatcast.evaluation.scoring import crps_ensemble, log_score_ensemble, mae, rmse
 from cassandra_threatcast.evaluation.calibration import calibration_report
 from cassandra_threatcast.evaluation.dm_test import dm_table
 from cassandra_threatcast.evaluation.baselines import run_all_baselines
@@ -85,7 +85,7 @@ def _scores_from_predictive(
     pred_samples: np.ndarray, # (n_samples, ..., T_test)
     horizons: list[int],
 ) -> pd.DataFrame:
-    """Compute per-horizon CRPS/MAE/RMSE from posterior predictive samples."""
+    """Compute per-horizon CRPS/LogS/MAE/RMSE from posterior predictive samples."""
     records = []
     for h in horizons:
         h = min(h, obs.shape[-1])
@@ -94,8 +94,10 @@ def _scores_from_predictive(
         pred_h_T = pred_h.T   # (N, n_samples)
 
         crps_val = float(np.mean(crps_ensemble(obs_h, pred_h_T)))
+        logs_val = float(np.mean(log_score_ensemble(obs_h, pred_h_T)))
         median   = np.median(pred_h, axis=0)
         records.append({"horizon": h, "metric": "CRPS", "value": crps_val})
+        records.append({"horizon": h, "metric": "LogS", "value": logs_val})
         records.append({"horizon": h, "metric": "MAE",  "value": mae(obs_h, median)})
         records.append({"horizon": h, "metric": "RMSE", "value": rmse(obs_h, median)})
     return pd.DataFrame(records)

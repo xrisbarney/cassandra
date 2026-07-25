@@ -223,13 +223,14 @@ def main() -> None:
         )
         samples = vi_module.vi_predictive_samples(
             guide, params, full_module.full_model, data,
-            n_samples=num_samples, seed=args.seed,
+            config=config, n_samples=num_samples, seed=args.seed,
         )
         # Wrap the VI posterior draws in an InferenceData (add a chain dim) so
         # downstream scripts consume NUTS and VI output identically.
         import arviz as az
         posterior = {k: np.asarray(v)[np.newaxis, ...] for k, v in samples.items()}
-        idata = az.from_dict(posterior=posterior)
+        # arviz >= 1.0: from_dict takes {"group": {...}} rather than kwargs.
+        idata = az.from_dict({"posterior": posterior})
 
     elapsed = time.time() - t0
     print(f"      {args.method.upper()} completed in {elapsed / 60:.1f} min.")

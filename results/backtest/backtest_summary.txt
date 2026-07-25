@@ -1,0 +1,11 @@
+Sequential 1-step-ahead backtest (2010-01 .. 2024-12, scored on 2023-01..2024-12).
+Each month the model predicted the next month BEFORE seeing it, was scored, then updated its regime beliefs with that month's actual data (all four observation channels).
+
+CVE-count channel, test window: CRPS 89.4, 90% interval coverage 98% (target ~90%), 50% coverage 65% (target ~50%).
+Full-history 90% coverage: 97%.
+Incident channel, test window: 90% coverage 95%.
+
+Caveats: static parameters were estimated on the full sample, so the test window is out-of-sample only for the sequential state updates; prediction-step covariates (effort index, exposure map) enter lagged by one month, though the effort index itself is a two-sided full-sample estimate; the forecast tail beyond 2024-12 holds both at their last observed values.
+
+--- AI summary ---
+The forecast overall over-predicted the number of CVEs, with the largest over-prediction in Remote Code Execution, where the model predicted 64,478 but only 58,709 occurred. It also over-predicted Miscellaneous Vulnerabilities and Cross-Site Scripting. On the other hand, the model under-predicted most in Cross-Site Request Forgery, predicting 17,391 versus 19,887 actual, and also under-predicted Denial of Service and Information Disclosure. The coverage number for the 90% uncertainty range across all topic-months was 97.9%, which is well above the target of 90%. This means the model was underconfident: its stated uncertainty ranges were too wide, containing the actual value more often than intended. So while the model's point predictions were often too high or too low, its uncertainty intervals were too conservative. Going forward, you can trust that the actual value will almost certainly fall within the stated 90% range, but you should also expect that range to be wider than necessary, giving a less precise picture of risk. The model is reliable for bounding outcomes but not for pinpointing exact counts.

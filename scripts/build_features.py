@@ -64,8 +64,10 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--effort-method", default="hp_filter",
-        choices=["hp_filter", "moving_avg", "log_diff"],
-        help="Effort estimation method.  Default: hp_filter",
+        choices=["hp_filter", "state_space", "moving_avg", "log_diff"],
+        help="Effort estimation method.  Default: hp_filter.  'state_space' is a "
+             "one-sided (causal) alternative for fully out-of-sample evaluation; "
+             "see docs/PAPER_NOTES.md §7.",
     )
     return parser.parse_args()
 

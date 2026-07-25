@@ -50,6 +50,37 @@ def log_score_negbin(obs: np.ndarray, mu: np.ndarray, phi: np.ndarray) -> np.nda
     return nbinom.logpmf(obs, n=phi, p=p)
 
 
+def log_score_ensemble(obs: np.ndarray, samples: np.ndarray) -> np.ndarray:
+    """
+    Logarithmic score for count observations from ensemble samples, reported
+    NEGATIVELY oriented (lower is better, matching CRPS): -log p(obs).
+
+    The predictive PMF is obtained by moment-matching a NegBin2 to the
+    samples per element: mu = sample mean, phi = mu^2 / (var - mu) when the
+    samples are overdispersed, else a near-Poisson phi. This keeps the score
+    comparable across the full model and residual-bootstrap baselines, which
+    only provide samples, not parametric forms.
+
+    Moments are computed on samples winsorised at the 1st/99th percentiles:
+    the state-space model's log-scale latent admits rare draws up to e^30,
+    which make the raw ensemble variance (hence the matched PMF) meaningless
+    while leaving the predictive bulk unchanged.
+
+    obs     : (...) count observations
+    samples : (..., n_samples) predictive samples (sample axis LAST)
+    Returns : (...) array of -log p(obs).
+    """
+    lo = np.quantile(samples, 0.01, axis=-1, keepdims=True)
+    hi = np.quantile(samples, 0.99, axis=-1, keepdims=True)
+    samples = np.clip(samples, lo, hi)
+    m = np.maximum(samples.mean(axis=-1), 1e-8)
+    v = samples.var(axis=-1)
+    overdispersed = v > m * (1.0 + 1e-6)
+    phi = np.where(overdispersed, m**2 / np.maximum(v - m, 1e-8), 1e8)
+    obs_r = np.maximum(np.round(obs), 0.0)
+    return -log_score_negbin(obs_r, m, phi)
+
+
 def mae(obs: np.ndarray, pred_median: np.ndarray) -> float:
     """Mean absolute error."""
     return float(np.mean(np.abs(obs - pred_median)))
@@ -71,7 +102,7 @@ def evaluate_forecasts(
     horizons: list[int],
 ) -> pd.DataFrame:
     """
-    Computes CRPS, MAE, RMSE for each channel and horizon.
+    Computes CRPS, LogS, MAE, RMSE for each channel and horizon.
     Returns a tidy DataFrame with columns: channel, horizon, metric, value.
     """
     records = []
@@ -91,9 +122,11 @@ def evaluate_forecasts(
             obs_flat = obs_h.ravel()
             pred_flat = pred_h_t.reshape(-1, pred_h_t.shape[-1])
             crps_val = float(np.mean(crps_ensemble(obs_flat, pred_flat)))
+            logs_val = float(np.mean(log_score_ensemble(obs_flat, pred_flat)))
 
             pred_median = np.median(pred_h, axis=0)  # (..., h)
             records.append({"channel": channel, "horizon": h, "metric": "CRPS", "value": crps_val})
+            records.append({"channel": channel, "horizon": h, "metric": "LogS", "value": logs_val})
             records.append({"channel": channel, "horizon": h, "metric": "MAE",
                             "value": mae(obs_h.ravel(), pred_median.ravel())})
             records.append({"channel": channel, "horizon": h, "metric": "RMSE",

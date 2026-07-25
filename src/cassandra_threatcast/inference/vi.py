@@ -41,6 +41,7 @@ def train_vi(
     num_steps: int = 30000,
     learning_rate: float = 1e-3,
     seed: int = 0,
+    num_particles: int = 4,
 ) -> tuple:
     """
     Run SVI training loop.
@@ -74,7 +75,7 @@ def train_vi(
         model,
         guide,
         optimizer,
-        loss=Trace_ELBO(num_particles=4),
+        loss=Trace_ELBO(num_particles=num_particles),
     )
 
     rng_key = jax.random.PRNGKey(seed)
@@ -100,6 +101,7 @@ def vi_predictive_samples(
     params,
     model,
     data: dict,
+    config: dict | None = None,
     n_samples: int = 1000,
     seed: int = 0,
 ) -> dict:
@@ -112,6 +114,9 @@ def vi_predictive_samples(
     params    : Variational parameters dict from train_vi.
     model     : Original NumPyro model function.
     data      : Data dict forwarded to Predictive.
+    config    : Config dict forwarded to the model (REQUIRED for models that
+                read structure from it -- passing {} silently crashed the
+                predictive step for full_model, which needs config["model"]).
     n_samples : Number of posterior samples to draw.
     seed      : JAX random seed.
 
@@ -119,6 +124,7 @@ def vi_predictive_samples(
     -------
     dict mapping site name → sample array of shape (n_samples, *site_shape).
     """
+    config = config if config is not None else {}
     rng_key = jax.random.PRNGKey(seed)
 
     predictive = Predictive(
@@ -128,16 +134,17 @@ def vi_predictive_samples(
         return_sites=None,  # return all latent sites from the guide
     )
     # Draw samples from the guide (posterior approximation)
-    guide_samples = predictive(rng_key, data=data, config={})
+    guide_samples = predictive(rng_key, data=data, config=config)
 
-    # Optionally draw from the full model conditioned on guide samples
-    # to get posterior predictive for observed variables
+    # Draw from the full model conditioned on guide samples so the returned
+    # dict also carries the model's deterministic sites (loglik_regime_t,
+    # Gamma, f_t, ...) that downstream sequential evaluation requires.
     pred_model = Predictive(
         model=model,
         posterior_samples=guide_samples,
         return_sites=None,
     )
-    model_samples = pred_model(rng_key, data=data, config={})
+    model_samples = pred_model(rng_key, data=data, config=config)
 
     # Merge: model_samples includes both latent and observed sites
     return {**guide_samples, **model_samples}

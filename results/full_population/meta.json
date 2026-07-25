@@ -1,0 +1,14 @@
+{
+  "K_full": 1024,
+  "n_active": 712,
+  "active_min_cves": 50,
+  "active_min_months": 24,
+  "test_window": [
+    "2023-01",
+    "2024-12"
+  ],
+  "vi_steps": 6000,
+  "num_samples": 200,
+  "notes": "E/B channels fully missing at population granularity; exposure map uniform. Full scored with sequential one-step-ahead prediction; BSTS-U with rolling 6-month refits.",
+  "runtime_min": 1277.5
+}

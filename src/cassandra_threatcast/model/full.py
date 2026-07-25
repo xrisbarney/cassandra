@@ -132,6 +132,20 @@ def full_model(data: dict, config: dict) -> None:
     enhanced: bool = bool(enh_cfg.get("enabled", False))
     student_t_df: float = float(enh_cfg.get("student_t_df", 4.0))
 
+    # Ablation flags (paper Table 4; driven by scripts/ablation.py).  Each
+    # removes one model component while leaving everything else untouched:
+    #   no_factors  : Gamma = 0 (independent topics; factors become nuisance)
+    #   flat_priors : all prior scales x10 (no shrinkage toward group levels)
+    #   drop_E      : exploitation channel excluded from the likelihood
+    #   drop_D      : incident channel excluded from the likelihood
+    #   no_effort   : e_t = 0 (raw counts treated as truth)
+    # "- regimes" needs no flag: set model.R = 1 in the variant config.
+    abl_cfg = config.get("ablation", {}) or {}
+    _abl_no_factors: bool = bool(abl_cfg.get("no_factors", False))
+    _abl_w_E: float = 0.0 if abl_cfg.get("drop_E", False) else 1.0
+    _abl_w_D: float = 0.0 if abl_cfg.get("drop_D", False) else 1.0
+    _pw: float = 10.0 if abl_cfg.get("flat_priors", False) else 1.0
+
     def _innovation(name: str, shape: tuple) -> jnp.ndarray:
         """Standardized latent innovation: Student-t in enhanced mode, else
         standard Normal. Always drawn as one (T, *shape) block up front (not
@@ -142,6 +156,8 @@ def full_model(data: dict, config: dict) -> None:
 
     T: int = int(data["e_t"].shape[0])
     e_t = jnp.asarray(data["e_t"])          # (T,)
+    if abl_cfg.get("no_effort", False):
+        e_t = jnp.zeros_like(e_t)
     M_skt = jnp.asarray(data["M_skt"])      # (S, K, T)
 
     # ------------------------------------------------------------------ #
@@ -151,10 +167,16 @@ def full_model(data: dict, config: dict) -> None:
     # (e.g. mean ~25/month vs. ~450/month), so mu_r must be able to sit far
     # from 0 for high-volume topics; sd=5 keeps this weakly informative
     # while accommodating the observed dynamic range.
-    mu_r = _plated_sample("mu_r", dist.Normal(0.0, 5.0), (R, K))  # (R, K)
+    mu_r = _plated_sample("mu_r", dist.Normal(0.0, 5.0 * _pw), (R, K))  # (R, K)
 
-    Gamma_raw = _plated_sample("Gamma_raw", dist.Normal(0.0, 1.0), (K, r))
-    Gamma = deterministic("Gamma", _positive_lower_triangular(Gamma_raw, r))  # (K, r)
+    Gamma_raw = _plated_sample("Gamma_raw", dist.Normal(0.0, 1.0 * _pw), (K, r))
+    Gamma_ltri = _positive_lower_triangular(Gamma_raw, r)
+    if _abl_no_factors:
+        # Zero BEFORE the deterministic so the posterior "Gamma" is zero too
+        # and every downstream consumer (predict, sequential eval) stays
+        # consistent with the ablated likelihood.
+        Gamma_ltri = jnp.zeros_like(Gamma_ltri)
+    Gamma = deterministic("Gamma", Gamma_ltri)  # (K, r)
 
     # Factor AR dynamics are regime-CONSTANT (see module docstring): only the
     # emission mean mu_r[z_t] switches by regime.
@@ -164,25 +186,25 @@ def full_model(data: dict, config: dict) -> None:
     # triangular matrix) to (-1, 1), guaranteeing a stationary AR so factors
     # cannot explode over long series (T can be ~180 months).
     Phi = deterministic("Phi", jnp.tanh(Phi_raw) * tril_mask)  # (r, r)
-    Q_f = _floored_scale("Q_f", 0.5, (r,))  # (r,)
+    Q_f = _floored_scale("Q_f", 0.5 * _pw, (r,))  # (r,)
 
     Pi = _plated_sample("Pi", dist.Dirichlet(2.0 * jnp.ones(R)), (R,))  # (R, R)
-    tau_k = _floored_scale("tau_k", 0.5, (K,))  # (K,)
+    tau_k = _floored_scale("tau_k", 0.5 * _pw, (K,))  # (K,)
 
     # ------------------------------------------------------------------ #
     # 1b. Latent severity process priors (log sigma_{k,t}), analogous to the
     #     intensity: regime-dependent level + lower-dimensional AR factors
     #     (also regime-constant dynamics, sharing the same z_t marginalization).
     # ------------------------------------------------------------------ #
-    nu_r = _plated_sample("nu_r", dist.Normal(1.5, 1.0), (R, K))  # (R, K)
-    Psi_raw = _plated_sample("Psi_raw", dist.Normal(0.0, 1.0), (K, r_sig))
+    nu_r = _plated_sample("nu_r", dist.Normal(1.5, 1.0 * _pw), (R, K))  # (R, K)
+    Psi_raw = _plated_sample("Psi_raw", dist.Normal(0.0, 1.0 * _pw), (K, r_sig))
     Psi = deterministic("Psi", _positive_lower_triangular(Psi_raw, r_sig))  # (K, r_sig)
     A_h_raw = _plated_sample("A_h_raw", dist.Normal(0.0, 0.3), (r_sig, r_sig))
     tril_sig = jnp.tril(jnp.ones((r_sig, r_sig)))
     A_h = deterministic("A_h", jnp.tanh(A_h_raw) * tril_sig)  # (r_sig, r_sig)
-    Q_h = _floored_scale("Q_h", 0.5, (r_sig,))         # (r_sig,)
-    omega_k = _floored_scale("omega_k", 0.5, (K,))     # (K,) idiosyncratic
-    kappa_k = _floored_scale("kappa_k", 0.5, (K,))     # (K,) severity meas. noise
+    Q_h = _floored_scale("Q_h", 0.5 * _pw, (r_sig,))         # (r_sig,)
+    omega_k = _floored_scale("omega_k", 0.5 * _pw, (K,))     # (K,) idiosyncratic
+    kappa_k = _floored_scale("kappa_k", 0.5 * _pw, (K,))     # (K,) severity meas. noise
 
     # ------------------------------------------------------------------ #
     # 2. Measurement parameters
@@ -281,7 +303,8 @@ def full_model(data: dict, config: dict) -> None:
                 obs_mask_B, dist.LogNormal(zeta_t, kappa_k).log_prob(B_safe), 0.0
             ).sum()
 
-            return ll_N + ll_E + ll_D + ll_B
+            # Ablation channel weights are 1.0 unless a variant drops a channel.
+            return ll_N + _abl_w_E * ll_E + _abl_w_D * ll_D + ll_B
 
         loglik_r = jax.vmap(loglik_given_regime)(jnp.arange(R))  # (R,)
 
@@ -408,6 +431,16 @@ def predict(
     Set ``enhanced=True`` (matching how the model was fit) to draw latent
     innovations from Student-t and incident counts from Negative Binomial.
 
+    Covariates (see docs/PAPER_NOTES.md §7): the reporting-effort offset
+    ``e_t`` -- which the fitted N-channel likelihood includes as
+    ``log mu = eta + e_t`` -- is carried into the forecast at its last
+    pre-forecast value (hold-last), taken from ``data["e_t"]``.  Omitting it
+    (the previous behaviour) implicitly reset effort to its historical mean
+    and under-predicted counts by exp(e_last) -- ~3.7x at end-2024 effort
+    levels (PAPER_NOTES §5).  The incident rate likewise now includes the
+    additive baseline disclosure rate ``pi_s`` present in the fitted
+    D-channel likelihood.
+
     Returns
     -------
     dict with keys:
@@ -418,6 +451,13 @@ def predict(
         ell_agg     : (n_samples, horizon)
     """
     rng = np.random.default_rng(seed=42)
+
+    # Hold-last reporting-effort offset for the forecast window.
+    e_last = 0.0
+    e_arr = np.asarray(data.get("e_t", []), dtype=float) if isinstance(data, dict) else np.array([])
+    if e_arr.size:
+        e_idx = (e_arr.size - 1) if start_t is None else min(start_t - 1, e_arr.size - 1)
+        e_last = float(e_arr[e_idx])
 
     def _draw(size):
         if enhanced:
@@ -436,6 +476,8 @@ def predict(
     D_pred = np.zeros((n_samples, S, horizon))
     ell_pred = np.zeros((n_samples, S, horizon))
     ell_agg = np.zeros((n_samples, horizon))
+    sigma_pred = np.zeros((n_samples, K, horizon))   # latent severity draws
+    g_pred = np.zeros((n_samples, S, horizon))       # sectoral damage fractions
 
     Lambda_L_j = jnp.asarray(Lambda_L)
     x_s_j = jnp.asarray(x_s)
@@ -486,7 +528,7 @@ def predict(
             eta_h = np.clip(mean_eta + eta_noise, -30.0, 30.0)
             lambda_pred[i, :, h] = eta_h
 
-            mu_kt_h = np.exp(eta_h)
+            mu_kt_h = np.exp(np.clip(eta_h + e_last, -30.0, 30.0))
             psi_arr = np.array(psi_k_i)
             for k in range(K):
                 p_nb = psi_arr[k] / (psi_arr[k] + mu_kt_h[k] + 1e-12)
@@ -495,7 +537,9 @@ def predict(
             M_h = np.array(M_future_j[:, :, h])
             exp_lam = np.exp(eta_h)
             rho_arr = np.array(rho_s_i)
-            rate_s = rho_arr * (M_h @ exp_lam)
+            pi_arr = (np.array(posterior_samples["pi_s"][i])
+                      if "pi_s" in posterior_samples else np.zeros(S))
+            rate_s = rho_arr * (M_h @ exp_lam) + pi_arr
             rate_s = np.clip(rate_s, 1e-8, None)
             if enhanced and "phi_D" in posterior_samples:
                 phi_D_i = np.array(posterior_samples["phi_D"][i])
@@ -516,6 +560,8 @@ def predict(
             d_s, ell = leontief_propagation(jnp.asarray(g_s), x_s_j, Lambda_L_j)
             ell_pred[i, :, h] = np.array(ell)
             ell_agg[i, h] = float(jnp.sum(ell))
+            sigma_pred[i, :, h] = sigma_h
+            g_pred[i, :, h] = g_s
 
             f_last = f_curr
             h_last = h_curr
@@ -527,4 +573,6 @@ def predict(
         "D_pred": D_pred,
         "ell_pred": ell_pred,
         "ell_agg": ell_agg,
+        "sigma_pred": sigma_pred,
+        "g_pred": g_pred,
     }
