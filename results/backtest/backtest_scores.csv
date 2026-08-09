@@ -19,3 +19,8 @@ D,full_history,MAE,0.023737373737373738
 D,full_history,RMSE,0.20474176886798628
 D,full_history,coverage_50,0.9828282828282828
 D,full_history,coverage_90,0.9924242424242424
+N,extension,CRPS,193.2928062273849
+N,extension,MAE,270.4375
+N,extension,RMSE,401.8535856208276
+N,extension,coverage_50,0.5197368421052632
+N,extension,coverage_90,0.9407894736842105

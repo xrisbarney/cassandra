@@ -109,9 +109,63 @@ def parse_args() -> argparse.Namespace:
         "--max-draws", type=int, default=0,
         help="Thin the posterior to at most this many draws (0 = use all).",
     )
+    parser.add_argument(
+        "--extend-to", default="now",
+        help="Continue the filter past the training panel on ACTUAL CVE data "
+             "(fetched with the frozen topic mapper, no retraining) up to this "
+             "month: 'now' (default; the last complete calendar month), a "
+             "YYYY-MM, or 'none' to stop at the training panel.",
+    )
+    parser.add_argument("--cache-dir", default="data/cache/")
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--enhanced-mode", action="store_true")
     return parser.parse_args()
+
+
+def _fetch_extension_counts(panel_end: pd.Period, extend_to: str,
+                            cache_dir: str, data_dir: str, K: int):
+    """
+    Actual monthly CVE counts for the months AFTER the training panel,
+    classified with the FROZEN topic mapper (never refit: refitting would
+    shuffle topic indices and break correspondence with the trained model).
+
+    Returns (N_ext (K, T_ext) or None, ext_periods or None).
+    """
+    if str(extend_to).lower() == "none":
+        return None, None
+    if str(extend_to).lower() == "now":
+        # Last complete calendar month: the present month's data is partial,
+        # so it becomes the first pure-forecast month instead.
+        end_p = pd.Timestamp.now().to_period("M") - 1
+    else:
+        end_p = pd.Period(extend_to, freq="M")
+    if end_p <= panel_end:
+        return None, None
+
+    ext_periods = pd.period_range(panel_end + 1, end_p, freq="M")
+    print(f"      Extension window: {ext_periods[0]} .. {ext_periods[-1]} "
+          f"({len(ext_periods)} months of actual data)")
+    try:
+        from cassandra_threatcast.data import nvd
+        start_dt = str(ext_periods[0].to_timestamp().date())
+        end_dt = str((ext_periods[-1].to_timestamp() + pd.offsets.MonthEnd(0)).date())
+        cve_df = nvd.fetch_cves(start_dt, end_dt, cache_dir)
+        if not len(cve_df):
+            print("      No CVEs returned for the extension window; skipping.")
+            return None, None
+        with open(os.path.join(data_dir, "topic_mapper.pkl"), "rb") as fh:
+            mapper = pickle.load(fh)
+        assign = mapper.assign_hard(cve_df["description"].fillna("").tolist())
+        months = pd.PeriodIndex(pd.to_datetime(cve_df["published_date"]), freq="M")
+        month_idx = ext_periods.get_indexer(months)
+        valid = month_idx >= 0
+        N_ext = np.zeros((K, len(ext_periods)), dtype=np.int64)
+        np.add.at(N_ext, (assign[valid], month_idx[valid]), 1)
+        print(f"      {int(valid.sum()):,} CVEs classified into the extension panel.")
+        return N_ext.astype(float), ext_periods
+    except Exception as exc:
+        print(f"      Extension fetch failed ({exc}); continuing without it.")
+        return None, None
 
 
 # ---------------------------------------------------------------------------
@@ -144,6 +198,9 @@ def build_topic_figure(
     data_end: pd.Timestamp,
     test_start: pd.Timestamp,
     test_end: pd.Timestamp,
+    train_end: pd.Timestamp | None = None,   # marks where TRAINING data ends
+                                             # when the filter continues on
+                                             # post-training actuals
 ):
     import plotly.graph_objects as go
 
@@ -184,6 +241,12 @@ def build_topic_figure(
         fillcolor="rgba(137,135,129,0.08)", line_width=0,
         annotation_text="test window", annotation_position="top left",
         annotation_font=dict(size=11, color=_MUTED))
+    if train_end is not None:
+        fig.add_vline(x=train_end, line_width=1, line_color=_BASELINE)
+        fig.add_annotation(
+            x=train_end, y=1.10, yref="paper", showarrow=False,
+            text="training data ends (filter continues on actuals)",
+            font=dict(size=10, color=_MUTED), xanchor="left")
     fig.add_vline(x=data_end, line_width=1, line_color=_BASELINE)
     fig.add_annotation(
         x=data_end, y=1.02, yref="paper", showarrow=False,
@@ -287,15 +350,29 @@ def main() -> None:
     student_t_df = float(config.get("enhanced", {}).get("student_t_df", 4.0))
 
     # ------------------------------------------------------------------ #
-    # 3. Sequential predict -> update, month 1 through the end + tail
+    # 3. Sequential predict -> update, month 1 through the present + tail
     # ------------------------------------------------------------------ #
-    print(f"[3/5] Sequential 1-step-ahead prediction: {periods[0]} .. {periods[-1]}"
+    # Extension: continue the filter past the training panel on actual CVE
+    # data up to the last complete month, so predictions reach the present
+    # without retraining ("one training is enough": static parameters stay
+    # fixed, beliefs stay current).
+    N_ext, ext_periods = _fetch_extension_counts(
+        periods[-1], args.extend_to, args.cache_dir, args.data_dir, K)
+    T_ext = 0 if N_ext is None else N_ext.shape[1]
+
+    last_obs = ext_periods[-1] if T_ext else periods[-1]
+    print(f"[3/5] Sequential 1-step-ahead prediction: {periods[0]} .. {last_obs}"
           f" + {args.tail_months}-month forecast tail ...")
     out = sequential_one_step_predict(
-        post, e_t, M_skt, args.tail_months, enhanced, student_t_df, args.seed)
-    N_pred = out["N_pred"]   # (n, K, T + tail)
-    D_pred = out["D_pred"]   # (n, S, T + tail)
+        post, e_t, M_skt, args.tail_months, enhanced, student_t_df, args.seed,
+        N_ext=N_ext)
+    N_pred = out["N_pred"]   # (n, K, T + T_ext + tail)
+    D_pred = out["D_pred"]   # (n, S, T + T_ext + tail)
     T_all = N_pred.shape[2]
+    T_obs_end = T + T_ext    # months with actual data
+
+    # Actuals covering training panel + extension, for scoring and charts.
+    N_obs_full = np.concatenate([N_actual, N_ext], axis=1) if T_ext else N_actual
 
     all_periods = pd.period_range(periods[0], periods=T_all, freq="M")
     dates_ts = all_periods.to_timestamp()
@@ -344,6 +421,15 @@ def main() -> None:
             for metric, value in _channel_scores(obs, pred, q, mask).items():
                 records.append({"channel": channel, "window": window,
                                 "metric": metric, "value": value})
+    if T_ext:
+        # Extension window (post-training actuals): genuinely out of sample
+        # for parameters AND states.
+        ext_mask = np.zeros(T_obs_end, dtype=bool)
+        ext_mask[T:] = True
+        for metric, value in _channel_scores(
+                N_obs_full, N_pred, N_q, ext_mask).items():
+            records.append({"channel": "N", "window": "extension",
+                            "metric": metric, "value": value})
     scores_df = pd.DataFrame(records)
     scores_path = os.path.join(args.output_dir, "backtest_scores.csv")
     scores_df.to_csv(scores_path, index=False)
@@ -356,11 +442,14 @@ def main() -> None:
     detail_records = []
     for k in range(K):
         for t in range(T_all):
-            in_sample = t < T
-            actual = float(N_actual[k, t]) if in_sample else np.nan
+            has_actual = t < T_obs_end
+            actual = float(N_obs_full[k, t]) if has_actual else np.nan
             q05, q25, q50, q75, q95 = (float(N_q[j, k, t]) for j in range(5))
-            if in_sample:
+            if t < T:
                 period = "test" if test_mask[t] else "history"
+                inside = float(q05 <= actual <= q95)
+            elif has_actual:
+                period = "extension"
                 inside = float(q05 <= actual <= q95)
             else:
                 period, inside = "forecast", np.nan
@@ -378,10 +467,16 @@ def main() -> None:
     detail_path = os.path.join(args.output_dir, "threat_comparison.csv")
     detail_df.to_csv(detail_path, index=False)
 
-    hist_cov = detail_df.loc[detail_df.period != "forecast", "within_90pct_interval"].mean()
+    hist_cov = detail_df.loc[detail_df.period.isin(["history", "test"]),
+                             "within_90pct_interval"].mean()
     test_cov = detail_df.loc[detail_df.period == "test", "within_90pct_interval"].mean()
     print(f"      Threat comparison (per topic-month, full history) -> {detail_path}")
     print(f"      90% coverage -- full history: {hist_cov:.1%}   test window: {test_cov:.1%}   (target ~90%)")
+    if T_ext:
+        ext_cov = detail_df.loc[detail_df.period == "extension",
+                                "within_90pct_interval"].mean()
+        print(f"      90% coverage -- extension ({ext_periods[0]}..{ext_periods[-1]}, "
+              f"fully out of sample): {ext_cov:.1%}")
 
     # Per sector-month detail over the test window (incident channel)
     sector_names = get_default_sector_labels()[:S]
@@ -419,14 +514,15 @@ def main() -> None:
     overview_parts = []
     for k in range(K):
         actual_padded = np.full(T_all, np.nan)
-        actual_padded[:T] = N_actual[k]
+        actual_padded[:T_obs_end] = N_obs_full[k]
         q = {name: N_q[j, k, :] for j, name in
              enumerate(["q05", "q25", "q50", "q75", "q95"])}
         fig = build_topic_figure(
             dates_ts, actual_padded, q, f"{topic_labels[k]} — topic {k:02d}",
-            data_end=periods[-1].to_timestamp(),
+            data_end=last_obs.to_timestamp(),
             test_start=test_start_p.to_timestamp(),
             test_end=(test_end_p + 1).to_timestamp(),
+            train_end=periods[-1].to_timestamp() if T_ext else None,
         )
         html_path = os.path.join(fig_dir, f"backtest_topic_{k:02d}.html")
         fig.write_html(html_path, include_plotlyjs="directory", full_html=True)
@@ -453,9 +549,18 @@ def main() -> None:
     # Summary
     # ------------------------------------------------------------------ #
     test_crps = scores_df.query("channel=='N' and window=='test' and metric=='CRPS'")["value"].iloc[0]
+    ext_line = ""
+    if T_ext:
+        ext_cov_v = detail_df.loc[detail_df.period == "extension",
+                                  "within_90pct_interval"].mean()
+        ext_line = (
+            f"Extension {ext_periods[0]}..{ext_periods[-1]} ({T_ext} months "
+            f"beyond training, filter updated on actual CVE counts, fully "
+            f"out of sample): 90% coverage {ext_cov_v:.0%}.\n")
     summary = (
-        f"Sequential 1-step-ahead backtest ({periods[0]} .. {periods[-1]}, "
+        f"Sequential 1-step-ahead backtest ({periods[0]} .. {last_obs}, "
         f"scored on {args.test_start}..{args.test_end}).\n"
+        + ext_line +
         f"Each month the model predicted the next month BEFORE seeing it, was "
         f"scored, then updated its regime beliefs with that month's actual data "
         f"(all four observation channels).\n\n"
@@ -468,7 +573,7 @@ def main() -> None:
         f"test window is out-of-sample only for the sequential state updates; "
         f"prediction-step covariates (effort index, exposure map) enter lagged "
         f"by one month, though the effort index itself is a two-sided full-"
-        f"sample estimate; the forecast tail beyond {periods[-1]} holds both "
+        f"sample estimate; the forecast tail beyond {last_obs} holds both "
         f"at their last observed values."
     )
     summary_path = os.path.join(args.output_dir, "backtest_summary.txt")

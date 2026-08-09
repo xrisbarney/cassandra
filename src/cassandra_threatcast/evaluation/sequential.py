@@ -241,12 +241,26 @@ def sequential_one_step_predict(
     enhanced: bool,
     student_t_df: float,
     seed: int = 42,
+    N_ext: np.ndarray | None = None,   # (K, T_ext) actual CVE counts AFTER the
+                                       # training panel (e.g. 2025-01..present)
 ) -> dict:
     """
     One-step-ahead predictive draws for every month of the panel, plus a
     pure-forecast tail after the data ends.  Fully vectorised across draws.
     See the module docstring for the conditioning guarantees.
+
+    Extension months (``N_ext``): the training posterior is NOT refitted.
+    For each month beyond the training panel the model first predicts one
+    step ahead, then performs an exact Bayes update of the regime belief
+    using the N-channel likelihood of that month's ACTUAL counts, evaluated
+    per draw under each regime hypothesis at the draw's current factor
+    state.  This is the "one training is enough" operating mode: static
+    parameters stay fixed, beliefs stay current.  Covariates (e_t, M_skt)
+    hold their last panel values; the E/D/B channels are not fetched at
+    extension time, so extension updates use the CVE channel only.
     """
+    from scipy.stats import nbinom
+
     rng = np.random.default_rng(seed=seed)
 
     loglik = np.asarray(post["loglik_regime_t"], dtype=float)  # (n, T, R)
@@ -266,7 +280,9 @@ def sequential_one_step_predict(
     K = mu_r.shape[-1]
     S = rho_s.shape[-1]
     r_dim = f_init.shape[-1]
-    T_all = T + tail_months
+    T_ext = 0 if N_ext is None else int(N_ext.shape[1])
+    T_obs_end = T + T_ext            # last month with actual data (exclusive)
+    T_all = T_obs_end + tail_months
 
     def _draw(shape):
         if enhanced:
@@ -280,19 +296,31 @@ def sequential_one_step_predict(
     N_pred = np.zeros((n, K, T_all))
     D_pred = np.zeros((n, S, T_all))
     idx = np.arange(n)
+    belief = filtered[:, T - 1].copy()   # regime belief carried past training
 
-    print(f"      One-step-ahead predictions for {T} observed months ...")
+    if T_ext:
+        print(f"      One-step-ahead predictions: {T} training months, "
+              f"{T_ext} extension months (filter continues on actual CVE "
+              f"counts), {tail_months} pure-forecast months ...")
+    else:
+        print(f"      One-step-ahead predictions for {T} observed months ...")
+
     for t in range(T_all):
-        in_sample = t < T
+        in_train = t < T
+        in_ext = T <= t < T_obs_end
 
         # --- regime, one step ahead of the data the model has seen -------
-        if in_sample:
+        if in_train:
             # P(z_t | y_{1:t-1}): month t's own data is NOT in here.
-            z_t = sample_categorical(predicted[:, t], rng)
-        elif t == T:
-            # First tail month: advance the last filtered belief once.
-            z_t = sample_categorical(
-                np.einsum("nr,nrj->nj", filtered[:, T - 1], Pi), rng)
+            pred_z = predicted[:, t]
+            z_t = sample_categorical(pred_z, rng)
+        elif in_ext or t == T_obs_end:
+            # Extension months (and the first tail month) advance the
+            # carried belief vector one step; extension months will update
+            # it below after the prediction is made and scored.
+            pred_z = np.einsum("nr,nrj->nj", belief, Pi)
+            pred_z = pred_z / pred_z.sum(axis=1, keepdims=True)
+            z_t = sample_categorical(pred_z, rng)
         else:
             # Deeper tail: evolve the sampled chain, no more updates.
             z_t = sample_categorical(Pi[idx, z_prev], rng)
@@ -305,14 +333,16 @@ def sequential_one_step_predict(
             # month t's prediction starts from the posterior state at t-1;
             # at t == T this is f_post[:, T-1], the last observed month.
             f_prev = f_post[:, t - 1]
-        # (deeper in the tail, f_prev carries over from the previous step)
+        # (beyond the training panel, f_prev carries over from the previous
+        # step: the factor state is not re-estimated at extension time)
         f_curr = np.einsum("nij,nj->ni", Phi, f_prev) + Q_f * _draw((n, r_dim))
         f_prev = f_curr
 
         # --- threat intensity and observation channels --------------------
-        mean_eta = mu_r[idx, z_t] + np.einsum("nkr,nr->nk", Gamma, f_curr)
+        factor_term = np.einsum("nkr,nr->nk", Gamma, f_curr)
         if g_pred is not None:
-            mean_eta = mean_eta + a_g * g_pred[:, t][:, None]
+            factor_term = factor_term + a_g * g_pred[:, t][:, None]
+        mean_eta = mu_r[idx, z_t] + factor_term
         eta = mean_eta + tau_k * _draw((n, K))
 
         # Covariates enter the PREDICTION lagged (hold-last): month t's own
@@ -334,5 +364,21 @@ def sequential_one_step_predict(
         else:
             D_pred[:, :, t] = rng.poisson(rate_s)
 
+        # --- belief UPDATE with the extension month's actual counts ------
+        if in_ext:
+            # Per draw, per regime: log p(N_actual_t | z_t = r, f_curr),
+            # evaluated at the draw's own factor state and hold-last
+            # covariates.  Exact Bayes step on the regime belief.
+            eta_r = (mu_r + factor_term[:, None, :])            # (n, R, K)
+            mu_r_N = np.exp(soft_clip(eta_r + e_t[T - 1]))
+            p_r = psi_k[:, None, :] / (psi_k[:, None, :] + mu_r_N)
+            obs = np.maximum(np.round(N_ext[:, t - T]), 0.0)    # (K,)
+            ll = nbinom.logpmf(obs[None, None, :], psi_k[:, None, :], p_r).sum(axis=2)  # (n, R)
+            log_joint = np.log(pred_z + 1e-300) + ll
+            log_joint -= log_joint.max(axis=1, keepdims=True)
+            belief = np.exp(log_joint)
+            belief /= belief.sum(axis=1, keepdims=True)
+
     return {"N_pred": N_pred, "D_pred": D_pred,
-            "filtered": filtered, "predicted": predicted}
+            "filtered": filtered, "predicted": predicted,
+            "final_belief": belief}
