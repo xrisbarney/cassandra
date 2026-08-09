@@ -146,6 +146,19 @@ def full_model(data: dict, config: dict) -> None:
     _abl_w_D: float = 0.0 if abl_cfg.get("drop_D", False) else 1.0
     _pw: float = 10.0 if abl_cfg.get("flat_priors", False) else 1.0
 
+    # Learned temporal kernel (config["kernel"]): a moving-window ("square")
+    # covariance component with LEARNABLE width and amplitude.  See §9 of
+    # docs/PAPER_NOTES.md.  g_t = sigma_g * sum_d w_d(h) u_{t-d} with iid
+    # u ~ N(0,1) and smooth-edged box weights w_d(h) = sigmoid((h-|d|)/2),
+    # unit-normalised.  Implied covariance Cov(g_t, g_{t+d}) =
+    # sigma_g^2 * sum_j w_j w_{j+d}: nonzero exactly when two months fall
+    # inside overlapping windows.  h quantifies "how close is close";
+    # sigma_g quantifies how much local covariance matters beyond the AR
+    # factors and global trends; per-topic loadings a_g say who feels it.
+    krn_cfg = config.get("kernel", {}) or {}
+    kernel_on: bool = bool(krn_cfg.get("enabled", False))
+    _krn_D: int = int(krn_cfg.get("max_halfwidth", 60))   # window support, months
+
     def _innovation(name: str, shape: tuple) -> jnp.ndarray:
         """Standardized latent innovation: Student-t in enhanced mode, else
         standard Normal. Always drawn as one (T, *shape) block up front (not
@@ -237,6 +250,32 @@ def full_model(data: dict, config: dict) -> None:
     eps_v_all = _innovation("eps_v", (T, K))
 
     # ------------------------------------------------------------------ #
+    # 3b. Learned moving-window kernel factor (optional)
+    # ------------------------------------------------------------------ #
+    if kernel_on:
+        # Half-width prior centred on 24 months (a "square" spanning ~4
+        # years, e.g. 2016-2020, centred on the prediction point).
+        g_halfwidth = numpyro.sample(
+            "g_halfwidth", dist.LogNormal(jnp.log(float(krn_cfg.get("halfwidth_prior_months", 24.0))), 0.5))
+        sigma_g = numpyro.sample("sigma_g", dist.HalfNormal(0.5))
+        a_g = _plated_sample("a_g", dist.Normal(0.0, 1.0), (K,))   # per-topic loading
+        u_g = _plated_sample("u_g", dist.Normal(0.0, 1.0), (T,))   # window innovations
+
+        lags = jnp.arange(-_krn_D, _krn_D + 1)                      # (2D+1,)
+        w_g = jax.nn.sigmoid((g_halfwidth - jnp.abs(lags)) / 2.0)
+        w_g = w_g / jnp.sqrt(jnp.sum(w_g ** 2) + 1e-12)             # Var(g)=sigma_g^2
+        deterministic("g_kernel_weights", w_g)
+        # Explicit zero-pad + 'valid' keeps the output length exactly T and
+        # the window unambiguously centred ('same' returns the LONGER input's
+        # length when the window exceeds the series).
+        u_pad = jnp.concatenate([jnp.zeros(_krn_D), u_g, jnp.zeros(_krn_D)])
+        g_seq = sigma_g * jnp.convolve(u_pad, w_g, mode="valid")    # (T,)
+        deterministic("g_t", g_seq)
+    else:
+        a_g = jnp.zeros(K)
+        g_seq = jnp.zeros(T)
+
+    # ------------------------------------------------------------------ #
     # 4. Data channels, prepared as (T, ...) sequences for scan
     # ------------------------------------------------------------------ #
     def _seq(key: str, fallback_shape: tuple) -> jnp.ndarray:
@@ -260,7 +299,7 @@ def full_model(data: dict, config: dict) -> None:
     def step(carry, xs_t):
         f_prev, h_prev, log_alpha_prev = carry
         (e_t_t, M_skt_t, N_t, E_t, D_t, B_t,
-         eps_f_t, eps_eta_t, xi_h_t, eps_v_t) = xs_t
+         eps_f_t, eps_eta_t, xi_h_t, eps_v_t, g_t_t) = xs_t
 
         f_t = Phi @ f_prev + Q_f * eps_f_t
         h_t = A_h @ h_prev + Q_h * xi_h_t
@@ -275,7 +314,7 @@ def full_model(data: dict, config: dict) -> None:
         B_safe = jnp.clip(jnp.where(obs_mask_B, B_t, 1.0), 0.1, 10.0)
 
         def loglik_given_regime(r_idx):
-            eta_t = mu_r[r_idx] + f_t @ Gamma.T + tau_k * eps_eta_t
+            eta_t = mu_r[r_idx] + f_t @ Gamma.T + a_g * g_t_t + tau_k * eps_eta_t
             zeta_t = nu_r[r_idx] + h_t @ Psi.T + omega_k * eps_v_t
 
             # -- vulnerability (NegBin) --
@@ -319,7 +358,7 @@ def full_model(data: dict, config: dict) -> None:
         predict_probs_t = jax.nn.softmax(log_predict)  # (R,)
         mu_bar_t = predict_probs_t @ mu_r   # (K,) regime-forecast-weighted level
         nu_bar_t = predict_probs_t @ nu_r   # (K,)
-        eta_t = mu_bar_t + f_t @ Gamma.T + tau_k * eps_eta_t
+        eta_t = mu_bar_t + f_t @ Gamma.T + a_g * g_t_t + tau_k * eps_eta_t
         zeta_t = nu_bar_t + h_t @ Psi.T + omega_k * eps_v_t
 
         # Diagnostic-only observation sites: give downstream tooling
@@ -352,7 +391,7 @@ def full_model(data: dict, config: dict) -> None:
         step,
         (f_init, h_init, log_pi0),
         (e_t, M_skt_seq, N_seq, E_seq, D_seq, B_seq,
-         eps_f_all, eps_eta_all, xi_h_all, eps_v_all),
+         eps_f_all, eps_eta_all, xi_h_all, eps_v_all, g_seq),
         length=T,
     )
     # f_seq: (T,r), h_seq: (T,r_sig), eta_seq/zeta_seq: (T,K), loglik_seq: (T,R)
@@ -508,6 +547,24 @@ def predict(
         f_last = np.array(posterior_samples["f_t"][i, s_idx, :])   # (r,)
         h_last = np.array(posterior_samples["h_t"][i, s_idx, :])   # (r_sig,)
 
+        # Learned moving-window kernel factor: extend g past the data by
+        # convolving [observed innovations, fresh draws] with this draw's
+        # learned window (see full_model §3b).
+        if "u_g" in posterior_samples:
+            w_i = np.array(posterior_samples["g_kernel_weights"][i])
+            sg_i = float(posterior_samples["sigma_g"][i])
+            ag_i = np.array(posterior_samples["a_g"][i])            # (K,)
+            u_i = np.array(posterior_samples["u_g"][i])
+            u_hist = u_i if start_t is None else u_i[:start_t]
+            D_k = (len(w_i) - 1) // 2
+            u_ext = np.concatenate([np.zeros(D_k), u_hist,
+                                    rng.standard_normal(horizon + D_k)])
+            g_fore = (sg_i * np.convolve(u_ext, w_i, mode="valid"))[
+                len(u_hist): len(u_hist) + horizon]                 # (horizon,)
+        else:
+            ag_i = np.zeros(K)
+            g_fore = np.zeros(horizon)
+
         # Terminal regime: recovered via the exact Hamilton filter on this
         # draw's per-timestep regime log-likelihoods (loglik_regime_t is
         # only available up to the training series length; for start_t before
@@ -523,7 +580,7 @@ def predict(
             eps = _draw(r)
             f_curr = Phi_i @ f_last + Q_f_i * eps
 
-            mean_eta = np.array(mu_r_i[z_curr]) + f_curr @ np.array(Gamma_i).T
+            mean_eta = np.array(mu_r_i[z_curr]) + f_curr @ np.array(Gamma_i).T + ag_i * g_fore[h]
             eta_noise = _draw(K) * np.array(tau_k_i)
             eta_h = np.clip(mean_eta + eta_noise, -30.0, 30.0)
             lambda_pred[i, :, h] = eta_h

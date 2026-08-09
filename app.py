@@ -250,7 +250,8 @@ done_eval = artifact_exists(RESULTS / "evaluation" / "scores.csv")
 done_forecast = artifact_exists(RESULTS / "forecasts" / "forecast_quantiles.csv")
 done_backtest = artifact_exists(RESULTS / "backtest" / "threat_comparison.csv")
 
-tab_run, tab_data, tab_forecast = st.tabs(["▶️ Run the steps", "📊 Your data", "🔮 The forecast"])
+tab_run, tab_data, tab_forecast, tab_kernel = st.tabs(
+    ["▶️ Run the steps", "📊 Your data", "🔮 The forecast", "🧪 Kernel lab"])
 
 # ---------------------------------------------------------------------------
 # TAB 1 — Run the steps
@@ -497,13 +498,20 @@ with tab_forecast:
 
         fig_dir = forecast_dir / "figures"
         if fig_dir.exists():
-            fig_jsons = sorted(fig_dir.glob("*.json"))
+            # Per-topic fan charts are intentionally NOT shown here: the
+            # backtest section below renders the same topic series WITH the
+            # actual line overlaid, which supersedes them. (The standalone
+            # .html versions still land in results/forecasts/figures/.)
+            fig_jsons = [f for f in sorted(fig_dir.glob("*.json"))
+                         if not f.stem.startswith("fan_chart_topic_")]
             if fig_jsons:
                 import plotly.io as pio
                 st.markdown("#### Charts")
                 st.caption(
-                    "Black: observed history. Blue: forecast median with "
-                    "50%/90% credible bands. Drag the slider to zoom; hover for values."
+                    "The predictive loss distribution and the regime "
+                    "early-warning signal. Per-topic predicted-vs-actual "
+                    "charts are in the backtest section below. Hover for "
+                    "values; drag to zoom."
                 )
                 for fj in fig_jsons:
                     st.plotly_chart(
@@ -516,6 +524,36 @@ with tab_forecast:
                     st.markdown("#### Charts")
                     for img in imgs:
                         st.image(str(img), caption=img.stem.replace("_", " "))
+
+        # --- Model vs. baselines (rolling-origin evaluation) -------------
+        eval_scores_path = RESULTS / "evaluation" / "scores.csv"
+        if eval_scores_path.exists():
+            st.divider()
+            st.markdown("### 🏁 How does it compare to the baselines?")
+            st.caption(
+                "Rolling-origin evaluation against five baselines: random "
+                "forest (the published standard), ARIMA, exponential "
+                "smoothing, seasonal naïve, and univariate Bayesian "
+                "structural time series. Lower is better on every metric."
+            )
+            from cassandra_threatcast.viz.interactive import baseline_lines
+            eval_scores = pd.read_csv(eval_scores_path)
+            metric_options = [m for m in ["CRPS", "LogS", "MAE", "RMSE"]
+                              if m in eval_scores["metric"].unique()]
+            metric_pick = st.selectbox("Metric", metric_options, index=0,
+                                       key="baseline_metric")
+            st.plotly_chart(baseline_lines(eval_scores, metric_pick),
+                            use_container_width=True)
+
+            dm_path = RESULTS / "evaluation" / "dm_test.csv"
+            if dm_path.exists():
+                st.caption(
+                    "Diebold–Mariano tests on CRPS differentials vs. the "
+                    "proposed model — 'worse' means the baseline is "
+                    "significantly less accurate."
+                )
+                st.dataframe(pd.read_csv(dm_path),
+                             use_container_width=True, hide_index=True)
 
         # --- Backtest: how did this forecast actually do? ---------------
         backtest_dir = RESULTS / "backtest"
@@ -576,9 +614,24 @@ with tab_forecast:
                     "The dollar loss forecast has no routinely-collected actual-loss "
                     "series to check against, so this — disclosed incident counts, "
                     "one of the loss model's real inputs — is the closest available "
-                    "check on it."
+                    "check on it. Pick sectors below; blue is the model's "
+                    "1-month-ahead prediction, black is what happened."
                 )
-                st.markdown(_sector_table_html(incident_cmp, name_col="sector"), unsafe_allow_html=True)
+                from cassandra_threatcast.viz.interactive import incident_sector_chart
+                all_sectors = sorted(incident_cmp["sector"].unique())
+                # Default to the sectors where something actually happened.
+                active_sectors = sorted(
+                    incident_cmp.loc[incident_cmp["actual_incidents"] > 0, "sector"].unique())
+                chosen = st.multiselect(
+                    "Sectors", all_sectors,
+                    default=active_sectors or all_sectors[:3],
+                    key="incident_sectors")
+                for sec in chosen:
+                    st.plotly_chart(
+                        incident_sector_chart(incident_cmp[incident_cmp["sector"] == sec], sec),
+                        use_container_width=True)
+                with st.expander("Full table (all sectors, all months)"):
+                    st.markdown(_sector_table_html(incident_cmp, name_col="sector"), unsafe_allow_html=True)
                 sector_glossary_expander()
 
             bt_fig_dir = backtest_dir / "figures"
@@ -609,3 +662,103 @@ with tab_forecast:
                 "Run **Step 6 — Check the model against reality** to replay history "
                 "with sequential 1-step-ahead predictions and see how the model did here."
             )
+
+# ---------------------------------------------------------------------------
+# TAB 4 — Kernel lab (test theory: learned moving-window covariance)
+# ---------------------------------------------------------------------------
+with tab_kernel:
+    st.markdown("### 🧪 Learned temporal kernel — a test theory")
+    st.caption(
+        "**Experimental — nothing here touches the main model or the other "
+        "tabs.** The main model assumes nearby months predict each other via "
+        "its AR factor dynamics. This experiment makes that assumption "
+        "explicit and learnable: a square window of learnable width slides "
+        "over the series, and the model learns (1) how far apart two months "
+        "can be and still co-move — the window half-width h, (2) how much "
+        "that local covariance matters relative to the historical trends — "
+        "the amplitude σ_g, and (3) which threat topics feel it — the "
+        "loadings a_k. If local covariance adds nothing beyond the existing "
+        "dynamics, σ_g shrinks toward zero and the kernel self-ablates."
+    )
+
+    kernel_params_path = RESULTS / "kernel" / "kernel_params.json"
+    kernel_row_exists = False
+    ablation_path = RESULTS / "ablation" / "ablation.csv"
+    if ablation_path.exists():
+        _ab = pd.read_csv(ablation_path)
+        kernel_row_exists = bool((_ab["variant"] == "kernel").any())
+
+    if not kernel_params_path.exists():
+        if kernel_row_exists:
+            st.info(
+                "The kernel variant is trained. Generate this tab's report with:\n\n"
+                "`python scripts/kernel_report.py`"
+            )
+        else:
+            st.info(
+                "The kernel variant hasn't been trained yet. Run:\n\n"
+                "`python scripts/ablation.py --variants kernel`\n\n"
+                "then `python scripts/kernel_report.py`. The main model is "
+                "unaffected either way — the kernel is opt-in via the "
+                "`kernel:` block in configs/default.yaml."
+            )
+    else:
+        kp = json.loads(kernel_params_path.read_text(encoding="utf-8"))
+        hw, sg = kp["halfwidth_months"], kp["sigma_g"]
+        comp = kp.get("comparison", {})
+
+        c1, c2, c3 = st.columns(3)
+        c1.metric(
+            "Learned half-width",
+            f"{hw['mean']:.0f} months",
+            help=f"90% CI {hw['q05']:.0f}–{hw['q95']:.0f} months. How far "
+                 "apart two months can be and still co-move — the width of "
+                 "the moving square window, learned from the data.",
+        )
+        c2.metric(
+            "Amplitude σ_g",
+            f"{sg['mean']:.3f}",
+            help=f"90% CI {sg['q05']:.3f}–{sg['q95']:.3f} (log-intensity "
+                 "units). How much local covariance matters beyond the AR "
+                 "factors, regimes, and effort trend. Near zero = the "
+                 "existing dynamics already capture it.",
+        )
+        if comp.get("kernel") and comp.get("full"):
+            delta = 100.0 * (comp["kernel"]["CRPS_h1"] - comp["full"]["CRPS_h1"]) / comp["full"]["CRPS_h1"]
+            c3.metric(
+                "CRPS h=1 vs. full model",
+                f"{comp['kernel']['CRPS_h1']:.1f}",
+                delta=f"{delta:+.1f}% vs {comp['full']['CRPS_h1']:.1f}",
+                delta_color="inverse",
+                help="Sequential 1-step-ahead CRPS on the 2023–2024 test "
+                     "window, settings-matched against the full model "
+                     "without the kernel. Negative = kernel improves accuracy.",
+            )
+
+        if comp.get("kernel") and comp.get("full"):
+            comp_df = pd.DataFrame([
+                {"model": "Full (no kernel)", **comp["full"]},
+                {"model": "Full + kernel", **comp["kernel"]},
+            ])
+            st.dataframe(comp_df, use_container_width=True, hide_index=True)
+
+        kfig_dir = RESULTS / "kernel" / "figures"
+        if kfig_dir.exists():
+            import plotly.io as pio
+            for stem, blurb in [
+                ("kernel_covariance",
+                 "The learned covariance between months as a function of how "
+                 "far apart they are — the quantified version of 'close "
+                 "points affect each other'."),
+                ("kernel_g_t",
+                 "The kernel factor through time: local co-movement the "
+                 "window picks up beyond the global trends."),
+                ("kernel_loadings",
+                 "Per-topic loadings: which threat categories participate in "
+                 "the local covariance."),
+            ]:
+                fj = kfig_dir / f"{stem}.json"
+                if fj.exists():
+                    st.plotly_chart(pio.from_json(fj.read_text(encoding="utf-8")),
+                                    use_container_width=True)
+                    st.caption(blurb)

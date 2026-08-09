@@ -231,6 +231,122 @@ def regime_area(
     return fig
 
 
+# Fixed categorical order for model identity — color follows the model,
+# never its rank (reference palette slots).
+MODEL_COLORS = {
+    "FullModel": "#2a78d6",   # blue      (the proposed model)
+    "BSTS-U":    "#1baf7a",   # aqua
+    "RF":        "#eda100",   # yellow
+    "ARIMA":     "#008300",   # green
+    "ETS":       "#4a3aa7",   # violet
+    "Naive":     "#e34948",   # red
+}
+
+
+def baseline_lines(scores_df: pd.DataFrame, metric: str = "CRPS") -> go.Figure:
+    """
+    Model-vs-baselines comparison: one line per model across forecast
+    horizons for the chosen metric (lower is better for all four).
+    Expects the tidy results/evaluation/scores.csv (model, horizon, metric,
+    value; already aggregated over folds by evaluate.py).
+    """
+    df = scores_df[scores_df["metric"] == metric]
+    # evaluate.py saves fold-aggregated scores as value_mean/value_std;
+    # accept a plain per-row "value" column too.
+    value_col = "value_mean" if "value_mean" in df.columns else "value"
+    agg = df.groupby(["model", "horizon"])[value_col].mean().reset_index()
+    agg = agg.rename(columns={value_col: "value"})
+
+    fig = go.Figure()
+    for model in MODEL_COLORS:
+        sub = agg[agg["model"] == model].sort_values("horizon")
+        if not len(sub):
+            continue
+        emphasis = model == "FullModel"
+        fig.add_trace(go.Scatter(
+            x=sub["horizon"], y=sub["value"], mode="lines+markers",
+            line=dict(color=MODEL_COLORS[model], width=3 if emphasis else 2),
+            marker=dict(size=9 if emphasis else 7,
+                        line=dict(color=SURFACE, width=2)),
+            name=model,
+            hovertemplate=f"{model}: %{{y:,.1f}}<extra></extra>"))
+    _base_layout(fig, None, height=380)
+    fig.update_xaxes(title="Forecast horizon (months)", tickvals=sorted(agg["horizon"].unique()))
+    fig.update_yaxes(title=f"{metric} (lower is better)", rangemode="tozero")
+    return fig
+
+
+def incident_sector_chart(sector_df: pd.DataFrame, sector_name: str) -> go.Figure:
+    """
+    Incident channel, predicted vs actual for one sector, from the
+    backtest's incident_comparison.csv rows (date, actual_incidents,
+    predicted_q05/q50/q95_incidents).
+    """
+    d = sector_df.sort_values("date")
+    x = [pd.Period(v, freq="M").to_timestamp() for v in d["date"]]
+
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(x=x, y=d["predicted_q95_incidents"], mode="lines",
+                             line=dict(width=0), hoverinfo="skip", showlegend=False))
+    fig.add_trace(go.Scatter(x=x, y=d["predicted_q05_incidents"], mode="lines",
+                             line=dict(width=0), fill="tonexty",
+                             fillcolor="rgba(42,120,214,0.12)",
+                             name="90% credible band", hoverinfo="skip"))
+    fig.add_trace(go.Scatter(x=x, y=d["predicted_q50_incidents"], mode="lines",
+                             line=dict(color=BLUE, width=2),
+                             name="Predicted (median)",
+                             hovertemplate="predicted %{y:,.1f}<extra></extra>"))
+    fig.add_trace(go.Scatter(x=x, y=d["actual_incidents"], mode="lines+markers",
+                             line=dict(color=INK, width=2),
+                             marker=dict(size=7, line=dict(color=SURFACE, width=2)),
+                             name="Actual",
+                             hovertemplate="actual %{y:,.0f}<extra></extra>"))
+    _base_layout(fig, f"{sector_name} — disclosed incidents", height=320)
+    fig.update_yaxes(title="Incidents per month", rangemode="tozero")
+    return fig
+
+
+def kernel_covariance_curve(lags: np.ndarray, cov_mean: np.ndarray,
+                            cov_lo: np.ndarray, cov_hi: np.ndarray,
+                            halfwidth_mean: float) -> go.Figure:
+    """Learned temporal covariance Cov(g_t, g_{t+d}) vs lag d, with 90% band."""
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(x=lags, y=cov_hi, mode="lines", line=dict(width=0),
+                             hoverinfo="skip", showlegend=False))
+    fig.add_trace(go.Scatter(x=lags, y=cov_lo, mode="lines", line=dict(width=0),
+                             fill="tonexty", fillcolor="rgba(42,120,214,0.12)",
+                             name="90% credible band", hoverinfo="skip"))
+    fig.add_trace(go.Scatter(x=lags, y=cov_mean, mode="lines",
+                             line=dict(color=BLUE, width=2),
+                             name="Posterior mean covariance",
+                             hovertemplate="lag %{x} mo: %{y:.4f}<extra></extra>"))
+    fig.add_vline(x=halfwidth_mean, line_width=1, line_color=BASELINE)
+    fig.add_annotation(x=halfwidth_mean, y=1.04, yref="paper", showarrow=False,
+                       text=f"learned half-width ≈ {halfwidth_mean:.0f} mo",
+                       font=dict(size=11, color=MUTED), xanchor="left")
+    _base_layout(fig, "How far apart do months still co-move?", height=360)
+    fig.update_xaxes(title="Separation between months (lag, months)")
+    fig.update_yaxes(title="Cov(g_t, g_t+lag)", rangemode="tozero")
+    return fig
+
+
+def kernel_loadings_bar(topic_labels: list, a_mean: np.ndarray,
+                        a_sd: np.ndarray) -> go.Figure:
+    """Per-topic kernel loadings a_k with +/-1 sd error bars."""
+    labels = [f"{lbl} — {k:02d}" for k, lbl in enumerate(topic_labels)]
+    fig = go.Figure(go.Bar(
+        x=labels, y=a_mean, width=0.55,
+        marker=dict(color=BLUE, cornerradius=4),
+        error_y=dict(type="data", array=a_sd, color=INK_2, thickness=1.5),
+        hovertemplate="%{x}: %{y:.2f}<extra></extra>"))
+    _base_layout(fig, "Which topics feel the local covariance? (loadings a_k)",
+                 height=340)
+    fig.update_layout(hovermode="closest", showlegend=False)
+    fig.update_xaxes(tickangle=-40, tickfont=dict(size=10))
+    fig.update_yaxes(title="Loading a_k", zeroline=True, zerolinecolor=BASELINE)
+    return fig
+
+
 def save_interactive(fig: go.Figure, path_base: str) -> None:
     """Write <path_base>.html (standalone) and <path_base>.json (dashboard)."""
     os.makedirs(os.path.dirname(path_base), exist_ok=True)

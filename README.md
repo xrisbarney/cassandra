@@ -83,6 +83,28 @@ coverage is ~98% on the 2023–2024 test window, versus 4.2% under the old
 open-loop design. Run `python scripts/backtest.py` (or dashboard **Step 6**)
 to reproduce; interactive charts land in `results/backtest/figures/`.
 
+**§8 documents the paper-conformance build** — everything the manuscript's
+tables promise now has numbers behind it: the BSTS-U baseline and log score
+in the evaluation (Tables 2/3/6); Bayesian calibration of the damage
+functions against the reference event set plus an aggregate annual anchor
+(Tables 7/8 — this also uncovered and fixed a saturated damage sigmoid and
+an x_s units error that together made all earlier loss figures invalid);
+systemic-event probabilities and regime-probability early-warning outputs;
+the six-variant ablation study (Table 4); and the K=1024 sparse-topic
+population run with the active-topic set and Full-vs-BSTS-U appendix
+comparison (§4.1). Headline results: the full model beats every baseline at
+every horizon (CRPS 41.2 vs best-baseline 49.6 at h=1, all DM tests
+p < 1e-14), and the calibrated forecast puts aggregate 12-month US losses at
+~$137B (90%: $128–148B).
+
+**§9 documents a test theory (quarantined from the main model):** a learned
+moving-window covariance kernel that quantifies how strongly nearby months
+co-move beyond the AR factor dynamics. The data chose a ±20-month window
+(90% CI 18.7–21.6) with decisively nonzero amplitude, improving sequential
+CRPS by ~11% in a settings-matched comparison. Opt-in via the `kernel:`
+config block (off by default — the paper-native model is untouched); results
+live in the dashboard's **🧪 Kernel lab** tab.
+
 ## Requirements
 
 - Python 3.11+
@@ -169,23 +191,62 @@ The two variants share all priors, latent structure, and the economic layer, so 
 
 ### 4. Evaluate
 
-Rolling-origin expanding-window evaluation against five baselines (RF, ARIMA, ETS, Naive, BSTS). Outputs CRPS/MAE/RMSE tables and Diebold-Mariano test results.
+Rolling-origin expanding-window evaluation against five baselines (RF, ARIMA, ETS, seasonal Naive, BSTS-U). Outputs CRPS/LogS/MAE/RMSE tables and Diebold-Mariano test results.
 
 ```bash
 python scripts/evaluate.py
 ```
 
-Results are written to `results/scores.csv`, `results/dm_test.csv`, `results/calibration.csv`.
+Results are written to `results/evaluation/scores.csv`, `results/evaluation/dm_test.csv`, `results/evaluation/calibration.csv`, and rendered as an interactive baseline-comparison chart in the dashboard's forecast tab.
 
 ### 5. Forecast
 
-Generates 12-month-ahead predictive draws, quantile CSV, and fan-chart figures.
+Generates 12-month-ahead predictive draws, quantile CSV, interactive fan charts, the loss distribution with systemic-event probabilities `P(loss > c)`, the ranked sector-exposure table, and the regime-probability early-warning series.
 
 ```bash
 python scripts/forecast.py --horizon 12
 ```
 
-Figures are saved to `results/figures/`.
+Interactive figures (`.html` to open in a browser, `.json` for the dashboard) land in `results/forecasts/figures/`. Uses the event-calibrated damage functions automatically when `results/calibration/damage_params.json` exists.
+
+### 6. Backtest (check the model against reality)
+
+Sequential one-step-ahead filtered evaluation over the full panel: starting
+from the first month, the model predicts each month **before** seeing it, is
+scored, then updates its regime beliefs with that month's actual data across
+all four observation channels. Needs only the trained model — no network.
+
+```bash
+python scripts/backtest.py                       # test window 2023-01..2024-12
+python scripts/backtest.py --test-start 2022-01  # or pick your own window
+```
+
+Outputs `results/backtest/backtest_scores.csv`, per-topic and per-sector
+predicted-vs-actual comparisons, and interactive charts in
+`results/backtest/figures/` (also rendered in the dashboard's forecast tab,
+including the per-sector incident charts with a sector filter).
+
+### Paper analyses (run after training)
+
+```bash
+# Damage-function calibration against the reference event set + Table 7
+# economic backtest (edit documented loss ranges in configs/reference_events.yaml)
+python scripts/calibrate_damage.py
+
+# Table 4 ablation study: -regimes, -factors, -hierarchy, -EPSS channel,
+# -incident channel, -effort, and the optional "+kernel" variant.
+# Resumable; merges results across invocations.
+python scripts/ablation.py --num-warmup 300 --num-samples 300
+
+# §4.1/Appendix: K=1024 sparse-topic population (MiniBatchNMF), active-topic
+# set, Full-via-VI vs per-series BSTS-U. Long run (~20h) -- leave overnight.
+python scripts/full_population.py --k-full 1024 --vi-steps 6000
+
+# Kernel experiment (test theory, see §9): train the variant, then distill
+# its posterior into the dashboard's Kernel lab tab.
+python scripts/ablation.py --variants kernel
+python scripts/kernel_report.py
+```
 
 ## Tests
 
@@ -205,20 +266,26 @@ paper-cyber-threatmodelling/
 ├── docs/PAPER_NOTES.md            # ⚠️ model corrections vs. the paper (identifiability, π, regime marginalization)
 ├── docs/MODEL_VARIANTS.md         # paper-native vs. --enhanced-mode comparison
 ├── configs/default.yaml          # K=8 topics, S=11 sectors, r=3 intensity + r_sigma=2 severity factors, R=3 regimes
-├── scripts/                      # CLI entry points (run in order)
-│   ├── ingest_data.py
+├── configs/reference_events.yaml # documented loss ranges for damage calibration (edit as sources improve)
+├── scripts/                      # CLI entry points
+│   ├── ingest_data.py             # pipeline steps, run in order
 │   ├── build_features.py
 │   ├── train.py
 │   ├── evaluate.py
 │   ├── forecast.py
-│   └── run_all.py                 # run all steps end-to-end (--fresh to wipe & restart)
+│   ├── backtest.py                # sequential 1-step-ahead filtered backtest
+│   ├── run_all.py                 # run all steps end-to-end (--fresh to wipe & restart)
+│   ├── calibrate_damage.py        # paper analyses:
+│   ├── ablation.py                #   Tables 7, 4
+│   ├── full_population.py         #   §4.1 / Appendix (K=1024 topics)
+│   └── kernel_report.py           #   Kernel lab artifacts (test theory, §9)
 ├── src/cassandra_threatcast/
 │   ├── data/       # NVD, EPSS, CISA KEV, SEC 8-K, BEA I-O ingestion
-│   ├── features/   # Topic mapper (TF-IDF+NMF), exposure map, HP-filter effort
-│   ├── model/      # NumPyro model (intensity + severity factor AR, Markov regimes, 4 obs channels, Leontief)
-│   ├── inference/  # plain NUTS (regime path marginalized in-model), FFBS terminal-regime recovery, VI fallback
-│   ├── evaluation/ # CRPS, log score, DM test, PIT calibration, 5 baselines
-│   └── viz/        # Fan charts, PIT histograms, regime-prob plots, sector exposure
+│   ├── features/   # Topic mapper (TF-IDF+NMF; MiniBatchNMF at large K), exposure map, effort estimators
+│   ├── model/      # NumPyro model (factor AR + optional moving-window kernel, Markov regimes, 4 obs channels, Leontief)
+│   ├── inference/  # plain NUTS (regime path marginalized in-model), FFBS terminal-regime recovery, VI
+│   ├── evaluation/ # CRPS, log score, DM test, PIT calibration, 5 baselines, sequential filter machinery
+│   └── viz/        # interactive plotly charts (fan, loss, regimes, baselines, kernel) + legacy matplotlib
 └── tests/
 ```
 
@@ -239,3 +306,5 @@ All hyperparameters are in `configs/default.yaml`. Key settings:
 | `bea.year` | 2022 | BEA I-O table year fetched via API |
 | `enhanced.enabled` | false | Enhanced model variant (also set by `--enhanced-mode`) — see [docs/MODEL_VARIANTS.md](docs/MODEL_VARIANTS.md) |
 | `enhanced.student_t_df` | 4.0 | Student-t d.o.f. for heavy-tailed innovations (enhanced only) |
+| `kernel.enabled` | false | Learned moving-window covariance kernel (test theory — PAPER_NOTES §9, dashboard 🧪 Kernel lab) |
+| `kernel.halfwidth_prior_months` | 24 | Prior centre for the kernel window half-width |

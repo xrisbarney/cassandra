@@ -128,6 +128,49 @@ def one_step_state_predictive(
     return {"eta": eta, "zeta": zeta, "z": z}
 
 
+def kernel_factor_predictive(
+    post: dict,
+    T_out: int,
+    T_obs: int,
+    h: int,
+    rng: np.random.Generator,
+) -> tuple[np.ndarray | None, np.ndarray | None]:
+    """
+    h-step-ahead predictive of the learned moving-window kernel factor
+    (model config["kernel"]; see full.py §3b).  For month t, conditions on
+    the window innovations u only through t-h; in-window u's newer than
+    that are replaced by their exact Gaussian predictive (fresh noise with
+    variance 1 - sum of known weights^2, thanks to the unit-norm weights).
+
+    Returns (g_pred, a_g): g_pred (n, T_out) kernel factor draws, a_g (n, K)
+    per-topic loadings -- or (None, None) if the model has no kernel.
+    """
+    if "u_g" not in post:
+        return None, None
+    u = np.asarray(post["u_g"], dtype=float)                    # (n, T_obs)
+    w_all = np.asarray(post["g_kernel_weights"], dtype=float)   # (n, 2D+1)
+    sg = np.asarray(post["sigma_g"], dtype=float).reshape(-1)   # (n,)
+    a_g = np.asarray(post["a_g"], dtype=float)                  # (n, K)
+    n = u.shape[0]
+    D = (w_all.shape[1] - 1) // 2
+
+    g = np.zeros((n, T_out))
+    for i in range(n):
+        w = w_all[i]                                            # symmetric, lags -D..D
+        for t in range(T_out):
+            lo = max(t - D, 0)
+            hi = min(t - h, T_obs - 1)
+            if hi >= lo:
+                d = t - np.arange(lo, hi + 1)                   # lags h..D within data
+                wk = w[D + d]
+                known = float(wk @ u[i, lo:hi + 1])
+                var_missing = max(1.0 - float(wk @ wk), 0.0)
+            else:
+                known, var_missing = 0.0, 1.0
+            g[i, t] = sg[i] * (known + np.sqrt(var_missing) * rng.standard_normal())
+    return g, a_g
+
+
 def sequential_h_step_predict(
     post: dict,
     e_t: np.ndarray,        # (T,) effort covariate
@@ -171,6 +214,7 @@ def sequential_h_step_predict(
         return rng.standard_normal(shape)
 
     filtered, _ = batch_forward_filter(loglik, Pi)
+    g_pred, a_g = kernel_factor_predictive(post, T, T, h, rng)
 
     N_pred = np.full((n, K, T), np.nan)
     for t in range(h, T):
@@ -181,6 +225,8 @@ def sequential_h_step_predict(
             z = sample_categorical(Pi[idx, z], rng)
             f_prev = np.einsum("nij,nj->ni", Phi, f_prev) + Q_f * _draw((n, r_dim))
         eta = mu_r[idx, z] + np.einsum("nkr,nr->nk", Gamma, f_prev) + tau_k * _draw((n, K))
+        if g_pred is not None:
+            eta = eta + a_g * g_pred[:, t][:, None]
         mu_N = np.exp(soft_clip(eta + e_t[o]))
         p_nb = psi_k / (psi_k + mu_N)
         N_pred[:, :, t] = rng.negative_binomial(psi_k, p_nb)
@@ -229,6 +275,7 @@ def sequential_one_step_predict(
 
     print(f"      Hamilton filter over {T} months x {n} draws ...")
     filtered, predicted = batch_forward_filter(loglik, Pi)
+    g_pred, a_g = kernel_factor_predictive(post, T_all, T, 1, rng)
 
     N_pred = np.zeros((n, K, T_all))
     D_pred = np.zeros((n, S, T_all))
@@ -264,6 +311,8 @@ def sequential_one_step_predict(
 
         # --- threat intensity and observation channels --------------------
         mean_eta = mu_r[idx, z_t] + np.einsum("nkr,nr->nk", Gamma, f_curr)
+        if g_pred is not None:
+            mean_eta = mean_eta + a_g * g_pred[:, t][:, None]
         eta = mean_eta + tau_k * _draw((n, K))
 
         # Covariates enter the PREDICTION lagged (hold-last): month t's own

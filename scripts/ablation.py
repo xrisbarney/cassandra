@@ -67,6 +67,11 @@ VARIANTS: dict[str, dict] = {
     "no_E":        {"overrides": {"ablation.drop_E": True},           "note": "CVE + 8-K only"},
     "no_D":        {"overrides": {"ablation.drop_D": True},           "note": "CVE + EPSS only"},
     "no_effort":   {"overrides": {"ablation.no_effort": True},        "note": "raw counts as truth (e_t=0)"},
+    # Addition rather than removal: the learned moving-window covariance
+    # kernel (config["kernel"]; PAPER_NOTES §9). Compare against "full" at
+    # the same settings to quantify what explicit local temporal covariance
+    # adds beyond the AR factor dynamics.
+    "kernel":      {"overrides": {"kernel.enabled": True},            "note": "+ learned moving-window kernel"},
 }
 
 
@@ -208,12 +213,20 @@ def main() -> None:
                          "status": f"score_failed: {exc}"})
 
         # Write progressively so an interrupted run still leaves results.
+        # MERGE with any existing table: a partial invocation (e.g.
+        # --variants kernel) must update its own rows without discarding
+        # variants scored by earlier runs.
         df = pd.DataFrame(rows)
+        csv_path = os.path.join(args.output_dir, "ablation.csv")
+        if os.path.exists(csv_path):
+            prev = pd.read_csv(csv_path)
+            prev = prev[~prev["variant"].isin(df["variant"])]
+            df = pd.concat([prev, df], ignore_index=True)
         full_row = df[df.variant == "full"]
         if len(full_row) and "CRPS_h1" in df.columns:
             ref = float(full_row["CRPS_h1"].iloc[0])
             df["delta_CRPS_h1_pct"] = 100.0 * (df["CRPS_h1"] - ref) / ref
-        df.to_csv(os.path.join(args.output_dir, "ablation.csv"), index=False)
+        df.to_csv(csv_path, index=False)
 
     print(f"\nTable 4 -> {os.path.join(args.output_dir, 'ablation.csv')}")
     if rows:

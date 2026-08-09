@@ -594,3 +594,49 @@ granularity (NaN-masked) and the exposure map is uniform.
 Related fix: `vi_predictive_samples` passed an empty config into the model,
 crashing the VI predictive path; it now threads the config through
 (inference/vi.py, scripts/train.py).
+
+## 9. Learned temporal kernel — quantifying "how close is close"
+
+The model's assumption that nearby months predict each other was implicit
+(AR(1) factor dynamics imply geometrically decaying correlation Φ^d). The
+kernel component makes it explicit, learnable, and testable.
+
+**Construction (moving-average kernel factor).** A smooth-edged square
+window of learnable half-width h (months) slides over iid innovations
+u_t ~ N(0,1):
+
+    g_t = σ_g · Σ_d w_d(h) · u_{t−d},   w_d(h) = sigmoid((h − |d|)/2),
+    weights unit-normalised so Var(g_t) = σ_g².
+
+Each topic loads on the common component: η_kt gains a_k · g_t. The
+implied temporal covariance is
+
+    Cov(g_t, g_{t+d}) = σ_g² Σ_j w_j(h) w_{j+d}(h),
+
+nonzero exactly when months t and t+d fall inside overlapping windows —
+the "square between 2016 and 2020 centred on the prediction", with the
+square's width learned from data rather than assumed. PSD by construction
+(a convolution of white noise), and forecastable: beyond the data, future
+u's are fresh standard-normal draws; the sequential evaluation conditions
+g on innovations through t−h only, replacing newer in-window u's by their
+exact Gaussian predictive (variance 1 − Σ w²_known via the unit norm).
+
+**Interpretation of the learned parameters.**
+- h    : the temporal reach of local covariance ("how close is close");
+- σ_g  : how much local co-movement matters beyond the AR factors,
+         regimes, and effort trend — if the data does not support extra
+         local covariance, σ_g shrinks toward 0 and the component
+         self-ablates;
+- a_k  : which topics participate in it.
+
+Priors: h ~ LogNormal(log 24, 0.5) (centred on a ±2-year window),
+σ_g ~ HalfNormal(0.5), a_k ~ N(0,1). Config block `kernel:` in
+configs/default.yaml (disabled by default — paper-native unchanged).
+
+**Evaluation.** Trained as an ablation-style ADDITION variant
+(scripts/ablation.py --variants kernel), settings-matched against the
+"full" reference; scored with sequential one-step and six-step CRPS and
+90% coverage on the 2023-2024 test window (results/ablation/ablation.csv,
+"kernel" row). Manuscript impact if adopted: Eq. (3) gains the term
+a_k g_t with the kernel definition above, and Table 4 gains a "+ kernel"
+row quantifying the improvement.

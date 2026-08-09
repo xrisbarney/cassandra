@@ -1,0 +1,9 @@
+topic,topic_label,a_mean,a_sd
+0,Cross-Site Request Forgery,1.1408138,0.2679849
+1,Denial of Service,-0.97562146,0.21671061
+2,SQL Injection,-0.09471834,0.1396785
+3,Remote Code Execution,0.4307369,0.13194655
+4,Miscellaneous Vulnerabilities,2.3350127,0.47443715
+5,Information Disclosure,-0.9249519,0.19268353
+6,Miscellaneous Vulnerabilities,-0.28864747,0.18833385
+7,Cross-Site Scripting,-0.48493606,0.115158916
