@@ -77,6 +77,11 @@ def calibration_report(
 
         obs_flat = obs.ravel()
         pred_flat = pred.reshape(pred.shape[0], -1).T  # (N, n_samples)
+        valid = np.isfinite(obs_flat) & np.all(np.isfinite(pred_flat), axis=1)
+        obs_flat = obs_flat[valid]
+        pred_flat = pred_flat[valid]
+        if obs_flat.size == 0:
+            continue
 
         # PIT values (computed once per channel)
         pit_vals = pit_values(obs_flat, pred_flat)

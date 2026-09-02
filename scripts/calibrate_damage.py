@@ -122,17 +122,50 @@ def main() -> None:
     # ------------------------------------------------------------------ #
     print("[2/4] Building pre-event predictive shock loads ...")
     rng = np.random.default_rng(seed)
-    loglik = np.asarray(post["loglik_regime_t"], dtype=float)
     Pi = np.asarray(post["Pi"], dtype=float)
-    _, predicted_probs = batch_forward_filter(loglik, Pi)
+    paper_exact = "Phi_r" in post and "z_t" in post
+    predicted_probs = None
+    if not paper_exact:
+        loglik = np.asarray(post["loglik_regime_t"], dtype=float)
+        _, predicted_probs = batch_forward_filter(loglik, Pi)
+
+    def state_predictive(t_index: int) -> dict[str, np.ndarray]:
+        if not paper_exact:
+            return one_step_state_predictive(
+                post, t_index, rng, predicted_probs=predicted_probs,
+                enhanced=enhanced, student_t_df=student_t_df,
+            )
+        eta_draws, zeta_draws = [], []
+        previous = max(t_index - 1, 0)
+        for idx in range(n):
+            z_prev = int(post["z_t"][idx, previous])
+            z = int(rng.choice(Pi.shape[-1], p=Pi[idx, z_prev]))
+            f = post["Phi_r"][idx, z] @ post["f_t"][idx, previous]
+            f += post["Q_r"][idx, z] * rng.standard_normal(post["f_init"].shape[-1])
+            h = post["A_sigma_r"][idx, z] @ post["h_t"][idx, previous]
+            h += post["Q_sigma_r"][idx, z] * rng.standard_normal(post["h_init"].shape[-1])
+            excitation = 0.0
+            if "hawkes_alpha" in post:
+                excitation = np.log1p(
+                    post["hawkes_decay"][idx]
+                    * (post["hawkes_alpha"][idx]
+                       @ np.exp(np.clip(post["eta_t"][idx, previous], -20, 20)))
+                )
+            eta_draws.append(
+                post["mu_r"][idx, z] + post["Gamma"][idx] @ f + excitation
+                + post["tau_k"][idx] * rng.standard_normal(post["tau_k"].shape[-1])
+            )
+            zeta_draws.append(
+                post["nu_r"][idx, z] + post["Psi"][idx] @ h
+                + post["omega_k"][idx] * rng.standard_normal(post["omega_k"].shape[-1])
+            )
+        return {"eta": np.asarray(eta_draws), "zeta": np.asarray(zeta_draws)}
 
     shock_loads = []       # list of (n, S)
     event_rows = []
     for ev in events:
         t_e = int(periods.get_loc(pd.Period(ev["month"], freq="M")))
-        states = one_step_state_predictive(
-            post, t_e, rng, predicted_probs=predicted_probs,
-            enhanced=enhanced, student_t_df=student_t_df)
+        states = state_predictive(t_e)
         exp_lam = np.exp(soft_clip(states["eta"]))       # (n, K)
         sigma = np.exp(soft_clip(states["zeta"]))        # (n, K)
         M_prev = M_skt[:, :, max(t_e - 1, 0)]            # (S, K), pre-event
@@ -161,9 +194,7 @@ def main() -> None:
     typ_months = np.linspace(T - 24, T - 1, n_typ).astype(int)
     typ_loads = []
     for t_m in typ_months:
-        st = one_step_state_predictive(post, int(t_m), rng,
-                                       predicted_probs=predicted_probs,
-                                       enhanced=enhanced, student_t_df=student_t_df)
+        st = state_predictive(int(t_m))
         lam_sig = np.exp(soft_clip(st["eta"])) * np.exp(soft_clip(st["zeta"]))
         typ_loads.append(np.einsum("sk,nk->ns", M_skt[:, :, max(t_m - 1, 0)], lam_sig))
     typ_arr = np.stack(typ_loads)                        # (M, n, S)
@@ -261,6 +292,17 @@ def main() -> None:
     with open(params_path, "w", encoding="utf-8") as fh:
         json.dump(params_out, fh, indent=2)
     print(f"      Calibrated params -> {params_path}")
+
+    # Retain the complete calibration posterior so forecast Step 28 propagates
+    # damage-function uncertainty instead of substituting posterior means.
+    damage_draws_path = os.path.join(args.output_dir, "damage_posterior.npz")
+    np.savez_compressed(
+        damage_draws_path,
+        shape=theta["steepness"][:, None] / sector_ref[None, :],
+        scale=theta["c_scale"][:, None] * sector_ref[None, :],
+        max_damage=np.repeat(theta["max_damage"][:, None], S, axis=1),
+    )
+    print(f"      Damage posterior draws -> {damage_draws_path}")
 
     # ------------------------------------------------------------------ #
     # 4. Table 7: economic-layer backtest, integrating over theta draws

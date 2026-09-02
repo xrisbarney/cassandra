@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 """
-Train the full Bayesian hierarchical state-space model via NUTS.
+Infer the full paper model via alternating NUTS and FFBS.
 
 Usage:
     python scripts/train.py \\
@@ -13,8 +13,8 @@ Usage:
 
 The script:
   1. Loads the processed panel and derived features from --data-dir.
-  2. Assembles the data dict expected by cassandra_threatcast.model.full.full_model.
-  3. Runs NUTS via cassandra_threatcast.inference.nuts.run_nuts.
+  2. Assembles the data dict expected by `model.paper_exact.paper_model`.
+  3. Alternates continuous NUTS blocks and discrete FFBS path draws.
   4. Saves the resulting ArviZ InferenceData to <output_dir>/idata.nc.
   5. Prints a posterior summary for key parameters.
 """
@@ -48,9 +48,10 @@ import numpyro
 numpyro.set_host_device_count(os.cpu_count() or 1)
 
 from cassandra_threatcast.data import pipeline
-from cassandra_threatcast.model import full as full_module
-from cassandra_threatcast.inference import nuts as nuts_module
-from cassandra_threatcast.inference import vi as vi_module
+from cassandra_threatcast.inference.blocked import (
+    run_blocked_nuts_ffbs,
+    run_blocked_vi_ffbs,
+)
 
 
 # ---------------------------------------------------------------------------
@@ -58,7 +59,7 @@ from cassandra_threatcast.inference import vi as vi_module
 # ---------------------------------------------------------------------------
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Train the full Bayesian hierarchical model via NUTS."
+        description="Infer the paper model via blocked NUTS/FFBS."
     )
     parser.add_argument(
         "--config", default="configs/default.yaml",
@@ -81,26 +82,19 @@ def parse_args() -> argparse.Namespace:
         help="Override num_samples from config.",
     )
     parser.add_argument(
-        "--num-chains", type=int, default=None,
-        help="Override num_chains from config.",
-    )
-    parser.add_argument(
         "--seed", type=int, default=42,
         help="JAX random seed.  Default: 42",
     )
+    parser.add_argument("--gibbs-blocks", type=int, default=None)
+    parser.add_argument("--gibbs-warmup-blocks", type=int, default=None)
+    parser.add_argument("--block-warmup", type=int, default=None)
     parser.add_argument(
         "--train-end", type=int, default=None,
         help="Last time index (exclusive) for training.  Default: full series.",
     )
     parser.add_argument(
-        "--method", choices=["nuts", "vi"], default="nuts",
-        help="Inference method: 'nuts' (MCMC, default) or 'vi' (variational).",
-    )
-    parser.add_argument(
-        "--enhanced-mode", action="store_true",
-        help="Use Claude's enhanced model (Student-t latent innovations, "
-             "Negative-Binomial incident channel) instead of the paper-native "
-             "model. See docs/MODEL_VARIANTS.md.",
+        "--method", choices=["blocked", "vi"], default="blocked",
+        help="Inference method: paper-exact blocked NUTS/FFBS (default), or scalable VI.",
     )
     return parser.parse_args()
 
@@ -136,6 +130,10 @@ def assemble_data(panel: dict, data_dir: str, config: dict) -> dict:
     Lambda_L = _load("Lambda_L.npy", np.eye(S))
     x_s     = _load("x_s.npy",    np.ones(S) * 1e12)
 
+    dates = panel.get("dates", [])
+    mandatory_t = np.array(
+        [str(date) >= "2023-12" for date in dates], dtype=float
+    ) if len(dates) == T else np.zeros(T)
     return {
         "N":        panel["N"].astype(float),        # (K, T)
         "B":        panel.get("B", np.full((K, T), np.nan)).astype(float),  # (K, T); NaN = unobserved
@@ -145,6 +143,7 @@ def assemble_data(panel: dict, data_dir: str, config: dict) -> dict:
         "e_t":      e_t.astype(float),               # (T,)
         "x_s":      x_s.astype(float),               # (S,)
         "Lambda_L": Lambda_L.astype(float),          # (S, S)
+        "mandatory_t": mandatory_t,                  # SEC rule in force from Dec. 2023
     }
 
 
@@ -159,27 +158,24 @@ def main() -> None:
         config = yaml.safe_load(fh)
 
     # MCMC settings live in config["mcmc"]; CLI flags override them.  We write
-    # the resolved values back into config["mcmc"] because run_nuts reads them
-    # from there (it takes only (model, data, config)).
-    # Enhanced mode: CLI flag overrides the config default.
-    if args.enhanced_mode:
-        config.setdefault("enhanced", {})["enabled"] = True
-    mode = "ENHANCED (Student-t + NegBin)" if config.get("enhanced", {}).get("enabled") \
-        else "paper-native"
-    print(f"      Model variant: {mode}")
+    # resolved values back into config because the blocked driver reads them.
+    print("      Model variant: paper-exact")
 
     mcmc_cfg = config.setdefault("mcmc", {})
     if args.num_warmup is not None:
         mcmc_cfg["num_warmup"] = args.num_warmup
     if args.num_samples is not None:
         mcmc_cfg["num_samples"] = args.num_samples
-    if args.num_chains is not None:
-        mcmc_cfg["num_chains"] = args.num_chains
+    if args.gibbs_blocks is not None:
+        mcmc_cfg["gibbs_blocks"] = args.gibbs_blocks
+    if args.gibbs_warmup_blocks is not None:
+        mcmc_cfg["gibbs_warmup_blocks"] = args.gibbs_warmup_blocks
+    if args.block_warmup is not None:
+        mcmc_cfg["block_warmup"] = args.block_warmup
     mcmc_cfg["seed"] = args.seed
 
     num_warmup  = int(mcmc_cfg.get("num_warmup", 1000))
     num_samples = int(mcmc_cfg.get("num_samples", 1000))
-    num_chains  = int(mcmc_cfg.get("num_chains", 4))
 
     os.makedirs(args.output_dir, exist_ok=True)
 
@@ -208,29 +204,16 @@ def main() -> None:
     # --- Run inference ------------------------------------------------------
     t0 = time.time()
 
-    if args.method == "nuts":
-        print(f"[2/3] Running NUTS  (warmup={num_warmup}  samples={num_samples}  "
-              f"chains={num_chains}) ...")
-        idata = nuts_module.run_nuts(full_module.full_model, data, config)
+    if args.method == "blocked":
+        print(f"[2/3] Alternating NUTS and FFBS  (initial warmup={num_warmup}  "
+              f"saved Gibbs draws={num_samples}) ...")
+        idata = run_blocked_nuts_ffbs(data, config)
     else:
         svi_cfg = config.get("svi", {})
         num_steps = int(svi_cfg.get("num_steps", 30000))
         lr = float(svi_cfg.get("learning_rate", 1e-3))
         print(f"[2/3] Running VI  (steps={num_steps}  lr={lr}) ...")
-        guide, params, losses = vi_module.train_vi(
-            full_module.full_model, data, config,
-            num_steps=num_steps, learning_rate=lr, seed=args.seed,
-        )
-        samples = vi_module.vi_predictive_samples(
-            guide, params, full_module.full_model, data,
-            config=config, n_samples=num_samples, seed=args.seed,
-        )
-        # Wrap the VI posterior draws in an InferenceData (add a chain dim) so
-        # downstream scripts consume NUTS and VI output identically.
-        import arviz as az
-        posterior = {k: np.asarray(v)[np.newaxis, ...] for k, v in samples.items()}
-        # arviz >= 1.0: from_dict takes {"group": {...}} rather than kwargs.
-        idata = az.from_dict({"posterior": posterior})
+        idata = run_blocked_vi_ffbs(data, config)
 
     elapsed = time.time() - t0
     print(f"      {args.method.upper()} completed in {elapsed / 60:.1f} min.")

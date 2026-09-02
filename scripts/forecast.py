@@ -211,6 +211,9 @@ def main() -> None:
         "E": panel.get("E", np.zeros_like(N_kt)),
         "M_skt": M_skt, "e_t": e_t,
         "x_s": x_s, "Lambda_L": Lambda_L,
+        "mandatory_t": np.array(
+            [str(date) >= "2023-12" for date in panel.get("dates", [])], dtype=float
+        ) if len(panel.get("dates", [])) == T else np.zeros(T),
     }
 
     # Reconstruct dates
@@ -253,6 +256,7 @@ def main() -> None:
     out = None
     try:
         from cassandra_threatcast.model import full as full_module
+        from cassandra_threatcast.model import paper_exact
         from cassandra_threatcast.model.economic import DamageFunctionParams
 
         # Flatten posterior (chain, draw, ...) -> (sample, ...)
@@ -289,11 +293,24 @@ def main() -> None:
         # figure downstream is in actual dollars.
         x_s_usd = x_s * 1e6
 
-        out = full_module.predict(
-            post, data_dict, args.horizon,
-            Lambda_L, x_s_usd, M_future, damage_params,
-            enhanced=enhanced, student_t_df=student_t_df,
-        )
+        if "Phi_r" in post and "z_t" in post:
+            damage_draws_path = os.path.join("results", "calibration", "damage_posterior.npz")
+            damage_draws = None
+            if os.path.exists(damage_draws_path):
+                with np.load(damage_draws_path) as saved:
+                    damage_draws = {name: saved[name] for name in saved.files}
+            out = paper_exact.predict(
+                post, data_dict, args.horizon, Lambda_L, x_s_usd, M_future,
+                damage_params, damage_draws=damage_draws,
+                exposure_concentration=float(config.get("forecast", {}).get(
+                    "exposure_concentration", 200.0)),
+            )
+        else:
+            out = full_module.predict(
+                post, data_dict, args.horizon,
+                Lambda_L, x_s_usd, M_future, damage_params,
+                enhanced=enhanced, student_t_df=student_t_df,
+            )
         pred_N = out["N_pred"]   # (n_samples, K, horizon) forecast CVE counts
     except Exception as exc:
         warnings.warn(f"full_module.predict failed: {exc}. "
@@ -397,14 +414,20 @@ def main() -> None:
         from cassandra_threatcast.evaluation.sequential import batch_forward_filter
         from cassandra_threatcast.viz.interactive import regime_area
 
-        loglik_all = np.asarray(post["loglik_regime_t"], dtype=float)
         Pi_all = np.asarray(post["Pi"], dtype=float)
-        filtered, _ = batch_forward_filter(loglik_all, Pi_all)      # (n, T, R)
-        R = filtered.shape[-1]
-        hist_probs = filtered.mean(axis=0)                          # (T, R)
+        if "z_t" in post:
+            z_draws = np.asarray(post["z_t"], dtype=int)
+            R = Pi_all.shape[-1]
+            hist_probs = np.stack([(z_draws == r).mean(axis=0) for r in range(R)], axis=1)
+            p = np.eye(R)[z_draws[:, -1]]
+        else:
+            loglik_all = np.asarray(post["loglik_regime_t"], dtype=float)
+            filtered, _ = batch_forward_filter(loglik_all, Pi_all)
+            R = filtered.shape[-1]
+            hist_probs = filtered.mean(axis=0)
+            p = filtered[:, -1]
 
         fwd_probs = []
-        p = filtered[:, -1]
         for _h in range(args.horizon):
             p = np.einsum("nr,nrj->nj", p, Pi_all)
             fwd_probs.append(p.mean(axis=0))
@@ -427,7 +450,7 @@ def main() -> None:
         reg_path = os.path.join(args.output_dir, "regime_probs.csv")
         reg_df.to_csv(reg_path, index=False)
         print(f"      Regime probabilities (early-warning) -> {reg_path}")
-        print(f"        Current filtered regime: "
+        print("        Current filtered regime: "
               + ", ".join(f"{regime_names[r]} {hist_probs[-1, r]:.0%}" for r in range(R)))
 
         fig_dir_reg = os.path.join(args.output_dir, "figures")

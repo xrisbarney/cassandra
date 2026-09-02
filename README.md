@@ -2,6 +2,67 @@
 
 Bayesian hierarchical state-space model of cyber threats and systemic economic risk.
 
+## Standalone paper implementation
+
+The `standalone` branch implements the numbered procedure in
+`ESWA_Journal_Article_Template.pdf` in its stated order. The default inference
+command is the paper's alternating NUTS/FFBS algorithm; it does not use the
+older marginalized-regime approximation. Run the complete sequence with:
+
+```bash
+pip install -e ".[dev]"
+python scripts/run_all.py --start 2010-01 --end 2024-12
+```
+
+A real paper run is computationally expensive because every rolling origin is
+re-estimated. Optional curated loss marks belong at
+`data/cache/incident_losses.csv` with columns `date,sector_idx,loss_usd`.
+
+### Exact paper-step mapping
+
+| Paper step | Implementation | Run |
+|---|---|---|
+| Step 1 | Observation history is assembled in `data/pipeline.py`, `data/incident_losses.py`, and `scripts/ingest_data.py`. | `python scripts/ingest_data.py --start 2010-01 --end 2024-12 --cache-dir data/cache` |
+| Step 2 | CPE-to-sector exposure tensor `M_skt` is built in `features/exposure_map.py`. | `python scripts/build_features.py` |
+| Step 3 | BEA coefficients and `(I-A)^-1` are implemented in `data/bea_io.py`. | `python scripts/build_features.py` |
+| Step 4 | Reference events and loss ranges are in `configs/reference_events.yaml`. | `python scripts/calibrate_damage.py` |
+| Step 5 | Markov transitions and mean-ordered labels are in `model/paper_exact.py`. | `python scripts/train.py --method blocked` |
+| Step 6 | Regime-specific `Phi_z` and `Q_z` factor recursion is in `model/paper_exact.py`. | `python scripts/train.py --method blocked` |
+| Step 7 | `eta_t`, `Gamma`, and `lambda_t=exp(eta_t)` are in `model/paper_exact.py`. | `python scripts/train.py --method blocked` |
+| Step 8 | The lower-dimensional severity recursion is in `model/paper_exact.py`. | `python scripts/train.py --method blocked` |
+| Step 9 | Inverse-gamma variances and hierarchical loading priors are in `model/paper_exact.py`. | `python scripts/train.py --method blocked` |
+| Step 10 | Optional multivariate Hawkes-type excitation is in `model/paper_exact.py`. | Set `hawkes.enabled: true`; run `python scripts/train.py --method blocked` |
+| Step 11 | Latent reporting effort is in `features/effort.py` and `model/paper_exact.py`. | `python scripts/build_features.py`; `python scripts/train.py --method blocked` |
+| Step 12 | `N_kt ~ NegBin(e_t lambda_kt, psi_k)` is in `model/paper_exact.py`. | `python scripts/train.py --method blocked` |
+| Step 13 | The exploitation channel on the logit scale is in `model/paper_exact.py`. | `python scripts/train.py --method blocked` |
+| Step 14 | Time-varying sector reporting propensity and the December-2023 indicator are in `model/paper_exact.py`. | `python scripts/train.py --method blocked` |
+| Step 15 | Multiplicative Poisson incident rate is in `model/paper_exact.py`. | `python scripts/train.py --method blocked` |
+| Step 16 | Independent N, E, and D likelihood sites encode conditional independence in `model/paper_exact.py`. | `python scripts/train.py --method blocked` |
+| Step 17 | Sector shock loads and `phi_s` are in `model/economic.py` and `model/paper_exact.py`. | `python scripts/forecast.py --horizon 12` |
+| Step 18 | Weak-prior Bayesian event calibration and retained posterior draws are in `scripts/calibrate_damage.py`. | `python scripts/calibrate_damage.py` |
+| Step 19 | Direct losses `d_s=g_s*x_s` are formed in `model/paper_exact.py`. | `python scripts/forecast.py --horizon 12` |
+| Step 20 | Leontief and aggregate losses are in `model/economic.py` and `model/paper_exact.py`. | `python scripts/forecast.py --horizon 12` |
+| Step 21 | The joint conditional posterior is `paper_model` in `model/paper_exact.py`. | `python scripts/train.py --method blocked` |
+| Step 22 | NUTS smooth-block sampling is in `inference/blocked.py`. | `python scripts/train.py --method blocked` |
+| Step 23 | Alternating FFBS is in `inference/blocked.py` and `inference/ffbs.py`. | `python scripts/train.py --method blocked` |
+| Step 24 | The scalable variational/FFBS alternative is in `inference/blocked.py` and `inference/vi.py`. | `python scripts/train.py --method vi` |
+| Step 25 | Regime/factor/intensity/severity forward simulation is `paper_exact.predict`. | `python scripts/forecast.py --horizon 12` |
+| Step 26 | Draws pass through uncertain `M_t` and `phi_s` in `paper_exact.predict`. | `python scripts/forecast.py --horizon 12` |
+| Step 27 | Direct and Leontief loss draws are generated in `paper_exact.predict`. | `python scripts/forecast.py --horizon 12` |
+| Step 28 | Joint intensity, exposure, severity, and damage uncertainty is retained by `paper_exact.predict`. | `python scripts/calibrate_damage.py`; `python scripts/forecast.py --horizon 12` |
+| Step 29 | Threat distributions and bands are written by `scripts/forecast.py`. | `python scripts/forecast.py --horizon 12` |
+| Step 30 | Sector indices are written to `results/forecasts/sector_exposure.csv`. | `python scripts/forecast.py --horizon 12` |
+| Step 31 | Loss, VaR95, ES95, and tail probabilities are written by `scripts/forecast.py`. | `python scripts/forecast.py --horizon 12` |
+| Step 32 | Regime probabilities are written to `results/forecasts/regime_probs.csv`. | `python scripts/forecast.py --horizon 12` |
+| Step 33 | Per-origin expanding-window refits are the default in `scripts/evaluate.py`. | `python scripts/evaluate.py` |
+| Step 34 | CRPS and count LogS are written to `results/evaluation/channel_scores.csv`. | `python scripts/evaluate.py` |
+| Step 35 | PIT, KS tests, and interval coverage are in `evaluation/calibration.py`. | `python scripts/evaluate.py` |
+| Step 36 | RF, ARIMA, persistence, ETS, and BSTS-U are in `evaluation/baselines.py`. | `python scripts/evaluate.py` |
+| Step 37 | Observation-channel checks are in `evaluation/posterior_predictive.py`. | `python scripts/evaluate.py` |
+
+The end-to-end command executes the dependency order: ingest, features,
+blocked inference, damage calibration, rolling validation, then forecasting.
+
 Models K=8 threat topics across S=11 BEA economic sectors using latent intensity and severity factor processes with shared Markov regime switching. Four observation channels are treated as biased views of the latent state: CVE counts and severity marks (NVD/CVSS), exploitation probability (EPSS/CISA KEV), and SEC 8-K incident disclosures. Posterior draws are propagated through a BEA input–output Leontief inverse to produce predictive distributions of systemic economic loss.
 
 ## 🔮 Easiest way to use it: the dashboard
@@ -13,26 +74,26 @@ pip install -e ".[dashboard]"    # one-time: installs the dashboard
 streamlit run app.py
 ```
 
-A page opens in your browser with **five buttons**, one per step (Collect data →
-Prepare inputs → Train → Check accuracy → Forecast). Click them top to bottom;
+A page opens in your browser with guided controls for the main pipeline stages.
+The command-line runner is authoritative for the paper-exact six-stage order.
 each shows a green light when finished, a live progress log while running, and
 charts of your data and the final forecast. No commands, no jargon. Everything
 below is the manual/command-line equivalent.
 
 **Run everything, unattended:** the dashboard also has a **🌙 Run the whole
-pipeline now** button that runs all five steps in sequence in the background.
+pipeline now** button that runs the stages in sequence in the background.
 Tick *Start completely fresh* to wipe all caches and re-download from scratch.
 It keeps running even if you close the browser — great for leaving overnight.
 The command-line equivalent is:
 
 ```bash
-python scripts/run_all.py --fresh          # wipe everything and run all 5 steps
+python scripts/run_all.py --fresh          # wipe generated artifacts and run all stages
 python scripts/run_all.py --quick          # keep caches, quick-preview training
 ```
 
-## ⚠️ Model corrections vs. the paper
+## Legacy scalable-model notes
 
-Making the model sample revealed issues in the paper's stated specification that
+The older scalable/VI implementation made changes to the paper specification that
 **require manuscript changes** — the model as written in Section 3 is not
 identified and will not sample (NUTS step size collapses to ~1e-10):
 
@@ -164,32 +225,27 @@ python scripts/build_features.py
 
 ### 3. Train the model
 
-> **"Training" here means Bayesian posterior inference, not machine-learning weight-fitting.** The model defines a posterior `p(parameters, latent states | data) ∝ likelihood × prior` that has no closed form for a state-space model of this complexity (regime switching, factor dynamics, hierarchical priors, non-conjugate likelihoods). `train.py` therefore *approximates* that posterior by drawing samples via MCMC (NUTS, with the discrete regime path marginalized analytically inside the model) — or, optionally, variational inference. This is exactly the inference procedure the model's mathematics prescribes; every downstream output (predictive distributions, loss VaR/ES, regime probabilities, CRPS scores) is a functional of this posterior. Nothing here is trained by gradient descent on a loss.
+> **"Training" means Bayesian posterior inference, not weight fitting.** The default alternates NUTS draws for the smooth blocks with FFBS draws for the complete discrete regime path, exactly as Steps 22–23 prescribe. `--method vi` replaces the smooth NUTS block with variational inference while retaining FFBS, as allowed by Step 24.
 
-Runs plain NUTS — the discrete Markov regime path is marginalized analytically via an HMM forward algorithm inside the model rather than Gibbs-sampled (4 chains × 2000 samples after 1000 warmup) — and saves the posterior to `results/idata.nc`.
+The command saves the posterior to `results/idata.pkl` and, when supported by the installed ArviZ stack, `results/idata.nc`.
 
 ```bash
 python scripts/train.py
 ```
 
-Training takes ~30–90 minutes on CPU depending on dataset length. To use VI instead (faster, less accurate):
+Runtime depends strongly on the panel and Gibbs settings. To use the scalable VI/FFBS alternative:
 
 ```bash
 python scripts/train.py --method vi
 ```
 
-#### Model variant: paper-native vs. enhanced
-
-By default the code runs the model **exactly as specified in the paper**. An opt-in `--enhanced-mode` flag switches on a set of Claude-proposed statistical enhancements (heavy-tailed Student-t latent innovations + a Negative-Binomial incident channel) aimed at better tail-risk calibration:
+### 4. Calibrate economic damage
 
 ```bash
-python scripts/train.py --enhanced-mode          # fit the enhanced model
-python scripts/forecast.py --enhanced-mode ...    # forecast must match how it was fit
+python scripts/calibrate_damage.py
 ```
 
-The two variants share all priors, latent structure, and the economic layer, so they form a clean ablation. See **[docs/MODEL_VARIANTS.md](docs/MODEL_VARIANTS.md)** for the full paper-vs-enhanced comparison table and the rationale for each change.
-
-### 4. Evaluate
+### 5. Evaluate
 
 Rolling-origin expanding-window evaluation against five baselines (RF, ARIMA, ETS, seasonal Naive, BSTS-U). Outputs CRPS/LogS/MAE/RMSE tables and Diebold-Mariano test results.
 
@@ -199,7 +255,7 @@ python scripts/evaluate.py
 
 Results are written to `results/evaluation/scores.csv`, `results/evaluation/dm_test.csv`, `results/evaluation/calibration.csv`, and rendered as an interactive baseline-comparison chart in the dashboard's forecast tab.
 
-### 5. Forecast
+### 6. Forecast
 
 Generates 12-month-ahead predictive draws, quantile CSV, interactive fan charts, the loss distribution with systemic-event probabilities `P(loss > c)`, the ranked sector-exposure table, and the regime-probability early-warning series.
 
@@ -256,7 +312,7 @@ pytest
 pytest --cov=cassandra_threatcast --cov-report=term-missing
 ```
 
-46 tests covering: Leontief correctness (live BEA API smoke test), panel aggregation, CRPS (including the analytical value (√2−1)/√π ≈ 0.2337 for N(0,1) at 0), DM test sign/symmetry, the NumPyro model forward pass, the latent severity process (with NaN-mark masking), and both model variants (paper-native and `--enhanced-mode`). The four BEA live tests are skipped automatically unless `BEA_API_KEY` is set.
+50 tests cover Leontief correctness, panel aggregation, scoring, calibration, the legacy model, and the paper-exact model. Four live BEA tests are skipped unless `BEA_API_KEY` is set.
 
 ## Project structure
 
@@ -283,7 +339,7 @@ paper-cyber-threatmodelling/
 │   ├── data/       # NVD, EPSS, CISA KEV, SEC 8-K, BEA I-O ingestion
 │   ├── features/   # Topic mapper (TF-IDF+NMF; MiniBatchNMF at large K), exposure map, effort estimators
 │   ├── model/      # NumPyro model (factor AR + optional moving-window kernel, Markov regimes, 4 obs channels, Leontief)
-│   ├── inference/  # plain NUTS (regime path marginalized in-model), FFBS terminal-regime recovery, VI
+│   ├── inference/  # paper-exact blocked NUTS/FFBS, scalable VI/FFBS, legacy inference
 │   ├── evaluation/ # CRPS, log score, DM test, PIT calibration, 5 baselines, sequential filter machinery
 │   └── viz/        # interactive plotly charts (fan, loss, regimes, baselines, kernel) + legacy matplotlib
 └── tests/
@@ -300,7 +356,7 @@ All hyperparameters are in `configs/default.yaml`. Key settings:
 | `model.r` | 3 | Number of latent intensity factors |
 | `model.r_sigma` | 2 | Number of latent severity factors |
 | `model.R` | 3 | Number of regimes |
-| `mcmc.num_chains` | 4 | MCMC chains (reduce to 1 for quick tests) |
+| `mcmc.num_chains` | 1 | Blocked MCMC chains (run additional seeds independently) |
 | `mcmc.num_samples` | 2000 | Posterior samples per chain |
 | `evaluation.horizons` | [1,3,6,12] | Forecast horizons in months |
 | `bea.year` | 2022 | BEA I-O table year fetched via API |

@@ -9,14 +9,29 @@ model:
 mcmc:
   num_warmup: 1000
   num_samples: 2000
-  num_chains: 4
+  num_chains: 1              # one blocked chain; run different seeds independently
   target_accept_prob: 0.9
   max_tree_depth: 10
+  gibbs_warmup_blocks: 2       # discarded NUTS/FFBS alternations
+  gibbs_blocks: 20             # retained alternations; draws are split among blocks
+  block_warmup: 100            # NUTS adaptation after the first block
+
+hawkes:
+  enabled: false               # optional paper Step 10 cross-topic excitation
+
+forecast:
+  exposure_concentration: 200  # uncertainty around each M_t sector allocation
 
 evaluation:
   test_years: 3
   val_years: 1
   horizons: [1, 3, 6, 12]   # forecast horizons in months
+  mcmc:                     # smaller per-origin refits for rolling evaluation
+    num_warmup: 300
+    num_samples: 200
+    gibbs_warmup_blocks: 1
+    gibbs_blocks: 5
+    block_warmup: 50
 
 paths:
   cache_dir: "data/cache"

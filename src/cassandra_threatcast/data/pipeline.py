@@ -179,12 +179,22 @@ def build_panel(
         metadata["sec_8k_status"] = f"error: {exc}"
         metadata["sec_8k_filing_count"] = 0
 
+    # Optional loss marks from a curated repository export. The explicit CSV
+    # schema keeps proprietary repositories usable without coupling ingestion
+    # to a particular vendor API.
+    from cassandra_threatcast.data.incident_losses import load_monthly_loss_marks
+    loss_path = Path(cache_dir) / "incident_losses.csv"
+    L_st = load_monthly_loss_marks(loss_path, all_months, S)
+    metadata["incident_loss_file"] = str(loss_path)
+    metadata["incident_loss_marks"] = int(np.isfinite(L_st).sum())
+
     return {
         "N": N_kt,
         "B": B_kt,
         "E": E_kt,
         "KEV": KEV_kt,
         "D": D_st,
+        "L": L_st,
         "dates": dates,
         "metadata": metadata,
     }
@@ -322,7 +332,7 @@ def save_panel(panel: dict, output_dir: str) -> None:
     out = Path(output_dir)
     out.mkdir(parents=True, exist_ok=True)
 
-    array_keys = ["N", "B", "E", "KEV", "D"]
+    array_keys = ["N", "B", "E", "KEV", "D", "L"]
     for key in array_keys:
         if key in panel and isinstance(panel[key], np.ndarray):
             np.save(str(out / f"{key}.npy"), panel[key])
@@ -356,7 +366,7 @@ def load_panel(input_dir: str) -> dict:
         raise FileNotFoundError(f"Panel directory not found: {input_dir}")
 
     panel: dict = {}
-    for key in ["N", "B", "E", "KEV", "D"]:
+    for key in ["N", "B", "E", "KEV", "D", "L"]:
         fpath = src / f"{key}.npy"
         if fpath.exists():
             panel[key] = np.load(str(fpath))

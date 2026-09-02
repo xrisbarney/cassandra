@@ -42,7 +42,6 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
 from cassandra_threatcast.data import pipeline
 from cassandra_threatcast.evaluation.scoring import crps_ensemble, log_score_ensemble, mae, rmse
-from cassandra_threatcast.evaluation.calibration import calibration_report
 from cassandra_threatcast.evaluation.dm_test import dm_table
 from cassandra_threatcast.evaluation.baselines import run_all_baselines
 
@@ -73,6 +72,10 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--max-folds", type=int, default=None,
         help="Cap the number of evaluation folds (for quick testing).",
+    )
+    parser.add_argument(
+        "--reuse-posterior", action="store_true",
+        help="Diagnostic shortcut only; paper Step 33 refits at every origin by default.",
     )
     return parser.parse_args()
 
@@ -117,16 +120,14 @@ def _get_full_model_predictive(
     config: dict,
     train_T: int,
     horizon: int,
-) -> np.ndarray:
+) -> dict:
     """
     Draw posterior predictive samples for observations in [train_T, train_T+horizon).
 
-    Returns (n_samples, K, horizon) array of CVE-count predictive samples.
-    Uses the predict() function from the model module if available;
-    otherwise falls back to extracting posterior_predictive samples that
-    were already generated during training.
+    Returns the complete predictive-draw dictionary for all paper channels.
     """
     from cassandra_threatcast.model import full as full_module
+    from cassandra_threatcast.model import paper_exact
     from cassandra_threatcast.model.economic import DamageFunctionParams
 
     S = int(config["model"]["S"])
@@ -150,14 +151,21 @@ def _get_full_model_predictive(
     enhanced = bool(config.get("enhanced", {}).get("enabled", False))
     student_t_df = float(config.get("enhanced", {}).get("student_t_df", 4.0))
 
-    out = full_module.predict(
-        post, data, horizon,
-        np.asarray(data["Lambda_L"]), np.asarray(data["x_s"]),
-        M_future, damage_params,
-        enhanced=enhanced, student_t_df=student_t_df,
-        start_t=train_T,   # forecast issued at the fold boundary
-    )
-    return out["N_pred"]  # (n_samples, K, horizon)
+    if "Phi_r" in post and "z_t" in post:
+        out = paper_exact.predict(
+            post, data, horizon,
+            np.asarray(data["Lambda_L"]), np.asarray(data["x_s"]) * 1e6,
+            M_future, damage_params, start_t=train_T,
+        )
+    else:
+        out = full_module.predict(
+            post, data, horizon,
+            np.asarray(data["Lambda_L"]), np.asarray(data["x_s"]) * 1e6,
+            M_future, damage_params,
+            enhanced=enhanced, student_t_df=student_t_df,
+            start_t=train_T,
+        )
+    return out
 
 
 def _evaluate_fold(
@@ -197,18 +205,34 @@ def _evaluate_fold(
     print(f"  Fold {fold_idx + 1}: train_T={train_T}  horizon={horizon}", flush=True)
 
     # --- Full model predictive ------------------------------------------
-    if idata is not None:
-        try:
+    try:
             data_dict = {
                 "N": N_kt, "D": D_st,
                 "B": panel.get("B", np.zeros_like(N_kt)),
                 "E": panel.get("E", np.zeros_like(N_kt)),
                 "M_skt": M_skt, "e_t": e_t,
                 "x_s": x_s, "Lambda_L": Lambda_L,
+                "mandatory_t": np.array(
+                    [str(date) >= "2023-12" for date in panel.get("dates", [])], dtype=float
+                ) if len(panel.get("dates", [])) == T else np.zeros(T),
             }
-            full_pred = _get_full_model_predictive(
-                idata, data_dict, config, train_T, horizon
-            )   # (n_samples, K, horizon)
+            fold_idata = idata
+            if fold_idata is None:
+                from copy import deepcopy
+                from cassandra_threatcast.inference.blocked import run_blocked_nuts_ffbs
+                fold_cfg = deepcopy(config)
+                eval_mcmc = fold_cfg.get("evaluation", {}).get("mcmc", {})
+                fold_cfg["mcmc"] = {**fold_cfg.get("mcmc", {}), **eval_mcmc}
+                fit_data = {
+                    key: (value[..., :train_T] if isinstance(value, np.ndarray)
+                          and value.ndim > 0 and value.shape[-1] == T else value)
+                    for key, value in data_dict.items()
+                }
+                fold_idata = run_blocked_nuts_ffbs(fit_data, fold_cfg)
+            full_out = _get_full_model_predictive(
+                fold_idata, data_dict, config, train_T, horizon
+            )
+            full_pred = full_out["N_pred"]
 
             scores_full = _scores_from_predictive(obs_test_N, full_pred, fold_horizons)
             scores_full["model"] = "FullModel"
@@ -221,8 +245,8 @@ def _evaluate_fold(
             )
             fold_dm_crps.setdefault("FullModel", []).extend(flat_crps.tolist())
 
-        except Exception as exc:
-            warnings.warn(f"  Full model evaluation failed at fold {fold_idx}: {exc}")
+    except Exception as exc:
+        warnings.warn(f"  Full model evaluation failed at fold {fold_idx}: {exc}")
 
     # --- Baselines -------------------------------------------------------
     train_panel_N = N_kt[:, :train_T]
@@ -279,7 +303,6 @@ def main() -> None:
     eval_cfg   = config.get("evaluation", {})
     horizons   = eval_cfg.get("horizons", [1, 3, 6, 12])
     test_years = eval_cfg.get("test_years", 2)
-    val_years  = eval_cfg.get("val_years",  1)
 
     # --- Load data ----------------------------------------------------------
     print("[1/4] Loading panel ...")
@@ -330,14 +353,17 @@ def main() -> None:
     print(f"[3/4] Running {len(fold_starts)} evaluation folds ...")
     print(f"      Horizons: {horizons}  T={T}  test_T={test_T}")
 
-    n_workers = min(len(fold_starts), os.cpu_count() or 1)
+    # Independent refits are memory-heavy JAX jobs; run sequentially unless a
+    # single pre-fitted diagnostic posterior was explicitly requested.
+    n_workers = min(len(fold_starts), os.cpu_count() or 1) if args.reuse_posterior else 1
     print(f"      Using {n_workers} worker process(es) (folds are independent)")
 
     all_scores: list[pd.DataFrame] = []
     dm_crps_series: dict[str, list[float]] = {}  # model -> flat CRPS list
 
     fold_args = [
-        (fold_idx, train_T, horizons, N_kt, D_st, panel, M_skt, e_t, Lambda_L, x_s, idata, config)
+        (fold_idx, train_T, horizons, N_kt, D_st, panel, M_skt, e_t, Lambda_L, x_s,
+         idata if args.reuse_posterior else None, config)
         for fold_idx, train_T in enumerate(fold_starts)
     ]
 
@@ -399,7 +425,7 @@ def main() -> None:
     print("\nCalibration report (last fold) ...")
     try:
         from cassandra_threatcast.evaluation.calibration import calibration_report as cal_report
-        if idata is not None:
+        if idata is not None or not args.reuse_posterior:
             train_T_last = fold_starts[-1] if fold_starts else T - 12
             horizon_last = min(12, T - train_T_last)
             data_dict = {
@@ -408,17 +434,77 @@ def main() -> None:
                 "E": panel.get("E", np.zeros_like(N_kt)),
                 "M_skt": M_skt, "e_t": e_t,
                 "x_s": x_s, "Lambda_L": Lambda_L,
+                "mandatory_t": np.array(
+                    [str(date) >= "2023-12" for date in panel.get("dates", [])], dtype=float
+                ) if len(panel.get("dates", [])) == T else np.zeros(T),
             }
-            full_pred = _get_full_model_predictive(
-                idata, data_dict, config, train_T_last, horizon_last
+            calibration_idata = idata
+            if not args.reuse_posterior:
+                from copy import deepcopy
+                from cassandra_threatcast.inference.blocked import run_blocked_nuts_ffbs
+                calibration_cfg = deepcopy(config)
+                eval_mcmc = calibration_cfg.get("evaluation", {}).get("mcmc", {})
+                calibration_cfg["mcmc"] = {
+                    **calibration_cfg.get("mcmc", {}), **eval_mcmc,
+                }
+                calibration_data = {
+                    key: (value[..., :train_T_last] if isinstance(value, np.ndarray)
+                          and value.ndim > 0 and value.shape[-1] == T else value)
+                    for key, value in data_dict.items()
+                }
+                calibration_idata = run_blocked_nuts_ffbs(
+                    calibration_data, calibration_cfg
+                )
+            full_out = _get_full_model_predictive(
+                calibration_idata, data_dict, config, train_T_last, horizon_last
             )
-            obs_dict  = {"N": N_kt[:, train_T_last : train_T_last + horizon_last]}
-            pred_dict = {"N": full_pred}
+            sl = slice(train_T_last, train_T_last + horizon_last)
+            obs_dict = {
+                "N": N_kt[:, sl],
+                "E": panel.get("E", np.full_like(N_kt, np.nan))[:, sl],
+                "B": panel.get("B", np.full_like(N_kt, np.nan))[:, sl],
+                "D": D_st[:, sl],
+            }
+            pred_dict = {key: full_out[f"{key}_pred"] for key in obs_dict}
+            if "L" in panel:
+                obs_dict["L"] = panel["L"][:, sl]
+                pred_dict["L"] = full_out["ell_pred"]
             cal_df = cal_report(obs_dict, pred_dict, alpha_levels=[0.1, 0.5])
             cal_path = os.path.join(args.output_dir, "calibration.csv")
             cal_df.to_csv(cal_path, index=False)
             print(f"      Calibration report saved to {cal_path}")
             print(cal_df.to_string(index=False))
+
+            # Step 34: CRPS for every real-valued target; logarithmic score
+            # only for the count channels N and D.
+            channel_rows = []
+            for channel, observed in obs_dict.items():
+                samples = np.moveaxis(pred_dict[channel], 0, -1)
+                observed_flat = observed.ravel()
+                samples_flat = samples.reshape(-1, samples.shape[-1])
+                valid = np.isfinite(observed_flat) & np.all(np.isfinite(samples_flat), axis=1)
+                if not valid.any():
+                    continue
+                channel_rows.append({
+                    "channel": channel,
+                    "metric": "CRPS",
+                    "value": float(np.mean(crps_ensemble(observed_flat[valid], samples_flat[valid]))),
+                })
+                if channel in {"N", "D"}:
+                    channel_rows.append({
+                        "channel": channel,
+                        "metric": "LogS",
+                        "value": float(np.mean(log_score_ensemble(observed_flat[valid], samples_flat[valid]))),
+                    })
+            channel_path = os.path.join(args.output_dir, "channel_scores.csv")
+            pd.DataFrame(channel_rows).to_csv(channel_path, index=False)
+            print(f"      All-channel scores saved to {channel_path}")
+            from cassandra_threatcast.evaluation.posterior_predictive import (
+                posterior_predictive_checks,
+            )
+            ppc_path = os.path.join(args.output_dir, "posterior_predictive_checks.csv")
+            posterior_predictive_checks(obs_dict, pred_dict).to_csv(ppc_path, index=False)
+            print(f"      Observation-channel checks saved to {ppc_path}")
     except Exception as exc:
         warnings.warn(f"Calibration report failed: {exc}")
 
