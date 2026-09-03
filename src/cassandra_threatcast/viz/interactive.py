@@ -1,19 +1,4 @@
-"""
-interactive.py
-==============
-Interactive (plotly) chart builders shared by the CLI scripts and the
-Streamlit dashboard.  Every figure uses one design system:
-
-  blue #2a78d6 = model output (predictions, bands, data series)
-  ink  #0b0b0b = observed/actual values
-  hairline grid, unified hover, px-sized system-ui typography
-
-Figures are written two ways by ``save_interactive``:
-  <name>.html  — standalone, opens in any browser (plotly.min.js written
-                 once per directory via include_plotlyjs='directory')
-  <name>.json  — consumed by the dashboard with plotly.io.from_json +
-                 st.plotly_chart, so charts stay interactive inline.
-"""
+"Interactive (plotly) chart builders shared by the CLI scripts and the"
 from __future__ import annotations
 
 import os
@@ -67,7 +52,7 @@ def fan_chart(
     topic_label: str = "",
     y_title: str = "CVEs per month",
 ) -> go.Figure:
-    """History line + forecast median with 50%/90% credible bands."""
+    "History line + forecast median with 50%/90% credible bands."
     obs_x = [p.to_timestamp() if hasattr(p, "to_timestamp") else pd.Timestamp(p)
              for p in obs_dates]
     pred_x = [p.to_timestamp() if hasattr(p, "to_timestamp") else pd.Timestamp(p)
@@ -125,7 +110,7 @@ def loss_distribution(
     units: str = "$ billions",
     title: str = "Predictive distribution of aggregate economic loss",
 ) -> go.Figure:
-    """Histogram of the predictive loss distribution with VaR/ES markers."""
+    "Histogram of the predictive loss distribution with VaR/ES markers."
     samples = np.asarray(samples, dtype=float)
     var95 = float(np.quantile(samples, 0.95))
     es95 = float(samples[samples >= var95].mean()) if np.any(samples >= var95) else var95
@@ -152,7 +137,7 @@ def loss_distribution(
 
 def activity_line(total: np.ndarray, dates: list,
                   y_title: str = "New vulnerabilities") -> go.Figure:
-    """Monthly total activity as a line with a light area wash."""
+    "Monthly total activity as a line with a light area wash."
     x = [pd.Timestamp(d) for d in dates]
     fig = go.Figure()
     fig.add_trace(go.Scatter(
@@ -167,7 +152,7 @@ def activity_line(total: np.ndarray, dates: list,
 
 
 def topic_heatmap(N: np.ndarray, topic_labels: list, dates: list) -> go.Figure:
-    """Topics x months heatmap on a single-hue sequential ramp."""
+    "Topics x months heatmap on a single-hue sequential ramp."
     x = [pd.Timestamp(d) for d in dates]
     labels = [f"{lbl} — topic {k:02d}" for k, lbl in enumerate(topic_labels)]
     fig = go.Figure(go.Heatmap(
@@ -184,7 +169,7 @@ def topic_heatmap(N: np.ndarray, topic_labels: list, dates: list) -> go.Figure:
 
 def sector_bar(values: np.ndarray, sector_names: list,
                y_title: str = "Incidents") -> go.Figure:
-    """Totals by sector as a thin-bar chart."""
+    "Totals by sector as a thin-bar chart."
     fig = go.Figure(go.Bar(
         x=list(sector_names), y=np.asarray(values, dtype=float),
         marker=dict(color=BLUE, cornerradius=4), width=0.55,
@@ -203,7 +188,7 @@ def regime_area(
     forecast_start: int | None = None,   # index where pure forecast begins
     title: str = "Regime probabilities — the model's early-warning signal",
 ) -> go.Figure:
-    """Stacked-area chart of filtered/forecast regime probabilities."""
+    "Stacked-area chart of filtered/forecast regime probabilities."
     x = [p.to_timestamp() if hasattr(p, "to_timestamp") else pd.Timestamp(p)
          for p in dates]
     # Categorical slots 1/3/6 from the reference palette: calm blue,
@@ -232,7 +217,7 @@ def regime_area(
 
 # Fixed categorical order for model identity — color follows the model,
 MODEL_COLORS = {
-    "FullModel": "#2a78d6",   # blue      (the proposed model)
+    "FullModel": "#2a78d6",   # blue (the proposed model)
     "BSTS-U":    "#1baf7a",   # aqua
     "RF":        "#eda100",   # yellow
     "ARIMA":     "#008300",   # green
@@ -242,12 +227,7 @@ MODEL_COLORS = {
 
 
 def baseline_lines(scores_df: pd.DataFrame, metric: str = "CRPS") -> go.Figure:
-    """
-    Model-vs-baselines comparison: one line per model across forecast
-    horizons for the chosen metric (lower is better for all four).
-    Expects the tidy results/evaluation/scores.csv (model, horizon, metric,
-    value; already aggregated over folds by evaluate.py).
-    """
+    "Model-vs-baselines comparison: one line per model across forecast"
     df = scores_df[scores_df["metric"] == metric]
     # evaluate.py saves fold-aggregated scores as value_mean/value_std;
     value_col = "value_mean" if "value_mean" in df.columns else "value"
@@ -274,11 +254,7 @@ def baseline_lines(scores_df: pd.DataFrame, metric: str = "CRPS") -> go.Figure:
 
 
 def incident_sector_chart(sector_df: pd.DataFrame, sector_name: str) -> go.Figure:
-    """
-    Incident channel, predicted vs actual for one sector, from the
-    backtest's incident_comparison.csv rows (date, actual_incidents,
-    predicted_q05/q50/q95_incidents).
-    """
+    "Incident channel, predicted vs actual for one sector, from the"
     d = sector_df.sort_values("date")
     x = [pd.Period(v, freq="M").to_timestamp() for v in d["date"]]
 
@@ -306,7 +282,7 @@ def incident_sector_chart(sector_df: pd.DataFrame, sector_name: str) -> go.Figur
 def kernel_covariance_curve(lags: np.ndarray, cov_mean: np.ndarray,
                             cov_lo: np.ndarray, cov_hi: np.ndarray,
                             halfwidth_mean: float) -> go.Figure:
-    """Learned temporal covariance Cov(g_t, g_{t+d}) vs lag d, with 90% band."""
+    "Learned temporal covariance Cov(g_t, g_{t+d}) vs lag d, with 90% band."
     fig = go.Figure()
     fig.add_trace(go.Scatter(x=lags, y=cov_hi, mode="lines", line=dict(width=0),
                              hoverinfo="skip", showlegend=False))
@@ -329,7 +305,7 @@ def kernel_covariance_curve(lags: np.ndarray, cov_mean: np.ndarray,
 
 def kernel_loadings_bar(topic_labels: list, a_mean: np.ndarray,
                         a_sd: np.ndarray) -> go.Figure:
-    """Per-topic kernel loadings a_k with +/-1 sd error bars."""
+    "Per-topic kernel loadings a_k with +/-1 sd error bars."
     labels = [f"{lbl} — {k:02d}" for k, lbl in enumerate(topic_labels)]
     fig = go.Figure(go.Bar(
         x=labels, y=a_mean, width=0.55,
@@ -345,7 +321,7 @@ def kernel_loadings_bar(topic_labels: list, a_mean: np.ndarray,
 
 
 def save_interactive(fig: go.Figure, path_base: str) -> None:
-    """Write <path_base>.html (standalone) and <path_base>.json (dashboard)."""
+    "Write <path_base>.html (standalone) and <path_base>.json (dashboard)."
     os.makedirs(os.path.dirname(path_base), exist_ok=True)
     fig.write_html(path_base + ".html", include_plotlyjs="directory", full_html=True)
     fig.write_json(path_base + ".json")

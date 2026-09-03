@@ -1,29 +1,4 @@
-"""
-full.py
-=======
-Combined NumPyro model: latent dynamics + all four measurement likelihoods,
-plus predictive utilities.
-
-Inference approach (see docs/PAPER_NOTES.md for the full history):
-the discrete regime path z_t is marginalized analytically via the standard
-HMM forward algorithm (explicit log-sum-exp over the R regime hypotheses at
-each time step, injected with numpyro.factor), rather than sampled via
-DiscreteHMCGibbs. This lets plain NUTS handle the entire continuous parameter
-space -- no interleaved discrete Gibbs kernel, no funsor/config_enumerate
-(which cannot correctly handle a regime that also drives the continuous
-factor's transition matrix -- a switching linear dynamical system that
-automatic enumeration is not designed for). DiscreteHMCGibbs was observed to
-collapse NUTS's warmup step-size adaptation to numerical underflow on the
-real data with high frequency; this manual marginalization has not shown
-that failure mode in testing.
-
-Consequence for the model: the factor/severity AR transition dynamics
-(Phi, Q_f, A_h, Q_h) are regime-CONSTANT -- only the emission means
-(mu_r[z_t], nu_r[z_t]) switch by regime. This is a "Markov-switching mean"
-model rather than a full "Markov-switching VAR"; it is a further deviation
-from the paper's Eq. (3)/(4) (documented in docs/PAPER_NOTES.md) made to
-keep exact regime marginalization tractable.
-"""
+"Combined NumPyro model: latent dynamics + all four measurement likelihoods,"
 from __future__ import annotations
 
 from contextlib import ExitStack
@@ -50,17 +25,12 @@ _SOFT_CLIP_BOUND = 30.0   # saturation bound for log-intensity/log-severity
 
 
 def _soft_clip(x: jnp.ndarray, bound: float = _SOFT_CLIP_BOUND) -> jnp.ndarray:
-    """Smoothly saturate x into (-bound, bound), preserving a nonzero
-    gradient everywhere (a hard jnp.clip has a zero-gradient plateau beyond
-    its bounds, a known source of HMC leapfrog instability)."""
+    "Smoothly saturate x into (-bound, bound), preserving a nonzero"
     return bound * jnp.tanh(x / bound)
 
 
 def _plated_sample(name: str, base_dist: dist.Distribution, shape: tuple) -> jnp.ndarray:
-    """Sample `name` ~ base_dist (a scalar/atomic distribution), broadcast to
-    `shape` via nested numpyro.plates, one per axis. Explicit plates are not
-    needed for the (removed) funsor enumeration path, but are kept here for
-    shape-safety and to keep every prior a clean, independent draw."""
+    "Sample `name` ~ base_dist (a scalar/atomic distribution), broadcast to"
     with ExitStack() as stack:
         ndim = len(shape)
         for i, size in enumerate(shape):
@@ -69,23 +39,13 @@ def _plated_sample(name: str, base_dist: dist.Distribution, shape: tuple) -> jnp
 
 
 def _floored_scale(name: str, base_scale: float, shape: tuple) -> jnp.ndarray:
-    """Sample a HalfNormal(base_scale) scale, floored away from exact zero.
-
-    An unfloored HalfNormal scale can wander arbitrarily close to 0, making
-    the corresponding state-transition conditionally near-deterministic
-    (infinite curvature in that direction), which collapses HMC's step-size
-    adaptation. This floor keeps the scale strictly positive.
-    """
+    "Sample a HalfNormal(base_scale) scale, floored away from exact zero."
     raw = _plated_sample(f"{name}_raw", dist.HalfNormal(base_scale), shape)
     return deterministic(name, _SCALE_FLOOR + raw)
 
 
 def _positive_lower_triangular(raw: jnp.ndarray, d: int) -> jnp.ndarray:
-    """Impose the standard factor-model identification constraint on a (K, d)
-    loading matrix: the top d x d block is lower-triangular with a positive
-    diagonal (rows below are free). Removes the rotation/scale/sign
-    indeterminacy between the loadings and the latent factors that otherwise
-    leaves the posterior non-identified (flat ridges -> terrible HMC mixing)."""
+    "Impose the standard factor-model identification constraint on a (K, d)"
     lower = jnp.tril(jnp.ones((d, d)))
     top = raw[:d] * lower
     top = top.at[jnp.diag_indices(d)].set(jax.nn.softplus(jnp.diagonal(raw[:d])))
@@ -95,28 +55,7 @@ def _positive_lower_triangular(raw: jnp.ndarray, d: int) -> jnp.ndarray:
 # Full combined model
 
 def full_model(data: dict, config: dict) -> None:
-    """
-    Combined NumPyro model: latent dynamics + all four measurement likelihoods.
-    The discrete regime z_t is marginalized via the HMM forward algorithm
-    (see module docstring); plain NUTS samples everything else.
-
-    data keys
-    ---------
-    N      : (K, T) observed CVE counts, or None
-    B      : (K, T) observed mean-CVSS severity marks (NaN = unobserved), or None
-    E      : (K, T) observed mean EPSS in [0,1] (NaN = unobserved), or None
-    D      : (S, T) observed 8-K incident counts, or None
-    M_skt  : (S, K, T) exposure map
-    e_t    : (T,) effort covariate
-    x_s    : (S,) gross output by sector [unused here; consumed by predict()]
-    Lambda_L : (S, S) Leontief inverse [unused here; consumed by predict()]
-
-    config keys (nested under "model")
-    -----------------------------------
-    K, S, r, R, r_sigma
-    config["enhanced"]: {enabled, student_t_df} -- heavier-tailed innovations
-    and an overdispersed (NegBin) incident channel when enabled.
-    """
+    "Combined NumPyro model: latent dynamics + all four measurement likelihoods."
     model_cfg = config.get("model", config)
     K: int = int(model_cfg["K"])
     S: int = int(model_cfg["S"])
@@ -128,7 +67,7 @@ def full_model(data: dict, config: dict) -> None:
     enhanced: bool = bool(enh_cfg.get("enabled", False))
     student_t_df: float = float(enh_cfg.get("student_t_df", 4.0))
 
-    # Ablation flags (paper Table 4; driven by scripts/ablation.py).  Each
+    # Ablation flags (paper Table 4; driven by scripts/ablation.py). Each
     abl_cfg = config.get("ablation", {}) or {}
     _abl_no_factors: bool = bool(abl_cfg.get("no_factors", False))
     _abl_w_E: float = 0.0 if abl_cfg.get("drop_E", False) else 1.0
@@ -141,10 +80,7 @@ def full_model(data: dict, config: dict) -> None:
     _krn_D: int = int(krn_cfg.get("max_halfwidth", 60))   # window support, months
 
     def _innovation(name: str, shape: tuple) -> jnp.ndarray:
-        """Standardized latent innovation: Student-t in enhanced mode, else
-        standard Normal. Always drawn as one (T, *shape) block up front (not
-        per-scan-step) so there is no per-step numpyro.sample call left for
-        an eliminated discrete regime to interact with."""
+        "Standardized latent innovation: Student-t in enhanced mode, else"
         base = dist.StudentT(student_t_df, 0.0, 1.0) if enhanced else dist.Normal(0.0, 1.0)
         return _plated_sample(name, base, shape)
 
@@ -154,7 +90,7 @@ def full_model(data: dict, config: dict) -> None:
         e_t = jnp.zeros_like(e_t)
     M_skt = jnp.asarray(data["M_skt"])      # (S, K, T)
 
-    # 1. Latent dynamics priors: Real CVE-topic counts span several orders of magnitude across topics
+    # Define latent-dynamics priors.
     mu_r = _plated_sample("mu_r", dist.Normal(0.0, 5.0 * _pw), (R, K))  # (R, K)
 
     Gamma_raw = _plated_sample("Gamma_raw", dist.Normal(0.0, 1.0 * _pw), (K, r))
@@ -164,7 +100,7 @@ def full_model(data: dict, config: dict) -> None:
         Gamma_ltri = jnp.zeros_like(Gamma_ltri)
     Gamma = deterministic("Gamma", Gamma_ltri)  # (K, r)
 
-    # Factor AR dynamics are regime-CONSTANT (see module docstring): only the
+    # Keep factor AR dynamics constant across regimes.
     Phi_raw = _plated_sample("Phi_raw", dist.Normal(0.0, 0.3), (r, r))
     tril_mask = jnp.tril(jnp.ones((r, r)))
     # tanh bounds every entry (hence the diagonal = eigenvalues of a
@@ -192,7 +128,7 @@ def full_model(data: dict, config: dict) -> None:
     varsigma_k = _floored_scale("varsigma_k", 1.0, (K,))              # EPSS obs noise
     rho_s = _plated_sample("rho_s", dist.HalfNormal(1.0), (S,))       # sector scaling
 
-    # Sector-specific baseline disclosure rate. One parameter per sector (S),
+    # Set one disclosure baseline per sector.
     pi_s = _plated_sample("pi_s", dist.HalfNormal(0.5), (S,))  # (S,)
 
     phi_D = None
@@ -332,7 +268,7 @@ def full_model(data: dict, config: dict) -> None:
          eps_f_all, eps_eta_all, xi_h_all, eps_v_all, g_seq),
         length=T,
     )
-    # f_seq: (T,r), h_seq: (T,r_sig), eta_seq/zeta_seq: (T,K), loglik_seq: (T,R)
+    # Unpack the scanned time-series arrays.
 
     deterministic("f_t", f_seq)
     deterministic("h_t", h_seq)
@@ -352,12 +288,7 @@ def recover_terminal_regime(
     Pi: np.ndarray,                # (R, R) transition matrix for the same draw
     rng: np.random.Generator,
 ) -> int:
-    """Sample z_T from its EXACT filtered posterior given one posterior draw's
-    per-timestep regime log-likelihoods, via the Hamilton forward filter
-    (ffbs.forward_filter). Only the terminal regime is needed (to seed
-    forecasting); the full backward-sampled path is available via
-    ffbs.backward_sample if ever needed for diagnostics.
-    """
+    "Sample z_T from its EXACT filtered posterior given one posterior draw's"
     T, R = loglik_regime_t.shape
     pi0 = np.ones(R) / R
     filtered_probs, _ = forward_filter(loglik_regime_t, Pi, pi0)
@@ -380,41 +311,7 @@ def predict(
     student_t_df: float = 4.0,
     start_t: int | None = None,  # forecast from this time index (default: series end)
 ) -> dict:
-    """
-    Generate h-step-ahead predictive draws.
-
-    For each posterior sample:
-      1. Recover the terminal regime z_T from its exact filtered posterior
-         (via the Hamilton forward filter on the per-draw regime log-likelihoods).
-      2. Extend factor/severity dynamics h steps forward (regime-constant AR,
-         but the regime-dependent EMISSION mean still switches via a sampled
-         forward regime path).
-      3. Sample future N, E, D from measurement models.
-      4. Compute g_s via damage_function.
-      5. Compute ell via leontief_propagation.
-
-    Set ``enhanced=True`` (matching how the model was fit) to draw latent
-    innovations from Student-t and incident counts from Negative Binomial.
-
-    Covariates (see docs/PAPER_NOTES.md §7): the reporting-effort offset
-    ``e_t`` -- which the fitted N-channel likelihood includes as
-    ``log mu = eta + e_t`` -- is carried into the forecast at its last
-    pre-forecast value (hold-last), taken from ``data["e_t"]``.  Omitting it
-    (the previous behaviour) implicitly reset effort to its historical mean
-    and under-predicted counts by exp(e_last) -- ~3.7x at end-2024 effort
-    levels (PAPER_NOTES §5).  The incident rate likewise now includes the
-    additive baseline disclosure rate ``pi_s`` present in the fitted
-    D-channel likelihood.
-
-    Returns
-    -------
-    dict with keys:
-        lambda_pred : (n_samples, K, horizon)
-        N_pred      : (n_samples, K, horizon)
-        D_pred      : (n_samples, S, horizon)
-        ell_pred    : (n_samples, S, horizon)
-        ell_agg     : (n_samples, horizon)
-    """
+    "Generate h-step-ahead predictive draws."
     rng = np.random.default_rng(seed=42)
 
     # Hold-last reporting-effort offset for the forecast window.
@@ -452,7 +349,7 @@ def predict(
         mu_r_i = posterior_samples["mu_r"][i]        # (R, K)
         Gamma_i = posterior_samples["Gamma"][i]       # (K, r)
         Phi_i = np.array(posterior_samples["Phi"][i])         # (r, r) regime-constant
-        Q_f_i = np.array(posterior_samples["Q_f"][i])         # (r,)   regime-constant
+        Q_f_i = np.array(posterior_samples["Q_f"][i])         # (r,) regime-constant
         Pi_i = posterior_samples["Pi"][i]             # (R, R)
         tau_k_i = posterior_samples["tau_k"][i]       # (K,)
         psi_k_i = posterior_samples["psi_k"][i]       # (K,)

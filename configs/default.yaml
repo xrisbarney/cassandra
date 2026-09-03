@@ -57,12 +57,12 @@ damage:
   scale_prior_alpha: 1.0
   scale_prior_beta: 2.0
 
-# Enhanced mode: Claude-proposed statistical enhancements beyond the paper's
+# Legacy enhanced-mode settings.
 enhanced:
   enabled: false
   student_t_df: 4.0   # degrees of freedom for heavy-tailed latent innovations
 
-# Learned temporal kernel: a moving-window ("square") covariance component
+# Optional moving-window kernel settings.
 kernel:
   enabled: false
   halfwidth_prior_months: 24   # prior centre: a ~4-year square window

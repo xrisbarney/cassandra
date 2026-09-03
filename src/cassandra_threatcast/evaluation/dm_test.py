@@ -1,4 +1,4 @@
-"""Diebold-Mariano test with Harvey et al. small-sample correction."""
+"Diebold-Mariano test with Harvey et al. small-sample correction."
 import numpy as np
 import pandas as pd
 from scipy import stats
@@ -9,30 +9,7 @@ def dm_test(
     loss_b: np.ndarray,  # (T,) loss series for model B
     h: int = 1,          # forecast horizon
 ) -> tuple[float, float]:
-    """
-    Diebold-Mariano test (1995) with Harvey, Leybourne & Newbold (1997)
-    small-sample correction.
-
-    H0: E[loss_a] = E[loss_b]
-    H1: E[loss_a] != E[loss_b]  (two-sided)
-
-    The variance of the loss differential is estimated via a Newey-West
-    long-run variance with (h - 1) autocovariance lags, matching the
-    autocorrelation structure introduced by h-step-ahead forecasts.
-
-    The Harvey et al. correction multiplies the DM statistic by
-        sqrt((T + 1 - 2h + h*(h-1)/T) / T)
-    and compares to a t(T-1) distribution instead of N(0,1).
-
-    Parameters
-    ----------
-    loss_a, loss_b : (T,) arrays of per-period loss values
-    h              : forecast horizon (determines number of NW lags = h - 1)
-
-    Returns
-    -------
-    (dm_stat_corrected, p_value) : two-sided test
-    """
+    "Diebold-Mariano test (1995) with Harvey, Leybourne & Newbold (1997)"
     loss_a = np.asarray(loss_a, dtype=float)
     loss_b = np.asarray(loss_b, dtype=float)
     T = len(loss_a)
@@ -77,12 +54,7 @@ def dm_table(
     reference_model: str,   # key in scores_dict
     h: int = 1,
 ) -> pd.DataFrame:
-    """
-    Run DM tests of all models against a reference model.
-
-    Returns DataFrame indexed by model with columns:
-        dm_stat, p_value, significant_5pct, note.
-    """
+    "Run DM tests of all models against a reference model."
     if reference_model not in scores_dict:
         raise KeyError(f"reference_model '{reference_model}' not found in scores_dict")
 
@@ -104,7 +76,7 @@ def dm_table(
         stat, pval = dm_test(losses, ref_losses, h=h)
 
         if pval < 0.05:
-            # stat < 0 means model A (this model) has lower losses than B (reference)
+    # A negative statistic favors model A.
             note = "better" if stat < 0 else "worse"
         else:
             note = "n.s."

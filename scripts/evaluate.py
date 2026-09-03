@@ -30,7 +30,7 @@ import yaml
 import numpy as np
 import pandas as pd
 
-# Force UTF-8 stdout/stderr: Windows' default console codepage cannot encode
+# Force UTF-8 stdout/stderr: Windows' default console codepage cannot...
 if sys.platform == "win32":
     import io
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace", line_buffering=True)
@@ -82,7 +82,7 @@ def _scores_from_predictive(
     pred_samples: np.ndarray, # (n_samples, ..., T_test)
     horizons: list[int],
 ) -> pd.DataFrame:
-    """Compute per-horizon CRPS/LogS/MAE/RMSE from posterior predictive samples."""
+    "Compute per-horizon CRPS/LogS/MAE/RMSE from posterior predictive samples."
     records = []
     for h in horizons:
         h = min(h, obs.shape[-1])
@@ -104,7 +104,7 @@ def _crps_series(
     obs: np.ndarray,          # (N,)
     pred_samples: np.ndarray, # (n_samples, N)
 ) -> np.ndarray:
-    """Return per-observation CRPS values (for DM test loss series)."""
+    "Return per-observation CRPS values (for DM test loss series)."
     return crps_ensemble(obs, pred_samples.T)   # (N,)
 
 
@@ -115,11 +115,7 @@ def _get_full_model_predictive(
     train_T: int,
     horizon: int,
 ) -> dict:
-    """
-    Draw posterior predictive samples for observations in [train_T, train_T+horizon).
-
-    Returns the complete predictive-draw dictionary for all paper channels.
-    """
+    "Draw posterior predictive samples for observations in [train_T, train_T+horizon)."
     from cassandra_threatcast.model import full as full_module
     from cassandra_threatcast.model import paper_exact
     from cassandra_threatcast.model.economic import DamageFunctionParams
@@ -176,15 +172,7 @@ def _evaluate_fold(
     idata,
     config: dict,
 ) -> tuple[list[pd.DataFrame], dict[str, list[float]]]:
-    """Evaluate one rolling-origin fold (full model + all baselines).
-
-    Every fold trains/predicts on its own [0, train_T) / [train_T,
-    train_T+horizon) split and seeds its baseline-noise RNG with its own
-    fold_idx, so folds share no mutable state -- safe to run in any order or
-    in parallel processes with bit-identical results to the sequential loop.
-    Kept as a module-level function (not a closure) so it can be pickled and
-    sent to worker processes by ProcessPoolExecutor.
-    """
+    "Evaluate one rolling-origin fold (full model + all baselines)."
     T, K = N_kt.shape[1], N_kt.shape[0]
     avail_h = T - train_T
     fold_horizons = [h for h in horizons if h <= avail_h]
@@ -250,7 +238,7 @@ def _evaluate_fold(
             horizons=fold_horizons,
             quantiles=[0.1, 0.5, 0.9],
             test_T=horizon,
-            seed=fold_idx * 100,  # *100 margin so each baseline's internal +1/+2 offset can't collide across folds
+            seed=fold_idx * 100,  # *100 margin so each baseline's internal +1/+2 offset can't collide...
         )
     except Exception as exc:
         warnings.warn(f"  Baselines failed at fold {fold_idx}: {exc}")
@@ -296,7 +284,7 @@ def main() -> None:
     horizons   = eval_cfg.get("horizons", [1, 3, 6, 12])
     test_years = eval_cfg.get("test_years", 2)
 
-    # --- Load data ----------------------------------------------------------
+    # Load data.
     print("[1/4] Loading panel ...")
     panel = pipeline.load_panel(args.data_dir)
     N_kt  = panel["N"].astype(float)   # (K, T)
@@ -313,7 +301,7 @@ def main() -> None:
     Lambda_L = _load("Lambda_L.npy", np.eye(S))
     x_s      = _load("x_s.npy",      np.ones(S) * 1e12)
 
-    # --- Load InferenceData -------------------------------------------------
+    # Load inference data.
     print("[2/4] Loading InferenceData ...")
     try:
         pkl_path = os.path.splitext(args.idata)[0] + ".pkl"
@@ -330,9 +318,9 @@ def main() -> None:
         print(f"      Warning: Could not load idata ({exc}).")
         idata = None
 
-    # --- Define rolling folds -----------------------------------------------
+    # Define rolling folds.
     test_T = test_years * 12
-    # Earliest start: need enough history for baselines (at least 2 seasonal periods)
+    # Earliest start: need enough history for baselines (at least 2...
     min_train_T = max(24, T - test_T * 3)
     fold_starts = list(range(min_train_T, T - max(horizons), 6))  # every 6 months
 
@@ -342,7 +330,7 @@ def main() -> None:
     print(f"[3/4] Running {len(fold_starts)} evaluation folds ...")
     print(f"      Horizons: {horizons}  T={T}  test_T={test_T}")
 
-    # Independent refits are memory-heavy JAX jobs; run sequentially unless a
+    # Run memory-heavy JAX refits sequentially by default.
     n_workers = min(len(fold_starts), os.cpu_count() or 1) if args.reuse_posterior else 1
     print(f"      Using {n_workers} worker process(es) (folds are independent)")
 
@@ -375,7 +363,7 @@ def main() -> None:
             for name, vals in fold_dm_crps.items():
                 dm_crps_series.setdefault(name, []).extend(vals)
 
-    # --- Aggregate scores ---------------------------------------------------
+    # Aggregate scores.
     print("[4/4] Aggregating scores and running DM tests ...")
 
     if not all_scores:
@@ -397,7 +385,7 @@ def main() -> None:
     print(agg.pivot_table(index="model", columns=["horizon", "metric"],
                           values="value_mean").to_string())
 
-    # --- DM test table ------------------------------------------------------
+    # Build the DM test table.
     if "FullModel" in dm_crps_series and len(dm_crps_series) > 1:
         # Equalise lengths (trim to the shortest series)
         min_len = min(len(v) for v in dm_crps_series.values())
@@ -408,7 +396,7 @@ def main() -> None:
         print(f"\nDM test results (ref = FullModel):\n{dm_df.to_string()}")
         print(f"      Saved to {dm_path}")
 
-    # --- Calibration report -------------------------------------------------
+    # Build the calibration report.
     print("\nCalibration report (last fold) ...")
     try:
         from cassandra_threatcast.evaluation.calibration import calibration_report as cal_report

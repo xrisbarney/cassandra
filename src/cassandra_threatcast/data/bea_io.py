@@ -1,15 +1,4 @@
-"""BEA Input-Output table utilities.
-
-Fetches the Summary Use table (TableID 259, "Use of Commodities by Industries")
-from the BEA API, aggregates the ~71 BEA summary industries into the model's
-11-sector classification, and computes technical coefficients and the Leontief
-inverse for systemic risk propagation.
-
-The parsing logic here was validated against the live BEA API (2022 Summary
-Use table): gross output is read from the ``T018`` ("Total industry output")
-row, ``F*`` columns are final demand, and ``T*``/``V*`` rows/columns are
-totals and value added — all excluded from the intermediate-use matrix.
-"""
+"BEA Input-Output table utilities."
 
 from __future__ import annotations
 
@@ -39,7 +28,7 @@ _DEFAULT_SECTOR_LABELS = [
     "Wholesale Trade",         # 5
     "Retail Trade",            # 6
     "Transportation",          # 7
-    "Finance",                 # 8  (includes insurance & real estate)
+    "Finance",                 # 8 (includes insurance & real estate)
     "Professional Services",   # 9
     "Government",              # 10
 ]
@@ -77,11 +66,11 @@ _CODE_TO_SECTOR: dict[str, int] = {
 
 
 def get_default_sector_labels() -> list[str]:
-    """Return the 11 model sector labels (always length 11)."""
+    "Return the 11 model sector labels (always length 11)."
     return list(_DEFAULT_SECTOR_LABELS)
 
 
-# One-sentence description + example constituent industries per sector, for
+# One-sentence description + example constituent industries per...
 _SECTOR_DESCRIPTIONS = [
     "Farming, forestry, fishing, and hunting -- crop and animal production, logging, commercial fishing.",
     "Extraction of oil, gas, coal, metal ores, and other minerals.",
@@ -98,8 +87,7 @@ _SECTOR_DESCRIPTIONS = [
 
 
 def get_sector_descriptions() -> list[str]:
-    """Return a one-sentence description per sector (always length 11,
-    aligned index-for-index with get_default_sector_labels())."""
+    "Return a one-sentence description per sector (always length 11,"
     return list(_SECTOR_DESCRIPTIONS)
 
 
@@ -110,7 +98,7 @@ def _cache_path(cache_dir: str, year: int) -> Path:
 
 
 def _fetch_raw_api(year: int, cache_dir: str) -> list[dict]:
-    """Fetch the BEA Summary Use table rows for *year* (cached by year)."""
+    "Fetch the BEA Summary Use table rows for *year* (cached by year)."
     api_key = os.environ.get("BEA_API_KEY")
     if not api_key:
         raise EnvironmentError(
@@ -144,7 +132,7 @@ def _fetch_raw_api(year: int, cache_dir: str) -> list[dict]:
     if "Error" in beaapi:
         raise RuntimeError(f"BEA API error: {beaapi['Error']}")
 
-    # Results may be a dict or a single-element list depending on the request.
+    # Normalize either BEA response shape.
     results = beaapi["Results"]
     if isinstance(results, list):
         rows = results[0]["Data"]
@@ -161,7 +149,7 @@ def _fetch_raw_api(year: int, cache_dir: str) -> list[dict]:
 
 
 def _parse_value(val: str) -> float:
-    """Parse a BEA DataValue string (may contain commas) to float."""
+    "Parse a BEA DataValue string (may contain commas) to float."
     try:
         return float(str(val).replace(",", "").strip())
     except (ValueError, TypeError):
@@ -169,21 +157,7 @@ def _parse_value(val: str) -> float:
 
 
 def _build_use_and_output(rows: list[dict], n_sectors: int) -> tuple[np.ndarray, np.ndarray]:
-    """Aggregate raw BEA rows into a sector×sector use matrix and output vector.
-
-    Only cells whose row (commodity) and column (industry) codes both map to
-    a model sector are counted as intermediate use; ``F*`` (final demand),
-    ``T*`` (totals) and ``V*`` (value added) codes are excluded automatically
-    because they are absent from :data:`_CODE_TO_SECTOR`.
-
-    Returns
-    -------
-    U : np.ndarray, shape (n_sectors, n_sectors)
-        Intermediate use, aggregated to sectors.  U[s, t] = commodity from
-        sector s used by industry sector t.
-    g : np.ndarray, shape (n_sectors,)
-        Gross output per sector, from the ``T018`` row.
-    """
+    "Aggregate raw BEA rows into a sector×sector use matrix and output vector."
     U = np.zeros((n_sectors, n_sectors), dtype=float)
     g = np.zeros(n_sectors, dtype=float)
 
@@ -192,7 +166,7 @@ def _build_use_and_output(rows: list[dict], n_sectors: int) -> tuple[np.ndarray,
         col_code = str(row.get("ColCode", "")).strip()
         value = _parse_value(row.get("DataValue", 0))
 
-        # Gross output: the T018 row gives total output for each industry column.
+    # Read gross output from the T018 row.
         if row_code == _GROSS_OUTPUT_ROW:
             s_col = _CODE_TO_SECTOR.get(col_code)
             if s_col is not None and s_col < n_sectors:
@@ -215,23 +189,7 @@ def get_technical_coefficients(
     n_sectors: int = 11,
     cache_dir: str = "data/cache",
 ) -> np.ndarray:
-    """Fetch the BEA Use table and return the direct-requirements matrix A.
-
-    A[i, j] = dollars of sector-i input per dollar of sector-j gross output.
-
-    Parameters
-    ----------
-    year : int
-        BEA I-O table year (default 2022, the most recent Summary table).
-    n_sectors : int
-        Number of model sectors (default 11).
-    cache_dir : str
-        Directory used to cache the raw API response.
-
-    Returns
-    -------
-    A : np.ndarray, shape (n_sectors, n_sectors)
-    """
+    "Fetch the BEA Use table and return the direct-requirements matrix A."
     rows = _fetch_raw_api(year, cache_dir)
     U, g = _build_use_and_output(rows, n_sectors)
 
@@ -257,21 +215,7 @@ def get_sector_output(
     n_sectors: int = 11,
     cache_dir: str = "data/cache",
 ) -> np.ndarray:
-    """Return gross output by sector (millions of current dollars).
-
-    Parameters
-    ----------
-    year : int
-        BEA I-O table year.
-    n_sectors : int
-        Number of model sectors.
-    cache_dir : str
-        Directory used to cache the raw API response.
-
-    Returns
-    -------
-    x_s : np.ndarray, shape (n_sectors,)
-    """
+    "Return gross output by sector (millions of current dollars)."
     rows = _fetch_raw_api(year, cache_dir)
     _, g = _build_use_and_output(rows, n_sectors)
     if not np.any(g):
@@ -285,14 +229,7 @@ def get_sector_output(
 # Core linear algebra
 
 def leontief_inverse(A: np.ndarray) -> np.ndarray:
-    """Compute the Leontief inverse L = (I - A)^{-1}.
-
-    Raises
-    ------
-    ValueError
-        If the spectral radius of *A* is ≥ 1 (non-productive economy; the
-        series I + A + A² + … diverges).
-    """
+    "Compute the Leontief inverse L = (I - A)^{-1}."
     rho = float(np.max(np.abs(np.linalg.eigvals(A))))
     if rho >= 1.0:
         raise ValueError(
@@ -307,7 +244,7 @@ def leontief_inverse(A: np.ndarray) -> np.ndarray:
 # File-based loaders (fallback for local CSV/Excel copies of BEA tables)
 
 def load_use_table(path: str) -> tuple[np.ndarray, list[str]]:
-    """Load a BEA Use table from a local CSV/Excel file and return (A, labels)."""
+    "Load a BEA Use table from a local CSV/Excel file and return (A, labels)."
     fpath = Path(path)
     if not fpath.exists():
         raise FileNotFoundError(f"BEA Use table not found: {path}")
@@ -331,7 +268,7 @@ def load_use_table(path: str) -> tuple[np.ndarray, list[str]]:
 
 
 def load_gross_output(path: str) -> tuple[np.ndarray, list[str]]:
-    """Load BEA gross output from a local CSV/Excel file and return (x_s, labels)."""
+    "Load BEA gross output from a local CSV/Excel file and return (x_s, labels)."
     fpath = Path(path)
     if not fpath.exists():
         raise FileNotFoundError(f"BEA gross output file not found: {path}")

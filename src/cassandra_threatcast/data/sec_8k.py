@@ -1,9 +1,4 @@
-﻿"""SEC EDGAR 8-K cybersecurity incident filing client.
-
-Queries EDGAR Full-Text Search (EFTS) for 8-K filings disclosing cybersecurity
-incidents under Item 1.05, enriches filings with NAICS sector codes, and
-aggregates to a (S, T) monthly panel of incident disclosures.
-"""
+﻿"SEC EDGAR 8-K cybersecurity incident filing client."
 
 from __future__ import annotations
 
@@ -31,9 +26,9 @@ _REQUEST_TIMEOUT = 30
 _INTER_REQUEST_DELAY = 0.11  # SEC fair-access: â‰¤10 req/s
 
 
-# SIC -> NAICS 2-digit mapping by SIC division ranges. SIC codes have a fixed
+# SIC -> NAICS 2-digit mapping by SIC division ranges. SIC codes have...
 def _sic_to_naics2(sic: int | None) -> int:
-    """Map a 4-digit SIC code to a 2-digit NAICS sector via SIC divisions."""
+    "Map a 4-digit SIC code to a 2-digit NAICS sector via SIC divisions."
     if sic is None:
         return _DEFAULT_NAICS2
     if 100 <= sic <= 999:
@@ -65,7 +60,7 @@ def _sic_to_naics2(sic: int | None) -> int:
 _DEFAULT_NAICS2 = 99  # Unknown / unclassified
 
 
-# 2-digit NAICS sector -> model sector index (0..10), matching the 11-sector
+# 2-digit NAICS sector -> model sector index (0..10), matching the...
 NAICS2_TO_SECTOR: dict[int, int] = {
     11: 0,                      # Agriculture
     21: 1,                      # Mining
@@ -83,7 +78,7 @@ NAICS2_TO_SECTOR: dict[int, int] = {
 
 
 def _cache_path(cache_dir: str, start_date: str, end_date: str) -> Path:
-    # Cache key includes a schema version: bump it whenever the parsed record
+    # Version cache keys when the record schema changes.
     key = hashlib.md5(f"sec8k-v2-{start_date}-{end_date}".encode()).hexdigest()
     return Path(cache_dir) / f"sec_8k_v2_{key}.json"
 
@@ -101,26 +96,7 @@ def _user_agent() -> str:
 
 
 def fetch_8k_cyber(start_date: str, end_date: str, cache_dir: str) -> pd.DataFrame:
-    """Query SEC EDGAR EFTS for 8-K cybersecurity incident filings.
-
-    Fetches all 8-K filings that mention "cybersecurity incident" and
-    "Item 1.05" within [*start_date*, *end_date*].  Results are cached by
-    date range.
-
-    Parameters
-    ----------
-    start_date:
-        ISO-8601 date string, e.g. ``"2023-01-01"``.
-    end_date:
-        ISO-8601 date string, e.g. ``"2023-12-31"``.
-    cache_dir:
-        Directory used to cache raw API responses.
-
-    Returns
-    -------
-    pd.DataFrame
-        Columns: cik, company_name, filed_date, accession_number, form_type.
-    """
+    "Query SEC EDGAR EFTS for 8-K cybersecurity incident filings."
     Path(cache_dir).mkdir(parents=True, exist_ok=True)
     cache_file = _cache_path(cache_dir, start_date, end_date)
 
@@ -153,12 +129,7 @@ def fetch_8k_cyber(start_date: str, end_date: str, cache_dir: str) -> pd.DataFra
 
 
 def _fetch_all_efts_hits(start_date: str, end_date: str) -> tuple[list[dict], bool]:
-    """Page through EFTS and return (records, complete).
-
-    complete is False if a request failed partway through pagination -- the
-    caller must not cache that as a genuine (possibly zero-result) fetch, or
-    a transient error permanently poisons the cache for that date range.
-    """
+    "Page through EFTS and return (records, complete)."
     ua = _user_agent()
     session = requests.Session()
     session.headers.update({"User-Agent": ua})
@@ -215,24 +186,7 @@ def _fetch_all_efts_hits(start_date: str, end_date: str) -> tuple[list[dict], bo
 
 
 def enrich_with_naics(df: pd.DataFrame, cache_dir: str) -> pd.DataFrame:
-    """Add a ``naics_2digit`` column derived from each filer's SIC code.
-
-    Fetches SIC codes from SEC EDGAR company JSON submissions endpoint for
-    each unique CIK in *df* and maps them to 2-digit NAICS sectors using a
-    hardcoded lookup table.
-
-    Parameters
-    ----------
-    df:
-        DataFrame returned by :func:`fetch_8k_cyber`.
-    cache_dir:
-        Directory used to cache per-CIK company JSON files.
-
-    Returns
-    -------
-    pd.DataFrame
-        Input DataFrame with an extra ``naics_2digit`` column (int).
-    """
+    "Add a ``naics_2digit`` column derived from each filer's SIC code."
     if df.empty:
         df = df.copy()
         df["naics_2digit"] = pd.Series(dtype=int)
@@ -300,22 +254,7 @@ def enrich_with_naics(df: pd.DataFrame, cache_dir: str) -> pd.DataFrame:
 
 
 def aggregate_monthly(df: pd.DataFrame, sector_map: dict) -> np.ndarray:
-    """Aggregate 8-K incident counts into a (S, T) monthly panel.
-
-    Parameters
-    ----------
-    df:
-        DataFrame with at least columns ``filed_date`` (datetime) and
-        ``naics_2digit`` (int).  Typically output of :func:`enrich_with_naics`.
-    sector_map:
-        Mapping ``{naics_2digit: sector_index}`` where ``sector_index`` is an
-        integer in ``0 .. S-1``.
-
-    Returns
-    -------
-    D_st : np.ndarray, shape (S, T), dtype int64
-        Monthly 8-K cyber incident disclosure counts per sector.
-    """
+    "Aggregate 8-K incident counts into a (S, T) monthly panel."
     if df.empty:
         S = len(set(sector_map.values())) if sector_map else 0
         return np.zeros((S, 0), dtype=np.int64)

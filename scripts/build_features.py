@@ -25,7 +25,7 @@ import yaml
 import numpy as np
 import pandas as pd
 
-# Force UTF-8 stdout/stderr: Windows' default console codepage cannot encode
+# Force UTF-8 stdout/stderr: Windows' default console codepage cannot...
 if sys.platform == "win32":
     import io
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace", line_buffering=True)
@@ -80,7 +80,7 @@ def main() -> None:
 
     os.makedirs(args.output_dir, exist_ok=True)
 
-    # 1.  Load panel
+    # 1. Load panel
     print("[1/4] Loading processed panel ...")
     panel = pipeline.load_panel(args.data_dir)
 
@@ -91,7 +91,7 @@ def main() -> None:
 
     print(f"      N shape={N_kt.shape}  D shape={D_st.shape}  T={T}")
 
-    # 2.  Sector-topic exposure map M_skt
+    # 2. Sector-topic exposure map M_skt
     print("[2/4] Loading exposure map M_skt ...")
     # M_skt is built by ingest_data.py from CVE-level CPE data (which is not
     m_path = os.path.join(args.data_dir, "M_skt.npy")
@@ -109,7 +109,7 @@ def main() -> None:
 
     np.save(os.path.join(args.output_dir, "M_skt.npy"), M_skt)
 
-    # 3.  Reporting-effort index e_t
+    # 3. Reporting-effort index e_t
     print("[3/4] Estimating reporting-effort index e_t ...")
     # Aggregate CVE counts across topics to get total monthly volume
     N_total = N_kt.sum(axis=0).astype(float)   # (T,)
@@ -120,7 +120,7 @@ def main() -> None:
 
     np.save(os.path.join(args.output_dir, "e_t.npy"), e_t)
 
-    # 4.  BEA I-O Leontief inverse
+    # 4. BEA I-O Leontief inverse
     print("[4/4] Computing Leontief inverse from BEA I-O table ...")
     try:
         A = bea_io.get_technical_coefficients(year=args.bea_year, n_sectors=S, cache_dir=args.data_dir)
@@ -133,7 +133,7 @@ def main() -> None:
 
     np.save(os.path.join(args.output_dir, "Lambda_L.npy"), Lambda_L)
 
-    # Save sector output values x_s  (from BEA or config)
+    # Save sector output values x_s (from BEA or config)
     if "sector_output" in config.get("model", {}):
         x_s = np.array(config["model"]["sector_output"], dtype=float)
     else:

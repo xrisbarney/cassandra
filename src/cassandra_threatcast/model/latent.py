@@ -1,8 +1,4 @@
-"""
-latent.py
-=========
-NumPyro generative model for the latent factor / regime-switching layer.
-"""
+"NumPyro generative model for the latent factor / regime-switching layer."
 from __future__ import annotations
 
 from functools import partial
@@ -23,32 +19,14 @@ def factor_dynamics(
     Q_chol: jnp.ndarray,  # (r, r) lower-triangular Cholesky of noise cov
     eps: jnp.ndarray,     # (r,) standard-normal noise
 ) -> jnp.ndarray:
-    """
-    One-step AR(1) factor dynamics.
-
-    f_t = Phi @ f_{t-1} + Q_chol @ eps,  eps ~ N(0, I)
-
-    Returns f_t of shape (r,).
-    """
+    "One-step AR(1) factor dynamics."
     return Phi @ f_prev + Q_chol @ eps
 
 
 # Helper: regime transition
 
 def regime_transition(z_prev: int, Pi: jnp.ndarray, rng_key) -> int:
-    """
-    Sample next regime from Pi[z_prev, :].
-
-    Parameters
-    ----------
-    z_prev : current regime index (scalar int).
-    Pi     : (R, R) Markov transition matrix.
-    rng_key: JAX random key.
-
-    Returns
-    -------
-    z_next : sampled next regime (scalar int).
-    """
+    "Sample next regime from Pi[z_prev, :]."
     probs = Pi[z_prev]
     z_next = jax.random.categorical(rng_key, jnp.log(probs + 1e-30))
     return z_next
@@ -63,21 +41,7 @@ def latent_dynamics_model(
     R: int,
     observed_eta=None,  # (T, K) or None
 ) -> None:
-    """
-    Full NumPyro generative model for the latent layer.
-
-    Samples
-    -------
-    mu_r   : (R, K)    regime-specific means for log-intensity
-    Gamma  : (K, r)    factor loadings
-    Phi_r  : (R, r, r) per-regime AR matrices (lower-triangular for identifiability)
-    Q_r    : (R, r)    per-regime factor noise std (diagonal Q)
-    Pi     : (R, R)    Markov transition matrix (Dirichlet rows)
-    tau_k  : (K,)      idiosyncratic std per topic
-    f_t    : (T, r)    latent factors via scan
-    z_t    : (T,)      regime path via scan
-    eta_t  : (T, K)    log-intensities = mu_r[z_t] + f_t @ Gamma.T + noise
-    """
+    "Full NumPyro generative model for the latent layer."
     # ---- Global priors ----
     mu_r = numpyro.sample(
         "mu_r",
@@ -116,7 +80,7 @@ def latent_dynamics_model(
         dist.HalfNormal(jnp.ones(K) * 0.5),
     )  # (K,)
 
-    # ---- Time-series scan ----: State: (f_t, z_t) — (r,) factor and scalar regime index
+    # ---- Time-series scan ----: State: (f_t, z_t) — (r,) factor and...
 
     def _transition(carry, _):
         f_prev, z_prev = carry  # (r,), ()
@@ -159,7 +123,7 @@ def latent_dynamics_model(
     # f_seq: (T, r), z_seq: (T,), eta_seq: (T, K)
 
     deterministic("f_t", f_seq)
-    # NOTE: "z_t" is already recorded by scan as a sampled site of shape (T,);
+    # The scan already records z_t with shape (T,).
 
     # Optionally condition on observed log-intensities
     if observed_eta is not None:

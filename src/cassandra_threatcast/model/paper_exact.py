@@ -1,10 +1,4 @@
-"""Paper-conformant four-layer Bayesian state-space model.
-
-This module follows Steps 5--24 of the manuscript literally.  In particular,
-factor transitions depend on the sampled Markov regime and the incident
-channel uses the multiplicative, time-varying reporting propensity ``pi_st``.
-The discrete path is supplied by the blocked NUTS/FFBS driver.
-"""
+"Paper-conformant four-layer Bayesian state-space model."
 from __future__ import annotations
 
 import jax
@@ -16,17 +10,17 @@ from numpyro.contrib.control_flow import scan
 
 
 def _sample_array(name: str, distribution: dist.Distribution, shape: tuple[int, ...]):
-    """Draw an independent array while declaring event dimensions explicitly."""
+    "Draw an independent array while declaring event dimensions explicitly."
     return numpyro.sample(name, distribution.expand(shape).to_event(len(shape)))
 
 
 def _ordered_regime_means(raw: jnp.ndarray) -> jnp.ndarray:
-    """Apply Step 5's mean-level ordering to make regime labels stable."""
+    "Apply Step 5's mean-level ordering to make regime labels stable."
     return raw[jnp.argsort(jnp.mean(raw, axis=1))]
 
 
 def _stationary_matrix(raw: jnp.ndarray) -> jnp.ndarray:
-    """Bound triangular VAR eigenvalues without changing the paper's structure."""
+    "Bound triangular VAR eigenvalues without changing the paper's structure."
     return jnp.tanh(raw) * jnp.tril(jnp.ones(raw.shape[-2:]))
 
 
@@ -36,29 +30,25 @@ def reporting_propensity(
     mandatory_effect: jnp.ndarray,
     mandatory_t: jnp.ndarray,
 ) -> jnp.ndarray:
-    """Step 14: sector/time propensity with a December-2023 regime indicator."""
+    "Step 14: sector/time propensity with a December-2023 regime indicator."
     logits = logit_base_s[:, None] + reporting_rw_t[None, :]
     logits = logits + mandatory_effect * mandatory_t[None, :]
     return jax.nn.sigmoid(logits)
 
 
 def paper_model(data: dict, config: dict, z_path: jnp.ndarray) -> None:
-    """Joint continuous conditional posterior for a fixed regime path.
-
-    The outer sampler alternates this conditional model (NUTS, Step 22) with
-    FFBS draws of ``z_path`` (Step 23).
-    """
+    "Joint continuous conditional posterior for a fixed regime path."
     cfg = config.get("model", config)
     K, S = int(cfg["K"]), int(cfg["S"])
     r, r_sig, R = int(cfg["r"]), int(cfg.get("r_sigma", cfg["r"])), int(cfg["R"])
     T = int(np.shape(data["N"])[1])
     z_path = jnp.asarray(z_path, dtype=jnp.int32)
 
-    # Steps 5--9: Markov switching factors, intensities, severities, hierarchy.
+    # Steps 5--9: Markov switching factors, intensities, severities,...
     mu_raw = _sample_array("mu_raw", dist.Normal(0.0, 5.0), (R, K))
     mu_r = numpyro.deterministic("mu_r", _ordered_regime_means(mu_raw))
     nu_raw = _sample_array("nu_raw", dist.Normal(1.5, 1.0), (R, K))
-    # Severity regimes share the intensity ordering, as both use the same z_t.
+    # Share regime ordering through z_t.
     order = jnp.argsort(jnp.mean(mu_raw, axis=1))
     nu_r = numpyro.deterministic("nu_r", nu_raw[order])
 
@@ -194,7 +184,7 @@ def paper_model(data: dict, config: dict, z_path: jnp.ndarray) -> None:
 
 
 def regime_log_potentials(draw: dict, data: dict) -> np.ndarray:
-    """Compute local FFBS potentials p(states_t, observations_t | z_t=r)."""
+    "Compute local FFBS potentials p(states_t, observations_t | z_t=r)."
     mu, nu = np.asarray(draw["mu_r"]), np.asarray(draw["nu_r"])
     phi, q = np.asarray(draw["Phi_r"]), np.asarray(draw["Q_r"])
     a_sig, q_sig = np.asarray(draw["A_sigma_r"]), np.asarray(draw["Q_sigma_r"])
@@ -261,7 +251,7 @@ def predict(
     seed: int = 42,
     start_t: int | None = None,
 ) -> dict[str, np.ndarray]:
-    """Execute paper Steps 25--28 for every joint posterior draw."""
+    "Execute paper Steps 25--28 for every joint posterior draw."
     from cassandra_threatcast.model.economic import DamageFunctionParams, damage_function
 
     rng = np.random.default_rng(seed)

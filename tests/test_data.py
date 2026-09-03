@@ -1,4 +1,4 @@
-﻿"""Tests for data ingestion and feature utilities."""
+﻿"Tests for data ingestion and feature utilities."
 import numpy as np
 import pandas as pd
 import pytest
@@ -15,21 +15,21 @@ from cassandra_threatcast.features.effort import estimate_effort
 # leontief_inverse
 
 def test_leontief_identity():
-    """Leontief inverse of a zero technical-coefficient matrix is the identity."""
+    "Leontief inverse of a zero technical-coefficient matrix is the identity."
     A = np.zeros((5, 5))
     L = leontief_inverse(A)
     np.testing.assert_allclose(L, np.eye(5), atol=1e-10)
 
 
 def test_leontief_raises_on_unstable():
-    """leontief_inverse raises ValueError when the spectral radius of A >= 1."""
+    "leontief_inverse raises ValueError when the spectral radius of A >= 1."
     A = 2.0 * np.eye(5)   # spectral radius = 2
     with pytest.raises(ValueError, match="(?i)spectral radius"):
         leontief_inverse(A)
 
 
 def test_leontief_simple_chain():
-    """Verify Leontief inverse for a 2-sector chain: A = [[0, 0.5], [0, 0]]."""
+    "Verify Leontief inverse for a 2-sector chain: A = [[0, 0.5], [0, 0]]."
     A = np.array([[0.0, 0.5],
                   [0.0, 0.0]])
     L = leontief_inverse(A)
@@ -39,7 +39,7 @@ def test_leontief_simple_chain():
 
 
 def test_leontief_positive_entries():
-    """Leontief inverse has all entries >= 1 on the diagonal and >= 0 off-diagonal."""
+    "Leontief inverse has all entries >= 1 on the diagonal and >= 0 off-diagonal."
     rng = np.random.default_rng(7)
     # Stable A: each column sums to < 1
     A = rng.uniform(0, 0.15, (4, 4))
@@ -53,7 +53,7 @@ def test_leontief_positive_entries():
 # aggregate_monthly
 
 def test_aggregate_monthly_shape():
-    """aggregate_monthly returns arrays of shape (K, T)."""
+    "aggregate_monthly returns arrays of shape (K, T)."
     K, T = 4, 24
     rng = np.random.default_rng(0)
     dates = pd.date_range("2022-01-01", periods=T * 10, freq="3D")
@@ -72,7 +72,7 @@ def test_aggregate_monthly_shape():
 
 
 def test_aggregate_monthly_nonneg():
-    """aggregate_monthly counts and severity scores are non-negative."""
+    "aggregate_monthly counts and severity scores are non-negative."
     K = 3
     rng = np.random.default_rng(1)
     dates = pd.date_range("2020-01-01", periods=60, freq="5D")
@@ -91,7 +91,7 @@ def test_aggregate_monthly_nonneg():
 
 
 def test_aggregate_monthly_total_counts():
-    """Total counts across topics should equal total number of CVEs."""
+    "Total counts across topics should equal total number of CVEs."
     K = 5
     rng = np.random.default_rng(2)
     dates = pd.date_range("2021-06-01", periods=100, freq="3D")
@@ -110,7 +110,7 @@ def test_aggregate_monthly_total_counts():
 # estimate_effort
 
 def test_estimate_effort_length():
-    """estimate_effort returns an array of the same length as input."""
+    "estimate_effort returns an array of the same length as input."
     T = 60
     rng = np.random.default_rng(42)
     N_raw = rng.poisson(100, T).astype(float)
@@ -119,7 +119,7 @@ def test_estimate_effort_length():
 
 
 def test_estimate_effort_normalized():
-    """HP-filter effort has approximately zero mean and reasonable variance."""
+    "HP-filter effort has approximately zero mean and reasonable variance."
     T = 120
     rng = np.random.default_rng(0)
     N_raw = rng.poisson(200, T).astype(float) + np.linspace(0.0, 100.0, T)
@@ -129,7 +129,7 @@ def test_estimate_effort_normalized():
 
 
 def test_estimate_effort_finite():
-    """estimate_effort output is finite for all reasonable inputs."""
+    "estimate_effort output is finite for all reasonable inputs."
     T = 48
     rng = np.random.default_rng(3)
     for method in ["hp_filter", "moving_avg", "log_diff"]:
@@ -141,13 +141,13 @@ def test_estimate_effort_finite():
 # get_default_sector_labels
 
 def test_sector_labels_count():
-    """get_default_sector_labels returns exactly 11 sector labels."""
+    "get_default_sector_labels returns exactly 11 sector labels."
     labels = get_default_sector_labels()
     assert len(labels) == 11
 
 
 def test_sector_labels_are_strings():
-    """All sector labels are non-empty strings."""
+    "All sector labels are non-empty strings."
     labels = get_default_sector_labels()
     for lbl in labels:
         assert isinstance(lbl, str) and len(lbl) > 0

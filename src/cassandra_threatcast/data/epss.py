@@ -1,15 +1,4 @@
-"""Exploit Prediction Scoring System (EPSS) data client.
-
-Downloads EPSS daily score files from the official EPSS data host, caches them
-locally, and aggregates per-topic mean EPSS scores into a (K, T) monthly panel.
-
-Each daily file contains the full CVE catalog with its score as of that date,
-so a single mid-month snapshot fully populates one month of the panel; the
-range fetcher therefore samples one representative day per month rather than
-downloading all ~365 days per year. EPSS scores only exist from 2021-04-14
-onward (the EPSS v1 launch); earlier dates do not exist on the server and are
-skipped without issuing requests.
-"""
+"Exploit Prediction Scoring System (EPSS) data client."
 
 from __future__ import annotations
 
@@ -30,20 +19,7 @@ _REQUEST_TIMEOUT = 60
 
 
 def fetch_epss(date: str, cache_dir: str) -> pd.DataFrame:
-    """Download EPSS scores for a single *date* (``YYYY-MM-DD`` format).
-
-    Parameters
-    ----------
-    date:
-        Date string in ``YYYY-MM-DD`` format.
-    cache_dir:
-        Directory used to cache downloaded CSV files.
-
-    Returns
-    -------
-    pd.DataFrame
-        Columns: cve_id, epss_score, percentile.
-    """
+    "Download EPSS scores for a single *date* (``YYYY-MM-DD`` format)."
     Path(cache_dir).mkdir(parents=True, exist_ok=True)
     cache_file = Path(cache_dir) / f"epss_{date}.csv"
 
@@ -71,7 +47,7 @@ def fetch_epss(date: str, cache_dir: str) -> pd.DataFrame:
         logger.warning("EPSS gzip decompression failed for date %s: %s", date, exc)
         return pd.DataFrame(columns=["cve_id", "epss_score", "percentile"])
 
-    # The CSV has a model-version comment line starting with '#' before the header
+    # The CSV has a model-version comment line starting with '#' before...
     lines = [line for line in raw.splitlines() if not line.startswith("#")]
     csv_text = "\n".join(lines)
 
@@ -80,7 +56,7 @@ def fetch_epss(date: str, cache_dir: str) -> pd.DataFrame:
         columns={"cve": "cve_id", "epss": "epss_score"},
         inplace=True,
     )
-    # EPSS v1 files (2021-04 .. early 2022) have no "percentile" column; it was
+    # EPSS v1 files (2021-04 .. early 2022) have no "percentile" column;...
     if "percentile" not in df.columns:
         df["percentile"] = np.nan
     df["cve_id"] = df["cve_id"].astype(str)
@@ -94,27 +70,7 @@ def fetch_epss(date: str, cache_dir: str) -> pd.DataFrame:
 
 
 def fetch_epss_range(start_date: str, end_date: str, cache_dir: str) -> pd.DataFrame:
-    """Fetch EPSS scores at one representative snapshot per month in the range.
-
-    EPSS daily files each contain the full CVE catalog, so one mid-month
-    snapshot suffices for a monthly panel. The range is clamped to the EPSS
-    availability window (scores exist only from 2021-04-14); months entirely
-    before that date are skipped without issuing any HTTP requests.
-
-    Parameters
-    ----------
-    start_date:
-        ISO-8601 date string, e.g. ``"2022-01-01"``.
-    end_date:
-        ISO-8601 date string, e.g. ``"2022-12-31"``.
-    cache_dir:
-        Directory used to cache per-day CSV files.
-
-    Returns
-    -------
-    pd.DataFrame
-        Columns: cve_id, epss_score, percentile, date (datetime.date).
-    """
+    "Fetch EPSS scores at one representative snapshot per month in the range."
     empty = pd.DataFrame(columns=["cve_id", "epss_score", "percentile", "date"])
     start = pd.Timestamp(start_date)
     end = pd.Timestamp(end_date)
@@ -158,22 +114,7 @@ def aggregate_monthly(
     epss_df: pd.DataFrame,
     topic_assignments: pd.Series,
 ) -> np.ndarray:
-    """Compute per-topic mean EPSS score for each calendar month.
-
-    Parameters
-    ----------
-    epss_df:
-        DataFrame with at least columns ``cve_id``, ``epss_score``, and
-        ``date`` (date or datetime).  Typically the output of
-        :func:`fetch_epss_range`.
-    topic_assignments:
-        Series indexed by ``cve_id`` with integer topic labels ``0 .. K-1``.
-
-    Returns
-    -------
-    E_kt : np.ndarray, shape (K, T)
-        Mean EPSS score per topic per month.  NaN where no CVEs exist.
-    """
+    "Compute per-topic mean EPSS score for each calendar month."
     if epss_df.empty or topic_assignments.empty:
         K = int(topic_assignments.max()) + 1 if not topic_assignments.empty else 0
         return np.full((K, 0), np.nan)

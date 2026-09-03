@@ -1,4 +1,4 @@
-﻿"""Visualization utilities for the cassandra_threatcast paper figures."""
+﻿"Visualization utilities for the cassandra_threatcast paper figures."
 import os
 import numpy as np
 import pandas as pd
@@ -28,24 +28,7 @@ def plot_threat_forecast(
     ax: Optional[plt.Axes] = None,
     actual: Optional[np.ndarray] = None,  # (T_pred,) real values for the forecast period, if since become known
 ) -> plt.Figure:
-    """
-    Fan chart with 50 % and 90 % posterior predictive bands.
-
-    Parameters
-    ----------
-    topic_k    : integer topic index (for title)
-    obs        : (T_obs,) array of historical observed counts
-    predictive : (n_samples, T_pred) array of posterior predictive samples
-    dates      : combined date list of length T_obs + T_pred.  If
-                 obs_dates / pred_dates are supplied, this argument is ignored.
-    topic_label: human-readable topic name
-    ax         : existing Axes to draw on (optional)
-    actual     : real observed values for the forecast window, once the
-                 future has happened (e.g. backtesting a past forecast
-                 against data collected after the fact). Overlaid on top of
-                 the predictive fan so the reader can see how the forecast
-                 held up. Omit for an ordinary forward-looking forecast.
-    """
+    "Fan chart with 50 % and 90 % posterior predictive bands."
     if ax is None:
         fig, ax = plt.subplots(figsize=(10, 4))
     else:
@@ -111,15 +94,7 @@ def plot_pit_histogram(
     n_bins: int = 20,
     ax: Optional[plt.Axes] = None,
 ) -> plt.Figure:
-    """
-    PIT histogram with a uniform reference line and KS-test annotation.
-
-    Parameters
-    ----------
-    pit_vals     : (N,) array of PIT values in [0, 1]
-    channel_name : label used in the title
-    n_bins       : number of histogram bins
-    """
+    "PIT histogram with a uniform reference line and KS-test annotation."
     if ax is None:
         fig, ax = plt.subplots(figsize=(6, 4))
     else:
@@ -159,16 +134,7 @@ def plot_regime_probs(
     regime_names: Optional[list[str]] = None,
     ax: Optional[plt.Axes] = None,
 ) -> plt.Figure:
-    """
-    Stacked area chart of P(z_t = r | F_T).
-
-    Parameters
-    ----------
-    regime_probs : (T, R) array â€” rows sum to 1
-    dates        : length-T sequence of x-axis values
-    event_labels : optional dict mapping integer time index to annotation text
-    regime_names : optional list of length R with regime labels
-    """
+    "Stacked area chart of P(z_t = r | F_T)."
     if ax is None:
         fig, ax = plt.subplots(figsize=(12, 4))
     else:
@@ -221,17 +187,7 @@ def plot_loss_distribution(
     units: str = "$ billions",
     ax: Optional[plt.Axes] = None,
 ) -> plt.Figure:
-    """
-    Histogram of aggregate posterior predictive losses with VaR and ES.
-
-    Parameters
-    ----------
-    loss_samples : posterior predictive loss draws; aggregated over last
-                   dimension if 2-D
-    var_alpha    : tail probability for VaR (e.g. 0.05 -> 95th percentile)
-    es_alpha     : tail probability for ES / CVaR
-    units        : label string for the x-axis
-    """
+    "Histogram of aggregate posterior predictive losses with VaR and ES."
     if ax is None:
         fig, ax = plt.subplots(figsize=(8, 4))
     else:
@@ -285,15 +241,7 @@ def plot_sector_exposure(
     title: str = "Sector Cyber-Induced Loss Exposure",
     ax: Optional[plt.Axes] = None,
 ) -> plt.Figure:
-    """
-    Horizontal bar chart with 90 % credible interval error bars.
-
-    Parameters
-    ----------
-    sector_means : (S,) array of posterior mean losses
-    sector_cis   : (S, 2) array of [lower, upper] credible-interval bounds
-    sector_names : list of sector labels (length S)
-    """
+    "Horizontal bar chart with 90 % credible interval error bars."
     S = len(sector_names)
     if ax is None:
         fig, ax = plt.subplots(figsize=(8, max(4, S * 0.5)))
@@ -323,7 +271,7 @@ def plot_sector_exposure(
 
 # Utility
 def save_figure(fig: plt.Figure, path: str, dpi: int = 300) -> None:
-    """Save *fig* to *path*, creating parent directories as needed."""
+    "Save *fig* to *path*, creating parent directories as needed."
     os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
     fig.savefig(path, dpi=dpi, bbox_inches="tight")
     plt.close(fig)

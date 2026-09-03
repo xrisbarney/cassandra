@@ -1,4 +1,4 @@
-# Overnight conformance chain: evaluation -> ablation -> full population.
+# Run conformance jobs overnight.
 $ErrorActionPreference = "Continue"
 Set-Location (Split-Path $PSScriptRoot -Parent)
 $py = ".\.venv\Scripts\python.exe"

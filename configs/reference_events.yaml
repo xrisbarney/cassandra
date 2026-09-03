@@ -1,4 +1,4 @@
-# Reference event set for damage-function calibration (paper §3, Table 7).
+# Damage-calibration reference events.
 events:
   - name: "NotPetya (US exposure)"
     month: "2017-06"
@@ -23,12 +23,12 @@ events:
 
   - name: "Change Healthcare"
     month: "2024-02"
-    sectors: ["Professional Services"]   # healthcare payments/claims infrastructure; nearest BEA summary bucket in this S=11 aggregation
-    # UnitedHealth reported ~$2.87B in direct 2024 costs (to ~$3.1B in later
+    sectors: ["Professional Services"]   # Nearest BEA summary sector.
+    # UnitedHealth reported about $2.87B in direct 2024 costs.
     low_usd: 2.4e9
     high_usd: 3.5e9
 
-# Aggregate anchor: documented estimates of TOTAL annual US cyber losses.
+# Annual US cyber-loss anchor.
 aggregate_anchor:
   low_usd_per_year: 3.0e10
   high_usd_per_year: 2.0e11

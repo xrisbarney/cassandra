@@ -1,43 +1,16 @@
-"""
-sequential.py
-=============
-Sequential (filtered) posterior-predictive machinery shared by the backtest,
-the damage-function calibration (pre-event predictives), and the ablation
-study.
-
-The Hamilton filter runs from the first panel month (uniform initial regime
-distribution), so the belief entering any month t is a recursive function of
-ALL preceding months' data across all four observation channels.  The
-one-step-ahead prediction for month t uses only P(z_t | y_{1:t-1}), the
-factor state at t-1, and covariates lagged to t-1 -- never month t itself.
-
-Documented caveats (see scripts/backtest.py and docs/PAPER_NOTES.md §7):
-continuous factor states and static parameters come from the full-sample
-MCMC posterior (the standard posterior-predictive check for MCMC-fitted
-state-space models), and e_t is itself a two-sided full-sample estimate.
-"""
+"Sequential (filtered) posterior-predictive machinery shared by the backtest,"
 from __future__ import annotations
 
 import numpy as np
 
 
 def soft_clip(x: np.ndarray, bound: float = 30.0) -> np.ndarray:
-    """Numpy mirror of the model's jax soft clip: bound * tanh(x / bound)."""
+    "Numpy mirror of the model's jax soft clip: bound * tanh(x / bound)."
     return bound * np.tanh(x / bound)
 
 
 def batch_forward_filter(loglik: np.ndarray, Pi: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
-    """
-    Hamilton filter vectorised across posterior draws.
-
-    loglik : (n, T, R) log p(y_t | z_t=r) per draw
-    Pi     : (n, R, R) transition matrices per draw
-
-    Returns (filtered, predicted), each (n, T, R):
-      predicted[:, t] = P(z_t | y_{1:t-1})   -- uses data through t-1 ONLY
-      filtered[:, t]  = P(z_t | y_{1:t})
-    Initial predicted distribution at t=0 is uniform, matching the model.
-    """
+    "Hamilton filter vectorised across posterior draws."
     n, T, R = loglik.shape
     filtered = np.zeros((n, T, R))
     predicted = np.zeros((n, T, R))
@@ -54,7 +27,7 @@ def batch_forward_filter(loglik: np.ndarray, Pi: np.ndarray) -> tuple[np.ndarray
 
 
 def sample_categorical(probs: np.ndarray, rng: np.random.Generator) -> np.ndarray:
-    """Vectorised categorical draw: probs (n, R) -> (n,) integer labels."""
+    "Vectorised categorical draw: probs (n, R) -> (n,) integer labels."
     probs = np.clip(probs, 0.0, None)
     probs = probs / probs.sum(axis=1, keepdims=True)
     u = rng.random((probs.shape[0], 1))
@@ -71,16 +44,7 @@ def one_step_state_predictive(
     enhanced: bool = False,
     student_t_df: float = 4.0,
 ) -> dict:
-    """
-    Pre-month-t predictive draws of the latent states, conditioned on data
-    through t-1 only (filtered regime belief; factor/severity states
-    propagated one AR step from their t-1 posterior values with fresh noise).
-
-    Returns dict with:
-      eta   : (n, K) predictive log-intensity at t
-      zeta  : (n, K) predictive log-severity at t
-      z     : (n,)   sampled regime at t
-    """
+    "Pre-month-t predictive draws of the latent states, conditioned on data"
     Pi = np.asarray(post["Pi"], dtype=float)
     mu_r = np.asarray(post["mu_r"], dtype=float)
     nu_r = np.asarray(post["nu_r"], dtype=float)
@@ -134,16 +98,7 @@ def kernel_factor_predictive(
     h: int,
     rng: np.random.Generator,
 ) -> tuple[np.ndarray | None, np.ndarray | None]:
-    """
-    h-step-ahead predictive of the learned moving-window kernel factor
-    (model config["kernel"]; see full.py §3b).  For month t, conditions on
-    the window innovations u only through t-h; in-window u's newer than
-    that are replaced by their exact Gaussian predictive (fresh noise with
-    variance 1 - sum of known weights^2, thanks to the unit-norm weights).
-
-    Returns (g_pred, a_g): g_pred (n, T_out) kernel factor draws, a_g (n, K)
-    per-topic loadings -- or (None, None) if the model has no kernel.
-    """
+    "h-step-ahead predictive of the learned moving-window kernel factor"
     if "u_g" not in post:
         return None, None
     u = np.asarray(post["u_g"], dtype=float)                    # (n, T_obs)
@@ -179,17 +134,7 @@ def sequential_h_step_predict(
     student_t_df: float = 4.0,
     seed: int = 42,
 ) -> np.ndarray:
-    """
-    Rolling-origin h-step-ahead CVE-count predictive.
-
-    Entry [:, :, t] (for t >= h) is the prediction of month t issued at
-    origin o = t - h: regime belief = filtered at o advanced h steps through
-    the sampled chain, factor state = posterior at o propagated h AR steps
-    with fresh noise, covariates held at their origin values.  For h = 1
-    this reduces to the one-step machinery.  Months t < h are NaN.
-
-    Returns N_pred of shape (n, K, T).
-    """
+    "Rolling-origin h-step-ahead CVE-count predictive."
     rng = np.random.default_rng(seed=seed)
 
     loglik = np.asarray(post["loglik_regime_t"], dtype=float)
@@ -243,21 +188,7 @@ def sequential_one_step_predict(
     N_ext: np.ndarray | None = None,   # (K, T_ext) actual CVE counts AFTER the
                                        # training panel (e.g. 2025-01..present)
 ) -> dict:
-    """
-    One-step-ahead predictive draws for every month of the panel, plus a
-    pure-forecast tail after the data ends.  Fully vectorised across draws.
-    See the module docstring for the conditioning guarantees.
-
-    Extension months (``N_ext``): the training posterior is NOT refitted.
-    For each month beyond the training panel the model first predicts one
-    step ahead, then performs an exact Bayes update of the regime belief
-    using the N-channel likelihood of that month's ACTUAL counts, evaluated
-    per draw under each regime hypothesis at the draw's current factor
-    state.  This is the "one training is enough" operating mode: static
-    parameters stay fixed, beliefs stay current.  Covariates (e_t, M_skt)
-    hold their last panel values; the E/D/B channels are not fetched at
-    extension time, so extension updates use the CVE channel only.
-    """
+    "One-step-ahead predictive draws for every month of the panel, plus a"
     from scipy.stats import nbinom
 
     rng = np.random.default_rng(seed=seed)

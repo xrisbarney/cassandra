@@ -1,22 +1,10 @@
-"""Proper scoring rules and point metrics for forecast evaluation."""
+"Proper scoring rules and point metrics for forecast evaluation."
 import numpy as np
 import pandas as pd
 
 
 def crps_ensemble(obs: np.ndarray, samples: np.ndarray) -> np.ndarray:
-    """
-    CRPS computed from ensemble samples using the energy score identity.
-
-    CRPS(F, y) = E_F|X - y| - 0.5 * E_F|X - X'|
-
-    The second term is computed via the sorted-weights identity:
-        E|X - X'| = (2 / n^2) * sum_i (2i - n - 1) * x_{(i)}
-    where x_{(i)} are the order statistics (1-indexed).
-
-    obs     : (...) array of observations
-    samples : (..., n_samples) array of predictive samples
-    Returns : CRPS array of shape (...)
-    """
+    "CRPS computed from ensemble samples using the energy score identity."
     n = samples.shape[-1]
 
     # Term 1: E_F |X - y|
@@ -29,42 +17,19 @@ def crps_ensemble(obs: np.ndarray, samples: np.ndarray) -> np.ndarray:
     # Broadcast weights to (..., n)
     term2 = np.sum(weights * sorted_s, axis=-1) / (n * n)   # E|X-X'| / 2
 
-    # CRPS = term1 - 0.5 * E|X-X'| = term1 - term2: (term2 already equals sum(w * x) / n^2 = 0.5 * E|X-X'|)
+    # CRPS = term1 - 0.5 * E|X-X'| = term1 - term2: (term2 already equals...
     return term1 - term2
 
 
 def log_score_negbin(obs: np.ndarray, mu: np.ndarray, phi: np.ndarray) -> np.ndarray:
-    """
-    Log score for NegBin predictive: log p(obs | mu, phi).
-    NB parameterization: p = phi/(phi+mu), r = phi.
-    obs, mu: (...) arrays; phi: (K,) or scalar broadcastable to obs.
-    Returns log-score array of same shape as obs.
-    """
+    "Log score for NegBin predictive: log p(obs | mu, phi)."
     from scipy.stats import nbinom
     p = phi / (phi + mu)
     return nbinom.logpmf(obs, n=phi, p=p)
 
 
 def log_score_ensemble(obs: np.ndarray, samples: np.ndarray) -> np.ndarray:
-    """
-    Logarithmic score for count observations from ensemble samples, reported
-    NEGATIVELY oriented (lower is better, matching CRPS): -log p(obs).
-
-    The predictive PMF is obtained by moment-matching a NegBin2 to the
-    samples per element: mu = sample mean, phi = mu^2 / (var - mu) when the
-    samples are overdispersed, else a near-Poisson phi. This keeps the score
-    comparable across the full model and residual-bootstrap baselines, which
-    only provide samples, not parametric forms.
-
-    Moments are computed on samples winsorised at the 1st/99th percentiles:
-    the state-space model's log-scale latent admits rare draws up to e^30,
-    which make the raw ensemble variance (hence the matched PMF) meaningless
-    while leaving the predictive bulk unchanged.
-
-    obs     : (...) count observations
-    samples : (..., n_samples) predictive samples (sample axis LAST)
-    Returns : (...) array of -log p(obs).
-    """
+    "Logarithmic score for count observations from ensemble samples, reported"
     lo = np.quantile(samples, 0.01, axis=-1, keepdims=True)
     hi = np.quantile(samples, 0.99, axis=-1, keepdims=True)
     samples = np.clip(samples, lo, hi)
@@ -77,17 +42,17 @@ def log_score_ensemble(obs: np.ndarray, samples: np.ndarray) -> np.ndarray:
 
 
 def mae(obs: np.ndarray, pred_median: np.ndarray) -> float:
-    """Mean absolute error."""
+    "Mean absolute error."
     return float(np.mean(np.abs(obs - pred_median)))
 
 
 def rmse(obs: np.ndarray, pred_median: np.ndarray) -> float:
-    """Root mean squared error."""
+    "Root mean squared error."
     return float(np.sqrt(np.mean((obs - pred_median) ** 2)))
 
 
 def mape(obs: np.ndarray, pred_median: np.ndarray, eps: float = 1.0) -> float:
-    """Mean absolute percentage error with epsilon floor to avoid division by zero."""
+    "Mean absolute percentage error with epsilon floor to avoid division by zero."
     return float(np.mean(np.abs(obs - pred_median) / (np.abs(obs) + eps)))
 
 
@@ -96,10 +61,7 @@ def evaluate_forecasts(
     predictive_dict: dict, # {"N": (n_samples,K,T), "D": (n_samples,S,T), ...}
     horizons: list[int],
 ) -> pd.DataFrame:
-    """
-    Computes CRPS, LogS, MAE, RMSE for each channel and horizon.
-    Returns a tidy DataFrame with columns: channel, horizon, metric, value.
-    """
+    "Computes CRPS, LogS, MAE, RMSE for each channel and horizon."
     records = []
     for channel, obs in obs_dict.items():
         if channel not in predictive_dict:

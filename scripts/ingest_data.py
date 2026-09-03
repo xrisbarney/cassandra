@@ -1,12 +1,5 @@
 ﻿#!/usr/bin/env python3
-"""
-Ingest all data sources and save processed arrays.
-
-Usage:
-    python scripts/ingest_data.py --start 2010-01 --end 2024-12 \\
-        --cache-dir data/cache/ --output-dir data/processed/ \\
-        --config configs/default.yaml
-"""
+"Ingest all data sources and save processed arrays."
 import argparse
 import json
 import logging
@@ -20,7 +13,7 @@ import yaml
 import numpy as np
 import pandas as pd
 
-# Force UTF-8 stdout/stderr: Windows' default console codepage (e.g. cp1252)
+# Force UTF-8 stdout/stderr: Windows' default console codepage (e.g....
 if sys.platform == "win32":
     import io
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace", line_buffering=True)
@@ -76,7 +69,7 @@ def parse_args() -> argparse.Namespace:
 def main() -> None:
     args = parse_args()
 
-    # --- Load config --------------------------------------------------------
+    # Load configuration.
     with open(args.config) as fh:
         config = yaml.safe_load(fh)
 
@@ -89,12 +82,12 @@ def main() -> None:
     start_dt = args.start + "-01"
     end_dt   = args.end   + "-28"   # safe upper bound for any month
 
-    # --- NVD CVEs -----------------------------------------------------------
+    # Load NVD CVEs.
     print(f"[1/6] Fetching NVD CVEs from {args.start} to {args.end} ...")
     cve_df = nvd.fetch_cves(start_dt, end_dt, args.cache_dir)
     print(f"      {len(cve_df):,} CVEs fetched.")
 
-    # --- Topic model --------------------------------------------------------
+    # Fit the topic model.
     print(f"[2/6] Fitting topic model (K={K}) ...")
     descriptions = cve_df["description"].fillna("").tolist()
     mapper = tm.WikiTopicMapper(n_topics=K)
@@ -106,7 +99,7 @@ def main() -> None:
         pickle.dump(mapper, fh)
     print(f"      Topic mapper saved to {mapper_path}")
 
-    # Optional: ask DeepSeek for an analyst-recognizable name per topic (e.g.
+    # Optionally name topics with DeepSeek.
     top_words_per_topic = [mapper.top_words(k, n_words=15) for k in range(K)]
     llm_names = label_topics(top_words_per_topic)
     if llm_names:
@@ -117,7 +110,7 @@ def main() -> None:
     else:
         print("      (Set DEEPSEEK_API_KEY in .env for AI-generated topic names.)")
 
-    # --- EPSS ---------------------------------------------------------------
+    # Load EPSS data.
     print("[3/6] Fetching EPSS scores ...")
     try:
         epss_df = epss.fetch_epss_range(start_dt, end_dt, args.cache_dir)
@@ -126,7 +119,7 @@ def main() -> None:
         print(f"      Warning: EPSS fetch failed ({exc}).  Proceeding without.")
         epss_df = None
 
-    # --- CISA KEV -----------------------------------------------------------
+    # Load CISA KEV data.
     print("[4/6] Fetching CISA KEV catalog ...")
     try:
         kev_df = cisa_kev.fetch_kev(args.cache_dir)
@@ -135,7 +128,7 @@ def main() -> None:
         print(f"      Warning: KEV fetch failed ({exc}).  Proceeding without.")
         kev_df = None
 
-    # --- SEC 8-K ------------------------------------------------------------
+    # Load SEC 8-K data.
     print("[5/6] Fetching SEC 8-K cyber-disclosure filings ...")
     try:
         sec_df = sec_8k.fetch_8k_cyber(start_dt, end_dt, args.cache_dir)
@@ -145,12 +138,12 @@ def main() -> None:
         print(f"      Warning: SEC 8-K fetch failed ({exc}).  Proceeding without.")
         sec_df = None
 
-    # --- Build panel --------------------------------------------------------
+    # Build the panel.
     print("[6/6] Building monthly panel arrays ...")
-    # Map 2-digit NAICS (from SEC filers' SIC codes) to model sector indices.
+    # Map two-digit NAICS codes to sector indices.
     sector_map = config.get("sector_map") or sec_8k.NAICS2_TO_SECTOR
 
-    # Pass the full ISO dates (start_dt/end_dt) used for fetching, NOT the bare
+    # Pass the full ISO fetch dates.
     panel = pipeline.build_panel(
         start=start_dt,
         end=end_dt,
@@ -163,7 +156,7 @@ def main() -> None:
 
     pipeline.save_panel(panel, args.output_dir)
 
-    # --- Exposure map M_skt (needs CVE-level CPE data) ----------------------
+    # Build the CPE-based exposure map.
     try:
         from cassandra_threatcast.features.exposure_map import build_exposure_map
         if len(cve_df) > 0 and len(topic_assignments) == len(cve_df):
@@ -186,7 +179,7 @@ def main() -> None:
     except Exception as exc:
         print(f"      Warning: exposure map build failed ({exc}).")
 
-    # --- Summary ------------------------------------------------------------
+    # Print the summary.
     print("\nDone.  Panel saved to:", args.output_dir)
     for key, arr in panel.items():
         if isinstance(arr, np.ndarray):

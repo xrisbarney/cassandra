@@ -1,4 +1,4 @@
-"""Blocked NUTS/FFBS inference prescribed by paper Steps 21--24."""
+"Blocked NUTS/FFBS inference prescribed by paper Steps 21--24."
 from __future__ import annotations
 
 from functools import partial
@@ -21,7 +21,7 @@ def _one_continuous_block(
     warmup: int,
     draws: int,
 ) -> dict[str, np.ndarray]:
-    """Sample the smooth conditional posterior p(continuous | z, data)."""
+    "Sample the smooth conditional posterior p(continuous | z, data)."
     conditioned = partial(paper_model, z_path=jnp.asarray(z_path))
     cfg = config.get("mcmc", {})
     kernel = NUTS(
@@ -35,12 +35,7 @@ def _one_continuous_block(
 
 
 def run_blocked_nuts_ffbs(data: dict, config: dict) -> az.InferenceData:
-    """Alternate NUTS continuous blocks with exact FFBS regime-path draws.
-
-    ``mcmc.num_samples`` is the total number of retained draws, divided among
-    ``gibbs_blocks`` alternating updates. This avoids restarting NUTS once per
-    draw while preserving the paper's block order.
-    """
+    "Alternate NUTS continuous blocks with exact FFBS regime-path draws."
     mcfg = config.get("mcmc", {})
     T = int(np.shape(data["N"])[1])
     R = int(config.get("model", config)["R"])
@@ -52,7 +47,7 @@ def run_blocked_nuts_ffbs(data: dict, config: dict) -> az.InferenceData:
     later_warmup = int(mcfg.get("block_warmup", max(25, first_warmup // 10)))
     seed = int(mcfg.get("seed", 0))
 
-    # Spread the initial path across regimes so every conditional block starts
+    # Initialize the path across all regimes.
     z_path = np.arange(T, dtype=int) % R
     retained: dict[str, list[np.ndarray]] = {}
     retained_z: list[np.ndarray] = []
@@ -95,7 +90,7 @@ def run_blocked_nuts_ffbs(data: dict, config: dict) -> az.InferenceData:
 
 
 def run_blocked_vi_ffbs(data: dict, config: dict) -> az.InferenceData:
-    """Scalable Step-24 alternative: alternate variational blocks with FFBS."""
+    "Scalable Step-24 alternative: alternate variational blocks with FFBS."
     from cassandra_threatcast.inference.vi import train_vi, vi_predictive_samples
 
     T = int(np.shape(data["N"])[1])

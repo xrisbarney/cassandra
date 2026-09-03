@@ -1,20 +1,11 @@
-"""Calibration diagnostics: PIT, coverage, KS test."""
+"Calibration diagnostics: PIT, coverage, KS test."
 import numpy as np
 import pandas as pd
 from scipy import stats
 
 
 def pit_values(obs: np.ndarray, samples: np.ndarray) -> np.ndarray:
-    """
-    Probability Integral Transform values.
-
-    obs     : (N,) observations
-    samples : (N, n_samples) predictive samples
-
-    Returns PIT values in [0, 1] using rank-based empirical CDF.
-    Randomizes for ties (uniform on the probability mass at obs),
-    which gives valid PIT values for discrete distributions.
-    """
+    "Probability Integral Transform values."
     # Fraction of samples strictly below obs
     below = np.mean(samples < obs[:, np.newaxis], axis=1)
     # Probability mass at obs
@@ -25,7 +16,7 @@ def pit_values(obs: np.ndarray, samples: np.ndarray) -> np.ndarray:
 
 
 def coverage(obs: np.ndarray, lower: np.ndarray, upper: np.ndarray) -> float:
-    """Empirical coverage rate: fraction of obs in [lower, upper]."""
+    "Empirical coverage rate: fraction of obs in [lower, upper]."
     return float(np.mean((obs >= lower) & (obs <= upper)))
 
 
@@ -35,13 +26,7 @@ def interval_score(
     upper: np.ndarray,
     alpha: float,
 ) -> float:
-    """
-    Winkler interval score for a (1 - alpha) prediction interval.
-
-    IS = (upper - lower)
-         + (2/alpha) * (lower - obs) * [obs < lower]
-         + (2/alpha) * (obs - upper) * [obs > upper]
-    """
+    "Winkler interval score for a (1 - alpha) prediction interval."
     width = upper - lower
     below_penalty = (2.0 / alpha) * np.maximum(lower - obs, 0.0)
     above_penalty = (2.0 / alpha) * np.maximum(obs - upper, 0.0)
@@ -49,10 +34,7 @@ def interval_score(
 
 
 def pit_ks_test(pit_vals: np.ndarray) -> tuple[float, float]:
-    """
-    KS test for PIT uniformity.
-    Returns (statistic, p_value).
-    """
+    "KS test for PIT uniformity."
     stat, pval = stats.kstest(pit_vals, "uniform")
     return float(stat), float(pval)
 
@@ -62,13 +44,7 @@ def calibration_report(
     predictive_dict: dict,
     alpha_levels: list[float] = [0.1, 0.5],
 ) -> pd.DataFrame:
-    """
-    Compute calibration diagnostics for each channel and alpha level.
-
-    Returns DataFrame with columns:
-        channel, alpha, coverage_nominal, coverage_empirical,
-        interval_score, pit_ks_stat, pit_ks_pval.
-    """
+    "Compute calibration diagnostics for each channel and alpha level."
     records = []
     for channel, obs in obs_dict.items():
         if channel not in predictive_dict:

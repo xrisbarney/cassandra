@@ -1,4 +1,4 @@
-﻿"""Tests for forecast evaluation utilities."""
+﻿"Tests for forecast evaluation utilities."
 import numpy as np
 import pytest
 import sys
@@ -14,7 +14,7 @@ from cassandra_threatcast.evaluation.calibration import pit_values, coverage, pi
 # crps_ensemble
 
 def test_crps_deterministic_forecast():
-    """CRPS of a perfect deterministic forecast (all samples = obs) is 0."""
+    "CRPS of a perfect deterministic forecast (all samples = obs) is 0."
     rng = np.random.default_rng(0)
     obs = np.array([1.0, 2.0, 3.0])
     # All 100 samples are exactly equal to the observation
@@ -24,7 +24,7 @@ def test_crps_deterministic_forecast():
 
 
 def test_crps_ordering():
-    """Better (tighter) forecast has lower average CRPS than worse forecast."""
+    "Better (tighter) forecast has lower average CRPS than worse forecast."
     rng = np.random.default_rng(7)
     obs = np.array([5.0, 5.0, 5.0])
     good_samples = rng.normal(5.0, 0.5, (3, 500))
@@ -37,14 +37,7 @@ def test_crps_ordering():
 
 
 def test_crps_analytical():
-    """
-    CRPS of N(0, 1) evaluated at y = 0 equals (sqrt(2) - 1)/sqrt(pi) ~= 0.2337.
-
-    From the analytical formula for the Normal distribution:
-        CRPS(N(mu, sigma), y) = sigma * (z*(2*Phi(z)-1) + 2*phi(z) - 1/sqrt(pi))
-    where z = (y - mu)/sigma.  At y = mu = 0, sigma = 1 this is
-        2*phi(0) - 1/sqrt(pi) = sqrt(2/pi) - 1/sqrt(pi) = (sqrt(2) - 1)/sqrt(pi).
-    """
+    "CRPS of N(0, 1) evaluated at y = 0 equals (sqrt(2) - 1)/sqrt(pi) ~= 0.2337."
     rng = np.random.default_rng(42)
     n_samples = 100_000
     obs = np.array([0.0])
@@ -55,7 +48,7 @@ def test_crps_analytical():
 
 
 def test_crps_nonnegative():
-    """CRPS is always >= 0."""
+    "CRPS is always >= 0."
     rng = np.random.default_rng(3)
     obs = rng.standard_normal(20)
     samples = rng.standard_normal((20, 200))
@@ -66,7 +59,7 @@ def test_crps_nonnegative():
 
 
 def test_crps_batch_shapes():
-    """crps_ensemble handles multi-dimensional obs/samples correctly."""
+    "crps_ensemble handles multi-dimensional obs/samples correctly."
     rng = np.random.default_rng(4)
     obs     = rng.standard_normal((4, 6))       # (K, T)
     samples = rng.standard_normal((4, 6, 100))  # (K, T, n_samples)
@@ -77,7 +70,7 @@ def test_crps_batch_shapes():
 # dm_test
 
 def test_dm_test_correct_sign():
-    """DM stat is negative when model A clearly outperforms model B."""
+    "DM stat is negative when model A clearly outperforms model B."
     rng = np.random.default_rng(0)
     T = 100
     obs = rng.standard_normal(T)
@@ -90,7 +83,7 @@ def test_dm_test_correct_sign():
 
 
 def test_dm_test_symmetric():
-    """Swapping loss_a and loss_b exactly negates the DM statistic."""
+    "Swapping loss_a and loss_b exactly negates the DM statistic."
     rng = np.random.default_rng(1)
     T = 80
     loss_a = rng.exponential(1.0, T)
@@ -101,7 +94,7 @@ def test_dm_test_symmetric():
 
 
 def test_dm_test_equal_losses():
-    """DM test with identical loss series gives stat near 0 and large p-value."""
+    "DM test with identical loss series gives stat near 0 and large p-value."
     rng = np.random.default_rng(2)
     T = 60
     losses = rng.exponential(1.0, T)
@@ -111,13 +104,13 @@ def test_dm_test_equal_losses():
 
 
 def test_dm_test_raises_mismatched_lengths():
-    """dm_test raises ValueError for loss series of different lengths."""
+    "dm_test raises ValueError for loss series of different lengths."
     with pytest.raises(ValueError):
         dm_test(np.ones(50), np.ones(40))
 
 
 def test_dm_test_multi_horizon():
-    """DM test with h > 1 runs without error and returns valid stat/pval."""
+    "DM test with h > 1 runs without error and returns valid stat/pval."
     rng = np.random.default_rng(5)
     T = 120
     loss_a = rng.exponential(1.0, T)
@@ -130,7 +123,7 @@ def test_dm_test_multi_horizon():
 # pit_values & coverage
 
 def test_pit_coverage_calibrated():
-    """90 % interval from a correctly specified model achieves ~90 % coverage."""
+    "90 % interval from a correctly specified model achieves ~90 % coverage."
     rng = np.random.default_rng(42)
     n = 500
     true_mu = rng.standard_normal(n)
@@ -143,7 +136,7 @@ def test_pit_coverage_calibrated():
 
 
 def test_pit_uniform_correct_model():
-    """PIT values from a correctly specified model pass the KS uniformity test."""
+    "PIT values from a correctly specified model pass the KS uniformity test."
     rng = np.random.default_rng(99)
     n = 1000
     obs     = rng.standard_normal(n)
@@ -158,7 +151,7 @@ def test_pit_uniform_correct_model():
 
 
 def test_pit_biased_model():
-    """PIT values from a biased model fail the KS uniformity test."""
+    "PIT values from a biased model fail the KS uniformity test."
     rng = np.random.default_rng(10)
     n = 500
     obs     = rng.standard_normal(n)
@@ -175,7 +168,7 @@ def test_pit_biased_model():
 # mae and rmse
 
 def test_mae_rmse_correct():
-    """mae and rmse give analytically correct values for a simple case."""
+    "mae and rmse give analytically correct values for a simple case."
     obs  = np.array([1.0, 2.0, 3.0])
     pred = np.array([1.5, 2.5, 3.5])
     assert mae(obs, pred)  == pytest.approx(0.5, abs=1e-10)
@@ -183,14 +176,14 @@ def test_mae_rmse_correct():
 
 
 def test_mae_rmse_perfect_forecast():
-    """mae and rmse are 0 for a perfect point forecast."""
+    "mae and rmse are 0 for a perfect point forecast."
     obs = np.array([1.0, 2.0, 3.0, 4.0])
     assert mae(obs, obs)  == pytest.approx(0.0, abs=1e-10)
     assert rmse(obs, obs) == pytest.approx(0.0, abs=1e-10)
 
 
 def test_rmse_ge_mae():
-    """RMSE >= MAE always holds (by Jensen's inequality)."""
+    "RMSE >= MAE always holds (by Jensen's inequality)."
     rng = np.random.default_rng(11)
     obs  = rng.poisson(5, 100).astype(float)
     pred = rng.poisson(5, 100).astype(float)

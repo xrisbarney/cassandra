@@ -1,8 +1,4 @@
-﻿"""CISA Known Exploited Vulnerabilities (KEV) catalog client.
-
-Downloads the KEV JSON feed, caches it locally, and computes per-topic
-monthly exploitation counts for use in the threat-panel.
-"""
+﻿"CISA Known Exploited Vulnerabilities (KEV) catalog client."
 
 from __future__ import annotations
 
@@ -22,20 +18,7 @@ _CACHE_FILENAME = "cisa_kev.json"
 
 
 def fetch_kev(cache_dir: str) -> pd.DataFrame:
-    """Download the CISA KEV catalog, cache locally, and return as a DataFrame.
-
-    Parameters
-    ----------
-    cache_dir:
-        Directory used to cache the raw JSON response.
-
-    Returns
-    -------
-    pd.DataFrame
-        Columns: cve_id, date_added, vendor_project, product,
-        vulnerability_name, short_description, required_action, due_date,
-        known_ransomware_campaign_use.
-    """
+    "Download the CISA KEV catalog, cache locally, and return as a DataFrame."
     Path(cache_dir).mkdir(parents=True, exist_ok=True)
     cache_file = Path(cache_dir) / _CACHE_FILENAME
 
@@ -109,29 +92,7 @@ def merge_with_topics(
     topic_assignments: np.ndarray,
     K: int,
 ) -> np.ndarray:
-    """Count KEV-listed CVEs per topic per month.
-
-    For each topic ``k`` and calendar month ``t``, counts how many CVEs
-    assigned to topic ``k`` and published in month ``t`` appear in the KEV
-    catalog.
-
-    Parameters
-    ----------
-    kev_df:
-        DataFrame returned by :func:`fetch_kev`.  Must have ``cve_id`` column.
-    cve_df:
-        DataFrame returned by :func:`~cassandra_threatcast.data.nvd.fetch_cves`.
-        Index is ``cve_id``; must have ``published_date`` column.
-    topic_assignments:
-        Integer array of length ``len(cve_df)`` with values in ``0 .. K-1``.
-    K:
-        Total number of topics.
-
-    Returns
-    -------
-    KEV_kt : np.ndarray, shape (K, T), dtype int64
-        Number of KEV-listed CVEs per topic per month.
-    """
+    "Count KEV-listed CVEs per topic per month."
     if len(cve_df) != len(topic_assignments):
         raise ValueError(
             f"cve_df length {len(cve_df)} != topic_assignments length {len(topic_assignments)}"

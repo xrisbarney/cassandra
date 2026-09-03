@@ -1,8 +1,4 @@
-﻿"""Data pipeline orchestrator.
-
-Builds the full threat-panel dictionary by calling NVD, EPSS, CISA KEV, and
-SEC 8-K data modules, then saving / loading the result to / from disk.
-"""
+﻿"Data pipeline orchestrator."
 
 from __future__ import annotations
 
@@ -25,43 +21,8 @@ def build_panel(
     K: int,
     S: int,
 ) -> dict:
-    """Orchestrate all data sources and return a unified threat panel.
-
-    Calls each data module in sequence.  If any individual source fails the
-    corresponding array is filled with NaN / zeros and a warning is logged,
-    so a partial panel is always returned.
-
-    Parameters
-    ----------
-    start:
-        Panel start date, ISO-8601 string, e.g. ``"2017-01-01"``.
-    end:
-        Panel end date, ISO-8601 string, e.g. ``"2023-12-31"``.
-    cache_dir:
-        Root cache directory; sub-modules will create sub-directories.
-    topic_assignments:
-        Integer array of length ``n_cves`` with values in ``0 .. K-1``.
-        Passed to aggregation functions.  If not yet computed (e.g., first
-        run before topic modelling), pass ``np.zeros(0, dtype=int)``.
-    sector_map:
-        ``{naics_2digit: sector_index}`` mapping for SEC 8-K aggregation.
-    K:
-        Number of threat topics.
-    S:
-        Number of economic sectors.
-
-    Returns
-    -------
-    dict with keys:
-        - ``N``  : np.ndarray (K, T) â€“ monthly CVE counts per topic
-        - ``B``  : np.ndarray (K, T) â€“ monthly mean CVSS score per topic
-        - ``E``  : np.ndarray (K, T) â€“ monthly mean EPSS score per topic
-        - ``KEV``: np.ndarray (K, T) â€“ monthly KEV exploitation count per topic
-        - ``D``  : np.ndarray (S, T) â€“ monthly 8-K disclosures per sector
-        - ``dates``: list[pd.Period] â€“ monthly period labels (length T)
-        - ``metadata``: dict â€“ source-level record counts and status flags
-    """
-    # Normalize to full ISO dates. fetch_cves' window logic requires YYYY-MM-DD
+    "Orchestrate all data sources and return a unified threat panel."
+    # Normalize to full ISO dates. fetch_cves' window logic requires...
     start = pd.Timestamp(start).strftime("%Y-%m-%d")
     end = pd.Timestamp(end).strftime("%Y-%m-%d")
 
@@ -188,7 +149,7 @@ def build_panel(
     }
 
 
-# Alignment helpers â€” map module-internal time axes to the panel's month range
+# Alignment helpers â€” map module-internal time axes to the panel's...
 
 def _align_kt(
     N_raw: np.ndarray,
@@ -198,7 +159,7 @@ def _align_kt(
     K: int,
     T: int,
 ) -> tuple[np.ndarray, np.ndarray]:
-    """Align (K, T_src) arrays produced by NVD aggregation to the panel's (K, T)."""
+    "Align (K, T_src) arrays produced by NVD aggregation to the panel's (K, T)."
     _pub = pd.to_datetime(cve_df["published_date"], utc=True).dt.tz_localize(None)
     src_months = pd.period_range(
         start=_pub.min().to_period("M"),
@@ -227,7 +188,7 @@ def _align_kt_int(
     K: int,
     T: int,
 ) -> np.ndarray:
-    """Align a single (K, T_src) integer array to the panel's (K, T)."""
+    "Align a single (K, T_src) integer array to the panel's (K, T)."
     _pub = pd.to_datetime(cve_df["published_date"], utc=True).dt.tz_localize(None)
     src_months = pd.period_range(
         start=_pub.min().to_period("M"),
@@ -253,7 +214,7 @@ def _align_k_array(
     T: int,
     col: str = "date",
 ) -> np.ndarray:
-    """Align a (K, T_src) float array using the date column of *df*."""
+    "Align a (K, T_src) float array using the date column of *df*."
     df_dates = pd.to_datetime(df[col])
     src_min = df_dates.min().to_period("M")
     src_max = df_dates.max().to_period("M")
@@ -277,7 +238,7 @@ def _align_st(
     S: int,
     T: int,
 ) -> np.ndarray:
-    """Align a (S, T_src) int array using filed_date column of sec_df."""
+    "Align a (S, T_src) int array using filed_date column of sec_df."
     filed = pd.to_datetime(sec_df["filed_date"].dropna())
     if filed.empty:
         return np.zeros((S, T), dtype=np.int64)
@@ -301,18 +262,7 @@ def _align_st(
 # Persistence helpers
 
 def save_panel(panel: dict, output_dir: str) -> None:
-    """Persist a panel dict to *output_dir*.
-
-    Arrays are saved as ``.npy`` files; the dates list and metadata dict are
-    saved as ``panel_meta.json``.
-
-    Parameters
-    ----------
-    panel:
-        Dict returned by :func:`build_panel`.
-    output_dir:
-        Destination directory (will be created if absent).
-    """
+    "Persist a panel dict to *output_dir*."
     out = Path(output_dir)
     out.mkdir(parents=True, exist_ok=True)
 
@@ -333,18 +283,7 @@ def save_panel(panel: dict, output_dir: str) -> None:
 
 
 def load_panel(input_dir: str) -> dict:
-    """Load a panel from *input_dir* previously written by :func:`save_panel`.
-
-    Parameters
-    ----------
-    input_dir:
-        Directory containing ``.npy`` files and ``panel_meta.json``.
-
-    Returns
-    -------
-    dict
-        Same structure as returned by :func:`build_panel`.
-    """
+    "Load a panel from *input_dir* previously written by :func:`save_panel`."
     src = Path(input_dir)
     if not src.exists():
         raise FileNotFoundError(f"Panel directory not found: {input_dir}")

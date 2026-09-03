@@ -25,7 +25,7 @@ import time
 import yaml
 import numpy as np
 
-# Force UTF-8 stdout/stderr: Windows' default console codepage cannot encode
+# Force UTF-8 stdout/stderr: Windows' default console codepage cannot...
 if sys.platform == "win32":
     import io
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace", line_buffering=True)
@@ -33,7 +33,7 @@ if sys.platform == "win32":
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
-# Must run before the first jax/numpyro import (including transitively, via
+# Must run before the first jax/numpyro import (including...
 import numpyro
 numpyro.set_host_device_count(os.cpu_count() or 1)
 
@@ -89,7 +89,7 @@ def parse_args() -> argparse.Namespace:
 
 # Data loading helpers
 def load_features(data_dir: str, S: int) -> dict:
-    """Load derived feature arrays, falling back to sensible defaults."""
+    "Load derived feature arrays, falling back to sensible defaults."
     def _try_load(fname: str, fallback: np.ndarray) -> np.ndarray:
         fpath = os.path.join(data_dir, fname)
         if os.path.exists(fpath):
@@ -102,7 +102,7 @@ def load_features(data_dir: str, S: int) -> dict:
 
 
 def assemble_data(panel: dict, data_dir: str, config: dict) -> dict:
-    """Build the data dict expected by full_model."""
+    "Build the data dict expected by full_model."
     K = config["model"]["K"]
     S = config["model"]["S"]
     T = panel["N"].shape[1]
@@ -137,11 +137,11 @@ def assemble_data(panel: dict, data_dir: str, config: dict) -> dict:
 def main() -> None:
     args = parse_args()
 
-    # --- Config -------------------------------------------------------------
+    # Load configuration.
     with open(args.config) as fh:
         config = yaml.safe_load(fh)
 
-    # MCMC settings live in config["mcmc"]; CLI flags override them.  We write
+    # Let CLI flags override MCMC configuration.
     print("      Model variant: paper-exact")
 
     mcmc_cfg = config.setdefault("mcmc", {})
@@ -162,7 +162,7 @@ def main() -> None:
 
     os.makedirs(args.output_dir, exist_ok=True)
 
-    # --- Load data ----------------------------------------------------------
+    # Load data.
     print("[1/3] Loading panel and features ...")
     panel = pipeline.load_panel(args.data_dir)
 
@@ -184,7 +184,7 @@ def main() -> None:
     print(f"      N total counts: {data['N'].sum():.0f}  "
           f"D total counts: {data['D'].sum():.0f}")
 
-    # --- Run inference ------------------------------------------------------
+    # Run inference.
     t0 = time.time()
 
     if args.method == "blocked":
@@ -201,7 +201,7 @@ def main() -> None:
     elapsed = time.time() - t0
     print(f"      {args.method.upper()} completed in {elapsed / 60:.1f} min.")
 
-    # --- Save ---------------------------------------------------------------
+    # Save results.
     print("[3/3] Saving InferenceData ...")
     out_path = os.path.join(args.output_dir, "idata.nc")
     pkl_path = os.path.join(args.output_dir, "idata.pkl")
@@ -223,7 +223,7 @@ def main() -> None:
     except Exception as exc:  # noqa: BLE001 — never fail the run over the secondary copy
         print(f"      netCDF save skipped ({exc}); the .pkl above is complete and authoritative.")
 
-    # --- Summary ------------------------------------------------------------
+    # Print the summary.
     try:
         import arviz as az
         key_vars = [v for v in idata.posterior.data_vars

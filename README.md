@@ -22,43 +22,43 @@ re-estimated. Optional curated loss marks belong at
 
 | Paper step | Implementation | Run |
 |---|---|---|
-| Step 1 | Panel assembly: `data/pipeline.py:19`; loss marks: `data/incident_losses.py:10`; CLI: `scripts/ingest_data.py:76`. | `python scripts/ingest_data.py --start 2010-01 --end 2024-12 --cache-dir data/cache` |
-| Step 2 | Exposure tensor: `features/exposure_map.py:111`. | `python scripts/build_features.py` |
-| Step 3 | BEA coefficients: `data/bea_io.py:213`; Leontief inverse: `data/bea_io.py:287`. | `python scripts/build_features.py` |
+| Step 1 | Panel assembly: `src/cassandra_threatcast/data/pipeline.py:15`; loss marks: `src/cassandra_threatcast/data/incident_losses.py:10`; CLI: `scripts/ingest_data.py:69`. | `python scripts/ingest_data.py --start 2010-01 --end 2024-12 --cache-dir data/cache` |
+| Step 2 | Exposure tensor: `src/cassandra_threatcast/features/exposure_map.py:107`. | `python scripts/build_features.py` |
+| Step 3 | BEA coefficients: `src/cassandra_threatcast/data/bea_io.py:187`; Leontief inverse: `src/cassandra_threatcast/data/bea_io.py:231`. | `python scripts/build_features.py` |
 | Step 4 | Reference events: `configs/reference_events.yaml:2`. | `python scripts/calibrate_damage.py` |
-| Step 5 | Ordered regime means: `model/paper_exact.py:59`; transition matrix: line 94. | `python scripts/train.py --method blocked` |
-| Step 6 | Regime-specific factor dynamics: `model/paper_exact.py:83` and line 150. | `python scripts/train.py --method blocked` |
-| Step 7 | Factor loadings: `model/paper_exact.py:67`; intensity: lines 156 and 192. | `python scripts/train.py --method blocked` |
-| Step 8 | Severity process: `model/paper_exact.py:88` and line 152. | `python scripts/train.py --method blocked` |
-| Step 9 | Hierarchical priors: `model/paper_exact.py:64` and line 78. | `python scripts/train.py --method blocked` |
-| Step 10 | Hawkes extension: `model/paper_exact.py:120`. | Set `hawkes.enabled: true`; run `python scripts/train.py --method blocked` |
-| Step 11 | Effort estimator: `features/effort.py:13`; latent process: `model/paper_exact.py:101`. | `python scripts/build_features.py`; `python scripts/train.py --method blocked` |
-| Step 12 | Vulnerability likelihood: `model/paper_exact.py:163`. | `python scripts/train.py --method blocked` |
-| Step 13 | Exploitation likelihood: `model/paper_exact.py:166`. | `python scripts/train.py --method blocked` |
-| Step 14 | Reporting propensity: `model/paper_exact.py:33` and line 134. | `python scripts/train.py --method blocked` |
-| Step 15 | Incident likelihood: `model/paper_exact.py:182`. | `python scripts/train.py --method blocked` |
-| Step 16 | Independent likelihood sites: `model/paper_exact.py:163`, line 170, and line 183. | `python scripts/train.py --method blocked` |
-| Step 17 | Damage function: `model/economic.py:70`; shock load: `model/paper_exact.py:346`. | `python scripts/forecast.py --horizon 12` |
+| Step 5 | Ordered regime means: `src/cassandra_threatcast/model/paper_exact.py:49`; transition matrix: line 84. | `python scripts/train.py --method blocked` |
+| Step 6 | Regime-specific factor dynamics: `src/cassandra_threatcast/model/paper_exact.py:73` and line 140. | `python scripts/train.py --method blocked` |
+| Step 7 | Factor loadings: `src/cassandra_threatcast/model/paper_exact.py:57`; intensity: lines 145 and 182. | `python scripts/train.py --method blocked` |
+| Step 8 | Severity process: `src/cassandra_threatcast/model/paper_exact.py:78` and line 142. | `python scripts/train.py --method blocked` |
+| Step 9 | Hierarchical priors: `src/cassandra_threatcast/model/paper_exact.py:54` and line 68. | `python scripts/train.py --method blocked` |
+| Step 10 | Hawkes extension: `src/cassandra_threatcast/model/paper_exact.py:110`. | Set `hawkes.enabled: true`; run `python scripts/train.py --method blocked` |
+| Step 11 | Effort estimator: `src/cassandra_threatcast/features/effort.py:9`; latent process: `src/cassandra_threatcast/model/paper_exact.py:91`. | `python scripts/build_features.py`; `python scripts/train.py --method blocked` |
+| Step 12 | Vulnerability likelihood: `src/cassandra_threatcast/model/paper_exact.py:153`. | `python scripts/train.py --method blocked` |
+| Step 13 | Exploitation likelihood: `src/cassandra_threatcast/model/paper_exact.py:158`. | `python scripts/train.py --method blocked` |
+| Step 14 | Reporting propensity: `src/cassandra_threatcast/model/paper_exact.py:27` and line 124. | `python scripts/train.py --method blocked` |
+| Step 15 | Incident likelihood: `src/cassandra_threatcast/model/paper_exact.py:172`. | `python scripts/train.py --method blocked` |
+| Step 16 | Independent likelihood sites: `src/cassandra_threatcast/model/paper_exact.py:153`, line 160, and line 173. | `python scripts/train.py --method blocked` |
+| Step 17 | Damage function: `src/cassandra_threatcast/model/economic.py:66`; shock load: `src/cassandra_threatcast/model/paper_exact.py:336`. | `python scripts/forecast.py --horizon 12` |
 | Step 18 | Bayesian calibration: `scripts/calibrate_damage.py:215`; retained draws: line 275. | `python scripts/calibrate_damage.py` |
-| Step 19 | Direct loss: `model/paper_exact.py:348`. | `python scripts/forecast.py --horizon 12` |
-| Step 20 | Leontief propagation: `model/economic.py:105`; aggregate draws: `model/paper_exact.py:364`. | `python scripts/forecast.py --horizon 12` |
-| Step 21 | Joint model: `model/paper_exact.py:45`. | `python scripts/train.py --method blocked` |
-| Step 22 | NUTS block: `inference/blocked.py:16`. | `python scripts/train.py --method blocked` |
-| Step 23 | Alternation: `inference/blocked.py:37`; FFBS: `inference/ffbs.py:101`. | `python scripts/train.py --method blocked` |
-| Step 24 | VI/FFBS alternative: `inference/blocked.py:97`. | `python scripts/train.py --method vi` |
-| Step 25 | Forward simulation: `model/paper_exact.py:250` and line 295. | `python scripts/forecast.py --horizon 12` |
-| Step 26 | Exposure and damage push-forward: `model/paper_exact.py:322` and line 346. | `python scripts/forecast.py --horizon 12` |
-| Step 27 | Loss push-forward: `model/paper_exact.py:348`. | `python scripts/forecast.py --horizon 12` |
-| Step 28 | Joint `M_t`/damage draws: `model/paper_exact.py:322` and line 337. | `python scripts/calibrate_damage.py`; `python scripts/forecast.py --horizon 12` |
-| Step 29 | Threat bands: `scripts/forecast.py:330`. | `python scripts/forecast.py --horizon 12` |
-| Step 30 | Sector exposure output: `scripts/forecast.py:391`. | `python scripts/forecast.py --horizon 12` |
-| Step 31 | VaR/ES: `scripts/forecast.py:148`; tail probabilities: line 352. | `python scripts/forecast.py --horizon 12` |
-| Step 32 | Regime probabilities: `scripts/forecast.py:432`. | `python scripts/forecast.py --horizon 12` |
-| Step 33 | Rolling origins: `scripts/evaluate.py:337`; per-origin refit: line 225. | `python scripts/evaluate.py` |
-| Step 34 | Channel scoring: `scripts/evaluate.py:461`; output: line 485. | `python scripts/evaluate.py` |
-| Step 35 | PIT/coverage report: `evaluation/calibration.py:60`. | `python scripts/evaluate.py` |
-| Step 36 | RF/ARIMA/ETS/naive/BSTS-U: `evaluation/baselines.py:8`, lines 88, 155, 231, and 287. | `python scripts/evaluate.py` |
-| Step 37 | Posterior checks: `evaluation/posterior_predictive.py:8`; output: `scripts/evaluate.py:491`. | `python scripts/evaluate.py` |
+| Step 19 | Direct loss: `src/cassandra_threatcast/model/paper_exact.py:338`. | `python scripts/forecast.py --horizon 12` |
+| Step 20 | Leontief propagation: `src/cassandra_threatcast/model/economic.py:88`; aggregate draws: `src/cassandra_threatcast/model/paper_exact.py:354`. | `python scripts/forecast.py --horizon 12` |
+| Step 21 | Joint model: `src/cassandra_threatcast/model/paper_exact.py:39`. | `python scripts/train.py --method blocked` |
+| Step 22 | NUTS block: `src/cassandra_threatcast/inference/blocked.py:16`. | `python scripts/train.py --method blocked` |
+| Step 23 | Alternation: `src/cassandra_threatcast/inference/blocked.py:37`; FFBS: `src/cassandra_threatcast/inference/ffbs.py:72`. | `python scripts/train.py --method blocked` |
+| Step 24 | VI/FFBS alternative: `src/cassandra_threatcast/inference/blocked.py:92`. | `python scripts/train.py --method vi` |
+| Step 25 | Forward simulation: `src/cassandra_threatcast/model/paper_exact.py:240` and line 285. | `python scripts/forecast.py --horizon 12` |
+| Step 26 | Exposure and damage push-forward: `src/cassandra_threatcast/model/paper_exact.py:312` and line 336. | `python scripts/forecast.py --horizon 12` |
+| Step 27 | Loss push-forward: `src/cassandra_threatcast/model/paper_exact.py:338`. | `python scripts/forecast.py --horizon 12` |
+| Step 28 | Joint `M_t`/damage draws: `src/cassandra_threatcast/model/paper_exact.py:312` and line 327. | `python scripts/calibrate_damage.py`; `python scripts/forecast.py --horizon 12` |
+| Step 29 | Threat bands: `scripts/forecast.py:312`. | `python scripts/forecast.py --horizon 12` |
+| Step 30 | Sector exposure output: `scripts/forecast.py:373`. | `python scripts/forecast.py --horizon 12` |
+| Step 31 | VaR/ES: `scripts/forecast.py:130`; tail probabilities: line 334. | `python scripts/forecast.py --horizon 12` |
+| Step 32 | Regime probabilities: `scripts/forecast.py:414`. | `python scripts/forecast.py --horizon 12` |
+| Step 33 | Rolling origins: `scripts/evaluate.py:325`; per-origin refit: line 213. | `python scripts/evaluate.py` |
+| Step 34 | Channel scoring: `scripts/evaluate.py:454`; output: line 473. | `python scripts/evaluate.py` |
+| Step 35 | PIT/coverage report: `src/cassandra_threatcast/evaluation/calibration.py:42`. | `python scripts/evaluate.py` |
+| Step 36 | RF/ARIMA/ETS/naive/BSTS-U: `src/cassandra_threatcast/evaluation/baselines.py:8`, lines 70, 126, 192, and 244. | `python scripts/evaluate.py` |
+| Step 37 | Posterior checks: `src/cassandra_threatcast/evaluation/posterior_predictive.py:8`; output: `scripts/evaluate.py:479`. | `python scripts/evaluate.py` |
 
 The end-to-end command executes the dependency order: ingest, features,
 blocked inference, damage calibration, rolling validation, then forecasting.

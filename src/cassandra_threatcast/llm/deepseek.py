@@ -1,19 +1,4 @@
-"""
-deepseek.py
-===========
-Thin client for DeepSeek's OpenAI-compatible chat completions API. Two uses:
-
-1. explain_forecast() -- turn the forecast's numeric outputs (predictive
-   quantiles, loss distribution) into a short plain-English summary.
-2. label_topics() -- turn a fitted topic model's raw top-TF-IDF-word clusters
-   into short, analyst-recognizable category names (e.g. "SQL Injection"
-   instead of "Sql / Injection / Php").
-
-Both are purely additive and optional: if DEEPSEEK_API_KEY is not set, or a
-request fails for any reason, these return None and callers fall back to
-their non-LLM behavior -- nothing else in the pipeline depends on either
-succeeding.
-"""
+"Thin client for DeepSeek's OpenAI-compatible chat completions API. Two uses:"
 from __future__ import annotations
 
 import json
@@ -69,13 +54,7 @@ _TOPIC_LABEL_SYSTEM_PROMPT = (
 
 
 def _strip_markdown(text: str) -> str:
-    """Remove stray markdown the LLM might emit despite instructions not to.
-
-    st.info() in the dashboard renders markdown, so a leftover/unmatched '**'
-    or '_' from the model reads as randomly-inconsistent bold/italic text
-    mid-sentence -- this makes the output safe to render as plain prose
-    regardless of what the model actually returned.
-    """
+    "Remove stray markdown the LLM might emit despite instructions not to."
     text = re.sub(r"\*\*(.*?)\*\*", r"\1", text)
     text = re.sub(r"\*(.*?)\*", r"\1", text)
     text = re.sub(r"(?<!\w)_(.+?)_(?!\w)", r"\1", text)
@@ -85,8 +64,7 @@ def _strip_markdown(text: str) -> str:
 
 
 def _summarize_topics(q_df: pd.DataFrame, top_n: int = 3) -> str:
-    """Rank topics by their final-horizon forecast level and by growth over
-    the horizon, and describe the top few of each in plain text."""
+    "Rank topics by their final-horizon forecast level and by growth over"
     by_topic = q_df.groupby("topic_label")
     rows = []
     for label, g in by_topic:
@@ -114,7 +92,7 @@ def _summarize_topics(q_df: pd.DataFrame, top_n: int = 3) -> str:
 
 
 def _summarize_losses(loss_df: pd.DataFrame, top_n: int = 3) -> str:
-    """Describe the aggregate loss distribution and the riskiest sectors."""
+    "Describe the aggregate loss distribution and the riskiest sectors."
     var_col = next((c for c in loss_df.columns if c.startswith("VaR")), None)
     es_col = next((c for c in loss_df.columns if c.startswith("ES")), None)
     horizon = int(loss_df["horizon_months"].iloc[0]) if "horizon_months" in loss_df.columns else None
@@ -179,12 +157,7 @@ def _call_deepseek(
 
 
 def explain_forecast(q_df: pd.DataFrame, loss_df: pd.DataFrame) -> str | None:
-    """
-    Build a plain-English summary of a forecast run from its two output
-    tables (forecast_quantiles.csv and loss_distribution.csv, already loaded
-    as DataFrames). Returns None if DEEPSEEK_API_KEY is not set or the API
-    call fails -- this is always an optional enhancement, never required.
-    """
+    "Build a plain-English summary of a forecast run from its two output"
     prompt = (
         "Here is the cyber-threat forecast data:\n\n"
         + _summarize_topics(q_df)
@@ -197,15 +170,7 @@ def explain_forecast(q_df: pd.DataFrame, loss_df: pd.DataFrame) -> str | None:
 
 
 def label_topics(topic_top_words: list[list[str]]) -> list[str | None] | None:
-    """
-    Given each fitted topic's top TF-IDF words (see WikiTopicMapper.top_words),
-    ask DeepSeek for a short, analyst-recognizable category name per topic.
-
-    Returns a list the same length as topic_top_words, with None in any slot
-    the model didn't return a name for (caller should fall back to the
-    word-based label for that slot). Returns None entirely if
-    DEEPSEEK_API_KEY is not set or the request fails.
-    """
+    "Given each fitted topic's top TF-IDF words (see WikiTopicMapper.top_words),"
     prompt = "\n".join(
         f"{k}: {', '.join(words)}" for k, words in enumerate(topic_top_words)
     )
@@ -246,13 +211,7 @@ _BACKTEST_SYSTEM_PROMPT = (
 
 
 def explain_backtest(detail_df: pd.DataFrame, scores_df: pd.DataFrame, coverage: float) -> str | None:
-    """
-    Build a plain-English "how did the forecast do" summary from a backtest
-    comparison (scripts/backtest.py): per-topic actual-vs-predicted detail,
-    aggregate CRPS/MAE/RMSE by horizon, and the empirical 90%-interval
-    coverage rate. Returns None if DEEPSEEK_API_KEY is not set or the API
-    call fails.
-    """
+    "Build a plain-English \"how did the forecast do\" summary from a backtest"
     by_topic = detail_df.groupby("topic_label").agg(
         actual_total=("actual_cves", "sum"),
         predicted_total=("predicted_mean_cves", "sum"),

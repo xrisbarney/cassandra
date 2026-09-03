@@ -1,15 +1,5 @@
 #!/usr/bin/env python3
-"""
-Run the entire CASSANDRA pipeline end-to-end, unattended.
-
-Collect data -> Prepare inputs -> Infer -> Calibrate -> Evaluate -> Forecast, in order,
-stopping at the first failure. Optionally wipes all caches and outputs first
-(--fresh) for a true from-scratch run. Designed to be launched and left running
-(e.g. overnight); it logs clear step markers the dashboard can read.
-
-    python scripts/run_all.py --fresh            # full fresh run
-    python scripts/run_all.py --quick            # quick preview training
-"""
+"Run the entire CASSANDRA pipeline end-to-end, unattended."
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -21,7 +11,7 @@ import sys
 import time
 from pathlib import Path
 
-# Force UTF-8 stdout/stderr here (for run_all.py's own prints) AND propagate
+# Force UTF-8 stdout/stderr here (for run_all.py's own prints) AND...
 if sys.platform == "win32":
     import io
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace", line_buffering=True)
@@ -37,7 +27,7 @@ def log(msg: str) -> None:
 
 
 def nuke() -> None:
-    """Delete all downloaded data, processed features, and results."""
+    "Delete all downloaded data, processed features, and results."
     for d in ("data/cache", "data/processed", "results"):
         p = ROOT / d
         if p.exists():

@@ -1,4 +1,4 @@
-"""Posterior predictive checks for paper Step 37."""
+"Posterior predictive checks for paper Step 37."
 from __future__ import annotations
 
 import numpy as np
@@ -6,7 +6,7 @@ import pandas as pd
 
 
 def posterior_predictive_checks(obs_dict: dict, predictive_dict: dict) -> pd.DataFrame:
-    """Compare observed totals, dispersion, and zero rates with replications."""
+    "Compare observed totals, dispersion, and zero rates with replications."
     rows = []
     statistics = {
         "mean": lambda x: np.nanmean(x, axis=-1),

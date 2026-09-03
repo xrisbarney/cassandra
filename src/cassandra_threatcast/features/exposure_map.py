@@ -1,8 +1,4 @@
-"""
-exposure_map.py
-===============
-Maps CPE vendor strings to BEA sector indices and builds the M_skt exposure tensor.
-"""
+"Maps CPE vendor strings to BEA sector indices and builds the M_skt exposure tensor."
 from __future__ import annotations
 
 import re
@@ -90,7 +86,7 @@ _DEFAULT_SECTOR = 7  # Information technology
 
 
 def _extract_cpe_vendor(cpe_string: str) -> str:
-    """Extract the vendor component from a CPE 2.3 URI or formatted string."""
+    "Extract the vendor component from a CPE 2.3 URI or formatted string."
     # cpe:2.3:a:vendor:product:... or cpe:/a:vendor:product:...
     parts = cpe_string.split(":")
     if len(parts) >= 4:
@@ -99,7 +95,7 @@ def _extract_cpe_vendor(cpe_string: str) -> str:
 
 
 def _lookup_sector(vendor: str) -> int:
-    """Look up sector index for a vendor string (normalised)."""
+    "Look up sector index for a vendor string (normalised)."
     vendor_clean = re.sub(r"[^a-z0-9]", "", vendor.lower())
     for prefix, sector in CPE_SECTOR_MAP.items():
         prefix_clean = re.sub(r"[^a-z0-9]", "", prefix.lower())
@@ -115,34 +111,20 @@ def build_exposure_map(
     topic_assignments: np.ndarray,
     dates: list,
 ) -> np.ndarray:
-    """
-    Construct M_skt exposure tensor of shape (S, K, T).
-
-    Parameters
-    ----------
-    cve_df : DataFrame with at least columns 'date' and 'cpe' (string or list of CPE strings).
-    S : number of BEA sectors.
-    K : number of threat topics.
-    topic_assignments : (n_cves,) integer array of topic labels.
-    dates : ordered list of T period labels (matched against cve_df['date']).
-
-    Returns
-    -------
-    M_skt : np.ndarray of shape (S, K, T), column-normalised per time slice.
-    """
+    "Construct M_skt exposure tensor of shape (S, K, T)."
     T = len(dates)
     date_index = {d: t for t, d in enumerate(dates)}
 
     M = np.zeros((S, K, T), dtype=np.float64)
 
-    # Pre-resolve the per-row month index and topic as arrays (vectorized), then
+    # Pre-resolve the per-row month index and topic as arrays...
     dates_arr = cve_df["date"].map(date_index).to_numpy()   # NaN where out of range
     cpe_arr = cve_df["cpe"].to_numpy()
     topics = np.asarray(topic_assignments)
 
     vendor_sector_cache: dict[str, int] = {}
 
-    # Accumulate contributions as flat index lists for a single np.add.at call.
+    # Accumulate contributions as flat index lists for a single np.add.at...
     idx_s: list[int] = []
     idx_k: list[int] = []
     idx_t: list[int] = []
@@ -204,15 +186,7 @@ def summarize_exposure(
     sector_labels: list[str],
     topic_labels: list[str],
 ) -> pd.DataFrame:
-    """
-    Return tidy DataFrame with columns: sector, topic, mean_exposure, std_exposure.
-
-    Parameters
-    ----------
-    M_skt : (S, K, T) exposure tensor.
-    sector_labels : list of length S.
-    topic_labels : list of length K.
-    """
+    "Return tidy DataFrame with columns: sector, topic, mean_exposure, std_exposure."
     S, K, T = M_skt.shape
     records = []
     for s in range(S):

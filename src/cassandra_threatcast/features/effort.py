@@ -1,8 +1,4 @@
-"""
-effort.py
-=========
-Estimates latent reporting effort e_t from raw monthly CVE counts.
-"""
+"Estimates latent reporting effort e_t from raw monthly CVE counts."
 from __future__ import annotations
 
 import numpy as np
@@ -15,21 +11,7 @@ def estimate_effort(
     method: str = "hp_filter",
     hp_lambda: float = 1600,
 ) -> np.ndarray:
-    """
-    Estimate latent reporting effort e_t from raw monthly CVE counts.
-
-    Parameters
-    ----------
-    N_raw : 1-D array of length T with raw monthly CVE counts.
-    method : one of 'hp_filter', 'state_space', 'moving_avg', 'log_diff'.
-    hp_lambda : smoothing parameter for the HP filter (default 1600 for quarterly;
-                use 129600 for monthly data as a rule-of-thumb, but 1600 is kept
-                as default to match the function signature).
-
-    Returns
-    -------
-    e_t : T-length float array normalised to mean 0, std 1.
-    """
+    "Estimate latent reporting effort e_t from raw monthly CVE counts."
     N_raw = np.asarray(N_raw, dtype=np.float64)
     T = len(N_raw)
 
@@ -53,7 +35,7 @@ def estimate_effort(
         kernel = np.ones(window) / window
         e_raw = np.convolve(log_N, kernel, mode="same")
     elif method == "log_diff":
-        # Month-over-month log growth as an effort proxy; prepend to keep length T.
+        # Month-over-month log growth as an effort proxy; prepend to keep...
         e_raw = np.diff(log_N, prepend=log_N[0])
     else:
         raise ValueError(
@@ -71,27 +53,14 @@ def estimate_effort(
 
 
 def detrend_counts(N_raw: np.ndarray, e_t: np.ndarray, scale: float = 1.0) -> np.ndarray:
-    """
-    Remove reporting-effort trend from raw counts.
-
-    Returns N_raw / exp(e_t * scale) as detrended counts.
-    """
+    "Remove reporting-effort trend from raw counts."
     N_raw = np.asarray(N_raw, dtype=np.float64)
     e_t = np.asarray(e_t, dtype=np.float64)
     return N_raw / np.exp(e_t * scale)
 
 
 def effort_summary(N_raw: np.ndarray, e_t: np.ndarray) -> dict:
-    """
-    Compute summary statistics of the effort covariate.
-
-    Returns
-    -------
-    dict with keys:
-        trend_variance_fraction : fraction of log(N) variance explained by e_t
-        min_effort, max_effort  : range of e_t
-        autocorr_lag1           : first-order autocorrelation of e_t
-    """
+    "Compute summary statistics of the effort covariate."
     N_raw = np.asarray(N_raw, dtype=np.float64)
     e_t = np.asarray(e_t, dtype=np.float64)
 

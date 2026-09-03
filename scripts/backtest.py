@@ -122,13 +122,7 @@ def parse_args() -> argparse.Namespace:
 
 def _fetch_extension_counts(panel_end: pd.Period, extend_to: str,
                             cache_dir: str, data_dir: str, K: int):
-    """
-    Actual monthly CVE counts for the months AFTER the training panel,
-    classified with the FROZEN topic mapper (never refit: refitting would
-    shuffle topic indices and break correspondence with the trained model).
-
-    Returns (N_ext (K, T_ext) or None, ext_periods or None).
-    """
+    "Actual monthly CVE counts for the months AFTER the training panel,"
     if str(extend_to).lower() == "none":
         return None, None
     if str(extend_to).lower() == "now":
@@ -168,7 +162,7 @@ def _fetch_extension_counts(panel_end: pd.Period, extend_to: str,
 # The sequential filter / one-step-ahead predictive machinery lives in
 
 
-# Interactive charts: Palette: dataviz reference instance (categorical slot 1 + chart chrome).
+    # Use the categorical chart palette.
 _BLUE      = "#2a78d6"   # predicted median + bands
 _INK       = "#0b0b0b"   # actual line / primary ink
 _INK_2     = "#52514e"   # secondary ink
@@ -369,7 +363,7 @@ def main() -> None:
     D_mean = _trimmed_mean(D_pred)                # (S, T_all)
 
     def _channel_scores(obs, pred, q, mask):
-        """obs (C,T), pred (n,C,T_all), q (5,C,T_all), mask (T,) over panel months."""
+        "obs (C,T), pred (n,C,T_all), q (5,C,T_all), mask (T,) over panel months."
         obs_w = obs[:, mask]
         samp_w = np.moveaxis(pred[:, :, :obs.shape[1]][:, :, mask], 0, -1)  # (C,Tw,n)
         med_w = q[2][:, :obs.shape[1]][:, mask]

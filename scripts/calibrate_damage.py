@@ -177,7 +177,7 @@ def main() -> None:
     log_tau = np.array([(np.log(r["high"]) - np.log(r["low"])) / 3.29
                         for r in event_rows])            # 90% interval width -> sd
 
-    # Aggregate annual anchor: typical-month shock loads over recent history.
+    # Aggregate recent monthly shocks into the annual anchor.
     anchor = events_cfg.get("aggregate_anchor", {})
     anchor_lo = float(anchor.get("low_usd_per_year", 3.0e10))
     anchor_hi = float(anchor.get("high_usd_per_year", 2.0e11))
@@ -208,7 +208,7 @@ def main() -> None:
     typ_j = jnp.asarray(typ_arr)                         # (M, n, S)
     Lam_j = jnp.asarray(Lambda_L)
     x_j = jnp.asarray(x_s_usd)
-    # Per-sector operating points.  Shock loads are wildly heterogeneous
+    # Per-sector operating points. Shock loads are wildly heterogeneous
     sector_ref = np.clip(np.median(shock_arr, axis=(0, 1)), 1e-6, None)   # (S,)
     sector_ref_j = jnp.asarray(sector_ref)
 
@@ -271,7 +271,7 @@ def main() -> None:
         json.dump(params_out, fh, indent=2)
     print(f"      Calibrated params -> {params_path}")
 
-    # Retain the complete calibration posterior so forecast Step 28 propagates
+    # Retain posterior draws for forecast Step 28.
     damage_draws_path = os.path.join(args.output_dir, "damage_posterior.npz")
     np.savez_compressed(
         damage_draws_path,

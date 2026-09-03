@@ -1,13 +1,4 @@
-"""
-CASSANDRA — interactive dashboard.
-
-A friendly, click-through interface to the cyber-threat forecasting pipeline.
-Run it with:
-
-    streamlit run app.py
-
-Each step is a button. You do not need to touch the command line.
-"""
+"CASSANDRA — interactive dashboard."
 from __future__ import annotations
 
 import html
@@ -39,16 +30,14 @@ st.set_page_config(page_title="CASSANDRA — Cyber Threat Forecasting", page_ico
 
 
 def sector_glossary_expander() -> None:
-    """Reference table of all 11 sectors and what they cover, for anyone who
-    wants to browse definitions instead of hovering over each name."""
+    "Reference table of all 11 sectors and what they cover, for anyone who"
     with st.expander("ℹ️ What do these sectors mean?"):
         for name in SECTOR_LABELS:
             st.markdown(f"**{name}** — {SECTOR_DESCRIPTIONS[name]}")
 
 
 def _sector_table_html(df: pd.DataFrame, name_col: str = "scope") -> str:
-    """Render a small DataFrame as an HTML table with a native hover tooltip
-    (title attribute) on any cell whose value is a known sector name."""
+    "Render a small DataFrame as an HTML table with a native hover tooltip"
     header = "".join(
         f"<th style='padding:4px 10px;text-align:left;border-bottom:1px solid rgba(128,128,128,0.4)'>{html.escape(str(c))}</th>"
         for c in df.columns
@@ -93,7 +82,7 @@ def panel_has_data() -> bool:
 
 
 def run_step(cmd: list[str], title: str) -> bool:
-    """Run a pipeline script, streaming its output into the page. Returns success."""
+    "Run a pipeline script, streaming its output into the page. Returns success."
     log_area = st.empty()
     lines: list[str] = []
     with st.status(f"Running: {title} …", expanded=True) as status:
@@ -126,10 +115,9 @@ def status_badge(done: bool, ready: bool = True) -> str:
     return "🔵 Ready to run"
 
 
-# ---- Unattended "run everything" support ----------------------------------
+# ---- Unattended "run everything" support...
 def launch_full_run(fresh: bool, quick: bool, enhanced: bool, start: str, end: str) -> None:
-    """Start the whole pipeline as a detached background process (survives closing
-    this browser window). Output is streamed to results/run_all.log."""
+    "Start the whole pipeline as a detached background process (survives closing"
     RESULTS.mkdir(parents=True, exist_ok=True)
     cmd = [PY, "scripts/run_all.py", "--start", start, "--end", end]
     if fresh:
@@ -151,7 +139,7 @@ def launch_full_run(fresh: bool, quick: bool, enhanced: bool, start: str, end: s
 
 
 def full_run_state() -> tuple[str, str]:
-    """Return (state, log_text): state is none/running/done/failed."""
+    "Return (state, log_text): state is none/running/done/failed."
     if not RUN_LOG.exists():
         return "none", ""
     # encoding="utf-8" is required here: the log is written in UTF-8 (see
@@ -181,7 +169,7 @@ def stop_full_run() -> None:
 
 @st.fragment(run_every="5s")
 def live_full_run_log() -> None:
-    """Auto-refreshing view of the unattended run's progress."""
+    "Auto-refreshing view of the unattended run's progress."
     state, text = full_run_state()
     if state == "none":
         return
@@ -353,7 +341,7 @@ with tab_run:
         if not done_train:
             st.info("Finish Step 3 first.")
 
-    # Step 6 (optional — only meaningful once the forecast window is in the past)
+    # Step 6 (optional — only meaningful once the forecast window is in...
     with st.container(border=True):
         st.subheader(f"Step 6 — Check the model against reality   {status_badge(done_backtest, ready=done_train)}")
         st.write(

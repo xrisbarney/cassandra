@@ -1,4 +1,4 @@
-"""Optional curated incident-loss marks used by paper Steps 1, 4, and 34."""
+"Optional curated incident-loss marks used by paper Steps 1, 4, and 34."
 from __future__ import annotations
 
 from pathlib import Path
@@ -8,11 +8,7 @@ import pandas as pd
 
 
 def load_monthly_loss_marks(path: str | Path, months, S: int) -> np.ndarray:
-    """Aggregate a curated CSV to sector/month loss marks in US dollars.
-
-    The CSV columns are ``date``, ``sector_idx`` and ``loss_usd``. Missing
-    sector-months remain NaN, distinguishing unreported losses from zero loss.
-    """
+    "Aggregate a curated CSV to sector/month loss marks in US dollars."
     out = np.full((S, len(months)), np.nan)
     source = Path(path)
     if not source.exists():
