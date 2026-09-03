@@ -29,9 +29,7 @@ _DEFAULT_TABLE_ID = "259"       # Use of Commodities by Industries – Summary
 _DEFAULT_YEAR = 2022
 _GROSS_OUTPUT_ROW = "T018"      # "Total industry output (basic prices)"
 
-# ---------------------------------------------------------------------------
 # 11-sector aggregation
-# ---------------------------------------------------------------------------
 _DEFAULT_SECTOR_LABELS = [
     "Agriculture",             # 0
     "Mining",                  # 1
@@ -47,7 +45,6 @@ _DEFAULT_SECTOR_LABELS = [
 ]
 
 # Explicit BEA summary industry/commodity code → sector index (validated
-# against the 2022 Summary Use table's 71 real industry codes).
 _CODE_TO_SECTOR: dict[str, int] = {
     # Agriculture
     "111CA": 0, "113FF": 0,
@@ -85,8 +82,6 @@ def get_default_sector_labels() -> list[str]:
 
 
 # One-sentence description + example constituent industries per sector, for
-# UI tooltips/glossaries -- written from the actual NAICS groupings in
-# _CODE_TO_SECTOR above, not just the short label name.
 _SECTOR_DESCRIPTIONS = [
     "Farming, forestry, fishing, and hunting -- crop and animal production, logging, commercial fishing.",
     "Extraction of oil, gas, coal, metal ores, and other minerals.",
@@ -108,9 +103,7 @@ def get_sector_descriptions() -> list[str]:
     return list(_SECTOR_DESCRIPTIONS)
 
 
-# ---------------------------------------------------------------------------
 # BEA API fetch & cache
-# ---------------------------------------------------------------------------
 
 def _cache_path(cache_dir: str, year: int) -> Path:
     return Path(cache_dir) / f"bea_use_table_{year}.json"
@@ -215,9 +208,7 @@ def _build_use_and_output(rows: list[dict], n_sectors: int) -> tuple[np.ndarray,
     return U, g
 
 
-# ---------------------------------------------------------------------------
 # Public API (called by scripts/build_features.py)
-# ---------------------------------------------------------------------------
 
 def get_technical_coefficients(
     year: int = _DEFAULT_YEAR,
@@ -291,9 +282,7 @@ def get_sector_output(
     return g
 
 
-# ---------------------------------------------------------------------------
 # Core linear algebra
-# ---------------------------------------------------------------------------
 
 def leontief_inverse(A: np.ndarray) -> np.ndarray:
     """Compute the Leontief inverse L = (I - A)^{-1}.
@@ -315,9 +304,7 @@ def leontief_inverse(A: np.ndarray) -> np.ndarray:
     return L
 
 
-# ---------------------------------------------------------------------------
 # File-based loaders (fallback for local CSV/Excel copies of BEA tables)
-# ---------------------------------------------------------------------------
 
 def load_use_table(path: str) -> tuple[np.ndarray, list[str]]:
     """Load a BEA Use table from a local CSV/Excel file and return (A, labels)."""

@@ -23,18 +23,13 @@ def crps_ensemble(obs: np.ndarray, samples: np.ndarray) -> np.ndarray:
     term1 = np.mean(np.abs(samples - obs[..., np.newaxis]), axis=-1)
 
     # Term 2: 0.5 * E_F |X - X'| via the sorted-weights identity
-    # For sorted x_{(1)} <= ... <= x_{(n)}:
-    #   E|X - X'| = (2 / n^2) * sum_{i=1}^{n} (2i - n - 1) * x_{(i)}
-    # Equivalently, multiply each order statistic by weight (2i - n - 1) / n^2
-    # and double because 0.5 * E|X-X'| = (1/n^2) * sum_i (2i - n - 1) * x_{(i)}
     sorted_s = np.sort(samples, axis=-1)                     # (..., n)
     i = np.arange(1, n + 1)                                  # 1-indexed
     weights = (2 * i - n - 1).astype(float)                  # (n,)
     # Broadcast weights to (..., n)
     term2 = np.sum(weights * sorted_s, axis=-1) / (n * n)   # E|X-X'| / 2
 
-    # CRPS = term1 - 0.5 * E|X-X'| = term1 - term2
-    # (term2 already equals sum(w * x) / n^2 = 0.5 * E|X-X'|)
+    # CRPS = term1 - 0.5 * E|X-X'| = term1 - term2: (term2 already equals sum(w * x) / n^2 = 0.5 * E|X-X'|)
     return term1 - term2
 
 

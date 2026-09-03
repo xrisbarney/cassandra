@@ -21,11 +21,6 @@ import numpy as np
 import pandas as pd
 
 # Force UTF-8 stdout/stderr: Windows' default console codepage (e.g. cp1252)
-# cannot encode many Unicode characters (arrows, em-dashes, etc.), which
-# raises UnicodeEncodeError and kills the process the moment such a
-# character is printed -- especially when output is redirected to a log
-# file (as the dashboard and run_all.py both do). This must happen before
-# any other code prints anything.
 if sys.platform == "win32":
     import io
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace", line_buffering=True)
@@ -45,9 +40,7 @@ from cassandra_threatcast.features import topic_map as tm
 from cassandra_threatcast.llm.deepseek import label_topics
 
 
-# ---------------------------------------------------------------------------
 # Argument parsing
-# ---------------------------------------------------------------------------
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Ingest cyber-threat and economic data and save processed arrays."
@@ -79,9 +72,7 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-# ---------------------------------------------------------------------------
 # Main
-# ---------------------------------------------------------------------------
 def main() -> None:
     args = parse_args()
 
@@ -116,11 +107,6 @@ def main() -> None:
     print(f"      Topic mapper saved to {mapper_path}")
 
     # Optional: ask DeepSeek for an analyst-recognizable name per topic (e.g.
-    # "SQL Injection" instead of "Sql / Injection / Php"). The raw top-words
-    # label is data-driven but can still read as noise for topics that don't
-    # cleanly resolve to one category; an LLM given the full top-word list
-    # can usually name the underlying concept even then. Skipped silently if
-    # DEEPSEEK_API_KEY isn't set.
     top_words_per_topic = [mapper.top_words(k, n_words=15) for k in range(K)]
     llm_names = label_topics(top_words_per_topic)
     if llm_names:
@@ -165,8 +151,6 @@ def main() -> None:
     sector_map = config.get("sector_map") or sec_8k.NAICS2_TO_SECTOR
 
     # Pass the full ISO dates (start_dt/end_dt) used for fetching, NOT the bare
-    # YYYY-MM strings — build_panel forwards these to fetch_cves, whose date
-    # parsing requires YYYY-MM-DD, and matching the fetch dates reuses the cache.
     panel = pipeline.build_panel(
         start=start_dt,
         end=end_dt,
@@ -180,8 +164,6 @@ def main() -> None:
     pipeline.save_panel(panel, args.output_dir)
 
     # --- Exposure map M_skt (needs CVE-level CPE data) ----------------------
-    # Built here (not in build_features) because it requires the raw cve_df with
-    # CPE strings and the per-CVE topic assignments, which only exist at ingest.
     try:
         from cassandra_threatcast.features.exposure_map import build_exposure_map
         if len(cve_df) > 0 and len(topic_assignments) == len(cve_df):

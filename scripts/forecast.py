@@ -29,8 +29,6 @@ import numpy as np
 import pandas as pd
 
 # Force UTF-8 stdout/stderr: Windows' default console codepage cannot encode
-# many Unicode characters, which raises UnicodeEncodeError and kills the
-# process -- especially when output is redirected to a log file.
 if sys.platform == "win32":
     import io
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace", line_buffering=True)
@@ -44,9 +42,7 @@ from cassandra_threatcast.features.topic_map import load_topic_labels
 from cassandra_threatcast.viz.interactive import fan_chart, loss_distribution, save_interactive
 
 
-# ---------------------------------------------------------------------------
 # Argument parsing
-# ---------------------------------------------------------------------------
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Generate 12-month-ahead forecasts from a fitted model."
@@ -87,9 +83,7 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-# ---------------------------------------------------------------------------
 # Helpers
-# ---------------------------------------------------------------------------
 def _quantile_df(
     pred_samples: np.ndarray,  # (n_samples, K, horizon)
     dates_pred: list,
@@ -173,9 +167,7 @@ def _loss_summary_df(
     return pd.DataFrame(records)
 
 
-# ---------------------------------------------------------------------------
 # Main
-# ---------------------------------------------------------------------------
 def main() -> None:
     args = parse_args()
 
@@ -222,7 +214,6 @@ def main() -> None:
     pred_dates = dates_all[T : T + args.horizon]
     if len(pred_dates) < args.horizon:
         # The panel's date list only covers the observed T months, so the
-        # forecast horizon always needs new future labels appended here.
         n_missing = args.horizon - len(pred_dates)
         last = dates_all[-1] if dates_all else T - 1
         if isinstance(last, pd.Period):
@@ -232,9 +223,6 @@ def main() -> None:
             pred_dates = list(pred_dates) + list(range(int(last) + 1, int(last) + 1 + n_missing))
 
     # --- Load InferenceData -------------------------------------------------
-    # The pickle (written unconditionally by train.py) is preferred: it is the
-    # guaranteed-complete save. The .nc file is a best-effort secondary copy
-    # that some xarray/arviz version combinations can leave empty/corrupt.
     print("[2/4] Loading InferenceData and generating posterior predictive ...")
     try:
         import arviz as az
@@ -267,8 +255,6 @@ def main() -> None:
         M_future = np.repeat(M_skt[:, :, -1:], args.horizon, axis=2)  # (S, K, horizon)
 
         # Damage-function parameters: the event-calibrated posterior (paper
-        # §3 / Table 7, produced by scripts/calibrate_damage.py) when
-        # available, else the config defaults.
         cal_path = os.path.join("results", "calibration", "damage_params.json")
         if os.path.exists(cal_path):
             with open(cal_path, encoding="utf-8") as fh:
@@ -290,7 +276,6 @@ def main() -> None:
                   "scripts/calibrate_damage.py for the event-calibrated set.")
 
         # BEA gross output arrives in $ millions; convert so every loss
-        # figure downstream is in actual dollars.
         x_s_usd = x_s * 1e6
 
         if "Phi_r" in post and "z_t" in post:
@@ -330,7 +315,6 @@ def main() -> None:
     print(f"      pred_N shape: {pred_N.shape}  (n_samples={n_samples}, K={_K}, H={_H})")
 
     # Economic loss samples: prefer the losses computed inside predict()
-    # (damage function + Leontief propagation + severity), else fall back.
     if out is not None:
         loss_samples = out["ell_pred"]                       # (n_samples, S, horizon)
         if args.n_samples is not None:
@@ -385,7 +369,6 @@ def main() -> None:
         contrib_pct = 100.0 * contrib / max(contrib.sum(), 1e-12)
 
         # Dominant threat topics per sector: mean contribution to the shock
-        # load, M_sk * E[lambda_k * sigma_k].
         drive = (lam_pred * sigma_pred).mean(axis=(0, 2))   # (K,)
         M_h_mean = M_future.mean(axis=2)                    # (S, K)
         rows8 = []
@@ -434,7 +417,6 @@ def main() -> None:
         fwd_probs = np.asarray(fwd_probs)                           # (H, R)
 
         # Order regime labels by their posterior mean intensity level so
-        # "Regime 1" is always the calmest and the last is the most severe.
         mu_level = np.asarray(post["mu_r"]).mean(axis=(0, 2))       # (R,)
         order = np.argsort(mu_level)
         names = ["low activity", "elevated", "high activity"][:R]
@@ -502,7 +484,6 @@ def main() -> None:
     print(f"      {K} interactive fan charts (.html + .json) -> {fig_dir}/")
 
     # Loss distribution figure (values pre-scaled to $ billions; the units
-    # string is only an axis label).
     agg_loss = loss_samples.sum(axis=(1, 2)) if loss_samples.ndim == 3 else loss_samples
     fig_loss = loss_distribution(
         agg_loss / 1e9, units=f"$ billions, total over {args.horizon} months")

@@ -66,9 +66,7 @@ def main() -> None:
     n, K = a_g.shape
     D = (w_all.shape[1] - 1) // 2
 
-    # ------------------------------------------------------------------ #
     # Covariance curve: Cov(g_t, g_{t+d}) = sigma^2 * sum_j w_j w_{j+d}
-    # ------------------------------------------------------------------ #
     print("[2/3] Computing learned covariance curve ...")
     lags = np.arange(0, D + 1)
     cov = np.zeros((n, D + 1))
@@ -125,9 +123,7 @@ def main() -> None:
     with open(os.path.join(OUT, "kernel_params.json"), "w", encoding="utf-8") as fh:
         json.dump(params, fh, indent=2)
 
-    # ------------------------------------------------------------------ #
     # Interactive figures
-    # ------------------------------------------------------------------ #
     print("[3/3] Building interactive figures ...")
     import plotly.graph_objects as go
 

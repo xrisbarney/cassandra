@@ -43,7 +43,6 @@ def dm_test(
     d_bar = np.mean(d)
 
     # Newey-West long-run variance estimate with (h - 1) lags
-    # gamma_0 = biased variance of d
     gamma_0 = np.mean((d - d_bar) ** 2)
 
     if h > 1:

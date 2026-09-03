@@ -7,9 +7,7 @@ import os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
 
-# ---------------------------------------------------------------------------
 # Synthetic data factory
-# ---------------------------------------------------------------------------
 
 def make_synthetic_data(K: int = 3, S: int = 2, T: int = 12, r: int = 2, R: int = 2) -> dict:
     """Return a minimal data dict suitable for testing the model."""
@@ -28,9 +26,7 @@ def make_synthetic_data(K: int = 3, S: int = 2, T: int = 12, r: int = 2, R: int 
     }
 
 
-# ---------------------------------------------------------------------------
 # full_model
-# ---------------------------------------------------------------------------
 
 def test_full_model_forward_pass():
     """full_model can be traced by NumPyro's Predictive without raising."""
@@ -172,9 +168,7 @@ def test_severity_obs_masks_missing_marks():
     assert "B_obs" in samples
 
 
-# ---------------------------------------------------------------------------
 # latent_dynamics_model
-# ---------------------------------------------------------------------------
 
 def test_latent_dynamics_shapes():
     """latent_dynamics_model produces eta_t of shape (n_samples, T, K)."""
@@ -211,9 +205,7 @@ def test_latent_dynamics_finite():
     assert np.all(np.isfinite(eta)), "eta_t contains non-finite values"
 
 
-# ---------------------------------------------------------------------------
 # damage_function
-# ---------------------------------------------------------------------------
 
 def test_damage_function_monotone():
     """damage_function is non-decreasing in shock_load for each sector."""
@@ -274,9 +266,7 @@ def test_damage_function_bounded():
         )
 
 
-# ---------------------------------------------------------------------------
 # leontief_propagation
-# ---------------------------------------------------------------------------
 
 def test_leontief_propagation_identity():
     """leontief_propagation with identity Lambda_L returns d_s = g_s * x_s."""

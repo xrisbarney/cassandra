@@ -146,8 +146,6 @@ def _fetch_all_pages(start_date: str, end_date: str, cache_dir: str) -> list[dic
                     window_items = json.load(fh)
             except json.JSONDecodeError:
                 # The cache file itself was left truncated by an earlier crash
-                # mid-write. Treat it like a missing window and refetch rather
-                # than propagating the corruption forever.
                 print(f"  [{i:>2}/{n_windows}] {win_start} -> {win_end}  "
                       f"(cache corrupt, refetching)", flush=True)
                 win_cache.unlink()
@@ -168,11 +166,6 @@ def _fetch_all_pages(start_date: str, end_date: str, cache_dir: str) -> list[dic
                 "resultsPerPage": _RESULTS_PER_PAGE,
                 "startIndex": start_index,
                 # Server-side filter: excludes CVEs formally marked Rejected
-                # (not real vulnerabilities) so we never fetch/cache/pay
-                # pagination cost for them. fetch_cves() also filters
-                # client-side below, since this only helps *new* fetches --
-                # window files cached before this parameter was added can
-                # still contain Rejected records.
                 "noRejected": "",
             }
 
@@ -191,8 +184,6 @@ def _fetch_all_pages(start_date: str, end_date: str, cache_dir: str) -> list[dic
             time.sleep(inter_request_delay)
 
         # Persist this window immediately (crash-safe / resumable). Written to
-        # a temp file and atomically renamed so a crash mid-write can never
-        # leave a truncated, corrupt cache file at the final path.
         tmp_cache = win_cache.with_suffix(win_cache.suffix + ".tmp")
         with tmp_cache.open("w") as fh:
             json.dump(window_items, fh)
@@ -241,9 +232,6 @@ def _get_with_backoff(
             requests.exceptions.JSONDecodeError,
         ) as exc:
             # Transient network faults: dropped/incomplete responses, read
-            # timeouts, or a truncated body that fails JSON parsing. Retry with
-            # exponential backoff. (Genuine 4xx errors fall through
-            # raise_for_status above and are not retried.)
             logger.warning(
                 "NVD network error (attempt %d/%d): %s",
                 attempt + 1, _MAX_RETRIES, exc,

@@ -83,9 +83,7 @@ def main() -> None:
     n_state_draws = int(cal_cfg.get("n_state_draws", 2000))
     seed = int(cal_cfg.get("seed", 7))
 
-    # ------------------------------------------------------------------ #
     # 1. Load posterior + panel geometry
-    # ------------------------------------------------------------------ #
     print("[1/4] Loading posterior and panel ...")
     pkl_path = os.path.splitext(args.idata)[0] + ".pkl"
     if os.path.exists(pkl_path):
@@ -117,9 +115,7 @@ def main() -> None:
     enhanced = args.enhanced_mode or bool(config.get("enhanced", {}).get("enabled", False))
     student_t_df = float(config.get("enhanced", {}).get("student_t_df", 4.0))
 
-    # ------------------------------------------------------------------ #
     # 2. Pre-event predictive shock loads per event
-    # ------------------------------------------------------------------ #
     print("[2/4] Building pre-event predictive shock loads ...")
     rng = np.random.default_rng(seed)
     Pi = np.asarray(post["Pi"], dtype=float)
@@ -182,10 +178,6 @@ def main() -> None:
                         for r in event_rows])            # 90% interval width -> sd
 
     # Aggregate annual anchor: typical-month shock loads over recent history.
-    # The events identify the damage function's event-scale response; this
-    # anchor identifies its LEVEL (max_damage), which otherwise saturates at
-    # whatever the prior allows once forecast-month shocks exceed the event
-    # operating points.
     anchor = events_cfg.get("aggregate_anchor", {})
     anchor_lo = float(anchor.get("low_usd_per_year", 3.0e10))
     anchor_hi = float(anchor.get("high_usd_per_year", 2.0e11))
@@ -204,9 +196,7 @@ def main() -> None:
           f"[${anchor_lo/1e9:.0f}B, ${anchor_hi/1e9:.0f}B] "
           f"({n_typ} typical months sampled)")
 
-    # ------------------------------------------------------------------ #
     # 3. NUTS over the 3 damage parameters
-    # ------------------------------------------------------------------ #
     print("[3/4] Sampling damage parameters (NUTS) ...")
     import jax
     import jax.numpy as jnp
@@ -219,23 +209,11 @@ def main() -> None:
     Lam_j = jnp.asarray(Lambda_L)
     x_j = jnp.asarray(x_s_usd)
     # Per-sector operating points.  Shock loads are wildly heterogeneous
-    # across sectors (a few carry thousands, most carry ~0 because their
-    # exposure-map rows are tiny), so the paper's phi_s is sector-specific:
-    # each sector's sigmoid is centred relative to its OWN typical load.
-    # Three global parameters (c_scale, steepness, max_damage) then tie the
-    # sectors together -- all four events can identify three parameters,
-    # not 33.
     sector_ref = np.clip(np.median(shock_arr, axis=(0, 1)), 1e-6, None)   # (S,)
     sector_ref_j = jnp.asarray(sector_ref)
 
     def damage_model():
         # Same functional form as model.economic.damage_function (zero-
-        # anchored linear sigmoid).  scale_s = c_scale * sector_ref_s keeps
-        # each sector's sigmoid centre near its own operating point (a loose
-        # scale prior lets the sampler collapse it to ~0, saturating g at
-        # max_damage for every draw -- the degenerate point-mass loss this
-        # calibration exists to fix); shape_s = steepness / sector_ref_s
-        # makes the transition width proportional to the operating point.
         steepness = numpyro.sample("steepness", dist.LogNormal(jnp.log(2.0), 0.5))
         c_scale = numpyro.sample("c_scale", dist.LogNormal(0.0, 0.3))
         max_dmg = numpyro.sample("max_damage", dist.Beta(2.0, 18.0))
@@ -294,7 +272,6 @@ def main() -> None:
     print(f"      Calibrated params -> {params_path}")
 
     # Retain the complete calibration posterior so forecast Step 28 propagates
-    # damage-function uncertainty instead of substituting posterior means.
     damage_draws_path = os.path.join(args.output_dir, "damage_posterior.npz")
     np.savez_compressed(
         damage_draws_path,
@@ -304,9 +281,7 @@ def main() -> None:
     )
     print(f"      Damage posterior draws -> {damage_draws_path}")
 
-    # ------------------------------------------------------------------ #
     # 4. Table 7: economic-layer backtest, integrating over theta draws
-    # ------------------------------------------------------------------ #
     print("[4/4] Economic-layer backtest (Table 7) ...")
     n_theta = len(theta["steepness"])
     thin = np.linspace(0, n_theta - 1, min(200, n_theta)).astype(int)

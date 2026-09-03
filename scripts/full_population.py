@@ -98,9 +98,7 @@ def main() -> None:
         config = yaml.safe_load(fh)
     S = config["model"]["S"]
 
-    # ------------------------------------------------------------------ #
     # 1. Corpus -> large-K topic panel
-    # ------------------------------------------------------------------ #
     with open(os.path.join(args.data_dir, "panel_meta.json"), encoding="utf-8") as fh:
         meta = json.load(fh)
     date_strs = meta.get("dates") or meta.get("metadata", {}).get("dates", [])
@@ -153,9 +151,7 @@ def main() -> None:
     test_mask = np.asarray((periods >= pd.Period(args.test_start, freq="M"))
                            & (periods <= pd.Period(args.test_end, freq="M")))
 
-    # ------------------------------------------------------------------ #
     # 2. Train the Full model on the population via VI
-    # ------------------------------------------------------------------ #
     idata_path = os.path.join(args.output_dir, "idata.pkl")
     if args.skip_train and os.path.exists(idata_path):
         print("[2/4] Reusing existing population posterior ...")
@@ -183,7 +179,6 @@ def main() -> None:
         }
         t0 = time.time()
         # num_particles=1: at population scale each extra ELBO particle
-        # multiplies step cost; 1 particle + more steps is the right trade.
         guide, params, losses = vi_module.train_vi(
             full_module.full_model, data, pop_config,
             num_steps=args.vi_steps, seed=args.seed, num_particles=1)
@@ -199,13 +194,10 @@ def main() -> None:
             pickle.dump(idata, fh)
         print(f"      Posterior -> {idata_path}")
 
-    # ------------------------------------------------------------------ #
     # 3. Score Full (sequential one-step-ahead) on the three topic sets
-    # ------------------------------------------------------------------ #
     print("[3/4] Scoring Full model (sequential 1-step-ahead) ...")
     post = {k: np.asarray(v) for k, v in idata.posterior.items()}
     # Drop zero-size sites (numpyro.factor sites come back empty from
-    # Predictive) before flattening (chain, draw) -> draw.
     post = {k: v.reshape((-1,) + v.shape[2:]) for k, v in post.items() if v.size > 0}
     e_t = np.load(os.path.join(args.data_dir, "e_t.npy"))
     M_uniform = np.ones((S, K_full, T)) / S
@@ -235,9 +227,7 @@ def main() -> None:
         print(f"      {r['topic_set']:16s} ({r['n_topics']:5d} topics)  "
               f"CRPS {r['CRPS_h1']:.3f}")
 
-    # ------------------------------------------------------------------ #
     # 4. BSTS-U on the complete population (appendix comparison)
-    # ------------------------------------------------------------------ #
     if not args.skip_bsts:
         print("[4/4] BSTS-U per series, rolling "
               f"{args.bsts_origin_step}-month refits over the test window ...")

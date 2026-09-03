@@ -11,13 +11,6 @@ from sklearn.feature_extraction import text as sk_text
 from sklearn.decomposition import NMF, LatentDirichletAllocation
 
 # CVE descriptions share a lot of near-universal report-writing boilerplate
-# ("This vulnerability allows a remote attacker to...", CVSS-derived
-# exploitability phrasing, vendor-advisory templates) that carries no
-# discriminative signal for the vulnerability TYPE and otherwise dominates
-# several NMF topics outright (e.g. a topic whose top words are just
-# 'oracle', 'cvss', 'access', 'attacks' -- Oracle's Critical Patch Update
-# advisory template, not a real threat category). These are added on top of
-# sklearn's standard English stopword list.
 _CVE_BOILERPLATE_STOPWORDS = [
     "vulnerability", "vulnerabilities", "allows", "allow", "could", "may",
     "attacker", "attackers", "successful", "cvss", "score", "affected",
@@ -25,9 +18,7 @@ _CVE_BOILERPLATE_STOPWORDS = [
     "oracle", "exploitation", "result", "results",
 ]
 
-# ---------------------------------------------------------------------------
 # Seed vocabulary for 8 canonical threat topics
-# ---------------------------------------------------------------------------
 THREAT_TOPIC_SEEDS: dict[str, list[str]] = {
     "memory_corruption": [
         "buffer overflow", "use after free", "heap spray", "stack overflow",
@@ -109,9 +100,6 @@ class WikiTopicMapper:
         if self.method == "nmf":
             if self.n_topics >= 64:
                 # Large-K (sparse-topic population) fits: full NMF at K in the
-                # hundreds/thousands is impractical on ~200k documents;
-                # MiniBatchNMF converges in minutes with equivalent quality
-                # for topic extraction.
                 from sklearn.decomposition import MiniBatchNMF
                 self.model = MiniBatchNMF(
                     n_components=self.n_topics,

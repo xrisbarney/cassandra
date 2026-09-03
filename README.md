@@ -22,43 +22,43 @@ re-estimated. Optional curated loss marks belong at
 
 | Paper step | Implementation | Run |
 |---|---|---|
-| Step 1 | Observation history is assembled in `data/pipeline.py`, `data/incident_losses.py`, and `scripts/ingest_data.py`. | `python scripts/ingest_data.py --start 2010-01 --end 2024-12 --cache-dir data/cache` |
-| Step 2 | CPE-to-sector exposure tensor `M_skt` is built in `features/exposure_map.py`. | `python scripts/build_features.py` |
-| Step 3 | BEA coefficients and `(I-A)^-1` are implemented in `data/bea_io.py`. | `python scripts/build_features.py` |
-| Step 4 | Reference events and loss ranges are in `configs/reference_events.yaml`. | `python scripts/calibrate_damage.py` |
-| Step 5 | Markov transitions and mean-ordered labels are in `model/paper_exact.py`. | `python scripts/train.py --method blocked` |
-| Step 6 | Regime-specific `Phi_z` and `Q_z` factor recursion is in `model/paper_exact.py`. | `python scripts/train.py --method blocked` |
-| Step 7 | `eta_t`, `Gamma`, and `lambda_t=exp(eta_t)` are in `model/paper_exact.py`. | `python scripts/train.py --method blocked` |
-| Step 8 | The lower-dimensional severity recursion is in `model/paper_exact.py`. | `python scripts/train.py --method blocked` |
-| Step 9 | Inverse-gamma variances and hierarchical loading priors are in `model/paper_exact.py`. | `python scripts/train.py --method blocked` |
-| Step 10 | Optional multivariate Hawkes-type excitation is in `model/paper_exact.py`. | Set `hawkes.enabled: true`; run `python scripts/train.py --method blocked` |
-| Step 11 | Latent reporting effort is in `features/effort.py` and `model/paper_exact.py`. | `python scripts/build_features.py`; `python scripts/train.py --method blocked` |
-| Step 12 | `N_kt ~ NegBin(e_t lambda_kt, psi_k)` is in `model/paper_exact.py`. | `python scripts/train.py --method blocked` |
-| Step 13 | The exploitation channel on the logit scale is in `model/paper_exact.py`. | `python scripts/train.py --method blocked` |
-| Step 14 | Time-varying sector reporting propensity and the December-2023 indicator are in `model/paper_exact.py`. | `python scripts/train.py --method blocked` |
-| Step 15 | Multiplicative Poisson incident rate is in `model/paper_exact.py`. | `python scripts/train.py --method blocked` |
-| Step 16 | Independent N, E, and D likelihood sites encode conditional independence in `model/paper_exact.py`. | `python scripts/train.py --method blocked` |
-| Step 17 | Sector shock loads and `phi_s` are in `model/economic.py` and `model/paper_exact.py`. | `python scripts/forecast.py --horizon 12` |
-| Step 18 | Weak-prior Bayesian event calibration and retained posterior draws are in `scripts/calibrate_damage.py`. | `python scripts/calibrate_damage.py` |
-| Step 19 | Direct losses `d_s=g_s*x_s` are formed in `model/paper_exact.py`. | `python scripts/forecast.py --horizon 12` |
-| Step 20 | Leontief and aggregate losses are in `model/economic.py` and `model/paper_exact.py`. | `python scripts/forecast.py --horizon 12` |
-| Step 21 | The joint conditional posterior is `paper_model` in `model/paper_exact.py`. | `python scripts/train.py --method blocked` |
-| Step 22 | NUTS smooth-block sampling is in `inference/blocked.py`. | `python scripts/train.py --method blocked` |
-| Step 23 | Alternating FFBS is in `inference/blocked.py` and `inference/ffbs.py`. | `python scripts/train.py --method blocked` |
-| Step 24 | The scalable variational/FFBS alternative is in `inference/blocked.py` and `inference/vi.py`. | `python scripts/train.py --method vi` |
-| Step 25 | Regime/factor/intensity/severity forward simulation is `paper_exact.predict`. | `python scripts/forecast.py --horizon 12` |
-| Step 26 | Draws pass through uncertain `M_t` and `phi_s` in `paper_exact.predict`. | `python scripts/forecast.py --horizon 12` |
-| Step 27 | Direct and Leontief loss draws are generated in `paper_exact.predict`. | `python scripts/forecast.py --horizon 12` |
-| Step 28 | Joint intensity, exposure, severity, and damage uncertainty is retained by `paper_exact.predict`. | `python scripts/calibrate_damage.py`; `python scripts/forecast.py --horizon 12` |
-| Step 29 | Threat distributions and bands are written by `scripts/forecast.py`. | `python scripts/forecast.py --horizon 12` |
-| Step 30 | Sector indices are written to `results/forecasts/sector_exposure.csv`. | `python scripts/forecast.py --horizon 12` |
-| Step 31 | Loss, VaR95, ES95, and tail probabilities are written by `scripts/forecast.py`. | `python scripts/forecast.py --horizon 12` |
-| Step 32 | Regime probabilities are written to `results/forecasts/regime_probs.csv`. | `python scripts/forecast.py --horizon 12` |
-| Step 33 | Per-origin expanding-window refits are the default in `scripts/evaluate.py`. | `python scripts/evaluate.py` |
-| Step 34 | CRPS and count LogS are written to `results/evaluation/channel_scores.csv`. | `python scripts/evaluate.py` |
-| Step 35 | PIT, KS tests, and interval coverage are in `evaluation/calibration.py`. | `python scripts/evaluate.py` |
-| Step 36 | RF, ARIMA, persistence, ETS, and BSTS-U are in `evaluation/baselines.py`. | `python scripts/evaluate.py` |
-| Step 37 | Observation-channel checks are in `evaluation/posterior_predictive.py`. | `python scripts/evaluate.py` |
+| Step 1 | Panel assembly: `data/pipeline.py:19`; loss marks: `data/incident_losses.py:10`; CLI: `scripts/ingest_data.py:76`. | `python scripts/ingest_data.py --start 2010-01 --end 2024-12 --cache-dir data/cache` |
+| Step 2 | Exposure tensor: `features/exposure_map.py:111`. | `python scripts/build_features.py` |
+| Step 3 | BEA coefficients: `data/bea_io.py:213`; Leontief inverse: `data/bea_io.py:287`. | `python scripts/build_features.py` |
+| Step 4 | Reference events: `configs/reference_events.yaml:2`. | `python scripts/calibrate_damage.py` |
+| Step 5 | Ordered regime means: `model/paper_exact.py:59`; transition matrix: line 94. | `python scripts/train.py --method blocked` |
+| Step 6 | Regime-specific factor dynamics: `model/paper_exact.py:83` and line 150. | `python scripts/train.py --method blocked` |
+| Step 7 | Factor loadings: `model/paper_exact.py:67`; intensity: lines 156 and 192. | `python scripts/train.py --method blocked` |
+| Step 8 | Severity process: `model/paper_exact.py:88` and line 152. | `python scripts/train.py --method blocked` |
+| Step 9 | Hierarchical priors: `model/paper_exact.py:64` and line 78. | `python scripts/train.py --method blocked` |
+| Step 10 | Hawkes extension: `model/paper_exact.py:120`. | Set `hawkes.enabled: true`; run `python scripts/train.py --method blocked` |
+| Step 11 | Effort estimator: `features/effort.py:13`; latent process: `model/paper_exact.py:101`. | `python scripts/build_features.py`; `python scripts/train.py --method blocked` |
+| Step 12 | Vulnerability likelihood: `model/paper_exact.py:163`. | `python scripts/train.py --method blocked` |
+| Step 13 | Exploitation likelihood: `model/paper_exact.py:166`. | `python scripts/train.py --method blocked` |
+| Step 14 | Reporting propensity: `model/paper_exact.py:33` and line 134. | `python scripts/train.py --method blocked` |
+| Step 15 | Incident likelihood: `model/paper_exact.py:182`. | `python scripts/train.py --method blocked` |
+| Step 16 | Independent likelihood sites: `model/paper_exact.py:163`, line 170, and line 183. | `python scripts/train.py --method blocked` |
+| Step 17 | Damage function: `model/economic.py:70`; shock load: `model/paper_exact.py:346`. | `python scripts/forecast.py --horizon 12` |
+| Step 18 | Bayesian calibration: `scripts/calibrate_damage.py:215`; retained draws: line 275. | `python scripts/calibrate_damage.py` |
+| Step 19 | Direct loss: `model/paper_exact.py:348`. | `python scripts/forecast.py --horizon 12` |
+| Step 20 | Leontief propagation: `model/economic.py:105`; aggregate draws: `model/paper_exact.py:364`. | `python scripts/forecast.py --horizon 12` |
+| Step 21 | Joint model: `model/paper_exact.py:45`. | `python scripts/train.py --method blocked` |
+| Step 22 | NUTS block: `inference/blocked.py:16`. | `python scripts/train.py --method blocked` |
+| Step 23 | Alternation: `inference/blocked.py:37`; FFBS: `inference/ffbs.py:101`. | `python scripts/train.py --method blocked` |
+| Step 24 | VI/FFBS alternative: `inference/blocked.py:97`. | `python scripts/train.py --method vi` |
+| Step 25 | Forward simulation: `model/paper_exact.py:250` and line 295. | `python scripts/forecast.py --horizon 12` |
+| Step 26 | Exposure and damage push-forward: `model/paper_exact.py:322` and line 346. | `python scripts/forecast.py --horizon 12` |
+| Step 27 | Loss push-forward: `model/paper_exact.py:348`. | `python scripts/forecast.py --horizon 12` |
+| Step 28 | Joint `M_t`/damage draws: `model/paper_exact.py:322` and line 337. | `python scripts/calibrate_damage.py`; `python scripts/forecast.py --horizon 12` |
+| Step 29 | Threat bands: `scripts/forecast.py:330`. | `python scripts/forecast.py --horizon 12` |
+| Step 30 | Sector exposure output: `scripts/forecast.py:391`. | `python scripts/forecast.py --horizon 12` |
+| Step 31 | VaR/ES: `scripts/forecast.py:148`; tail probabilities: line 352. | `python scripts/forecast.py --horizon 12` |
+| Step 32 | Regime probabilities: `scripts/forecast.py:432`. | `python scripts/forecast.py --horizon 12` |
+| Step 33 | Rolling origins: `scripts/evaluate.py:337`; per-origin refit: line 225. | `python scripts/evaluate.py` |
+| Step 34 | Channel scoring: `scripts/evaluate.py:461`; output: line 485. | `python scripts/evaluate.py` |
+| Step 35 | PIT/coverage report: `evaluation/calibration.py:60`. | `python scripts/evaluate.py` |
+| Step 36 | RF/ARIMA/ETS/naive/BSTS-U: `evaluation/baselines.py:8`, lines 88, 155, 231, and 287. | `python scripts/evaluate.py` |
+| Step 37 | Posterior checks: `evaluation/posterior_predictive.py:8`; output: `scripts/evaluate.py:491`. | `python scripts/evaluate.py` |
 
 The end-to-end command executes the dependency order: ingest, features,
 blocked inference, damage calibration, rolling validation, then forecasting.

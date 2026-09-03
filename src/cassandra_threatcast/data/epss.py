@@ -81,7 +81,6 @@ def fetch_epss(date: str, cache_dir: str) -> pd.DataFrame:
         inplace=True,
     )
     # EPSS v1 files (2021-04 .. early 2022) have no "percentile" column; it was
-    # added in EPSS v2. Fill it with NaN so the schema is stable across versions.
     if "percentile" not in df.columns:
         df["percentile"] = np.nan
     df["cve_id"] = df["cve_id"].astype(str)

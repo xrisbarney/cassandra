@@ -44,9 +44,7 @@ from cassandra_threatcast.model.economic import (
 )
 
 
-# ---------------------------------------------------------------------------
 # Helpers
-# ---------------------------------------------------------------------------
 _SCALE_FLOOR = 0.02       # minimum value for latent-dynamics noise scales
 _SOFT_CLIP_BOUND = 30.0   # saturation bound for log-intensity/log-severity
 
@@ -94,9 +92,7 @@ def _positive_lower_triangular(raw: jnp.ndarray, d: int) -> jnp.ndarray:
     return jnp.concatenate([top, raw[d:]], axis=0)
 
 
-# ---------------------------------------------------------------------------
 # Full combined model
-# ---------------------------------------------------------------------------
 
 def full_model(data: dict, config: dict) -> None:
     """
@@ -133,13 +129,6 @@ def full_model(data: dict, config: dict) -> None:
     student_t_df: float = float(enh_cfg.get("student_t_df", 4.0))
 
     # Ablation flags (paper Table 4; driven by scripts/ablation.py).  Each
-    # removes one model component while leaving everything else untouched:
-    #   no_factors  : Gamma = 0 (independent topics; factors become nuisance)
-    #   flat_priors : all prior scales x10 (no shrinkage toward group levels)
-    #   drop_E      : exploitation channel excluded from the likelihood
-    #   drop_D      : incident channel excluded from the likelihood
-    #   no_effort   : e_t = 0 (raw counts treated as truth)
-    # "- regimes" needs no flag: set model.R = 1 in the variant config.
     abl_cfg = config.get("ablation", {}) or {}
     _abl_no_factors: bool = bool(abl_cfg.get("no_factors", False))
     _abl_w_E: float = 0.0 if abl_cfg.get("drop_E", False) else 1.0
@@ -147,14 +136,6 @@ def full_model(data: dict, config: dict) -> None:
     _pw: float = 10.0 if abl_cfg.get("flat_priors", False) else 1.0
 
     # Learned temporal kernel (config["kernel"]): a moving-window ("square")
-    # covariance component with LEARNABLE width and amplitude.  See §9 of
-    # docs/PAPER_NOTES.md.  g_t = sigma_g * sum_d w_d(h) u_{t-d} with iid
-    # u ~ N(0,1) and smooth-edged box weights w_d(h) = sigmoid((h-|d|)/2),
-    # unit-normalised.  Implied covariance Cov(g_t, g_{t+d}) =
-    # sigma_g^2 * sum_j w_j w_{j+d}: nonzero exactly when two months fall
-    # inside overlapping windows.  h quantifies "how close is close";
-    # sigma_g quantifies how much local covariance matters beyond the AR
-    # factors and global trends; per-topic loadings a_g say who feels it.
     krn_cfg = config.get("kernel", {}) or {}
     kernel_on: bool = bool(krn_cfg.get("enabled", False))
     _krn_D: int = int(krn_cfg.get("max_halfwidth", 60))   # window support, months
@@ -173,42 +154,27 @@ def full_model(data: dict, config: dict) -> None:
         e_t = jnp.zeros_like(e_t)
     M_skt = jnp.asarray(data["M_skt"])      # (S, K, T)
 
-    # ------------------------------------------------------------------ #
-    # 1. Latent dynamics priors
-    # ------------------------------------------------------------------ #
-    # Real CVE-topic counts span several orders of magnitude across topics
-    # (e.g. mean ~25/month vs. ~450/month), so mu_r must be able to sit far
-    # from 0 for high-volume topics; sd=5 keeps this weakly informative
-    # while accommodating the observed dynamic range.
+    # 1. Latent dynamics priors: Real CVE-topic counts span several orders of magnitude across topics
     mu_r = _plated_sample("mu_r", dist.Normal(0.0, 5.0 * _pw), (R, K))  # (R, K)
 
     Gamma_raw = _plated_sample("Gamma_raw", dist.Normal(0.0, 1.0 * _pw), (K, r))
     Gamma_ltri = _positive_lower_triangular(Gamma_raw, r)
     if _abl_no_factors:
         # Zero BEFORE the deterministic so the posterior "Gamma" is zero too
-        # and every downstream consumer (predict, sequential eval) stays
-        # consistent with the ablated likelihood.
         Gamma_ltri = jnp.zeros_like(Gamma_ltri)
     Gamma = deterministic("Gamma", Gamma_ltri)  # (K, r)
 
     # Factor AR dynamics are regime-CONSTANT (see module docstring): only the
-    # emission mean mu_r[z_t] switches by regime.
     Phi_raw = _plated_sample("Phi_raw", dist.Normal(0.0, 0.3), (r, r))
     tril_mask = jnp.tril(jnp.ones((r, r)))
     # tanh bounds every entry (hence the diagonal = eigenvalues of a
-    # triangular matrix) to (-1, 1), guaranteeing a stationary AR so factors
-    # cannot explode over long series (T can be ~180 months).
     Phi = deterministic("Phi", jnp.tanh(Phi_raw) * tril_mask)  # (r, r)
     Q_f = _floored_scale("Q_f", 0.5 * _pw, (r,))  # (r,)
 
     Pi = _plated_sample("Pi", dist.Dirichlet(2.0 * jnp.ones(R)), (R,))  # (R, R)
     tau_k = _floored_scale("tau_k", 0.5 * _pw, (K,))  # (K,)
 
-    # ------------------------------------------------------------------ #
     # 1b. Latent severity process priors (log sigma_{k,t}), analogous to the
-    #     intensity: regime-dependent level + lower-dimensional AR factors
-    #     (also regime-constant dynamics, sharing the same z_t marginalization).
-    # ------------------------------------------------------------------ #
     nu_r = _plated_sample("nu_r", dist.Normal(1.5, 1.0 * _pw), (R, K))  # (R, K)
     Psi_raw = _plated_sample("Psi_raw", dist.Normal(0.0, 1.0 * _pw), (K, r_sig))
     Psi = deterministic("Psi", _positive_lower_triangular(Psi_raw, r_sig))  # (K, r_sig)
@@ -219,9 +185,7 @@ def full_model(data: dict, config: dict) -> None:
     omega_k = _floored_scale("omega_k", 0.5 * _pw, (K,))     # (K,) idiosyncratic
     kappa_k = _floored_scale("kappa_k", 0.5 * _pw, (K,))     # (K,) severity meas. noise
 
-    # ------------------------------------------------------------------ #
     # 2. Measurement parameters
-    # ------------------------------------------------------------------ #
     psi_k = _plated_sample("psi_k", dist.HalfNormal(10.0), (K,))      # NegBin dispersion
     alpha_k = _plated_sample("alpha_k", dist.Normal(0.0, 2.0), (K,))  # EPSS intercept
     beta_k = _plated_sample("beta_k", dist.Normal(0.0, 1.0), (K,))    # EPSS slope
@@ -229,18 +193,13 @@ def full_model(data: dict, config: dict) -> None:
     rho_s = _plated_sample("rho_s", dist.HalfNormal(1.0), (S,))       # sector scaling
 
     # Sector-specific baseline disclosure rate. One parameter per sector (S),
-    # constant over time, rather than one per sector-month (S*T ~ 2000
-    # nuisance parameters, which pinned against zero on the ~99%-zero
-    # incident channel and destroyed the sampling geometry).
     pi_s = _plated_sample("pi_s", dist.HalfNormal(0.5), (S,))  # (S,)
 
     phi_D = None
     if enhanced:
         phi_D = _plated_sample("phi_D", dist.HalfNormal(10.0), (S,))  # NegBin dispersion
 
-    # ------------------------------------------------------------------ #
     # 3. Initial state + per-step innovations (drawn once, up front)
-    # ------------------------------------------------------------------ #
     f_init = _plated_sample("f_init", dist.Normal(0.0, 1.0), (r,))
     h_init = _plated_sample("h_init", dist.Normal(0.0, 1.0), (r_sig,))
 
@@ -249,12 +208,9 @@ def full_model(data: dict, config: dict) -> None:
     xi_h_all = _innovation("xi_h", (T, r_sig))
     eps_v_all = _innovation("eps_v", (T, K))
 
-    # ------------------------------------------------------------------ #
     # 3b. Learned moving-window kernel factor (optional)
-    # ------------------------------------------------------------------ #
     if kernel_on:
         # Half-width prior centred on 24 months (a "square" spanning ~4
-        # years, e.g. 2016-2020, centred on the prediction point).
         g_halfwidth = numpyro.sample(
             "g_halfwidth", dist.LogNormal(jnp.log(float(krn_cfg.get("halfwidth_prior_months", 24.0))), 0.5))
         sigma_g = numpyro.sample("sigma_g", dist.HalfNormal(0.5))
@@ -266,8 +222,6 @@ def full_model(data: dict, config: dict) -> None:
         w_g = w_g / jnp.sqrt(jnp.sum(w_g ** 2) + 1e-12)             # Var(g)=sigma_g^2
         deterministic("g_kernel_weights", w_g)
         # Explicit zero-pad + 'valid' keeps the output length exactly T and
-        # the window unambiguously centred ('same' returns the LONGER input's
-        # length when the window exceeds the series).
         u_pad = jnp.concatenate([jnp.zeros(_krn_D), u_g, jnp.zeros(_krn_D)])
         g_seq = sigma_g * jnp.convolve(u_pad, w_g, mode="valid")    # (T,)
         deterministic("g_t", g_seq)
@@ -275,9 +229,7 @@ def full_model(data: dict, config: dict) -> None:
         a_g = jnp.zeros(K)
         g_seq = jnp.zeros(T)
 
-    # ------------------------------------------------------------------ #
     # 4. Data channels, prepared as (T, ...) sequences for scan
-    # ------------------------------------------------------------------ #
     def _seq(key: str, fallback_shape: tuple) -> jnp.ndarray:
         arr = data.get(key)
         arr = jnp.asarray(arr) if arr is not None else jnp.full(fallback_shape, jnp.nan)
@@ -292,10 +244,7 @@ def full_model(data: dict, config: dict) -> None:
     log_pi0 = jnp.log(jnp.ones(R) / R)  # uniform initial regime distribution
     log_Pi = jnp.log(Pi + 1e-30)        # (R, R)
 
-    # ------------------------------------------------------------------ #
     # 5. Scan: regime-constant continuous dynamics + exact HMM forward
-    #    marginalization of the discrete regime, all four channels.
-    # ------------------------------------------------------------------ #
     def step(carry, xs_t):
         f_prev, h_prev, log_alpha_prev = carry
         (e_t_t, M_skt_t, N_t, E_t, D_t, B_t,
@@ -305,8 +254,6 @@ def full_model(data: dict, config: dict) -> None:
         h_t = A_h @ h_prev + Q_h * xi_h_t
 
         # NaN-safe transforms computed once (shared by every regime hypothesis
-        # below and by the diagnostic observation sites further down) so a
-        # missing entry never lets a NaN reach a log_prob call.
         obs_mask_E = ~jnp.isnan(E_t)
         E_clip = jnp.clip(jnp.where(obs_mask_E, E_t, 0.5), 1e-4, 1.0 - 1e-4)
         logit_E_obs_t = jnp.log(E_clip) - jnp.log1p(-E_clip)
@@ -348,13 +295,10 @@ def full_model(data: dict, config: dict) -> None:
         loglik_r = jax.vmap(loglik_given_regime)(jnp.arange(R))  # (R,)
 
         # Hamilton forward-filter update in log-space:
-        # log_alpha_t[r] = logsumexp_{r'}(log_alpha_prev[r'] + log_Pi[r',r]) + loglik_r[r]
         log_predict = jax.scipy.special.logsumexp(log_alpha_prev[:, None] + log_Pi, axis=0)
         log_alpha_t = log_predict + loglik_r  # (R,)
 
         # One-step-ahead (pre-update) regime-forecast weights, used only for
-        # the diagnostic quantities below -- NOT the likelihood, which is the
-        # exact joint marginal already captured in log_alpha_t/loglik_r.
         predict_probs_t = jax.nn.softmax(log_predict)  # (R,)
         mu_bar_t = predict_probs_t @ mu_r   # (K,) regime-forecast-weighted level
         nu_bar_t = predict_probs_t @ nu_r   # (K,)
@@ -362,12 +306,6 @@ def full_model(data: dict, config: dict) -> None:
         zeta_t = nu_bar_t + h_t @ Psi.T + omega_k * eps_v_t
 
         # Diagnostic-only observation sites: give downstream tooling
-        # (Predictive(), posterior-predictive checks) real N_obs/E_obs/D_obs/
-        # B_obs sample sites to draw from, built from the single
-        # regime-forecast-weighted level above. mask(mask=False) forces their
-        # log_prob contribution to exactly zero, so they cannot affect the
-        # posterior or double-count the likelihood -- inference is driven
-        # exclusively by the numpyro.factor() marginal below.
         log_mu_t = eta_t + e_t_t
         mu_t = jnp.exp(_soft_clip(log_mu_t))
         logit_E_t = alpha_k + beta_k * eta_t
@@ -395,8 +333,6 @@ def full_model(data: dict, config: dict) -> None:
         length=T,
     )
     # f_seq: (T,r), h_seq: (T,r_sig), eta_seq/zeta_seq: (T,K), loglik_seq: (T,R)
-    # log_alpha_final: (R,) final carry -- the exact forward-filter log-weights
-    # log alpha_T[r] = log p(all observations, z_T = r)
 
     deterministic("f_t", f_seq)
     deterministic("h_t", h_seq)
@@ -405,19 +341,11 @@ def full_model(data: dict, config: dict) -> None:
     deterministic("loglik_regime_t", loglik_seq)  # (T,R) per-regime log-lik, for FFBS recovery
 
     # Total marginal log-likelihood over the discrete regime path: log sum_r
-    # alpha_T[r]. This IS the model's actual likelihood contribution for the
-    # N/E/D/B channels -- their exact per-regime densities were evaluated
-    # inside the scan above via
-    # plain dist.*.log_prob() calls (not numpyro.sample statements), so
-    # injecting this single scalar factor is what registers that contribution
-    # with NUTS.
     marginal_ll = jax.scipy.special.logsumexp(log_alpha_final)
     numpyro.factor("marginal_regime_lik", marginal_ll)
 
 
-# ---------------------------------------------------------------------------
 # Post-hoc regime-path recovery (for forecasting)
-# ---------------------------------------------------------------------------
 
 def recover_terminal_regime(
     loglik_regime_t: np.ndarray,  # (T, R) per-regime log-likelihood for one posterior draw
@@ -438,9 +366,7 @@ def recover_terminal_regime(
     return int(rng.choice(R, p=probs_T))
 
 
-# ---------------------------------------------------------------------------
 # Predictive function
-# ---------------------------------------------------------------------------
 
 def predict(
     posterior_samples: dict,
@@ -542,14 +468,11 @@ def predict(
         omega_k_i = np.array(posterior_samples["omega_k"][i])  # (K,)
 
         # Terminal continuous state: f_t/h_t are regime-CONSTANT sequences
-        # (no branching), so they are exactly recoverable at any time index.
         s_idx = -1 if start_t is None else start_t - 1
         f_last = np.array(posterior_samples["f_t"][i, s_idx, :])   # (r,)
         h_last = np.array(posterior_samples["h_t"][i, s_idx, :])   # (r_sig,)
 
         # Learned moving-window kernel factor: extend g past the data by
-        # convolving [observed innovations, fresh draws] with this draw's
-        # learned window (see full_model §3b).
         if "u_g" in posterior_samples:
             w_i = np.array(posterior_samples["g_kernel_weights"][i])
             sg_i = float(posterior_samples["sigma_g"][i])
@@ -566,9 +489,6 @@ def predict(
             g_fore = np.zeros(horizon)
 
         # Terminal regime: recovered via the exact Hamilton filter on this
-        # draw's per-timestep regime log-likelihoods (loglik_regime_t is
-        # only available up to the training series length; for start_t before
-        # the series end we filter only up to that point).
         loglik_i = np.array(posterior_samples["loglik_regime_t"][i])  # (T, R)
         loglik_upto = loglik_i if start_t is None else loglik_i[:start_t]
         z_last = recover_terminal_regime(loglik_upto, np.array(Pi_i), rng)

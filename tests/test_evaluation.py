@@ -11,9 +11,7 @@ from cassandra_threatcast.evaluation.dm_test import dm_test
 from cassandra_threatcast.evaluation.calibration import pit_values, coverage, pit_ks_test
 
 
-# ---------------------------------------------------------------------------
 # crps_ensemble
-# ---------------------------------------------------------------------------
 
 def test_crps_deterministic_forecast():
     """CRPS of a perfect deterministic forecast (all samples = obs) is 0."""
@@ -76,9 +74,7 @@ def test_crps_batch_shapes():
     assert crps_vals.shape == (4, 6)
 
 
-# ---------------------------------------------------------------------------
 # dm_test
-# ---------------------------------------------------------------------------
 
 def test_dm_test_correct_sign():
     """DM stat is negative when model A clearly outperforms model B."""
@@ -131,9 +127,7 @@ def test_dm_test_multi_horizon():
     assert 0.0 <= pval <= 1.0, f"p-value out of [0,1]: {pval}"
 
 
-# ---------------------------------------------------------------------------
 # pit_values & coverage
-# ---------------------------------------------------------------------------
 
 def test_pit_coverage_calibrated():
     """90 % interval from a correctly specified model achieves ~90 % coverage."""
@@ -178,9 +172,7 @@ def test_pit_biased_model():
     )
 
 
-# ---------------------------------------------------------------------------
 # mae and rmse
-# ---------------------------------------------------------------------------
 
 def test_mae_rmse_correct():
     """mae and rmse give analytically correct values for a simple case."""

@@ -207,7 +207,6 @@ def regime_area(
     x = [p.to_timestamp() if hasattr(p, "to_timestamp") else pd.Timestamp(p)
          for p in dates]
     # Categorical slots 1/3/6 from the reference palette: calm blue,
-    # elevated yellow, severe red -- identity plus alert semantics.
     colors = ["#2a78d6", "#eda100", "#e34948", "#4a3aa7", "#1baf7a"]
 
     fig = go.Figure()
@@ -232,7 +231,6 @@ def regime_area(
 
 
 # Fixed categorical order for model identity — color follows the model,
-# never its rank (reference palette slots).
 MODEL_COLORS = {
     "FullModel": "#2a78d6",   # blue      (the proposed model)
     "BSTS-U":    "#1baf7a",   # aqua
@@ -252,7 +250,6 @@ def baseline_lines(scores_df: pd.DataFrame, metric: str = "CRPS") -> go.Figure:
     """
     df = scores_df[scores_df["metric"] == metric]
     # evaluate.py saves fold-aggregated scores as value_mean/value_std;
-    # accept a plain per-row "value" column too.
     value_col = "value_mean" if "value_mean" in df.columns else "value"
     agg = df.groupby(["model", "horizon"])[value_col].mean().reset_index()
     agg = agg.rename(columns={value_col: "value"})

@@ -53,7 +53,6 @@ def run_blocked_nuts_ffbs(data: dict, config: dict) -> az.InferenceData:
     seed = int(mcfg.get("seed", 0))
 
     # Spread the initial path across regimes so every conditional block starts
-    # with valid support, while FFBS determines all later paths from the data.
     z_path = np.arange(T, dtype=int) % R
     retained: dict[str, list[np.ndarray]] = {}
     retained_z: list[np.ndarray] = []

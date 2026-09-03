@@ -31,11 +31,7 @@ _REQUEST_TIMEOUT = 30
 _INTER_REQUEST_DELAY = 0.11  # SEC fair-access: â‰¤10 req/s
 
 
-# ---------------------------------------------------------------------------
 # SIC -> NAICS 2-digit mapping by SIC division ranges. SIC codes have a fixed
-# block structure, so range mapping covers essentially every filer (vastly more
-# than a handful of hardcoded codes).
-# ---------------------------------------------------------------------------
 def _sic_to_naics2(sic: int | None) -> int:
     """Map a 4-digit SIC code to a 2-digit NAICS sector via SIC divisions."""
     if sic is None:
@@ -70,8 +66,6 @@ _DEFAULT_NAICS2 = 99  # Unknown / unclassified
 
 
 # 2-digit NAICS sector -> model sector index (0..10), matching the 11-sector
-# BEA aggregation used elsewhere. Unmapped codes (e.g. 99 unclassified) are
-# dropped from the incident panel rather than forced into a sector.
 NAICS2_TO_SECTOR: dict[int, int] = {
     11: 0,                      # Agriculture
     21: 1,                      # Mining
@@ -90,7 +84,6 @@ NAICS2_TO_SECTOR: dict[int, int] = {
 
 def _cache_path(cache_dir: str, start_date: str, end_date: str) -> Path:
     # Cache key includes a schema version: bump it whenever the parsed record
-    # schema changes, so stale caches from an older parser are not reused.
     key = hashlib.md5(f"sec8k-v2-{start_date}-{end_date}".encode()).hexdigest()
     return Path(cache_dir) / f"sec_8k_v2_{key}.json"
 
@@ -139,8 +132,6 @@ def fetch_8k_cyber(start_date: str, end_date: str, cache_dir: str) -> pd.DataFra
         records, complete = _fetch_all_efts_hits(start_date, end_date)
         if not complete:
             # A partial/failed fetch must never be cached: caching it would
-            # silently and permanently record "zero filings" for this date
-            # range, even after the underlying API issue is resolved.
             raise RuntimeError(
                 f"SEC EFTS fetch for {start_date}..{end_date} did not complete "
                 f"({len(records)} partial record(s)) -- not caching. Retry once "
@@ -205,7 +196,6 @@ def _fetch_all_efts_hits(start_date: str, end_date: str) -> tuple[list[dict], bo
                     "accession_number": src.get("adsh", ""),
                     "form_type": src.get("form", "8-K"),
                     # SIC is returned inline by EFTS — capture it so enrich_with_naics
-                    # can skip a per-company API call.
                     "sic": int(sics[0]) if sics and str(sics[0]).isdigit() else None,
                 }
             )

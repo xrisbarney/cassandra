@@ -7,9 +7,7 @@ import matplotlib.patches as mpatches
 import seaborn as sns
 from typing import Optional
 
-# ---------------------------------------------------------------------------
 # Design tokens
-# ---------------------------------------------------------------------------
 PALETTE = {
     "primary":   "#2563EB",
     "secondary": "#7C3AED",
@@ -18,9 +16,7 @@ PALETTE = {
 }
 
 
-# ---------------------------------------------------------------------------
 # Fan chart
-# ---------------------------------------------------------------------------
 def plot_threat_forecast(
     topic_k: int,
     obs: np.ndarray,           # (T_obs,) historical observations
@@ -61,7 +57,6 @@ def plot_threat_forecast(
         pred_dates = dates[len(obs) :]
 
     # matplotlib has no native support for pandas Period objects (only
-    # Timestamp/datetime64); the panel stores monthly Periods, so convert.
     obs_dates = [d.to_timestamp() if isinstance(d, pd.Period) else d for d in obs_dates]
     pred_dates = [d.to_timestamp() if isinstance(d, pd.Period) else d for d in pred_dates]
 
@@ -109,9 +104,7 @@ def plot_threat_forecast(
     return fig
 
 
-# ---------------------------------------------------------------------------
 # PIT histogram
-# ---------------------------------------------------------------------------
 def plot_pit_histogram(
     pit_vals: np.ndarray,
     channel_name: str = "",
@@ -158,9 +151,7 @@ def plot_pit_histogram(
     return fig
 
 
-# ---------------------------------------------------------------------------
 # Regime probability chart
-# ---------------------------------------------------------------------------
 def plot_regime_probs(
     regime_probs: np.ndarray,         # (T, R) filtered / smoothed probabilities
     dates: list,
@@ -222,9 +213,7 @@ def plot_regime_probs(
     return fig
 
 
-# ---------------------------------------------------------------------------
 # Loss distribution
-# ---------------------------------------------------------------------------
 def plot_loss_distribution(
     loss_samples: np.ndarray,   # (n_samples,) or (n_samples, T)
     var_alpha: float = 0.05,
@@ -288,9 +277,7 @@ def plot_loss_distribution(
     return fig
 
 
-# ---------------------------------------------------------------------------
 # Sector exposure
-# ---------------------------------------------------------------------------
 def plot_sector_exposure(
     sector_means: np.ndarray,    # (S,) posterior mean sector losses
     sector_cis: np.ndarray,      # (S, 2) credible interval [lo, hi]
@@ -334,9 +321,7 @@ def plot_sector_exposure(
     return fig
 
 
-# ---------------------------------------------------------------------------
 # Utility
-# ---------------------------------------------------------------------------
 def save_figure(fig: plt.Figure, path: str, dpi: int = 300) -> None:
     """Save *fig* to *path*, creating parent directories as needed."""
     os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)

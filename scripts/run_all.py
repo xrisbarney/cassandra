@@ -22,10 +22,6 @@ import time
 from pathlib import Path
 
 # Force UTF-8 stdout/stderr here (for run_all.py's own prints) AND propagate
-# it to every child script via PYTHONUTF8, since Windows' default console
-# codepage cannot encode many Unicode characters and kills a subprocess the
-# moment one is printed -- especially when output is redirected to a log
-# file, as this script's caller (the dashboard) does.
 if sys.platform == "win32":
     import io
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace", line_buffering=True)

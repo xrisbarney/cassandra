@@ -77,9 +77,7 @@ def _sector_table_html(df: pd.DataFrame, name_col: str = "scope") -> str:
     )
 
 
-# ---------------------------------------------------------------------------
 # Helpers
-# ---------------------------------------------------------------------------
 def artifact_exists(*paths: Path) -> bool:
     return all(p.exists() for p in paths)
 
@@ -157,10 +155,6 @@ def full_run_state() -> tuple[str, str]:
     if not RUN_LOG.exists():
         return "none", ""
     # encoding="utf-8" is required here: the log is written in UTF-8 (see
-    # launch_full_run's open(..., encoding="utf-8") above), but Path.read_text()
-    # without an explicit encoding falls back to Windows' active codepage
-    # (cp1252), which mangles multi-byte UTF-8 sequences -- notably tqdm's
-    # progress-bar block characters ("█" -> "â–ˆ").
     text = RUN_LOG.read_text(encoding="utf-8", errors="replace")
     if "ALL DONE" in text:
         return "done", text
@@ -203,9 +197,7 @@ def live_full_run_log() -> None:
     st.code("\n".join(lines[-25:]) or "(starting…)")
 
 
-# ---------------------------------------------------------------------------
 # Header
-# ---------------------------------------------------------------------------
 st.title("🔮 CASSANDRA")
 st.caption("Forecasting cyber threats and their economic impact — a guided, step-by-step tool.")
 
@@ -216,9 +208,7 @@ st.markdown(
     "log as it runs — you don't need to understand it."
 )
 
-# ---------------------------------------------------------------------------
 # Settings (sidebar)
-# ---------------------------------------------------------------------------
 with st.sidebar:
     st.header("⚙️ Settings")
     st.caption("Sensible defaults are already chosen. You can leave these as they are.")
@@ -253,9 +243,7 @@ done_backtest = artifact_exists(RESULTS / "backtest" / "threat_comparison.csv")
 tab_run, tab_data, tab_forecast, tab_kernel = st.tabs(
     ["▶️ Run the steps", "📊 Your data", "🔮 The forecast", "🧪 Kernel lab"])
 
-# ---------------------------------------------------------------------------
 # TAB 1 — Run the steps
-# ---------------------------------------------------------------------------
 with tab_run:
     # Run-everything (unattended)
     with st.container(border=True):
@@ -381,9 +369,7 @@ with tab_run:
         if not done_train:
             st.info("Finish Step 3 first.")
 
-# ---------------------------------------------------------------------------
 # TAB 2 — Your data
-# ---------------------------------------------------------------------------
 with tab_data:
     if not done_ingest:
         st.info("No data yet. Run **Step 1 — Collect the data** first.")
@@ -424,9 +410,7 @@ with tab_data:
                             use_container_width=True)
             sector_glossary_expander()
 
-# ---------------------------------------------------------------------------
 # TAB 3 — The forecast
-# ---------------------------------------------------------------------------
 with tab_forecast:
     if not done_forecast:
         st.info("No forecast yet. Finish **Step 5 — Forecast the future** to see results here.")
@@ -499,9 +483,6 @@ with tab_forecast:
         fig_dir = forecast_dir / "figures"
         if fig_dir.exists():
             # Per-topic fan charts are intentionally NOT shown here: the
-            # backtest section below renders the same topic series WITH the
-            # actual line overlaid, which supersedes them. (The standalone
-            # .html versions still land in results/forecasts/figures/.)
             fig_jsons = [f for f in sorted(fig_dir.glob("*.json"))
                          if not f.stem.startswith("fan_chart_topic_")]
             if fig_jsons:
@@ -663,9 +644,7 @@ with tab_forecast:
                 "with sequential 1-step-ahead predictions and see how the model did here."
             )
 
-# ---------------------------------------------------------------------------
 # TAB 4 — Kernel lab (test theory: learned moving-window covariance)
-# ---------------------------------------------------------------------------
 with tab_kernel:
     st.markdown("### 🧪 Learned temporal kernel — a test theory")
     st.caption(

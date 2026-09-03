@@ -137,8 +137,6 @@ def vi_predictive_samples(
     guide_samples = predictive(rng_key, data=data, config=config)
 
     # Draw from the full model conditioned on guide samples so the returned
-    # dict also carries the model's deterministic sites (loglik_regime_t,
-    # Gamma, f_t, ...) that downstream sequential evaluation requires.
     pred_model = Predictive(
         model=model,
         posterior_samples=guide_samples,

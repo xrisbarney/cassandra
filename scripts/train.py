@@ -26,8 +26,6 @@ import yaml
 import numpy as np
 
 # Force UTF-8 stdout/stderr: Windows' default console codepage cannot encode
-# many Unicode characters, which raises UnicodeEncodeError and kills the
-# process -- especially when output is redirected to a log file.
 if sys.platform == "win32":
     import io
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace", line_buffering=True)
@@ -36,14 +34,6 @@ if sys.platform == "win32":
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
 # Must run before the first jax/numpyro import (including transitively, via
-# the cassandra_threatcast imports below) -- JAX locks in its device count
-# the moment its backend initializes. Without this, num_chains > 1 with
-# chain_method="parallel" silently falls back to running chains SEQUENTIALLY
-# on this machine's single visible CPU device (confirmed: NumPyro just prints
-# a UserWarning and eats the 4x-plus slowdown). This creates `cpu_count()`
-# virtual CPU devices so multiple chains genuinely run in parallel, which
-# also means R-hat/ESS convergence diagnostics become meaningful (they are
-# NaN with a single chain).
 import numpyro
 numpyro.set_host_device_count(os.cpu_count() or 1)
 
@@ -54,9 +44,7 @@ from cassandra_threatcast.inference.blocked import (
 )
 
 
-# ---------------------------------------------------------------------------
 # Argument parsing
-# ---------------------------------------------------------------------------
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Infer the paper model via blocked NUTS/FFBS."
@@ -99,9 +87,7 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-# ---------------------------------------------------------------------------
 # Data loading helpers
-# ---------------------------------------------------------------------------
 def load_features(data_dir: str, S: int) -> dict:
     """Load derived feature arrays, falling back to sensible defaults."""
     def _try_load(fname: str, fallback: np.ndarray) -> np.ndarray:
@@ -147,9 +133,7 @@ def assemble_data(panel: dict, data_dir: str, config: dict) -> dict:
     }
 
 
-# ---------------------------------------------------------------------------
 # Main
-# ---------------------------------------------------------------------------
 def main() -> None:
     args = parse_args()
 
@@ -158,7 +142,6 @@ def main() -> None:
         config = yaml.safe_load(fh)
 
     # MCMC settings live in config["mcmc"]; CLI flags override them.  We write
-    # resolved values back into config because the blocked driver reads them.
     print("      Model variant: paper-exact")
 
     mcmc_cfg = config.setdefault("mcmc", {})
@@ -219,12 +202,6 @@ def main() -> None:
     print(f"      {args.method.upper()} completed in {elapsed / 60:.1f} min.")
 
     # --- Save ---------------------------------------------------------------
-    # A pickle is ALWAYS written first: it is the reliable, guaranteed-complete
-    # save. netCDF (.nc) is attempted second, best-effort, purely as a portable
-    #/inspectable secondary copy — some xarray/arviz version combinations have
-    # been observed to silently produce a 0-byte or truncated .nc file for a
-    # large, multi-group InferenceData without raising, which would otherwise
-    # lose a long (multi-hour) sampling run outright.
     print("[3/3] Saving InferenceData ...")
     out_path = os.path.join(args.output_dir, "idata.nc")
     pkl_path = os.path.join(args.output_dir, "idata.pkl")

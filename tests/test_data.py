@@ -12,9 +12,7 @@ from cassandra_threatcast.data.nvd import aggregate_monthly
 from cassandra_threatcast.features.effort import estimate_effort
 
 
-# ---------------------------------------------------------------------------
 # leontief_inverse
-# ---------------------------------------------------------------------------
 
 def test_leontief_identity():
     """Leontief inverse of a zero technical-coefficient matrix is the identity."""
@@ -52,9 +50,7 @@ def test_leontief_positive_entries():
     assert np.all(L >= -1e-10)
 
 
-# ---------------------------------------------------------------------------
 # aggregate_monthly
-# ---------------------------------------------------------------------------
 
 def test_aggregate_monthly_shape():
     """aggregate_monthly returns arrays of shape (K, T)."""
@@ -91,7 +87,6 @@ def test_aggregate_monthly_nonneg():
     N_kt, B_kt = aggregate_monthly(df, topic_assignments)
     assert np.all(N_kt >= 0)
     # Empty (topic, month) cells carry NaN mean severity by design; where a
-    # severity is defined it must be a non-negative CVSS score.
     assert np.all(B_kt[~np.isnan(B_kt)] >= 0)
 
 
@@ -112,9 +107,7 @@ def test_aggregate_monthly_total_counts():
     assert int(N_kt.sum()) == len(df)
 
 
-# ---------------------------------------------------------------------------
 # estimate_effort
-# ---------------------------------------------------------------------------
 
 def test_estimate_effort_length():
     """estimate_effort returns an array of the same length as input."""
@@ -145,9 +138,7 @@ def test_estimate_effort_finite():
         assert np.all(np.isfinite(e_t)), f"Non-finite values for method={method}"
 
 
-# ---------------------------------------------------------------------------
 # get_default_sector_labels
-# ---------------------------------------------------------------------------
 
 def test_sector_labels_count():
     """get_default_sector_labels returns exactly 11 sector labels."""

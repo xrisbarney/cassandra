@@ -82,9 +82,7 @@ from cassandra_threatcast.evaluation.scoring import crps_ensemble, mae, rmse
 from cassandra_threatcast.evaluation.sequential import sequential_one_step_predict
 
 
-# ---------------------------------------------------------------------------
 # CLI
-# ---------------------------------------------------------------------------
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Sequential one-step-ahead filtered backtest over the full history."
@@ -135,7 +133,6 @@ def _fetch_extension_counts(panel_end: pd.Period, extend_to: str,
         return None, None
     if str(extend_to).lower() == "now":
         # Last complete calendar month: the present month's data is partial,
-        # so it becomes the first pure-forecast month instead.
         end_p = pd.Timestamp.now().to_period("M") - 1
     else:
         end_p = pd.Period(extend_to, freq="M")
@@ -168,17 +165,10 @@ def _fetch_extension_counts(panel_end: pd.Period, extend_to: str,
         return None, None
 
 
-# ---------------------------------------------------------------------------
 # The sequential filter / one-step-ahead predictive machinery lives in
-# cassandra_threatcast.evaluation.sequential (shared with the damage-
-# function calibration and the ablation study).
-# ---------------------------------------------------------------------------
 
 
-# ---------------------------------------------------------------------------
-# Interactive charts
-# ---------------------------------------------------------------------------
-# Palette: dataviz reference instance (categorical slot 1 + chart chrome).
+# Interactive charts: Palette: dataviz reference instance (categorical slot 1 + chart chrome).
 _BLUE      = "#2a78d6"   # predicted median + bands
 _INK       = "#0b0b0b"   # actual line / primary ink
 _INK_2     = "#52514e"   # secondary ink
@@ -199,8 +189,7 @@ def build_topic_figure(
     test_start: pd.Timestamp,
     test_end: pd.Timestamp,
     train_end: pd.Timestamp | None = None,   # marks where TRAINING data ends
-                                             # when the filter continues on
-                                             # post-training actuals
+                                             # when the filter continues on: post-training actuals
 ):
     import plotly.graph_objects as go
 
@@ -281,9 +270,7 @@ def build_topic_figure(
     return fig
 
 
-# ---------------------------------------------------------------------------
 # Main
-# ---------------------------------------------------------------------------
 def main() -> None:
     args = parse_args()
 
@@ -296,9 +283,7 @@ def main() -> None:
     fig_dir = os.path.join(args.output_dir, "figures")
     os.makedirs(fig_dir, exist_ok=True)
 
-    # ------------------------------------------------------------------ #
     # 1. Load the panel (the "actual" line comes straight from it)
-    # ------------------------------------------------------------------ #
     print("[1/5] Loading processed panel ...")
     N_actual = np.load(os.path.join(args.data_dir, "N.npy")).astype(float)   # (K, T)
     D_actual = np.load(os.path.join(args.data_dir, "D.npy")).astype(float)   # (S, T)
@@ -321,9 +306,7 @@ def main() -> None:
         sys.exit(1)
     print(f"      Test window: {args.test_start} .. {args.test_end}  ({n_test} months)")
 
-    # ------------------------------------------------------------------ #
     # 2. Load the posterior
-    # ------------------------------------------------------------------ #
     print("[2/5] Loading trained posterior ...")
     try:
         import arviz as az
@@ -349,13 +332,7 @@ def main() -> None:
     enhanced = args.enhanced_mode or bool(config.get("enhanced", {}).get("enabled", False))
     student_t_df = float(config.get("enhanced", {}).get("student_t_df", 4.0))
 
-    # ------------------------------------------------------------------ #
     # 3. Sequential predict -> update, month 1 through the present + tail
-    # ------------------------------------------------------------------ #
-    # Extension: continue the filter past the training panel on actual CVE
-    # data up to the last complete month, so predictions reach the present
-    # without retraining ("one training is enough": static parameters stay
-    # fixed, beliefs stay current).
     N_ext, ext_periods = _fetch_extension_counts(
         periods[-1], args.extend_to, args.cache_dir, args.data_dir, K)
     T_ext = 0 if N_ext is None else N_ext.shape[1]
@@ -377,9 +354,7 @@ def main() -> None:
     all_periods = pd.period_range(periods[0], periods=T_all, freq="M")
     dates_ts = all_periods.to_timestamp()
 
-    # ------------------------------------------------------------------ #
     # 4. Score
-    # ------------------------------------------------------------------ #
     print("[4/5] Scoring (every prediction is 1-step-ahead) ...")
     q_levels = [0.05, 0.25, 0.50, 0.75, 0.95]
     N_q = np.quantile(N_pred, q_levels, axis=0)   # (5, K, T_all)
@@ -387,9 +362,6 @@ def main() -> None:
 
     def _trimmed_mean(pred):
         # The raw ensemble mean is dominated by rare extreme draws (the
-        # log-scale latent allows per-draw means up to e^30, blowing the
-        # mean 10-280x past the same row's q95), so trim the top 1% of
-        # draws before averaging.  Quantiles are the headline summaries.
         thr = np.quantile(pred, 0.99, axis=0, keepdims=True)
         return np.nanmean(np.where(pred <= thr, pred, np.nan), axis=0)
 
@@ -423,7 +395,6 @@ def main() -> None:
                                 "metric": metric, "value": value})
     if T_ext:
         # Extension window (post-training actuals): genuinely out of sample
-        # for parameters AND states.
         ext_mask = np.zeros(T_obs_end, dtype=bool)
         ext_mask[T:] = True
         for metric, value in _channel_scores(
@@ -500,9 +471,7 @@ def main() -> None:
     d_cov = sector_df["within_90pct_interval"].mean()
     print(f"      Incident comparison (test window) -> {sector_path}  (90% coverage: {d_cov:.1%})")
 
-    # ------------------------------------------------------------------ #
     # 5. Interactive figures
-    # ------------------------------------------------------------------ #
     print("[5/5] Building interactive charts ...")
     import plotly.io as pio
 
@@ -545,9 +514,7 @@ def main() -> None:
             + "\n".join(overview_parts) + "</body></html>")
     print(f"      {K} interactive charts + overview -> {fig_dir}/")
 
-    # ------------------------------------------------------------------ #
     # Summary
-    # ------------------------------------------------------------------ #
     test_crps = scores_df.query("channel=='N' and window=='test' and metric=='CRPS'")["value"].iloc[0]
     ext_line = ""
     if T_ext:

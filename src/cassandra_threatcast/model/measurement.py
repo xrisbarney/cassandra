@@ -44,14 +44,9 @@ def vulnerability_obs(
     log_mu_kt = lambda_kt + e_t[None, :]  # (K, T)
 
     # Soft-clamp before exp: guards against overflow (mu -> inf makes the NegBin
-    # rate concentration/mu collapse to 0, an invalid Gamma rate) while keeping a
-    # nonzero gradient everywhere. exp(30) is already an implausibly large
-    # monthly count, so this never bites real, well-behaved data.
     mu_kt = jnp.exp(_soft_clip(log_mu_kt))  # (K, T)
 
     # NumPyro's NegativeBinomial2 uses mean + concentration parameterisation.
-    # concentration = psi_k (total_count in the overdispersion sense).
-    # psi_k shape (K,) → broadcast to (K, T)
     concentration = psi_k[:, None] * jnp.ones_like(mu_kt)  # (K, T)
 
     numpyro.sample(
@@ -124,7 +119,6 @@ def severity_obs(
     B = jnp.asarray(B_obs)
     obs_mask = ~jnp.isnan(B)
     # Replace missing / non-positive marks with a dummy positive value; the mask
-    # zeroes their contribution to the log-density.
     B_safe = jnp.clip(jnp.where(obs_mask, B, 1.0), 0.1, 10.0)
 
     with numpyro.handlers.mask(mask=obs_mask):

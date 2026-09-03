@@ -18,13 +18,6 @@ from numpyro.optim import ClippedAdam
 import arviz as az
 
 # Below this adapted step size, NUTS warmup has effectively collapsed (the
-# chain is not moving) and the resulting "samples" are not usable draws from
-# the posterior. HMC trajectories are chaotic — the same model/data/seed
-# family can occasionally adapt into a degenerate region depending on tiny
-# floating-point differences. This has not been observed with the current
-# model (the discrete regime is marginalized analytically via the HMM
-# forward algorithm rather than sampled with DiscreteHMCGibbs -- see
-# docs/PAPER_NOTES.md), but the retry loop is kept as a cheap safety net.
 _MIN_USABLE_STEP_SIZE = 1e-6
 _MAX_ADAPTATION_RETRIES = 6
 
@@ -64,10 +57,6 @@ def _build_mcmc(model, mcmc_cfg: dict, data: dict, R: int) -> MCMC:
     target_accept_prob = float(mcmc_cfg.get("target_accept_prob", 0.8))
 
     # The model's discrete latent regime path (z_t) is marginalized
-    # analytically inside the model via the HMM forward algorithm (see
-    # full_model in model/full.py and docs/PAPER_NOTES.md), rather than
-    # sampled with DiscreteHMCGibbs. Plain NUTS therefore samples the entire
-    # (continuous) parameter space directly.
     kernel = NUTS(
         model,
         target_accept_prob=target_accept_prob,

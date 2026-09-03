@@ -62,8 +62,6 @@ def build_panel(
         - ``metadata``: dict â€“ source-level record counts and status flags
     """
     # Normalize to full ISO dates. fetch_cves' window logic requires YYYY-MM-DD
-    # (date.fromisoformat rejects a bare "YYYY-MM"); a malformed date here would
-    # silently zero out the entire NVD-derived panel. Idempotent for full dates.
     start = pd.Timestamp(start).strftime("%Y-%m-%d")
     end = pd.Timestamp(end).strftime("%Y-%m-%d")
 
@@ -72,9 +70,7 @@ def build_panel(
     dates = list(all_months)
     metadata: dict = {"start": start, "end": end, "T": T, "K": K, "S": S}
 
-    # ------------------------------------------------------------------
     # 1. NVD: CVE counts (N_kt) and mean CVSS scores (B_kt)
-    # ------------------------------------------------------------------
     N_kt = np.zeros((K, T), dtype=np.int64)
     B_kt = np.full((K, T), np.nan, dtype=np.float64)
     cve_df: pd.DataFrame = pd.DataFrame()
@@ -105,9 +101,7 @@ def build_panel(
         metadata["nvd_status"] = f"error: {exc}"
         metadata["nvd_cve_count"] = 0
 
-    # ------------------------------------------------------------------
     # 2. EPSS: mean exploitation probability per topic (E_kt)
-    # ------------------------------------------------------------------
     E_kt = np.full((K, T), np.nan, dtype=np.float64)
 
     try:
@@ -130,9 +124,7 @@ def build_panel(
         metadata["epss_status"] = f"error: {exc}"
         metadata["epss_record_count"] = 0
 
-    # ------------------------------------------------------------------
     # 3. CISA KEV: exploitation flag counts per topic (KEV_kt)
-    # ------------------------------------------------------------------
     KEV_kt = np.zeros((K, T), dtype=np.int64)
 
     try:
@@ -154,9 +146,7 @@ def build_panel(
         metadata["kev_status"] = f"error: {exc}"
         metadata["kev_entry_count"] = 0
 
-    # ------------------------------------------------------------------
     # 4. SEC 8-K: incident disclosures per sector (D_st)
-    # ------------------------------------------------------------------
     D_st = np.zeros((S, T), dtype=np.int64)
 
     try:
@@ -180,8 +170,6 @@ def build_panel(
         metadata["sec_8k_filing_count"] = 0
 
     # Optional loss marks from a curated repository export. The explicit CSV
-    # schema keeps proprietary repositories usable without coupling ingestion
-    # to a particular vendor API.
     from cassandra_threatcast.data.incident_losses import load_monthly_loss_marks
     loss_path = Path(cache_dir) / "incident_losses.csv"
     L_st = load_monthly_loss_marks(loss_path, all_months, S)
@@ -200,9 +188,7 @@ def build_panel(
     }
 
 
-# ---------------------------------------------------------------------------
 # Alignment helpers â€” map module-internal time axes to the panel's month range
-# ---------------------------------------------------------------------------
 
 def _align_kt(
     N_raw: np.ndarray,
@@ -312,9 +298,7 @@ def _align_st(
     return out
 
 
-# ---------------------------------------------------------------------------
 # Persistence helpers
-# ---------------------------------------------------------------------------
 
 def save_panel(panel: dict, output_dir: str) -> None:
     """Persist a panel dict to *output_dir*.

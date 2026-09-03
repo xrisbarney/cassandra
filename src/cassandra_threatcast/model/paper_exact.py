@@ -117,7 +117,6 @@ def paper_model(data: dict, config: dict, z_path: jnp.ndarray) -> None:
     )
 
     # Step 10 is opt-in: a non-negative cross-excitation matrix augments the
-    # baseline innovation with decayed activity from the preceding month.
     hawkes_on = bool(config.get("hawkes", {}).get("enabled", False))
     if hawkes_on:
         hawkes_alpha = _sample_array("hawkes_alpha", dist.HalfNormal(0.05), (K, K))

@@ -9,21 +9,7 @@ import re
 import numpy as np
 import pandas as pd
 
-# ---------------------------------------------------------------------------
 # CPE vendor/product prefix → BEA sector index (0-based, 11 sectors)
-# Sector mapping:
-#   0  Agriculture, forestry, fishing
-#   1  Mining
-#   2  Utilities
-#   3  Construction
-#   4  Manufacturing
-#   5  Wholesale / Retail trade
-#   6  Transportation & warehousing
-#   7  Information technology / Telecom
-#   8  Finance & insurance
-#   9  Professional & business services
-#  10  Health care & social assistance
-# ---------------------------------------------------------------------------
 CPE_SECTOR_MAP: dict[str, int] = {
     # ---- Information Technology (sector 7) ----
     "microsoft": 7,
@@ -150,9 +136,6 @@ def build_exposure_map(
     M = np.zeros((S, K, T), dtype=np.float64)
 
     # Pre-resolve the per-row month index and topic as arrays (vectorized), then
-    # iterate rows with itertuples (far faster than iterrows) only for the CPE
-    # parsing, which is inherently variable-length per CVE. A small vendor->sector
-    # cache avoids recomputing the lookup for repeated vendors.
     dates_arr = cve_df["date"].map(date_index).to_numpy()   # NaN where out of range
     cpe_arr = cve_df["cpe"].to_numpy()
     topics = np.asarray(topic_assignments)

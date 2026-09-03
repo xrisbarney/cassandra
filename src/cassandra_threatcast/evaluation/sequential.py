@@ -60,7 +60,6 @@ def sample_categorical(probs: np.ndarray, rng: np.random.Generator) -> np.ndarra
     u = rng.random((probs.shape[0], 1))
     z = (u > np.cumsum(probs, axis=1)).sum(axis=1)
     # cumsum's last entry can round a few ULP below 1, which would let a
-    # u drawn extremely close to 1 index one past the last regime.
     return np.minimum(z, probs.shape[1] - 1).astype(int)
 
 
@@ -316,8 +315,6 @@ def sequential_one_step_predict(
             z_t = sample_categorical(pred_z, rng)
         elif in_ext or t == T_obs_end:
             # Extension months (and the first tail month) advance the
-            # carried belief vector one step; extension months will update
-            # it below after the prediction is made and scored.
             pred_z = np.einsum("nr,nrj->nj", belief, Pi)
             pred_z = pred_z / pred_z.sum(axis=1, keepdims=True)
             z_t = sample_categorical(pred_z, rng)
@@ -331,10 +328,8 @@ def sequential_one_step_predict(
             f_prev = f_init
         elif t <= T:
             # month t's prediction starts from the posterior state at t-1;
-            # at t == T this is f_post[:, T-1], the last observed month.
             f_prev = f_post[:, t - 1]
         # (beyond the training panel, f_prev carries over from the previous
-        # step: the factor state is not re-estimated at extension time)
         f_curr = np.einsum("nij,nj->ni", Phi, f_prev) + Q_f * _draw((n, r_dim))
         f_prev = f_curr
 
@@ -346,10 +341,6 @@ def sequential_one_step_predict(
         eta = mean_eta + tau_k * _draw((n, K))
 
         # Covariates enter the PREDICTION lagged (hold-last): month t's own
-        # e_t and M_skt values are month-t data, so the prediction for t may
-        # only use their t-1 values.  (The belief UPDATE, via
-        # loglik_regime_t, correctly uses month t's own values -- it happens
-        # after the month is observed.)
         cov_idx = min(max(t - 1, 0), T - 1)
         mu_N = np.exp(soft_clip(eta + e_t[cov_idx]))
         p_nb = psi_k / (psi_k + mu_N)
@@ -367,8 +358,6 @@ def sequential_one_step_predict(
         # --- belief UPDATE with the extension month's actual counts ------
         if in_ext:
             # Per draw, per regime: log p(N_actual_t | z_t = r, f_curr),
-            # evaluated at the draw's own factor state and hold-last
-            # covariates.  Exact Bayes step on the regime belief.
             eta_r = (mu_r + factor_term[:, None, :])            # (n, R, K)
             mu_r_N = np.exp(soft_clip(eta_r + e_t[T - 1]))
             p_r = psi_k[:, None, :] / (psi_k[:, None, :] + mu_r_N)

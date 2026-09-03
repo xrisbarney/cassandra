@@ -15,9 +15,7 @@ from numpyro.contrib.control_flow import scan
 from numpyro.primitives import deterministic
 
 
-# ---------------------------------------------------------------------------
 # Helper: one-step AR(1) factor dynamics
-# ---------------------------------------------------------------------------
 
 def factor_dynamics(
     f_prev: jnp.ndarray,  # (r,)
@@ -35,9 +33,7 @@ def factor_dynamics(
     return Phi @ f_prev + Q_chol @ eps
 
 
-# ---------------------------------------------------------------------------
 # Helper: regime transition
-# ---------------------------------------------------------------------------
 
 def regime_transition(z_prev: int, Pi: jnp.ndarray, rng_key) -> int:
     """
@@ -58,9 +54,7 @@ def regime_transition(z_prev: int, Pi: jnp.ndarray, rng_key) -> int:
     return z_next
 
 
-# ---------------------------------------------------------------------------
 # Full NumPyro generative model
-# ---------------------------------------------------------------------------
 
 def latent_dynamics_model(
     T: int,
@@ -96,7 +90,6 @@ def latent_dynamics_model(
     )  # (K, r)
 
     # Per-regime AR matrices: lower-triangular for identifiability
-    # We parameterise via a raw (R, r, r) matrix then mask upper triangle
     Phi_raw = numpyro.sample(
         "Phi_raw",
         dist.Normal(jnp.zeros((R, r, r)), jnp.ones((R, r, r)) * 0.3),
@@ -123,8 +116,7 @@ def latent_dynamics_model(
         dist.HalfNormal(jnp.ones(K) * 0.5),
     )  # (K,)
 
-    # ---- Time-series scan ----
-    # State: (f_t, z_t) — (r,) factor and scalar regime index
+    # ---- Time-series scan ----: State: (f_t, z_t) — (r,) factor and scalar regime index
 
     def _transition(carry, _):
         f_prev, z_prev = carry  # (r,), ()
@@ -151,7 +143,6 @@ def latent_dynamics_model(
         eta_t = mean_eta + eta_noise  # (K,)
 
         # Condition on observed_eta if provided (passed via obs)
-        # Observation is handled in full_model; here we just sample.
         return (f_t, z_t), (f_t, z_t, eta_t)
 
     # Initial state
@@ -169,8 +160,6 @@ def latent_dynamics_model(
 
     deterministic("f_t", f_seq)
     # NOTE: "z_t" is already recorded by scan as a sampled site of shape (T,);
-    # re-declaring it as deterministic here would duplicate the site name and
-    # crash the model. The regime path is available under "z_t" downstream.
 
     # Optionally condition on observed log-intensities
     if observed_eta is not None:

@@ -14,9 +14,7 @@ import numpyro.distributions as dist
 from scipy.optimize import minimize
 
 
-# ---------------------------------------------------------------------------
 # Reference cyber events used to calibrate damage functions
-# ---------------------------------------------------------------------------
 DEFAULT_REFERENCE_EVENTS: list[dict] = [
     {
         "name": "NotPetya",
@@ -57,9 +55,7 @@ DEFAULT_REFERENCE_EVENTS: list[dict] = [
 ]
 
 
-# ---------------------------------------------------------------------------
 # Dataclass for per-sector damage function parameters
-# ---------------------------------------------------------------------------
 
 @dataclass
 class DamageFunctionParams:
@@ -69,9 +65,7 @@ class DamageFunctionParams:
     max_damage: np.ndarray # (S,) maximum fraction of output that can be disrupted
 
 
-# ---------------------------------------------------------------------------
 # Damage function
-# ---------------------------------------------------------------------------
 
 def damage_function(
     shock_load: jnp.ndarray,       # (S,)
@@ -106,9 +100,7 @@ def jax_sigmoid(x: jnp.ndarray) -> jnp.ndarray:
     return jnp.where(x >= 0, 1.0 / (1.0 + jnp.exp(-x)), jnp.exp(x) / (1.0 + jnp.exp(x)))
 
 
-# ---------------------------------------------------------------------------
 # Leontief propagation
-# ---------------------------------------------------------------------------
 
 def leontief_propagation(
     g_s: jnp.ndarray,       # (S,) fraction of output disrupted per sector
@@ -128,9 +120,7 @@ def leontief_propagation(
     return d_s, ell
 
 
-# ---------------------------------------------------------------------------
 # Calibration
-# ---------------------------------------------------------------------------
 
 def calibrate_damage_functions(
     reference_events: list[dict],

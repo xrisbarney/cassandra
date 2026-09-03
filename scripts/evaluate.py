@@ -31,8 +31,6 @@ import numpy as np
 import pandas as pd
 
 # Force UTF-8 stdout/stderr: Windows' default console codepage cannot encode
-# many Unicode characters, which raises UnicodeEncodeError and kills the
-# process -- especially when output is redirected to a log file.
 if sys.platform == "win32":
     import io
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace", line_buffering=True)
@@ -46,9 +44,7 @@ from cassandra_threatcast.evaluation.dm_test import dm_table
 from cassandra_threatcast.evaluation.baselines import run_all_baselines
 
 
-# ---------------------------------------------------------------------------
 # Argument parsing
-# ---------------------------------------------------------------------------
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Rolling-origin forecast evaluation for the full model and baselines."
@@ -80,9 +76,7 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-# ---------------------------------------------------------------------------
 # Helpers
-# ---------------------------------------------------------------------------
 def _scores_from_predictive(
     obs: np.ndarray,          # (..., T_test)
     pred_samples: np.ndarray, # (n_samples, ..., T_test)
@@ -289,9 +283,7 @@ def _evaluate_fold(
     return fold_scores, fold_dm_crps
 
 
-# ---------------------------------------------------------------------------
 # Main
-# ---------------------------------------------------------------------------
 def main() -> None:
     args = parse_args()
 
@@ -322,9 +314,6 @@ def main() -> None:
     x_s      = _load("x_s.npy",      np.ones(S) * 1e12)
 
     # --- Load InferenceData -------------------------------------------------
-    # Prefer the pickle (written unconditionally by train.py, guaranteed
-    # complete) over the .nc file, which some xarray/arviz version
-    # combinations can leave empty/corrupt for a large InferenceData.
     print("[2/4] Loading InferenceData ...")
     try:
         pkl_path = os.path.splitext(args.idata)[0] + ".pkl"
@@ -354,7 +343,6 @@ def main() -> None:
     print(f"      Horizons: {horizons}  T={T}  test_T={test_T}")
 
     # Independent refits are memory-heavy JAX jobs; run sequentially unless a
-    # single pre-fitted diagnostic posterior was explicitly requested.
     n_workers = min(len(fold_starts), os.cpu_count() or 1) if args.reuse_posterior else 1
     print(f"      Using {n_workers} worker process(es) (folds are independent)")
 
@@ -421,7 +409,6 @@ def main() -> None:
         print(f"      Saved to {dm_path}")
 
     # --- Calibration report -------------------------------------------------
-    # Use the last fold only for calibration diagnostics
     print("\nCalibration report (last fold) ...")
     try:
         from cassandra_threatcast.evaluation.calibration import calibration_report as cal_report
@@ -476,7 +463,6 @@ def main() -> None:
             print(cal_df.to_string(index=False))
 
             # Step 34: CRPS for every real-valued target; logarithmic score
-            # only for the count channels N and D.
             channel_rows = []
             for channel, observed in obs_dict.items():
                 samples = np.moveaxis(pred_dict[channel], 0, -1)

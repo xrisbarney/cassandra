@@ -58,19 +58,11 @@ damage:
   scale_prior_beta: 2.0
 
 # Enhanced mode: Claude-proposed statistical enhancements beyond the paper's
-# native specification. Off by default (paper-native). Enable with the
-# --enhanced-mode flag on train.py / forecast.py, or set enabled: true here.
-# See docs/MODEL_VARIANTS.md for the paper-vs-enhanced comparison.
 enhanced:
   enabled: false
   student_t_df: 4.0   # degrees of freedom for heavy-tailed latent innovations
 
 # Learned temporal kernel: a moving-window ("square") covariance component
-# with learnable half-width h (months), amplitude sigma_g, and per-topic
-# loadings a_g. Quantifies how strongly nearby months co-move beyond the AR
-# factor dynamics and global trends (docs/PAPER_NOTES.md §9). Disabled by
-# default (paper-native); train a comparison variant with
-#   python scripts/ablation.py --variants full,kernel
 kernel:
   enabled: false
   halfwidth_prior_months: 24   # prior centre: a ~4-year square window
