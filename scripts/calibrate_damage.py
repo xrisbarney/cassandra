@@ -119,43 +119,14 @@ def main() -> None:
     print("[2/4] Building pre-event predictive shock loads ...")
     rng = np.random.default_rng(seed)
     Pi = np.asarray(post["Pi"], dtype=float)
-    paper_exact = "Phi_r" in post and "z_t" in post
-    predicted_probs = None
-    if not paper_exact:
-        loglik = np.asarray(post["loglik_regime_t"], dtype=float)
-        _, predicted_probs = batch_forward_filter(loglik, Pi)
+    loglik = np.asarray(post["loglik_regime_t"], dtype=float)
+    _, predicted_probs = batch_forward_filter(loglik, Pi)
 
     def state_predictive(t_index: int) -> dict[str, np.ndarray]:
-        if not paper_exact:
-            return one_step_state_predictive(
-                post, t_index, rng, predicted_probs=predicted_probs,
-                enhanced=enhanced, student_t_df=student_t_df,
-            )
-        eta_draws, zeta_draws = [], []
-        previous = max(t_index - 1, 0)
-        for idx in range(n):
-            z_prev = int(post["z_t"][idx, previous])
-            z = int(rng.choice(Pi.shape[-1], p=Pi[idx, z_prev]))
-            f = post["Phi_r"][idx, z] @ post["f_t"][idx, previous]
-            f += post["Q_r"][idx, z] * rng.standard_normal(post["f_init"].shape[-1])
-            h = post["A_sigma_r"][idx, z] @ post["h_t"][idx, previous]
-            h += post["Q_sigma_r"][idx, z] * rng.standard_normal(post["h_init"].shape[-1])
-            excitation = 0.0
-            if "hawkes_alpha" in post:
-                excitation = np.log1p(
-                    post["hawkes_decay"][idx]
-                    * (post["hawkes_alpha"][idx]
-                       @ np.exp(np.clip(post["eta_t"][idx, previous], -20, 20)))
-                )
-            eta_draws.append(
-                post["mu_r"][idx, z] + post["Gamma"][idx] @ f + excitation
-                + post["tau_k"][idx] * rng.standard_normal(post["tau_k"].shape[-1])
-            )
-            zeta_draws.append(
-                post["nu_r"][idx, z] + post["Psi"][idx] @ h
-                + post["omega_k"][idx] * rng.standard_normal(post["omega_k"].shape[-1])
-            )
-        return {"eta": np.asarray(eta_draws), "zeta": np.asarray(zeta_draws)}
+        return one_step_state_predictive(
+            post, t_index, rng, predicted_probs=predicted_probs,
+            enhanced=enhanced, student_t_df=student_t_df,
+        )
 
     shock_loads = []       # list of (n, S)
     event_rows = []

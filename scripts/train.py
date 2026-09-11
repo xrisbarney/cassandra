@@ -1,9 +1,12 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 from dotenv import load_dotenv
 load_dotenv()
 
 """
-Infer the full paper model via alternating NUTS and FFBS.
+Infer the paper model (manuscript §3.5): the discrete regime path is
+marginalized analytically inside the likelihood by the hidden-Markov forward
+recursion, and every remaining unknown is continuous and sampled directly
+with the No-U-Turn sampler.  No categorical variable is ever sampled.
 
 Usage:
     python scripts/train.py \\
@@ -14,8 +17,9 @@ Usage:
 The script:
   1. Loads the processed panel and derived features from --data-dir.
   2. Assembles the data dict expected by `model.paper_exact.paper_model`.
-  3. Alternates continuous NUTS blocks and discrete FFBS path draws.
-  4. Saves the resulting ArviZ InferenceData to <output_dir>/idata.nc.
+  3. Runs NUTS on the marginalized model (or VI with --method vi, the
+     scalable variant §4.1 prescribes for K in the thousands).
+  4. Saves the resulting ArviZ InferenceData to <output_dir>/idata.pkl/.nc.
   5. Prints a posterior summary for key parameters.
 """
 import argparse
@@ -38,16 +42,14 @@ import numpyro
 numpyro.set_host_device_count(os.cpu_count() or 1)
 
 from cassandra_threatcast.data import pipeline
-from cassandra_threatcast.inference.blocked import (
-    run_blocked_nuts_ffbs,
-    run_blocked_vi_ffbs,
-)
+from cassandra_threatcast.inference.nuts import run_nuts
+from cassandra_threatcast.model.paper_exact import paper_model
 
 
 # Argument parsing
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Infer the paper model via blocked NUTS/FFBS."
+        description="Infer the paper model via marginalized-regime NUTS (§3.5)."
     )
     parser.add_argument(
         "--config", default="configs/default.yaml",
@@ -70,39 +72,27 @@ def parse_args() -> argparse.Namespace:
         help="Override num_samples from config.",
     )
     parser.add_argument(
+        "--num-chains", type=int, default=None,
+        help="Override num_chains from config.",
+    )
+    parser.add_argument(
         "--seed", type=int, default=42,
         help="JAX random seed.  Default: 42",
     )
-    parser.add_argument("--gibbs-blocks", type=int, default=None)
-    parser.add_argument("--gibbs-warmup-blocks", type=int, default=None)
-    parser.add_argument("--block-warmup", type=int, default=None)
     parser.add_argument(
         "--train-end", type=int, default=None,
         help="Last time index (exclusive) for training.  Default: full series.",
     )
     parser.add_argument(
-        "--method", choices=["blocked", "vi"], default="blocked",
-        help="Inference method: paper-exact blocked NUTS/FFBS (default), or scalable VI.",
+        "--method", choices=["nuts", "vi"], default="nuts",
+        help="Inference: NUTS on the marginalized model (default; §3.5), or "
+             "variational inference (the §4.1 population-scale variant).",
     )
     return parser.parse_args()
 
 
-# Data loading helpers
-def load_features(data_dir: str, S: int) -> dict:
-    "Load derived feature arrays, falling back to sensible defaults."
-    def _try_load(fname: str, fallback: np.ndarray) -> np.ndarray:
-        fpath = os.path.join(data_dir, fname)
-        if os.path.exists(fpath):
-            return np.load(fpath)
-        print(f"  Warning: {fname} not found, using fallback shape={fallback.shape}")
-        return fallback
-
-    # We don't know K/T yet when this is called; use panel to infer dims
-    return None   # resolved after panel load
-
-
 def assemble_data(panel: dict, data_dir: str, config: dict) -> dict:
-    "Build the data dict expected by full_model."
+    "Build the data dict expected by paper_model."
     K = config["model"]["K"]
     S = config["model"]["S"]
     T = panel["N"].shape[1]
@@ -133,6 +123,33 @@ def assemble_data(panel: dict, data_dir: str, config: dict) -> dict:
     }
 
 
+def _run_vi(data: dict, config: dict):
+    "VI on the marginalized model; returns an ArviZ InferenceData."
+    import arviz as az
+    from cassandra_threatcast.inference.vi import train_vi, vi_predictive_samples
+
+    mcfg, scfg = config.get("mcmc", {}), config.get("svi", {})
+    n_samples = int(mcfg.get("num_samples", 1000))
+    seed = int(scfg.get("seed", mcfg.get("seed", 0)))
+    guide, params, _ = train_vi(
+        paper_model, data, config,
+        num_steps=int(scfg.get("num_steps", 30000)),
+        learning_rate=float(scfg.get("learning_rate", 1e-3)),
+        seed=seed,
+    )
+    samples = vi_predictive_samples(
+        guide, params, paper_model, data, config=config,
+        n_samples=n_samples, seed=seed + 1,
+    )
+    posterior = {
+        name: np.asarray(value)[None, ...]
+        for name, value in samples.items()
+        if name not in {"N_obs", "E_obs", "B_obs", "D_obs"}
+        and np.asarray(value).size > 0
+    }
+    return az.from_dict({"posterior": posterior})
+
+
 # Main
 def main() -> None:
     args = parse_args()
@@ -142,19 +159,15 @@ def main() -> None:
         config = yaml.safe_load(fh)
 
     # Let CLI flags override MCMC configuration.
-    print("      Model variant: paper-exact")
+    print("      Model variant: paper (marginalized regimes)")
 
     mcmc_cfg = config.setdefault("mcmc", {})
     if args.num_warmup is not None:
         mcmc_cfg["num_warmup"] = args.num_warmup
     if args.num_samples is not None:
         mcmc_cfg["num_samples"] = args.num_samples
-    if args.gibbs_blocks is not None:
-        mcmc_cfg["gibbs_blocks"] = args.gibbs_blocks
-    if args.gibbs_warmup_blocks is not None:
-        mcmc_cfg["gibbs_warmup_blocks"] = args.gibbs_warmup_blocks
-    if args.block_warmup is not None:
-        mcmc_cfg["block_warmup"] = args.block_warmup
+    if args.num_chains is not None:
+        mcmc_cfg["num_chains"] = args.num_chains
     mcmc_cfg["seed"] = args.seed
 
     num_warmup  = int(mcmc_cfg.get("num_warmup", 1000))
@@ -187,16 +200,16 @@ def main() -> None:
     # Run inference.
     t0 = time.time()
 
-    if args.method == "blocked":
-        print(f"[2/3] Alternating NUTS and FFBS  (initial warmup={num_warmup}  "
-              f"saved Gibbs draws={num_samples}) ...")
-        idata = run_blocked_nuts_ffbs(data, config)
+    if args.method == "nuts":
+        print(f"[2/3] NUTS on the marginalized model  (warmup={num_warmup}  "
+              f"samples={num_samples}) ...")
+        idata = run_nuts(paper_model, data, config)
     else:
         svi_cfg = config.get("svi", {})
         num_steps = int(svi_cfg.get("num_steps", 30000))
         lr = float(svi_cfg.get("learning_rate", 1e-3))
         print(f"[2/3] Running VI  (steps={num_steps}  lr={lr}) ...")
-        idata = run_blocked_vi_ffbs(data, config)
+        idata = _run_vi(data, config)
 
     elapsed = time.time() - t0
     print(f"      {args.method.upper()} completed in {elapsed / 60:.1f} min.")

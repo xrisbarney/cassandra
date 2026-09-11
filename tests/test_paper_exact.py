@@ -1,11 +1,12 @@
-import jax.numpy as jnp
 import numpy as np
 import pandas as pd
 from numpyro.handlers import seed, trace
 
 from cassandra_threatcast.data.incident_losses import load_monthly_loss_marks
 from cassandra_threatcast.evaluation.posterior_predictive import posterior_predictive_checks
-from cassandra_threatcast.model.paper_exact import paper_model, reporting_propensity
+from cassandra_threatcast.model.paper_exact import (
+    paper_config, paper_model, recover_regime_paths,
+)
 
 
 def _tiny_data():
@@ -20,23 +21,42 @@ def _tiny_data():
     }
 
 
-def test_paper_model_orders_regimes_and_builds_all_channels():
+def test_paper_config_pins_manuscript_model():
+    cfg = paper_config({
+        "model": {"K": 2},
+        "hawkes": {"enabled": True},
+        "enhanced": {"enabled": True},
+        "kernel": {"enabled": True},
+        "ablation": {"drop_E": True},
+    })
+    assert "hawkes" not in cfg                     # §3.2: only "a natural alternative"
+    assert cfg["enhanced"]["enabled"] is False     # §3.2: Gaussian innovations
+    assert cfg["kernel"]["enabled"] is True        # §4.3: optional, config-driven
+    assert cfg["ablation"]["drop_E"] is True       # §4.3: Table 4 variants pass through
+
+
+def test_paper_model_marginalizes_regimes_and_builds_all_channels():
     cfg = {"model": {"K": 2, "S": 2, "r": 1, "r_sigma": 1, "R": 2}}
-    sites = trace(seed(paper_model, 3)).get_trace(
-        _tiny_data(), cfg, jnp.array([0, 0, 1, 1])
-    )
-    means = np.asarray(sites["mu_r"]["value"]).mean(axis=1)
-    assert np.all(np.diff(means) >= 0)
-    assert np.asarray(sites["lambda_t"]["value"]).shape == (4, 2)
+    sites = trace(seed(paper_model, 3)).get_trace(_tiny_data(), cfg)
+    # §3.5: no categorical variable is ever sampled.
+    assert not any(s.get("type") == "sample" and s["name"].startswith("z")
+                   for s in sites.values())
+    assert np.asarray(sites["loglik_regime_t"]["value"]).shape == (4, 2)
+    assert "marginal_regime_lik" in sites
     assert {"N_obs", "E_obs", "B_obs", "D_obs"}.issubset(sites)
 
 
-def test_reporting_propensity_is_sector_and_time_varying():
-    pi = reporting_propensity(
-        jnp.array([-3.0, -2.0]), jnp.array([0.0, 0.2]), 1.0, jnp.array([0.0, 1.0])
-    )
-    assert pi.shape == (2, 2)
-    assert np.all(np.asarray(pi[:, 1]) > np.asarray(pi[:, 0]))
+def test_recover_regime_paths_shapes_and_labels():
+    rng = np.random.default_rng(0)
+    n, T, R = 3, 5, 2
+    posterior = {
+        "loglik_regime_t": rng.normal(size=(n, T, R)),
+        "Pi": np.full((n, R, R), 0.5),
+    }
+    z = recover_regime_paths(posterior, seed=1)
+    assert z.shape == (n, T)
+    assert z.dtype.kind == "i"
+    assert set(np.unique(z)).issubset({0, 1})
 
 
 def test_curated_loss_marks_are_aggregated(tmp_path):

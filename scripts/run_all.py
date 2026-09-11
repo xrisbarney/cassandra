@@ -67,8 +67,7 @@ def main() -> None:
 
     train = ["scripts/train.py"]
     if args.quick:
-        train += ["--num-warmup", "50", "--num-samples", "30",
-                  "--gibbs-blocks", "3", "--gibbs-warmup-blocks", "0", "--block-warmup", "10"]
+        train += ["--num-warmup", "50", "--num-samples", "30"]
     run("3/6 Infer the posterior", train)
 
     run("4/6 Calibrate damage functions", ["scripts/calibrate_damage.py"])

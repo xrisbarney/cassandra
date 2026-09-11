@@ -5,6 +5,21 @@ import pandas as pd
 from sklearn.ensemble import RandomForestRegressor
 
 
+def _residual_bootstrap(
+    point: np.ndarray,   # (horizon,) point forecast path
+    resid: np.ndarray,   # (m,) in-sample residuals
+    n_boot: int,
+    rng: np.random.Generator,
+) -> np.ndarray:
+    "Predictive samples for a point baseline: point path + resampled residuals."
+    resid = np.asarray(resid, dtype=float)
+    resid = resid[np.isfinite(resid)]
+    if resid.size == 0:
+        resid = np.zeros(1)
+    draws = rng.choice(resid, size=(n_boot, point.shape[0]), replace=True)
+    return np.maximum(point[None, :] + draws, 0.0)
+
+
 class RandomForestBaseline:
     "Per-series Random Forest with lag-embedded features."
 
@@ -66,6 +81,29 @@ class RandomForestBaseline:
 
         return results
 
+    def predict_samples(
+        self,
+        panel: np.ndarray,
+        horizon: int,
+        n_boot: int = 500,
+        seed: int = 0,
+    ) -> np.ndarray:
+        "Residual-bootstrap predictive samples: (n_series, n_boot, horizon)."
+        rng = np.random.default_rng(seed)
+        n_series = panel.shape[0]
+        out = np.zeros((n_series, n_boot, horizon))
+        for i, rf in self.models.items():
+            X, y = self._make_features(panel[i])
+            resid = y - rf.predict(X)
+            context = list(panel[i, -self.n_lags :])
+            point = np.zeros(horizon)
+            for h in range(horizon):
+                feat = np.array(context[-self.n_lags :]).reshape(1, -1)
+                point[h] = float(rf.predict(feat)[0])
+                context.append(point[h])
+            out[i] = _residual_bootstrap(point, resid, n_boot, rng)
+        return out
+
 
 class ArimaBaseline:
     "Per-series ARIMA via pmdarima auto_arima."
@@ -121,6 +159,22 @@ class ArimaBaseline:
                     results[i, h, qi] = np.quantile(samples, q)
 
         return results
+
+    def predict_samples(
+        self,
+        horizon: int,
+        n_boot: int = 500,
+        seed: int = 0,
+    ) -> np.ndarray:
+        "Residual-bootstrap predictive samples: (n_series, n_boot, horizon)."
+        rng = np.random.default_rng(seed)
+        n_series = len(self.models)
+        out = np.zeros((n_series, n_boot, horizon))
+        for i, model in self.models.items():
+            fc = np.asarray(model.predict(n_periods=horizon), dtype=float)
+            resid = np.asarray(model.resid(), dtype=float)
+            out[i] = _residual_bootstrap(fc, resid, n_boot, rng)
+        return out
 
 
 class EtsBaseline:
@@ -188,6 +242,23 @@ class EtsBaseline:
 
         return results
 
+    def predict_samples(
+        self,
+        horizon: int,
+        n_boot: int = 500,
+        seed: int = 0,
+    ) -> np.ndarray:
+        "Residual-bootstrap predictive samples: (n_series, n_boot, horizon)."
+        rng = np.random.default_rng(seed)
+        n_series = len(self.models)
+        out = np.zeros((n_series, n_boot, horizon))
+        for i, model in self.models.items():
+            fc = np.asarray(model.forecast(horizon), dtype=float)
+            resid = (np.asarray(model.resid, dtype=float)
+                     if getattr(model, "resid", None) is not None else np.zeros(1))
+            out[i] = _residual_bootstrap(fc, resid, n_boot, rng)
+        return out
+
 
 class NaiveBaseline:
     "Seasonal random walk: forecast = last observed same-season value"
@@ -239,6 +310,29 @@ class NaiveBaseline:
                     results[i, h, qi] = np.quantile(samples, q)
 
         return results
+
+    def predict_samples(
+        self,
+        horizon: int,
+        n_boot: int = 500,
+        seed: int = 0,
+    ) -> np.ndarray:
+        "Residual-bootstrap predictive samples: (n_series, n_boot, horizon)."
+        rng = np.random.default_rng(seed)
+        n_series = self.panel.shape[0]
+        out = np.zeros((n_series, n_boot, horizon))
+        m = self.seasonal_period
+        for i in range(n_series):
+            series = self.panel[i]
+            T = len(series)
+            if T >= m:
+                point = np.array([series[T - m + (h % m)] for h in range(horizon)])
+                resid = series[m:] - series[:-m] if T > m else series - series.mean()
+            else:
+                point = np.full(horizon, series[-1] if T else 0.0)
+                resid = series - series.mean() if T > 1 else np.zeros(1)
+            out[i] = _residual_bootstrap(point, resid, n_boot, rng)
+        return out
 
 
 class BstsUnivariate:
@@ -296,6 +390,26 @@ class BstsUnivariate:
         self.posterior = {k: np.array(v) for k, v in mcmc.get_samples().items()}
         self._T_fit = T
         return self
+
+    def predict_samples(self, horizon: int, seed: int = 0) -> np.ndarray:
+        "Posterior predictive draws (n_samples, horizon) from level + trend."
+        level_std = self.posterior["level_std"]   # (n_samples,)
+        trend_std = self.posterior["trend_std"]
+        obs_std = self.posterior["obs_std"]
+
+        levels = self.posterior["level"]
+        trends = self.posterior["trend"]
+        lv = levels[:, -1].copy()
+        tr = trends[:, -1].copy()
+
+        n_samples = len(lv)
+        preds = np.zeros((n_samples, horizon))
+        rng = np.random.default_rng(seed)
+        for h in range(horizon):
+            lv = lv + tr + rng.standard_normal(n_samples) * level_std
+            tr = tr + rng.standard_normal(n_samples) * trend_std
+            preds[:, h] = lv + rng.standard_normal(n_samples) * obs_std
+        return np.maximum(preds, 0.0)
 
     def predict_quantiles(
         self,

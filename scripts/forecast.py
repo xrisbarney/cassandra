@@ -226,7 +226,6 @@ def main() -> None:
     out = None
     try:
         from cassandra_threatcast.model import full as full_module
-        from cassandra_threatcast.model import paper_exact
         from cassandra_threatcast.model.economic import DamageFunctionParams
 
         # Flatten posterior (chain, draw, ...) -> (sample, ...)
@@ -260,24 +259,11 @@ def main() -> None:
         # BEA gross output arrives in $ millions; convert so every loss
         x_s_usd = x_s * 1e6
 
-        if "Phi_r" in post and "z_t" in post:
-            damage_draws_path = os.path.join("results", "calibration", "damage_posterior.npz")
-            damage_draws = None
-            if os.path.exists(damage_draws_path):
-                with np.load(damage_draws_path) as saved:
-                    damage_draws = {name: saved[name] for name in saved.files}
-            out = paper_exact.predict(
-                post, data_dict, args.horizon, Lambda_L, x_s_usd, M_future,
-                damage_params, damage_draws=damage_draws,
-                exposure_concentration=float(config.get("forecast", {}).get(
-                    "exposure_concentration", 200.0)),
-            )
-        else:
-            out = full_module.predict(
-                post, data_dict, args.horizon,
-                Lambda_L, x_s_usd, M_future, damage_params,
-                enhanced=enhanced, student_t_df=student_t_df,
-            )
+        out = full_module.predict(
+            post, data_dict, args.horizon,
+            Lambda_L, x_s_usd, M_future, damage_params,
+            enhanced=enhanced, student_t_df=student_t_df,
+        )
         pred_N = out["N_pred"]   # (n_samples, K, horizon) forecast CVE counts
     except Exception as exc:
         warnings.warn(f"full_module.predict failed: {exc}. "
@@ -380,17 +366,11 @@ def main() -> None:
         from cassandra_threatcast.viz.interactive import regime_area
 
         Pi_all = np.asarray(post["Pi"], dtype=float)
-        if "z_t" in post:
-            z_draws = np.asarray(post["z_t"], dtype=int)
-            R = Pi_all.shape[-1]
-            hist_probs = np.stack([(z_draws == r).mean(axis=0) for r in range(R)], axis=1)
-            p = np.eye(R)[z_draws[:, -1]]
-        else:
-            loglik_all = np.asarray(post["loglik_regime_t"], dtype=float)
-            filtered, _ = batch_forward_filter(loglik_all, Pi_all)
-            R = filtered.shape[-1]
-            hist_probs = filtered.mean(axis=0)
-            p = filtered[:, -1]
+        loglik_all = np.asarray(post["loglik_regime_t"], dtype=float)
+        filtered, _ = batch_forward_filter(loglik_all, Pi_all)
+        R = filtered.shape[-1]
+        hist_probs = filtered.mean(axis=0)
+        p = filtered[:, -1]
 
         fwd_probs = []
         for _h in range(args.horizon):
