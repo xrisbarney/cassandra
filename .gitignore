@@ -46,6 +46,9 @@ Thumbs.db
 htmlcov/
 .ruff_cache/
 
+# Docs (papers, downloaded PDFs, third-party benchmark code)
+docs/
+
 # Environment variables
 .env
 .env.local
