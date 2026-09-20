@@ -1,0 +1,70 @@
+model:
+  K: 8             # number of threat topics
+  S: 11            # number of sectors (matching BEA I-O summary level)
+  r: 3             # number of latent intensity factors
+  r_sigma: 2       # number of latent severity factors
+  R: 3             # number of regimes
+  vi_rank: 10      # rank for low-rank variational approximation
+
+mcmc:
+  num_warmup: 1000
+  num_samples: 2000
+  num_chains: 1              # run different seeds independently for more chains
+  target_accept_prob: 0.9
+  max_tree_depth: 10
+
+hawkes:
+  enabled: false               # optional paper Step 10 cross-topic excitation
+
+forecast:
+  exposure_concentration: 200  # uncertainty around each M_t sector allocation
+
+evaluation:
+  test_years: 2             # paper §4.1: final two years (2023-01..2024-12) held out
+  val_years: 1              # preceding year = validation window
+  horizons: [1, 3, 6, 12]   # forecast horizons in months
+  mcmc:                     # smaller per-origin refits for the strict robustness variant
+    num_warmup: 300
+    num_samples: 200
+
+paths:
+  cache_dir: "data/cache"
+  processed_dir: "data/processed"
+  results_dir: "results"
+
+apis:
+  nvd_base_url: "https://services.nvd.nist.gov/rest/json/cves/2.0"
+  epss_base_url: "https://api.first.org/data/v1/epss"
+  cisa_kev_url: "https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json"
+  sec_efts_url: "https://efts.sec.gov/LATEST/search-index?q=%22cybersecurity+incident%22+%22Item+1.05%22&dateRange=custom&startdt={start}&enddt={end}&forms=8-K"
+
+bea:
+  year: 2022        # BEA I-O table year to use (fetched via API)
+
+effort:
+  method: "hp_filter"
+  hp_lambda: 1600
+
+damage:
+  shape_prior_alpha: 2.0
+  shape_prior_beta: 1.0
+  scale_prior_alpha: 1.0
+  scale_prior_beta: 2.0
+
+# Legacy enhanced-mode settings.
+enhanced:
+  enabled: false
+  student_t_df: 4.0   # degrees of freedom for heavy-tailed latent innovations
+
+# Optional moving-window kernel settings.
+kernel:
+  enabled: false
+  halfwidth_prior_months: 24   # prior centre: a ~4-year square window
+  max_halfwidth: 60            # window support (months each side)
+
+# Final evaluated system (paper Sec. 4): E dropped from the model, D kept in
+# the methodology but excluded from the evaluated forecasting system.
+ablation:
+  drop_E: true
+  drop_D: true
+

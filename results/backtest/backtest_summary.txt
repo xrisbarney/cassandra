@@ -1,12 +1,13 @@
-Sequential 1-step-ahead backtest (2010-01 .. 2026-07, scored on 2023-01..2024-12).
-Extension 2025-01..2026-07 (19 months beyond training, filter updated on actual CVE counts, fully out of sample): 90% coverage 94%.
+Sequential 1-step-ahead backtest (2010-01 .. 2024-12, scored on 2023-01..2024-12).
 Each month the model predicted the next month BEFORE seeing it, was scored, then updated its regime beliefs with that month's actual data (all four observation channels).
 
-CVE-count channel, test window: CRPS 89.4, 90% interval coverage 98% (target ~90%), 50% coverage 65% (target ~50%).
-Full-history 90% coverage: 97%.
-Incident channel, test window: 90% coverage 95%.
+CVE-count channel, test window: CRPS 65.1, 90% interval coverage 97% (target ~90%), 50% coverage 70% (target ~50%).
+Full-history 90% coverage: 96%.
+Incident channel, test window: 90% coverage 55%.
 
 Caveats: static parameters were estimated on the full sample, so the test window is out-of-sample only for the sequential state updates; prediction-step covariates (effort index, exposure map) enter lagged by one month, though the effort index itself is a two-sided full-sample estimate; the forecast tail beyond 2024-12 holds both at their last observed values.
 
 --- AI summary ---
-The forecast overall leaned toward over-prediction, with the largest misses being remote code execution, cross-site scripting, and SQL injection, where predicted counts exceeded actuals by roughly 12,000, 3,400, and 2,100 respectively. On the under-prediction side, cross-site request forgery was the biggest gap, coming in about 8,000 short, followed by miscellaneous vulnerabilities and denial of service, each under by roughly 6,500 and 4,300. The model handled the smaller daily channel far better than the larger weekly channel, with much lower error metrics across all horizons and coverage rates near the target. For the weekly channel, the 90% interval coverage was 97.9% on the test window and 97.1% on full history, meaning the stated uncertainty ranges were too wide—the model was underconfident, so actual values fell inside the range more often than the 90% target. This suggests you can trust the ranges as conservative, but they likely overstate uncertainty. The 50% coverage was also high, reinforcing this. For the daily channel, coverage was close to target, so its ranges are more reliable. Going forward, treat weekly ranges as wider than necessary, and rely more on daily forecasts for precision.
+Looking back at this forecast now that the real numbers are in, the model was broadly close but leaned slightly low overall. It over-predicted a few areas, most notably miscellaneous vulnerabilities (about 30,836 predicted against 30,388 actual), SQL injection (23,040 versus 23,339), and cross-site scripting (17,970 versus 18,471). It under-predicted others more sharply, especially remote code execution (56,054 predicted against 58,709 actual), cross-site request forgery (17,509 versus 19,887), and denial of service (51,635 versus 52,608). So the biggest misses were on the under side, particularly for remote code execution and request forgery.
+
+The most important caveat is the uncertainty ranges. Across all topic-months, the stated 90 percent interval actually contained the true value 97.4 percent of the time, well above the roughly 90 percent target. That means the model was underconfident: its ranges were wider than they needed to be. Going forward, you can treat those intervals as conservative, though the narrower 50 percent coverage figures suggest the central estimates themselves still carry real error.

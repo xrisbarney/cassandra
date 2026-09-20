@@ -74,6 +74,7 @@ def calibration_report(
                 "coverage_nominal": 1.0 - alpha,
                 "coverage_empirical": cov,
                 "interval_score": is_val,
+                "sharpness_mean_width": float(np.mean(hi - lo)),  # Table 5
                 "pit_ks_stat": ks_stat,
                 "pit_ks_pval": ks_pval,
             })

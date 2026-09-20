@@ -66,6 +66,8 @@ VARIANTS: dict[str, dict] = {
     "flat_priors": {"overrides": {"ablation.flat_priors": True},      "note": "no shrinkage (prior scales x10)"},
     "no_E":        {"overrides": {"ablation.drop_E": True},           "note": "CVE + 8-K only"},
     "no_D":        {"overrides": {"ablation.drop_D": True},           "note": "CVE + EPSS only"},
+    "no_E_no_D":   {"overrides": {"ablation.drop_E": True,
+                                  "ablation.drop_D": True},           "note": "CVE + severity only (both channels dropped)"},
     "no_effort":   {"overrides": {"ablation.no_effort": True},        "note": "raw counts as truth (e_t=0)"},
     # Addition rather than removal: the learned moving-window covariance
     "kernel":      {"overrides": {"kernel.enabled": True},            "note": "+ learned moving-window kernel"},

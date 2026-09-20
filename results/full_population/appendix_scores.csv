@@ -1,7 +1,7 @@
 model,topic_set,n_topics,CRPS_h1
-Full (VI),full_population,1024,1.8078382344563801
-Full (VI),active_set,712,1.7726036326661987
-Full (VI),sparse_tail,312,1.8882454026442308
+Full (VI),full_population,1024,1.922326505533854
+Full (VI),active_set,712,1.9021593194054305
+Full (VI),sparse_tail,312,1.9683490584935897
 BSTS-U,full_population,1024,1.8517587559981568
 BSTS-U,active_set,712,1.8635285746738388
 BSTS-U,sparse_tail,312,1.8248994261998053
