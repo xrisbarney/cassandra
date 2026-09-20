@@ -1,6 +1,4 @@
-# Overnight conformance chain: evaluation -> ablation -> full population.
-# Launched detached (survives the editor/agent session). Stop it with:
-#   Get-Content results\overnight_chain.pid | ForEach-Object { Stop-Process -Id $_ -Force }
+# Run conformance jobs overnight.
 $ErrorActionPreference = "Continue"
 Set-Location (Split-Path $PSScriptRoot -Parent)
 $py = ".\.venv\Scripts\python.exe"

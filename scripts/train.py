@@ -1,9 +1,12 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 from dotenv import load_dotenv
 load_dotenv()
 
 """
-Train the full Bayesian hierarchical state-space model via NUTS.
+Infer the paper model (manuscript §3.5): the discrete regime path is
+marginalized analytically inside the likelihood by the hidden-Markov forward
+recursion, and every remaining unknown is continuous and sampled directly
+with the No-U-Turn sampler.  No categorical variable is ever sampled.
 
 Usage:
     python scripts/train.py \\
@@ -13,9 +16,10 @@ Usage:
 
 The script:
   1. Loads the processed panel and derived features from --data-dir.
-  2. Assembles the data dict expected by cassandra_threatcast.model.full.full_model.
-  3. Runs NUTS via cassandra_threatcast.inference.nuts.run_nuts.
-  4. Saves the resulting ArviZ InferenceData to <output_dir>/idata.nc.
+  2. Assembles the data dict expected by `model.paper_exact.paper_model`.
+  3. Runs NUTS on the marginalized model (or VI with --method vi, the
+     scalable variant §4.1 prescribes for K in the thousands).
+  4. Saves the resulting ArviZ InferenceData to <output_dir>/idata.pkl/.nc.
   5. Prints a posterior summary for key parameters.
 """
 import argparse
@@ -25,9 +29,7 @@ import time
 import yaml
 import numpy as np
 
-# Force UTF-8 stdout/stderr: Windows' default console codepage cannot encode
-# many Unicode characters, which raises UnicodeEncodeError and kills the
-# process -- especially when output is redirected to a log file.
+# Force UTF-8 stdout/stderr: Windows' default console codepage cannot...
 if sys.platform == "win32":
     import io
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace", line_buffering=True)
@@ -35,30 +37,19 @@ if sys.platform == "win32":
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
-# Must run before the first jax/numpyro import (including transitively, via
-# the cassandra_threatcast imports below) -- JAX locks in its device count
-# the moment its backend initializes. Without this, num_chains > 1 with
-# chain_method="parallel" silently falls back to running chains SEQUENTIALLY
-# on this machine's single visible CPU device (confirmed: NumPyro just prints
-# a UserWarning and eats the 4x-plus slowdown). This creates `cpu_count()`
-# virtual CPU devices so multiple chains genuinely run in parallel, which
-# also means R-hat/ESS convergence diagnostics become meaningful (they are
-# NaN with a single chain).
+# Must run before the first jax/numpyro import (including...
 import numpyro
 numpyro.set_host_device_count(os.cpu_count() or 1)
 
 from cassandra_threatcast.data import pipeline
-from cassandra_threatcast.model import full as full_module
-from cassandra_threatcast.inference import nuts as nuts_module
-from cassandra_threatcast.inference import vi as vi_module
+from cassandra_threatcast.inference.nuts import run_nuts
+from cassandra_threatcast.model.paper_exact import paper_model
 
 
-# ---------------------------------------------------------------------------
 # Argument parsing
-# ---------------------------------------------------------------------------
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Train the full Bayesian hierarchical model via NUTS."
+        description="Infer the paper model via marginalized-regime NUTS (§3.5)."
     )
     parser.add_argument(
         "--config", default="configs/default.yaml",
@@ -94,35 +85,14 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--method", choices=["nuts", "vi"], default="nuts",
-        help="Inference method: 'nuts' (MCMC, default) or 'vi' (variational).",
-    )
-    parser.add_argument(
-        "--enhanced-mode", action="store_true",
-        help="Use Claude's enhanced model (Student-t latent innovations, "
-             "Negative-Binomial incident channel) instead of the paper-native "
-             "model. See docs/MODEL_VARIANTS.md.",
+        help="Inference: NUTS on the marginalized model (default; §3.5), or "
+             "variational inference (the §4.1 population-scale variant).",
     )
     return parser.parse_args()
 
 
-# ---------------------------------------------------------------------------
-# Data loading helpers
-# ---------------------------------------------------------------------------
-def load_features(data_dir: str, S: int) -> dict:
-    """Load derived feature arrays, falling back to sensible defaults."""
-    def _try_load(fname: str, fallback: np.ndarray) -> np.ndarray:
-        fpath = os.path.join(data_dir, fname)
-        if os.path.exists(fpath):
-            return np.load(fpath)
-        print(f"  Warning: {fname} not found, using fallback shape={fallback.shape}")
-        return fallback
-
-    # We don't know K/T yet when this is called; use panel to infer dims
-    return None   # resolved after panel load
-
-
 def assemble_data(panel: dict, data_dir: str, config: dict) -> dict:
-    """Build the data dict expected by full_model."""
+    "Build the data dict expected by paper_model."
     K = config["model"]["K"]
     S = config["model"]["S"]
     T = panel["N"].shape[1]
@@ -136,6 +106,10 @@ def assemble_data(panel: dict, data_dir: str, config: dict) -> dict:
     Lambda_L = _load("Lambda_L.npy", np.eye(S))
     x_s     = _load("x_s.npy",    np.ones(S) * 1e12)
 
+    dates = panel.get("dates", [])
+    mandatory_t = np.array(
+        [str(date) >= "2023-12" for date in dates], dtype=float
+    ) if len(dates) == T else np.zeros(T)
     return {
         "N":        panel["N"].astype(float),        # (K, T)
         "B":        panel.get("B", np.full((K, T), np.nan)).astype(float),  # (K, T); NaN = unobserved
@@ -145,28 +119,47 @@ def assemble_data(panel: dict, data_dir: str, config: dict) -> dict:
         "e_t":      e_t.astype(float),               # (T,)
         "x_s":      x_s.astype(float),               # (S,)
         "Lambda_L": Lambda_L.astype(float),          # (S, S)
+        "mandatory_t": mandatory_t,                  # SEC rule in force from Dec. 2023
     }
 
 
-# ---------------------------------------------------------------------------
+def _run_vi(data: dict, config: dict):
+    "VI on the marginalized model; returns an ArviZ InferenceData."
+    import arviz as az
+    from cassandra_threatcast.inference.vi import train_vi, vi_predictive_samples
+
+    mcfg, scfg = config.get("mcmc", {}), config.get("svi", {})
+    n_samples = int(mcfg.get("num_samples", 1000))
+    seed = int(scfg.get("seed", mcfg.get("seed", 0)))
+    guide, params, _ = train_vi(
+        paper_model, data, config,
+        num_steps=int(scfg.get("num_steps", 30000)),
+        learning_rate=float(scfg.get("learning_rate", 1e-3)),
+        seed=seed,
+    )
+    samples = vi_predictive_samples(
+        guide, params, paper_model, data, config=config,
+        n_samples=n_samples, seed=seed + 1,
+    )
+    posterior = {
+        name: np.asarray(value)[None, ...]
+        for name, value in samples.items()
+        if name not in {"N_obs", "E_obs", "B_obs", "D_obs"}
+        and np.asarray(value).size > 0
+    }
+    return az.from_dict({"posterior": posterior})
+
+
 # Main
-# ---------------------------------------------------------------------------
 def main() -> None:
     args = parse_args()
 
-    # --- Config -------------------------------------------------------------
+    # Load configuration.
     with open(args.config) as fh:
         config = yaml.safe_load(fh)
 
-    # MCMC settings live in config["mcmc"]; CLI flags override them.  We write
-    # the resolved values back into config["mcmc"] because run_nuts reads them
-    # from there (it takes only (model, data, config)).
-    # Enhanced mode: CLI flag overrides the config default.
-    if args.enhanced_mode:
-        config.setdefault("enhanced", {})["enabled"] = True
-    mode = "ENHANCED (Student-t + NegBin)" if config.get("enhanced", {}).get("enabled") \
-        else "paper-native"
-    print(f"      Model variant: {mode}")
+    # Let CLI flags override MCMC configuration.
+    print("      Model variant: paper (marginalized regimes)")
 
     mcmc_cfg = config.setdefault("mcmc", {})
     if args.num_warmup is not None:
@@ -179,11 +172,10 @@ def main() -> None:
 
     num_warmup  = int(mcmc_cfg.get("num_warmup", 1000))
     num_samples = int(mcmc_cfg.get("num_samples", 1000))
-    num_chains  = int(mcmc_cfg.get("num_chains", 4))
 
     os.makedirs(args.output_dir, exist_ok=True)
 
-    # --- Load data ----------------------------------------------------------
+    # Load data.
     print("[1/3] Loading panel and features ...")
     panel = pipeline.load_panel(args.data_dir)
 
@@ -205,43 +197,24 @@ def main() -> None:
     print(f"      N total counts: {data['N'].sum():.0f}  "
           f"D total counts: {data['D'].sum():.0f}")
 
-    # --- Run inference ------------------------------------------------------
+    # Run inference.
     t0 = time.time()
 
     if args.method == "nuts":
-        print(f"[2/3] Running NUTS  (warmup={num_warmup}  samples={num_samples}  "
-              f"chains={num_chains}) ...")
-        idata = nuts_module.run_nuts(full_module.full_model, data, config)
+        print(f"[2/3] NUTS on the marginalized model  (warmup={num_warmup}  "
+              f"samples={num_samples}) ...")
+        idata = run_nuts(paper_model, data, config)
     else:
         svi_cfg = config.get("svi", {})
         num_steps = int(svi_cfg.get("num_steps", 30000))
         lr = float(svi_cfg.get("learning_rate", 1e-3))
         print(f"[2/3] Running VI  (steps={num_steps}  lr={lr}) ...")
-        guide, params, losses = vi_module.train_vi(
-            full_module.full_model, data, config,
-            num_steps=num_steps, learning_rate=lr, seed=args.seed,
-        )
-        samples = vi_module.vi_predictive_samples(
-            guide, params, full_module.full_model, data,
-            config=config, n_samples=num_samples, seed=args.seed,
-        )
-        # Wrap the VI posterior draws in an InferenceData (add a chain dim) so
-        # downstream scripts consume NUTS and VI output identically.
-        import arviz as az
-        posterior = {k: np.asarray(v)[np.newaxis, ...] for k, v in samples.items()}
-        # arviz >= 1.0: from_dict takes {"group": {...}} rather than kwargs.
-        idata = az.from_dict({"posterior": posterior})
+        idata = _run_vi(data, config)
 
     elapsed = time.time() - t0
     print(f"      {args.method.upper()} completed in {elapsed / 60:.1f} min.")
 
-    # --- Save ---------------------------------------------------------------
-    # A pickle is ALWAYS written first: it is the reliable, guaranteed-complete
-    # save. netCDF (.nc) is attempted second, best-effort, purely as a portable
-    #/inspectable secondary copy — some xarray/arviz version combinations have
-    # been observed to silently produce a 0-byte or truncated .nc file for a
-    # large, multi-group InferenceData without raising, which would otherwise
-    # lose a long (multi-hour) sampling run outright.
+    # Save results.
     print("[3/3] Saving InferenceData ...")
     out_path = os.path.join(args.output_dir, "idata.nc")
     pkl_path = os.path.join(args.output_dir, "idata.pkl")
@@ -263,7 +236,7 @@ def main() -> None:
     except Exception as exc:  # noqa: BLE001 — never fail the run over the secondary copy
         print(f"      netCDF save skipped ({exc}); the .pkl above is complete and authoritative.")
 
-    # --- Summary ------------------------------------------------------------
+    # Print the summary.
     try:
         import arviz as az
         key_vars = [v for v in idata.posterior.data_vars

@@ -61,3 +61,10 @@ kernel:
   enabled: false
   halfwidth_prior_months: 24   # prior centre: a ~4-year square window
   max_halfwidth: 60            # window support (months each side)
+
+# Final evaluated system (paper Sec. 4): E dropped from the model, D kept in
+# the methodology but excluded from the evaluated forecasting system.
+ablation:
+  drop_E: true
+  drop_D: true
+

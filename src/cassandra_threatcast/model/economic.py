@@ -1,8 +1,4 @@
-"""
-economic.py
-===========
-Damage functions and Leontief input-output propagation for cyber loss estimation.
-"""
+"Damage functions and Leontief input-output propagation for cyber loss estimation."
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -14,9 +10,7 @@ import numpyro.distributions as dist
 from scipy.optimize import minimize
 
 
-# ---------------------------------------------------------------------------
 # Reference cyber events used to calibrate damage functions
-# ---------------------------------------------------------------------------
 DEFAULT_REFERENCE_EVENTS: list[dict] = [
     {
         "name": "NotPetya",
@@ -57,40 +51,23 @@ DEFAULT_REFERENCE_EVENTS: list[dict] = [
 ]
 
 
-# ---------------------------------------------------------------------------
 # Dataclass for per-sector damage function parameters
-# ---------------------------------------------------------------------------
 
 @dataclass
 class DamageFunctionParams:
-    """Per-sector parameters for the damage function phi_s(load)."""
+    "Per-sector parameters for the damage function phi_s(load)."
     shape: np.ndarray      # (S,) sigmoid steepness
     scale: np.ndarray      # (S,) midpoint of sigmoid (fraction of capacity)
     max_damage: np.ndarray # (S,) maximum fraction of output that can be disrupted
 
 
-# ---------------------------------------------------------------------------
 # Damage function
-# ---------------------------------------------------------------------------
 
 def damage_function(
     shock_load: jnp.ndarray,       # (S,)
     params: DamageFunctionParams,
 ) -> jnp.ndarray:
-    """
-    Maps per-sector shock loads to fraction of output disrupted.
-
-    phi_s(load_s) = max_damage_s * (sigmoid(z) - sigmoid(z0)) / (1 - sigmoid(z0))
-    where z = (load_s - scale_s) * shape_s and z0 = (0 - scale_s) * shape_s.
-
-    The sigmoid is anchored at z0 so that a zero shock load yields zero
-    disruption (phi_s(0) = 0) while phi_s(inf) -> max_damage_s.  A raw sigmoid
-    would report a spurious non-zero damage floor at zero load, biasing
-    systemic-risk estimates upward.
-
-    Returns g_s of shape (S,), monotone non-decreasing and bounded in
-    [0, max_damage] for non-negative loads.
-    """
+    "Maps per-sector shock loads to fraction of output disrupted."
     shape = jnp.asarray(params.shape)      # (S,)
     scale = jnp.asarray(params.scale)      # (S,)
     max_damage = jnp.asarray(params.max_damage)  # (S,)
@@ -102,35 +79,24 @@ def damage_function(
 
 
 def jax_sigmoid(x: jnp.ndarray) -> jnp.ndarray:
-    """Numerically stable sigmoid."""
+    "Numerically stable sigmoid."
     return jnp.where(x >= 0, 1.0 / (1.0 + jnp.exp(-x)), jnp.exp(x) / (1.0 + jnp.exp(x)))
 
 
-# ---------------------------------------------------------------------------
 # Leontief propagation
-# ---------------------------------------------------------------------------
 
 def leontief_propagation(
     g_s: jnp.ndarray,       # (S,) fraction of output disrupted per sector
     x_s: jnp.ndarray,       # (S,) gross output by sector
     Lambda_L: jnp.ndarray,  # (S, S) Leontief inverse
 ) -> tuple[jnp.ndarray, jnp.ndarray]:
-    """
-    Compute direct and propagated losses.
-
-    d_s  = g_s * x_s               (direct losses, shape (S,))
-    ell  = Lambda_L @ d_s           (total losses with upstream propagation, shape (S,))
-
-    Returns (d_s, ell).
-    """
+    "Compute direct and propagated losses."
     d_s = g_s * x_s        # (S,)
     ell = Lambda_L @ d_s   # (S,)
     return d_s, ell
 
 
-# ---------------------------------------------------------------------------
 # Calibration
-# ---------------------------------------------------------------------------
 
 def calibrate_damage_functions(
     reference_events: list[dict],
@@ -139,16 +105,7 @@ def calibrate_damage_functions(
     S: int,
     num_samples: int = 1000,
 ) -> DamageFunctionParams:
-    """
-    Fit phi_s parameters using documented loss ranges from reference cyber events
-    as weakly informative constraints.
-
-    Uses scipy.optimize.minimize with bounds derived from loss_lo/loss_hi.
-    Returns fitted DamageFunctionParams.
-
-    The optimisation minimises the sum of squared relative errors between the
-    Leontief-propagated model losses and the mid-point of each event's loss range.
-    """
+    "Fit phi_s parameters using documented loss ranges from reference cyber events"
     # Initialise parameters with sensible defaults
     shape_init = np.full(S, 10.0)
     scale_init = np.full(S, 0.01)

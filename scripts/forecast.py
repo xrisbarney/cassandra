@@ -28,9 +28,7 @@ import yaml
 import numpy as np
 import pandas as pd
 
-# Force UTF-8 stdout/stderr: Windows' default console codepage cannot encode
-# many Unicode characters, which raises UnicodeEncodeError and kills the
-# process -- especially when output is redirected to a log file.
+# Force UTF-8 stdout/stderr: Windows' default console codepage cannot...
 if sys.platform == "win32":
     import io
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace", line_buffering=True)
@@ -44,9 +42,7 @@ from cassandra_threatcast.features.topic_map import load_topic_labels
 from cassandra_threatcast.viz.interactive import fan_chart, loss_distribution, save_interactive
 
 
-# ---------------------------------------------------------------------------
 # Argument parsing
-# ---------------------------------------------------------------------------
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Generate 12-month-ahead forecasts from a fitted model."
@@ -87,27 +83,14 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-# ---------------------------------------------------------------------------
 # Helpers
-# ---------------------------------------------------------------------------
 def _quantile_df(
     pred_samples: np.ndarray,  # (n_samples, K, horizon)
     dates_pred: list,
     topic_labels: list[str],
     quantiles: list[float] = [0.05, 0.10, 0.25, 0.50, 0.75, 0.90, 0.95],
 ) -> pd.DataFrame:
-    """Convert predictive samples to a tidy quantile DataFrame.
-
-    Value columns (``mean_cves_per_month``, ``q05_cves_per_month``, ...) are
-    counts of new CVEs published that month for that topic -- a MONTHLY
-    figure (unlike the loss table's horizon-cumulative totals), made explicit
-    via the column name suffix.
-
-    The mean is a 99%-trimmed mean (top 1% of draws excluded): the log-scale
-    latent allows rare draws up to e^30, which blow the raw ensemble mean
-    orders of magnitude past the same row's q95 at long horizons (see
-    docs/PAPER_NOTES.md §7).  Quantiles are the headline summaries.
-    """
+    "Convert predictive samples to a tidy quantile DataFrame."
     records = []
     K, H = pred_samples.shape[1], pred_samples.shape[2]
     for k in range(K):
@@ -135,14 +118,7 @@ def _loss_summary_df(
     horizon_months: int,
     alpha: float = 0.05,
 ) -> pd.DataFrame:
-    """Summarise the posterior loss distribution.
-
-    All value columns are in USD and are TOTALS ACCUMULATED OVER THE WHOLE
-    forecast horizon (summed across months), not a monthly figure -- this is
-    made explicit in the column names (``_usd_total``) and via the
-    ``horizon_months`` column, since a bare "mean"/"VaR95" column is easy to
-    misread as a monthly run-rate.
-    """
+    "Summarise the posterior loss distribution."
     var_pct = int((1 - alpha) * 100)
 
     def _row(scope: str, vals: np.ndarray) -> dict:
@@ -162,7 +138,7 @@ def _loss_summary_df(
         # Aggregate across all sectors/time already done
         records = [_row("aggregate", loss_samples)]
     elif loss_samples.ndim == 3:
-        # (n_samples, S, T_pred)  -> aggregate over time, then per-sector + total
+        # (n_samples, S, T_pred) -> aggregate over time, then per-sector + total
         loss_agg_time = loss_samples.sum(axis=-1)   # (n_samples, S)
         loss_total    = loss_agg_time.sum(axis=-1)  # (n_samples,)
         records = [_row(name, loss_agg_time[:, s]) for s, name in enumerate(sector_names)]
@@ -173,9 +149,7 @@ def _loss_summary_df(
     return pd.DataFrame(records)
 
 
-# ---------------------------------------------------------------------------
 # Main
-# ---------------------------------------------------------------------------
 def main() -> None:
     args = parse_args()
 
@@ -189,7 +163,7 @@ def main() -> None:
     topic_labels = config.get("topic_labels") or load_topic_labels(args.data_dir, K)
     sector_names = config.get("sector_names") or get_default_sector_labels()[:S]
 
-    # --- Load panel ---------------------------------------------------------
+    # Load the panel.
     print("[1/4] Loading panel ...")
     panel = pipeline.load_panel(args.data_dir)
     N_kt  = panel["N"].astype(float)   # (K, T)
@@ -211,6 +185,9 @@ def main() -> None:
         "E": panel.get("E", np.zeros_like(N_kt)),
         "M_skt": M_skt, "e_t": e_t,
         "x_s": x_s, "Lambda_L": Lambda_L,
+        "mandatory_t": np.array(
+            [str(date) >= "2023-12" for date in panel.get("dates", [])], dtype=float
+        ) if len(panel.get("dates", [])) == T else np.zeros(T),
     }
 
     # Reconstruct dates
@@ -219,7 +196,6 @@ def main() -> None:
     pred_dates = dates_all[T : T + args.horizon]
     if len(pred_dates) < args.horizon:
         # The panel's date list only covers the observed T months, so the
-        # forecast horizon always needs new future labels appended here.
         n_missing = args.horizon - len(pred_dates)
         last = dates_all[-1] if dates_all else T - 1
         if isinstance(last, pd.Period):
@@ -228,10 +204,7 @@ def main() -> None:
         else:
             pred_dates = list(pred_dates) + list(range(int(last) + 1, int(last) + 1 + n_missing))
 
-    # --- Load InferenceData -------------------------------------------------
-    # The pickle (written unconditionally by train.py) is preferred: it is the
-    # guaranteed-complete save. The .nc file is a best-effort secondary copy
-    # that some xarray/arviz version combinations can leave empty/corrupt.
+    # Load inference data.
     print("[2/4] Loading InferenceData and generating posterior predictive ...")
     try:
         import arviz as az
@@ -246,7 +219,7 @@ def main() -> None:
         print(f"Error loading idata: {exc}")
         sys.exit(1)
 
-    # --- Generate forecasts -------------------------------------------------
+    # Generate forecasts.
     enhanced = args.enhanced_mode or bool(config.get("enhanced", {}).get("enabled", False))
     student_t_df = float(config.get("enhanced", {}).get("student_t_df", 4.0))
     print(f"      Model variant: {'ENHANCED' if enhanced else 'paper-native'}")
@@ -259,12 +232,10 @@ def main() -> None:
         post = {k: np.asarray(v) for k, v in idata.posterior.items()}
         post = {k: v.reshape((-1,) + v.shape[2:]) for k, v in post.items()}
 
-        # Future exposure: hold the last observed month constant over the horizon.
+    # Hold the latest exposure constant over the horizon.
         M_future = np.repeat(M_skt[:, :, -1:], args.horizon, axis=2)  # (S, K, horizon)
 
         # Damage-function parameters: the event-calibrated posterior (paper
-        # §3 / Table 7, produced by scripts/calibrate_damage.py) when
-        # available, else the config defaults.
         cal_path = os.path.join("results", "calibration", "damage_params.json")
         if os.path.exists(cal_path):
             with open(cal_path, encoding="utf-8") as fh:
@@ -286,7 +257,6 @@ def main() -> None:
                   "scripts/calibrate_damage.py for the event-calibrated set.")
 
         # BEA gross output arrives in $ millions; convert so every loss
-        # figure downstream is in actual dollars.
         x_s_usd = x_s * 1e6
 
         out = full_module.predict(
@@ -313,7 +283,6 @@ def main() -> None:
     print(f"      pred_N shape: {pred_N.shape}  (n_samples={n_samples}, K={_K}, H={_H})")
 
     # Economic loss samples: prefer the losses computed inside predict()
-    # (damage function + Leontief propagation + severity), else fall back.
     if out is not None:
         loss_samples = out["ell_pred"]                       # (n_samples, S, horizon)
         if args.n_samples is not None:
@@ -323,7 +292,7 @@ def main() -> None:
         proxy = pred_N.sum(axis=1, keepdims=True) * (x_s.mean() * 1e-5)
         loss_samples = np.broadcast_to(proxy, (n_samples, S, args.horizon)).copy()
 
-    # --- Save quantile CSV --------------------------------------------------
+    # Save quantiles.
     print("[3/4] Saving forecast outputs ...")
     q_df = _quantile_df(pred_N, pred_dates, topic_labels)
     q_path = os.path.join(args.output_dir, "forecast_quantiles.csv")
@@ -338,7 +307,7 @@ def main() -> None:
           f"{args.horizon}-month forecast horizon -- not a monthly rate)")
     print(loss_df.to_string(index=False))
 
-    # --- Systemic-event probabilities P(agg loss > c)  (paper Problem 2) ----
+    # Compute systemic-event probabilities.
     agg_total = loss_samples.sum(axis=(1, 2)) if loss_samples.ndim == 3 else loss_samples
     thresholds = config.get("evaluation", {}).get(
         "loss_thresholds_usd", [1e9, 2e9, 5e9, 1e10, 5e10, 1e11])
@@ -354,7 +323,7 @@ def main() -> None:
     for _, row in sys_df.iterrows():
         print(f"        P(total loss > ${row.threshold_usd/1e9:,.0f}B) = {row.prob_exceed:.1%}")
 
-    # --- Table 8: ranked sectoral exposure ----------------------------------
+    # Rank sector exposure for Table 8.
     if out is not None and "g_pred" in out:
         g_pred = out["g_pred"]                      # (n, S, H) damage fractions
         sigma_pred = out["sigma_pred"]              # (n, K, H)
@@ -368,7 +337,6 @@ def main() -> None:
         contrib_pct = 100.0 * contrib / max(contrib.sum(), 1e-12)
 
         # Dominant threat topics per sector: mean contribution to the shock
-        # load, M_sk * E[lambda_k * sigma_k].
         drive = (lam_pred * sigma_pred).mean(axis=(0, 2))   # (K,)
         M_h_mean = M_future.mean(axis=2)                    # (S, K)
         rows8 = []
@@ -392,26 +360,25 @@ def main() -> None:
         table8.to_csv(table8_path, index_label="rank")
         print(f"      Sector exposure (Table 8) -> {table8_path}")
 
-    # --- Regime probabilities: the early-warning signal ---------------------
+    # Save regime probabilities.
     try:
         from cassandra_threatcast.evaluation.sequential import batch_forward_filter
         from cassandra_threatcast.viz.interactive import regime_area
 
-        loglik_all = np.asarray(post["loglik_regime_t"], dtype=float)
         Pi_all = np.asarray(post["Pi"], dtype=float)
-        filtered, _ = batch_forward_filter(loglik_all, Pi_all)      # (n, T, R)
+        loglik_all = np.asarray(post["loglik_regime_t"], dtype=float)
+        filtered, _ = batch_forward_filter(loglik_all, Pi_all)
         R = filtered.shape[-1]
-        hist_probs = filtered.mean(axis=0)                          # (T, R)
+        hist_probs = filtered.mean(axis=0)
+        p = filtered[:, -1]
 
         fwd_probs = []
-        p = filtered[:, -1]
         for _h in range(args.horizon):
             p = np.einsum("nr,nrj->nj", p, Pi_all)
             fwd_probs.append(p.mean(axis=0))
         fwd_probs = np.asarray(fwd_probs)                           # (H, R)
 
         # Order regime labels by their posterior mean intensity level so
-        # "Regime 1" is always the calmest and the last is the most severe.
         mu_level = np.asarray(post["mu_r"]).mean(axis=(0, 2))       # (R,)
         order = np.argsort(mu_level)
         names = ["low activity", "elevated", "high activity"][:R]
@@ -427,7 +394,7 @@ def main() -> None:
         reg_path = os.path.join(args.output_dir, "regime_probs.csv")
         reg_df.to_csv(reg_path, index=False)
         print(f"      Regime probabilities (early-warning) -> {reg_path}")
-        print(f"        Current filtered regime: "
+        print("        Current filtered regime: "
               + ", ".join(f"{regime_names[r]} {hist_probs[-1, r]:.0%}" for r in range(R)))
 
         fig_dir_reg = os.path.join(args.output_dir, "figures")
@@ -439,7 +406,7 @@ def main() -> None:
     except Exception as exc:
         warnings.warn(f"Regime-probability output failed: {exc}")
 
-    # --- Plain-English summary (optional, needs DEEPSEEK_API_KEY) -----------
+    # Optionally create a plain-English summary.
     from cassandra_threatcast.llm.deepseek import explain_forecast
     summary = explain_forecast(q_df, loss_df)
     if summary:
@@ -455,7 +422,7 @@ def main() -> None:
         print("\n      (Set DEEPSEEK_API_KEY in .env to get an AI-generated "
               "plain-English summary here and in the dashboard.)")
 
-    # --- Interactive fan-chart figures ---------------------------------------
+    # --- Interactive fan-chart figures...
     print("[4/4] Saving interactive fan-chart figures ...")
     fig_dir = os.path.join(args.output_dir, "figures")
     os.makedirs(fig_dir, exist_ok=True)
@@ -479,7 +446,6 @@ def main() -> None:
     print(f"      {K} interactive fan charts (.html + .json) -> {fig_dir}/")
 
     # Loss distribution figure (values pre-scaled to $ billions; the units
-    # string is only an axis label).
     agg_loss = loss_samples.sum(axis=(1, 2)) if loss_samples.ndim == 3 else loss_samples
     fig_loss = loss_distribution(
         agg_loss / 1e9, units=f"$ billions, total over {args.horizon} months")

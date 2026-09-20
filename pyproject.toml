@@ -39,8 +39,7 @@ dev = [
 dashboard = [
     "streamlit>=1.36",
 ]
-# For completing the funsor-enumeration sampler (see docs/PAPER_NOTES.md,
-# "Recommended long-term fix"). Not required for the current pipeline.
+# Optional funsor-enumeration support; see docs/PAPER_NOTES.md.
 enum-sampler = [
     "funsor>=0.4.7",
 ]

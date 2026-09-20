@@ -1,4 +1,4 @@
-﻿"""Tests for the Bayesian model components."""
+﻿"Tests for the Bayesian model components."
 import numpy as np
 import pytest
 import sys
@@ -7,12 +7,10 @@ import os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
 
-# ---------------------------------------------------------------------------
 # Synthetic data factory
-# ---------------------------------------------------------------------------
 
 def make_synthetic_data(K: int = 3, S: int = 2, T: int = 12, r: int = 2, R: int = 2) -> dict:
-    """Return a minimal data dict suitable for testing the model."""
+    "Return a minimal data dict suitable for testing the model."
     rng = np.random.default_rng(42)
     M_raw = rng.dirichlet(np.ones(K), size=(S, T))  # (S, T, K)
     M_skt = M_raw.transpose(0, 2, 1)               # (S, K, T)
@@ -28,12 +26,10 @@ def make_synthetic_data(K: int = 3, S: int = 2, T: int = 12, r: int = 2, R: int 
     }
 
 
-# ---------------------------------------------------------------------------
 # full_model
-# ---------------------------------------------------------------------------
 
 def test_full_model_forward_pass():
-    """full_model can be traced by NumPyro's Predictive without raising."""
+    "full_model can be traced by NumPyro's Predictive without raising."
     import jax
     from numpyro.infer import Predictive
     from cassandra_threatcast.model.full import full_model
@@ -51,7 +47,7 @@ def test_full_model_forward_pass():
 
 
 def test_full_model_contains_observables():
-    """Prior predictive must contain at least one observation site."""
+    "Prior predictive must contain at least one observation site."
     import jax
     from numpyro.infer import Predictive
     from cassandra_threatcast.model.full import full_model
@@ -73,7 +69,7 @@ def test_full_model_contains_observables():
 
 
 def test_full_model_sample_shapes():
-    """Prior predictive samples have correct batch dimension."""
+    "Prior predictive samples have correct batch dimension."
     import jax
     from numpyro.infer import Predictive
     from cassandra_threatcast.model.full import full_model
@@ -94,7 +90,7 @@ def test_full_model_sample_shapes():
 
 
 def test_full_model_has_severity_process():
-    """Prior predictive exposes the latent severity process and its B channel."""
+    "Prior predictive exposes the latent severity process and its B channel."
     import jax
     from numpyro.infer import Predictive
     from cassandra_threatcast.model.full import full_model
@@ -106,7 +102,7 @@ def test_full_model_has_severity_process():
     rng = jax.random.PRNGKey(7)
     samples = Predictive(full_model, num_samples=3)(rng, data=data, config=config)
 
-    # Severity latent (zeta_t), factor path (h_t), and the B observation channel.
+    # Severity latent (zeta_t), factor path (h_t), and the B observation...
     assert "zeta_t" in samples, f"missing zeta_t; keys={list(samples.keys())}"
     assert "B_obs" in samples, f"missing B_obs; keys={list(samples.keys())}"
     # zeta_t is (n_samples, T, K)
@@ -115,7 +111,7 @@ def test_full_model_has_severity_process():
 
 
 def test_enhanced_mode_uses_negbin_and_runs():
-    """Enhanced mode adds the NegBin dispersion param and still forward-passes."""
+    "Enhanced mode adds the NegBin dispersion param and still forward-passes."
     import jax
     from numpyro.infer import Predictive
     from cassandra_threatcast.model.full import full_model
@@ -137,7 +133,7 @@ def test_enhanced_mode_uses_negbin_and_runs():
 
 
 def test_native_mode_has_no_negbin_param():
-    """Paper-native mode must NOT introduce the enhanced-only phi_D parameter."""
+    "Paper-native mode must NOT introduce the enhanced-only phi_D parameter."
     import jax
     from numpyro.infer import Predictive
     from cassandra_threatcast.model.full import full_model
@@ -152,7 +148,7 @@ def test_native_mode_has_no_negbin_param():
 
 
 def test_severity_obs_masks_missing_marks():
-    """severity_obs must tolerate NaN severity marks (empty topic-months)."""
+    "severity_obs must tolerate NaN severity marks (empty topic-months)."
     import jax
     import jax.numpy as jnp
     from numpyro.infer import Predictive
@@ -172,12 +168,10 @@ def test_severity_obs_masks_missing_marks():
     assert "B_obs" in samples
 
 
-# ---------------------------------------------------------------------------
 # latent_dynamics_model
-# ---------------------------------------------------------------------------
 
 def test_latent_dynamics_shapes():
-    """latent_dynamics_model produces eta_t of shape (n_samples, T, K)."""
+    "latent_dynamics_model produces eta_t of shape (n_samples, T, K)."
     import jax
     from numpyro.infer import Predictive
     from cassandra_threatcast.model.latent import latent_dynamics_model
@@ -197,7 +191,7 @@ def test_latent_dynamics_shapes():
 
 
 def test_latent_dynamics_finite():
-    """Prior draws of eta_t must be finite."""
+    "Prior draws of eta_t must be finite."
     import jax
     from numpyro.infer import Predictive
     from cassandra_threatcast.model.latent import latent_dynamics_model
@@ -211,12 +205,10 @@ def test_latent_dynamics_finite():
     assert np.all(np.isfinite(eta)), "eta_t contains non-finite values"
 
 
-# ---------------------------------------------------------------------------
 # damage_function
-# ---------------------------------------------------------------------------
 
 def test_damage_function_monotone():
-    """damage_function is non-decreasing in shock_load for each sector."""
+    "damage_function is non-decreasing in shock_load for each sector."
     import jax.numpy as jnp
     from cassandra_threatcast.model.economic import damage_function, DamageFunctionParams
 
@@ -241,7 +233,7 @@ def test_damage_function_monotone():
 
 
 def test_damage_function_zero_load():
-    """damage_function returns 0 when shock_load is 0."""
+    "damage_function returns 0 when shock_load is 0."
     import jax.numpy as jnp
     from cassandra_threatcast.model.economic import damage_function, DamageFunctionParams
 
@@ -256,7 +248,7 @@ def test_damage_function_zero_load():
 
 
 def test_damage_function_bounded():
-    """damage_function output <= max_damage for all loads."""
+    "damage_function output <= max_damage for all loads."
     import jax.numpy as jnp
     from cassandra_threatcast.model.economic import damage_function, DamageFunctionParams
 
@@ -274,12 +266,10 @@ def test_damage_function_bounded():
         )
 
 
-# ---------------------------------------------------------------------------
 # leontief_propagation
-# ---------------------------------------------------------------------------
 
 def test_leontief_propagation_identity():
-    """leontief_propagation with identity Lambda_L returns d_s = g_s * x_s."""
+    "leontief_propagation with identity Lambda_L returns d_s = g_s * x_s."
     import jax.numpy as jnp
     from cassandra_threatcast.model.economic import leontief_propagation
 
@@ -295,7 +285,7 @@ def test_leontief_propagation_identity():
 
 
 def test_leontief_propagation_amplification():
-    """With off-diagonal Lambda_L > 0, aggregate loss >= sum of direct losses."""
+    "With off-diagonal Lambda_L > 0, aggregate loss >= sum of direct losses."
     import jax.numpy as jnp
     from cassandra_threatcast.model.economic import leontief_propagation
 

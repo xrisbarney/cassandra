@@ -1,8 +1,4 @@
-"""
-topic_map.py
-============
-Maps CVE descriptions to K threat topics using NMF or LDA on TF-IDF features.
-"""
+"Maps CVE descriptions to K threat topics using NMF or LDA on TF-IDF features."
 from __future__ import annotations
 
 import numpy as np
@@ -10,14 +6,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.feature_extraction import text as sk_text
 from sklearn.decomposition import NMF, LatentDirichletAllocation
 
-# CVE descriptions share a lot of near-universal report-writing boilerplate
-# ("This vulnerability allows a remote attacker to...", CVSS-derived
-# exploitability phrasing, vendor-advisory templates) that carries no
-# discriminative signal for the vulnerability TYPE and otherwise dominates
-# several NMF topics outright (e.g. a topic whose top words are just
-# 'oracle', 'cvss', 'access', 'attacks' -- Oracle's Critical Patch Update
-# advisory template, not a real threat category). These are added on top of
-# sklearn's standard English stopword list.
+# CVE descriptions share a lot of near-universal report-writing...
 _CVE_BOILERPLATE_STOPWORDS = [
     "vulnerability", "vulnerabilities", "allows", "allow", "could", "may",
     "attacker", "attackers", "successful", "cvss", "score", "affected",
@@ -25,9 +14,7 @@ _CVE_BOILERPLATE_STOPWORDS = [
     "oracle", "exploitation", "result", "results",
 ]
 
-# ---------------------------------------------------------------------------
 # Seed vocabulary for 8 canonical threat topics
-# ---------------------------------------------------------------------------
 THREAT_TOPIC_SEEDS: dict[str, list[str]] = {
     "memory_corruption": [
         "buffer overflow", "use after free", "heap spray", "stack overflow",
@@ -73,7 +60,7 @@ THREAT_TOPIC_SEEDS: dict[str, list[str]] = {
 
 
 class WikiTopicMapper:
-    """Maps CVE descriptions to K threat topics using NMF or LDA on TF-IDF features."""
+    "Maps CVE descriptions to K threat topics using NMF or LDA on TF-IDF features."
 
     def __init__(
         self,
@@ -91,9 +78,9 @@ class WikiTopicMapper:
         self.model: NMF | LatentDirichletAllocation | None = None
         self.topic_word_matrix: np.ndarray | None = None  # (K, vocab)
 
-    # ------------------------------------------------------------------
+    # Internal implementation detail.
     def fit(self, descriptions: list[str], n_topics: int | None = None) -> "WikiTopicMapper":
-        """Fit TF-IDF vectorizer then NMF or LDA on the corpus."""
+        "Fit TF-IDF vectorizer then NMF or LDA on the corpus."
         if n_topics is not None:
             self.n_topics = n_topics
 
@@ -109,9 +96,6 @@ class WikiTopicMapper:
         if self.method == "nmf":
             if self.n_topics >= 64:
                 # Large-K (sparse-topic population) fits: full NMF at K in the
-                # hundreds/thousands is impractical on ~200k documents;
-                # MiniBatchNMF converges in minutes with equivalent quality
-                # for topic extraction.
                 from sklearn.decomposition import MiniBatchNMF
                 self.model = MiniBatchNMF(
                     n_components=self.n_topics,
@@ -144,13 +128,13 @@ class WikiTopicMapper:
 
         return self
 
-    # ------------------------------------------------------------------
+    # Internal implementation detail.
     def _check_fitted(self) -> None:
         if self.vectorizer is None or self.model is None:
             raise RuntimeError("Call .fit() before transform/predict methods.")
 
     def transform(self, descriptions: list[str]) -> np.ndarray:
-        """Return (n_docs, K) soft topic distribution."""
+        "Return (n_docs, K) soft topic distribution."
         self._check_fitted()
         X = self.vectorizer.transform(descriptions)  # type: ignore[union-attr]
         if self.method == "nmf":
@@ -163,12 +147,12 @@ class WikiTopicMapper:
             return self.model.transform(X)  # type: ignore[union-attr]  # LDA already normalised
 
     def assign_hard(self, descriptions: list[str]) -> np.ndarray:
-        """Return argmax topic label per document, shape (n_docs,)."""
+        "Return argmax topic label per document, shape (n_docs,)."
         probs = self.transform(descriptions)
         return np.argmax(probs, axis=1)
 
     def top_words(self, topic_k: int, n_words: int = 10) -> list[str]:
-        """Return top n_words for topic topic_k."""
+        "Return top n_words for topic topic_k."
         self._check_fitted()
         feature_names: list[str] = self.vectorizer.get_feature_names_out().tolist()  # type: ignore[union-attr]
         topic_row = self.topic_word_matrix[topic_k]  # type: ignore[index]
@@ -176,16 +160,7 @@ class WikiTopicMapper:
         return [feature_names[i] for i in top_indices]
 
     def get_topic_labels(self, n_display: int = 3) -> list[str]:
-        """Return a human-readable label per topic from its top words.
-
-        Because top_words() returns both unigrams and bigrams, the naive top-N
-        often repeats the same concept twice (e.g. 'needed', 'privileges
-        needed', 'execution privileges' all share tokens) which reads as
-        garbled rather than informative. This greedily picks the top
-        *n_display* candidates whose word tokens don't overlap with any
-        already-chosen candidate, so each slot in the label contributes a
-        genuinely distinct word/concept.
-        """
+        "Return a human-readable label per topic from its top words."
         self._check_fitted()
         labels: list[str] = []
         for k in range(self.n_topics):
@@ -206,13 +181,7 @@ class WikiTopicMapper:
 
 
 def load_topic_labels(data_dir: str, K: int) -> list[str]:
-    """Load topic labels for display, preferring AI-generated names
-    (``topic_names.json``, e.g. 'SQL Injection') over the raw top-words
-    label (e.g. 'Sql / Injection / Php') for any topic that has one, and
-    falling back to generic 'Topic N' names if nothing is available.
-
-    Shared by scripts/forecast.py and app.py so both show the same names.
-    """
+    "Load topic labels for display, preferring AI-generated names"
     import json
     import os
     import pickle

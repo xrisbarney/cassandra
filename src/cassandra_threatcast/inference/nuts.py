@@ -1,8 +1,4 @@
-"""
-nuts.py
-=======
-NUTS sampler and SVI variational inference entry points.
-"""
+"NUTS sampler and SVI variational inference entry points."
 from __future__ import annotations
 
 from functools import partial
@@ -17,38 +13,20 @@ from numpyro.infer.autoguide import AutoLowRankMultivariateNormal
 from numpyro.optim import ClippedAdam
 import arviz as az
 
-# Below this adapted step size, NUTS warmup has effectively collapsed (the
-# chain is not moving) and the resulting "samples" are not usable draws from
-# the posterior. HMC trajectories are chaotic — the same model/data/seed
-# family can occasionally adapt into a degenerate region depending on tiny
-# floating-point differences. This has not been observed with the current
-# model (the discrete regime is marginalized analytically via the HMM
-# forward algorithm rather than sampled with DiscreteHMCGibbs -- see
-# docs/PAPER_NOTES.md), but the retry loop is kept as a cheap safety net.
+    # Reject effectively collapsed NUTS warmup.
 _MIN_USABLE_STEP_SIZE = 1e-6
 _MAX_ADAPTATION_RETRIES = 6
 
 
 def _mu_r_informed_init(site, mu_r_init):
-    """Per-site init: mu_r starts near the empirical per-topic log-count level;
-    every other site defers to init_to_median."""
+    "Per-site init: mu_r starts near the empirical per-topic log-count level;"
     if site["type"] == "sample" and not site["is_observed"] and site["name"] == "mu_r":
         return mu_r_init
     return init_to_median(site)
 
 
 def _data_informed_init_strategy(data: dict, R: int):
-    """Build an init strategy that starts mu_r near the data's per-topic log-
-    count scale instead of the prior median (0).
-
-    Real CVE-count topics can differ by orders of magnitude (e.g. mean count
-    25 vs. 450 per month), while mu_r's prior is a comparatively tight
-    Normal(0, 5). Starting every topic's mu_r at 0 means the very first
-    leapfrog steps face a huge, badly-scaled gradient (predicted mean ~1 vs.
-    an observed count in the hundreds), which can destabilize NUTS's warmup
-    step-size heuristic badly enough to collapse it to the smallest
-    representable float. Initializing near the right scale avoids that.
-    """
+    "Build an init strategy that starts mu_r near the data's per-topic log-"
     N = np.asarray(data["N"])                       # (K, T)
     e_t = np.asarray(data.get("e_t", np.zeros(N.shape[1])))
     per_topic_level = np.log(N.mean(axis=1) + 1.0) - float(np.mean(e_t))  # (K,)
@@ -64,10 +42,6 @@ def _build_mcmc(model, mcmc_cfg: dict, data: dict, R: int) -> MCMC:
     target_accept_prob = float(mcmc_cfg.get("target_accept_prob", 0.8))
 
     # The model's discrete latent regime path (z_t) is marginalized
-    # analytically inside the model via the HMM forward algorithm (see
-    # full_model in model/full.py and docs/PAPER_NOTES.md), rather than
-    # sampled with DiscreteHMCGibbs. Plain NUTS therefore samples the entire
-    # (continuous) parameter space directly.
     kernel = NUTS(
         model,
         target_accept_prob=target_accept_prob,
@@ -90,12 +64,7 @@ _STEP_SIZE_FIELD = "adapt_state.step_size"
 
 
 def _adapted_step_size(mcmc: MCMC) -> float | None:
-    """Mean adapted NUTS step size across sampling-phase draws, or None.
-
-    This must be requested explicitly via extra_fields when calling
-    mcmc.run — it is NOT carried over into az.from_numpyro's sample_stats,
-    so checking idata.sample_stats silently finds nothing.
-    """
+    "Mean adapted NUTS step size across sampling-phase draws, or None."
     try:
         extra = mcmc.get_extra_fields()
         vals = extra.get(_STEP_SIZE_FIELD)
@@ -107,27 +76,7 @@ def _adapted_step_size(mcmc: MCMC) -> float | None:
 
 
 def run_nuts(model, data: dict, config: dict) -> az.InferenceData:
-    """
-    Run NumPyro's NUTS sampler, automatically retrying with a new seed if
-    warmup adaptation collapses (step size < 1e-6 — the chain is not moving
-    and the resulting draws would not be usable posterior samples).
-
-    Parameters
-    ----------
-    model  : NumPyro model function (signature model(data, config) → None).
-    data   : Data dict forwarded to the model.
-    config : Config dict; reads config["mcmc"] for:
-               num_warmup  (default 500)
-               num_samples (default 1000)
-               num_chains  (default 1)
-               max_tree_depth (default 10)
-               target_accept_prob (default 0.8)
-               seed (default 0)
-
-    Returns
-    -------
-    arviz.InferenceData object with posterior and sample stats.
-    """
+    "Run NumPyro's NUTS sampler, automatically retrying with a new seed if"
     mcmc_cfg = config.get("mcmc", {})
     num_chains = int(mcmc_cfg.get("num_chains", 1))
     base_seed = int(mcmc_cfg.get("seed", 0))
@@ -170,20 +119,7 @@ def run_nuts(model, data: dict, config: dict) -> az.InferenceData:
 
 
 def run_svi(model, data: dict, config: dict) -> tuple:
-    """
-    Variational inference using NumPyro SVI with AutoLowRankMultivariateNormal guide.
-
-    Parameters
-    ----------
-    model  : NumPyro model function.
-    data   : Data dict forwarded to the model.
-    config : Config dict; reads config["model"]["vi_rank"] (default 10) and
-             config["svi"] for num_steps, learning_rate, seed.
-
-    Returns
-    -------
-    (guide, params, losses) tuple where losses is a list of ELBO values.
-    """
+    "Variational inference using NumPyro SVI with AutoLowRankMultivariateNormal guide."
     model_cfg = config.get("model", {})
     svi_cfg = config.get("svi", {})
 

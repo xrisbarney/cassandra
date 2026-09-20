@@ -1,8 +1,4 @@
-"""
-ffbs.py
-=======
-Forward-Filtering Backward-Sampling (FFBS) for discrete Markov regime paths.
-"""
+"Forward-Filtering Backward-Sampling (FFBS) for discrete Markov regime paths."
 from __future__ import annotations
 
 import numpy as np
@@ -13,20 +9,7 @@ def forward_filter(
     Pi: np.ndarray,               # (R, R) transition matrix
     pi0: np.ndarray,              # (R,) initial distribution
 ) -> tuple[np.ndarray, np.ndarray]:
-    """
-    Hamilton filter forward pass.
-
-    Parameters
-    ----------
-    log_likelihoods : (T, R) array of log observation likelihoods per regime.
-    Pi              : (R, R) row-stochastic transition matrix; Pi[i, j] = P(z_t=j | z_{t-1}=i).
-    pi0             : (R,) initial regime distribution.
-
-    Returns
-    -------
-    filtered_probs  : (T, R)  P(z_t | y_{1:t})
-    predicted_probs : (T, R)  P(z_t | y_{1:t-1})   (predicted before incorporating obs_t)
-    """
+    "Hamilton filter forward pass."
     T, R = log_likelihoods.shape
     filtered_probs = np.zeros((T, R))
     predicted_probs = np.zeros((T, R))
@@ -62,19 +45,7 @@ def backward_sample(
     Pi: np.ndarray,              # (R, R)
     rng: np.random.Generator,
 ) -> np.ndarray:
-    """
-    Stochastic backward pass. Samples z_T, z_{T-1}, …, z_1 sequentially.
-
-    Parameters
-    ----------
-    filtered_probs : (T, R) filtered probabilities from forward_filter.
-    Pi             : (R, R) row-stochastic transition matrix.
-    rng            : NumPy random Generator.
-
-    Returns
-    -------
-    z_path : (T,) integer array of sampled regime labels.
-    """
+    "Stochastic backward pass. Samples z_T, z_{T-1}, …, z_1 sequentially."
     T, R = filtered_probs.shape
     z_path = np.empty(T, dtype=int)
 
@@ -105,21 +76,7 @@ def ffbs(
     n_samples: int = 100,
     seed: int = 0,
 ) -> np.ndarray:
-    """
-    Combined Forward-Filtering Backward-Sampling.
-
-    Parameters
-    ----------
-    log_likelihoods : (T, R) log observation likelihoods.
-    Pi              : (R, R) transition matrix.
-    pi0             : (R,) initial distribution.
-    n_samples       : number of regime path samples.
-    seed            : random seed.
-
-    Returns
-    -------
-    regime_paths : (n_samples, T) integer array of sampled regime sequences.
-    """
+    "Combined Forward-Filtering Backward-Sampling."
     rng = np.random.default_rng(seed=seed)
     filtered_probs, _ = forward_filter(log_likelihoods, Pi, pi0)
 

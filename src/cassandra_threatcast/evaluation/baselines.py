@@ -1,18 +1,27 @@
-"""Baseline forecasting models for comparison against the full Bayesian model."""
+"Baseline forecasting models for comparison against the full Bayesian model."
 import warnings
 import numpy as np
 import pandas as pd
 from sklearn.ensemble import RandomForestRegressor
 
 
-class RandomForestBaseline:
-    """
-    Per-series Random Forest with lag-embedded features.
+def _residual_bootstrap(
+    point: np.ndarray,   # (horizon,) point forecast path
+    resid: np.ndarray,   # (m,) in-sample residuals
+    n_boot: int,
+    rng: np.random.Generator,
+) -> np.ndarray:
+    "Predictive samples for a point baseline: point path + resampled residuals."
+    resid = np.asarray(resid, dtype=float)
+    resid = resid[np.isfinite(resid)]
+    if resid.size == 0:
+        resid = np.zeros(1)
+    draws = rng.choice(resid, size=(n_boot, point.shape[0]), replace=True)
+    return np.maximum(point[None, :] + draws, 0.0)
 
-    Quantiles are derived from the distribution of individual tree predictions
-    (i.e., the ensemble distribution across estimators), following
-    Meinshausen (2006) quantile regression forests.
-    """
+
+class RandomForestBaseline:
+    "Per-series Random Forest with lag-embedded features."
 
     def __init__(
         self,
@@ -26,7 +35,7 @@ class RandomForestBaseline:
         self.models: dict = {}  # series_idx -> fitted RF
 
     def _make_features(self, series: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
-        """Create lag features X and targets y from a univariate series."""
+        "Create lag features X and targets y from a univariate series."
         T = len(series)
         X, y = [], []
         for t in range(self.n_lags, T):
@@ -35,11 +44,7 @@ class RandomForestBaseline:
         return np.array(X), np.array(y)
 
     def fit(self, panel: np.ndarray) -> "RandomForestBaseline":
-        """
-        Fit one RF per series.
-
-        panel : (n_series, T) array of observed counts
-        """
+        "Fit one RF per series."
         n_series = panel.shape[0]
         for i in range(n_series):
             X, y = self._make_features(panel[i])
@@ -56,15 +61,7 @@ class RandomForestBaseline:
         horizon: int,
         quantiles: list | None = None,
     ) -> np.ndarray:
-        """
-        Generate quantile forecasts by rolling the RF forward.
-
-        Uses the distribution of individual tree predictions as the
-        predictive distribution; point forecast for the next step
-        is the median over trees.
-
-        Returns : (n_series, horizon, n_quantiles)
-        """
+        "Generate quantile forecasts by rolling the RF forward."
         if quantiles is None:
             quantiles = self.quantiles
         n_series = panel.shape[0]
@@ -84,15 +81,32 @@ class RandomForestBaseline:
 
         return results
 
+    def predict_samples(
+        self,
+        panel: np.ndarray,
+        horizon: int,
+        n_boot: int = 500,
+        seed: int = 0,
+    ) -> np.ndarray:
+        "Residual-bootstrap predictive samples: (n_series, n_boot, horizon)."
+        rng = np.random.default_rng(seed)
+        n_series = panel.shape[0]
+        out = np.zeros((n_series, n_boot, horizon))
+        for i, rf in self.models.items():
+            X, y = self._make_features(panel[i])
+            resid = y - rf.predict(X)
+            context = list(panel[i, -self.n_lags :])
+            point = np.zeros(horizon)
+            for h in range(horizon):
+                feat = np.array(context[-self.n_lags :]).reshape(1, -1)
+                point[h] = float(rf.predict(feat)[0])
+                context.append(point[h])
+            out[i] = _residual_bootstrap(point, resid, n_boot, rng)
+        return out
+
 
 class ArimaBaseline:
-    """
-    Per-series ARIMA via pmdarima auto_arima.
-
-    Quantile intervals are obtained by simulating from a Normal distribution
-    whose standard deviation is derived from the 90 % prediction interval
-    returned by pmdarima.
-    """
+    "Per-series ARIMA via pmdarima auto_arima."
 
     def __init__(self, seasonal: bool = True, m: int = 12):
         self.seasonal = seasonal
@@ -100,7 +114,7 @@ class ArimaBaseline:
         self.models: dict = {}
 
     def fit(self, panel: np.ndarray) -> "ArimaBaseline":
-        """panel : (n_series, T)"""
+        "panel : (n_series, T)"
         try:
             import pmdarima as pm
         except ImportError:
@@ -128,12 +142,7 @@ class ArimaBaseline:
         n_bootstrap: int = 500,
         seed: int = 0,
     ) -> np.ndarray:
-        """
-        Returns (n_series, horizon, n_quantiles).
-
-        Quantiles are obtained by bootstrap sampling from a Normal(fc[h], sigma[h])
-        where sigma[h] is inferred from the 90 % prediction interval width.
-        """
+        "Returns (n_series, horizon, n_quantiles)."
         n_series = len(self.models)
         results = np.zeros((n_series, horizon, len(quantiles)))
         rng = np.random.default_rng(seed)
@@ -151,14 +160,25 @@ class ArimaBaseline:
 
         return results
 
+    def predict_samples(
+        self,
+        horizon: int,
+        n_boot: int = 500,
+        seed: int = 0,
+    ) -> np.ndarray:
+        "Residual-bootstrap predictive samples: (n_series, n_boot, horizon)."
+        rng = np.random.default_rng(seed)
+        n_series = len(self.models)
+        out = np.zeros((n_series, n_boot, horizon))
+        for i, model in self.models.items():
+            fc = np.asarray(model.predict(n_periods=horizon), dtype=float)
+            resid = np.asarray(model.resid(), dtype=float)
+            out[i] = _residual_bootstrap(fc, resid, n_boot, rng)
+        return out
+
 
 class EtsBaseline:
-    """
-    Per-series ETS (Holt-Winters) via statsmodels.
-
-    Falls back to SimpleExpSmoothing when the series is too short for
-    full seasonal decomposition.
-    """
+    "Per-series ETS (Holt-Winters) via statsmodels."
 
     def __init__(
         self,
@@ -172,7 +192,7 @@ class EtsBaseline:
         self.models: dict = {}
 
     def fit(self, panel: np.ndarray) -> "EtsBaseline":
-        """panel : (n_series, T)"""
+        "panel : (n_series, T)"
         from statsmodels.tsa.holtwinters import ExponentialSmoothing as HW
 
         for i in range(panel.shape[0]):
@@ -201,12 +221,7 @@ class EtsBaseline:
         n_bootstrap: int = 500,
         seed: int = 0,
     ) -> np.ndarray:
-        """
-        Returns (n_series, horizon, n_quantiles).
-
-        Uncertainty grows with horizon via sqrt(h + 1) scaling of the
-        residual standard deviation.
-        """
+        "Returns (n_series, horizon, n_quantiles)."
         n_series = len(self.models)
         results = np.zeros((n_series, horizon, len(quantiles)))
         rng = np.random.default_rng(seed)
@@ -227,20 +242,33 @@ class EtsBaseline:
 
         return results
 
+    def predict_samples(
+        self,
+        horizon: int,
+        n_boot: int = 500,
+        seed: int = 0,
+    ) -> np.ndarray:
+        "Residual-bootstrap predictive samples: (n_series, n_boot, horizon)."
+        rng = np.random.default_rng(seed)
+        n_series = len(self.models)
+        out = np.zeros((n_series, n_boot, horizon))
+        for i, model in self.models.items():
+            fc = np.asarray(model.forecast(horizon), dtype=float)
+            resid = (np.asarray(model.resid, dtype=float)
+                     if getattr(model, "resid", None) is not None else np.zeros(1))
+            out[i] = _residual_bootstrap(fc, resid, n_boot, rng)
+        return out
+
 
 class NaiveBaseline:
-    """
-    Seasonal random walk: forecast = last observed same-season value
-    plus additive Gaussian noise whose variance grows with the number
-    of full seasonal cycles elapsed.
-    """
+    "Seasonal random walk: forecast = last observed same-season value"
 
     def __init__(self, seasonal_period: int = 12):
         self.seasonal_period = seasonal_period
         self.panel: np.ndarray | None = None
 
     def fit(self, panel: np.ndarray) -> "NaiveBaseline":
-        """panel : (n_series, T)"""
+        "panel : (n_series, T)"
         self.panel = panel.copy()
         return self
 
@@ -251,7 +279,7 @@ class NaiveBaseline:
         n_bootstrap: int = 500,
         seed: int = 0,
     ) -> np.ndarray:
-        """Returns (n_series, horizon, n_quantiles)."""
+        "Returns (n_series, horizon, n_quantiles)."
         n_series = self.panel.shape[0]
         results = np.zeros((n_series, horizon, len(quantiles)))
         rng = np.random.default_rng(seed)
@@ -283,15 +311,32 @@ class NaiveBaseline:
 
         return results
 
+    def predict_samples(
+        self,
+        horizon: int,
+        n_boot: int = 500,
+        seed: int = 0,
+    ) -> np.ndarray:
+        "Residual-bootstrap predictive samples: (n_series, n_boot, horizon)."
+        rng = np.random.default_rng(seed)
+        n_series = self.panel.shape[0]
+        out = np.zeros((n_series, n_boot, horizon))
+        m = self.seasonal_period
+        for i in range(n_series):
+            series = self.panel[i]
+            T = len(series)
+            if T >= m:
+                point = np.array([series[T - m + (h % m)] for h in range(horizon)])
+                resid = series[m:] - series[:-m] if T > m else series - series.mean()
+            else:
+                point = np.full(horizon, series[-1] if T else 0.0)
+                resid = series - series.mean() if T > 1 else np.zeros(1)
+            out[i] = _residual_bootstrap(point, resid, n_boot, rng)
+        return out
+
 
 class BstsUnivariate:
-    """
-    Per-series BSTS: local linear trend estimated in NumPyro (NUTS).
-
-    This is a univariate baseline without topic factors or regime switching.
-    Posterior predictive samples are propagated forward using the last
-    level and trend draws.
-    """
+    "Per-series BSTS: local linear trend estimated in NumPyro (NUTS)."
 
     def __init__(self, num_warmup: int = 500, num_samples: int = 1000):
         self.num_warmup = num_warmup
@@ -325,7 +370,7 @@ class BstsUnivariate:
         numpyro.sample("obs", dist.Normal(levels, obs_std), obs=obs)
 
     def fit(self, series: np.ndarray, seed: int = 0) -> "BstsUnivariate":
-        """Fit via NUTS; stores posterior samples."""
+        "Fit via NUTS; stores posterior samples."
         import numpyro
         from numpyro.infer import MCMC, NUTS
         import jax
@@ -346,16 +391,32 @@ class BstsUnivariate:
         self._T_fit = T
         return self
 
+    def predict_samples(self, horizon: int, seed: int = 0) -> np.ndarray:
+        "Posterior predictive draws (n_samples, horizon) from level + trend."
+        level_std = self.posterior["level_std"]   # (n_samples,)
+        trend_std = self.posterior["trend_std"]
+        obs_std = self.posterior["obs_std"]
+
+        levels = self.posterior["level"]
+        trends = self.posterior["trend"]
+        lv = levels[:, -1].copy()
+        tr = trends[:, -1].copy()
+
+        n_samples = len(lv)
+        preds = np.zeros((n_samples, horizon))
+        rng = np.random.default_rng(seed)
+        for h in range(horizon):
+            lv = lv + tr + rng.standard_normal(n_samples) * level_std
+            tr = tr + rng.standard_normal(n_samples) * trend_std
+            preds[:, h] = lv + rng.standard_normal(n_samples) * obs_std
+        return np.maximum(preds, 0.0)
+
     def predict_quantiles(
         self,
         horizon: int,
         quantiles: list = [0.1, 0.5, 0.9],
     ) -> np.ndarray:
-        """
-        Propagate posterior level and trend forward for `horizon` steps.
-
-        Returns : (horizon, n_quantiles)
-        """
+        "Propagate posterior level and trend forward for `horizon` steps."
         level_std = self.posterior["level_std"]   # (n_samples,)
         trend_std = self.posterior["trend_std"]
         obs_std = self.posterior["obs_std"]
@@ -392,26 +453,7 @@ def run_all_baselines(
     test_T: int = 12,
     seed: int = 0,
 ) -> dict:
-    """
-    Fit all baselines on panel[:, :-test_T] and predict for test_T steps.
-
-    Parameters
-    ----------
-    panel     : (n_series, T) observed counts
-    horizons  : list of horizon lengths (informational; stored in results)
-    quantiles : quantile levels to forecast
-    test_T    : number of held-out time steps
-    seed      : RNG seed for baselines' bootstrap quantile sampling (ETS,
-                Naive, ARIMA -- RF's predictive spread comes from its trees,
-                not bootstrap noise, so it ignores this). Each baseline gets
-                a distinct seed (seed, seed+1, seed+2) so their bootstrap
-                draws aren't identical to each other.
-
-    Returns
-    -------
-    dict mapping baseline name ->
-        {"predictions": (n_series, test_T, n_quantiles), "name": str}
-    """
+    "Fit all baselines on panel[:, :-test_T] and predict for test_T steps."
     train = panel[:, :-test_T]
     results = {}
 
@@ -448,11 +490,6 @@ def run_all_baselines(
         print(f"Warning: ARIMA baseline failed: {e}")
 
     # --- BSTS-U (univariate Bayesian structural time series) ---
-    # Per-series local-linear-trend fit via NUTS. Isolates the value of the
-    # Bayesian treatment alone (no factors, no regimes) -- the BSTS-U row of
-    # the paper's comparison tables. Reduced MCMC settings keep the
-    # 16-fold x n_series sweep tractable; the model is tiny (5 params +
-    # 2 state paths), so these are ample.
     try:
         n_series = train.shape[0]
         preds = np.zeros((n_series, test_T, len(quantiles)))

@@ -1,13 +1,4 @@
-"""
-CASSANDRA — interactive dashboard.
-
-A friendly, click-through interface to the cyber-threat forecasting pipeline.
-Run it with:
-
-    streamlit run app.py
-
-Each step is a button. You do not need to touch the command line.
-"""
+"CASSANDRA — interactive dashboard."
 from __future__ import annotations
 
 import html
@@ -39,16 +30,14 @@ st.set_page_config(page_title="CASSANDRA — Cyber Threat Forecasting", page_ico
 
 
 def sector_glossary_expander() -> None:
-    """Reference table of all 11 sectors and what they cover, for anyone who
-    wants to browse definitions instead of hovering over each name."""
+    "Reference table of all 11 sectors and what they cover, for anyone who"
     with st.expander("ℹ️ What do these sectors mean?"):
         for name in SECTOR_LABELS:
             st.markdown(f"**{name}** — {SECTOR_DESCRIPTIONS[name]}")
 
 
 def _sector_table_html(df: pd.DataFrame, name_col: str = "scope") -> str:
-    """Render a small DataFrame as an HTML table with a native hover tooltip
-    (title attribute) on any cell whose value is a known sector name."""
+    "Render a small DataFrame as an HTML table with a native hover tooltip"
     header = "".join(
         f"<th style='padding:4px 10px;text-align:left;border-bottom:1px solid rgba(128,128,128,0.4)'>{html.escape(str(c))}</th>"
         for c in df.columns
@@ -77,9 +66,7 @@ def _sector_table_html(df: pd.DataFrame, name_col: str = "scope") -> str:
     )
 
 
-# ---------------------------------------------------------------------------
 # Helpers
-# ---------------------------------------------------------------------------
 def artifact_exists(*paths: Path) -> bool:
     return all(p.exists() for p in paths)
 
@@ -95,7 +82,7 @@ def panel_has_data() -> bool:
 
 
 def run_step(cmd: list[str], title: str) -> bool:
-    """Run a pipeline script, streaming its output into the page. Returns success."""
+    "Run a pipeline script, streaming its output into the page. Returns success."
     log_area = st.empty()
     lines: list[str] = []
     with st.status(f"Running: {title} …", expanded=True) as status:
@@ -128,10 +115,9 @@ def status_badge(done: bool, ready: bool = True) -> str:
     return "🔵 Ready to run"
 
 
-# ---- Unattended "run everything" support ----------------------------------
+# ---- Unattended "run everything" support...
 def launch_full_run(fresh: bool, quick: bool, enhanced: bool, start: str, end: str) -> None:
-    """Start the whole pipeline as a detached background process (survives closing
-    this browser window). Output is streamed to results/run_all.log."""
+    "Start the whole pipeline as a detached background process (survives closing"
     RESULTS.mkdir(parents=True, exist_ok=True)
     cmd = [PY, "scripts/run_all.py", "--start", start, "--end", end]
     if fresh:
@@ -153,14 +139,10 @@ def launch_full_run(fresh: bool, quick: bool, enhanced: bool, start: str, end: s
 
 
 def full_run_state() -> tuple[str, str]:
-    """Return (state, log_text): state is none/running/done/failed."""
+    "Return (state, log_text): state is none/running/done/failed."
     if not RUN_LOG.exists():
         return "none", ""
     # encoding="utf-8" is required here: the log is written in UTF-8 (see
-    # launch_full_run's open(..., encoding="utf-8") above), but Path.read_text()
-    # without an explicit encoding falls back to Windows' active codepage
-    # (cp1252), which mangles multi-byte UTF-8 sequences -- notably tqdm's
-    # progress-bar block characters ("█" -> "â–ˆ").
     text = RUN_LOG.read_text(encoding="utf-8", errors="replace")
     if "ALL DONE" in text:
         return "done", text
@@ -187,7 +169,7 @@ def stop_full_run() -> None:
 
 @st.fragment(run_every="5s")
 def live_full_run_log() -> None:
-    """Auto-refreshing view of the unattended run's progress."""
+    "Auto-refreshing view of the unattended run's progress."
     state, text = full_run_state()
     if state == "none":
         return
@@ -203,9 +185,7 @@ def live_full_run_log() -> None:
     st.code("\n".join(lines[-25:]) or "(starting…)")
 
 
-# ---------------------------------------------------------------------------
 # Header
-# ---------------------------------------------------------------------------
 st.title("🔮 CASSANDRA")
 st.caption("Forecasting cyber threats and their economic impact — a guided, step-by-step tool.")
 
@@ -216,9 +196,7 @@ st.markdown(
     "log as it runs — you don't need to understand it."
 )
 
-# ---------------------------------------------------------------------------
 # Settings (sidebar)
-# ---------------------------------------------------------------------------
 with st.sidebar:
     st.header("⚙️ Settings")
     st.caption("Sensible defaults are already chosen. You can leave these as they are.")
@@ -253,9 +231,7 @@ done_backtest = artifact_exists(RESULTS / "backtest" / "threat_comparison.csv")
 tab_run, tab_data, tab_forecast, tab_kernel = st.tabs(
     ["▶️ Run the steps", "📊 Your data", "🔮 The forecast", "🧪 Kernel lab"])
 
-# ---------------------------------------------------------------------------
 # TAB 1 — Run the steps
-# ---------------------------------------------------------------------------
 with tab_run:
     # Run-everything (unattended)
     with st.container(border=True):
@@ -365,7 +341,7 @@ with tab_run:
         if not done_train:
             st.info("Finish Step 3 first.")
 
-    # Step 6 (optional — only meaningful once the forecast window is in the past)
+    # Step 6 (optional — only meaningful once the forecast window is in...
     with st.container(border=True):
         st.subheader(f"Step 6 — Check the model against reality   {status_badge(done_backtest, ready=done_train)}")
         st.write(
@@ -381,9 +357,7 @@ with tab_run:
         if not done_train:
             st.info("Finish Step 3 first.")
 
-# ---------------------------------------------------------------------------
 # TAB 2 — Your data
-# ---------------------------------------------------------------------------
 with tab_data:
     if not done_ingest:
         st.info("No data yet. Run **Step 1 — Collect the data** first.")
@@ -424,9 +398,7 @@ with tab_data:
                             use_container_width=True)
             sector_glossary_expander()
 
-# ---------------------------------------------------------------------------
 # TAB 3 — The forecast
-# ---------------------------------------------------------------------------
 with tab_forecast:
     if not done_forecast:
         st.info("No forecast yet. Finish **Step 5 — Forecast the future** to see results here.")
@@ -499,9 +471,6 @@ with tab_forecast:
         fig_dir = forecast_dir / "figures"
         if fig_dir.exists():
             # Per-topic fan charts are intentionally NOT shown here: the
-            # backtest section below renders the same topic series WITH the
-            # actual line overlaid, which supersedes them. (The standalone
-            # .html versions still land in results/forecasts/figures/.)
             fig_jsons = [f for f in sorted(fig_dir.glob("*.json"))
                          if not f.stem.startswith("fan_chart_topic_")]
             if fig_jsons:
@@ -663,9 +632,7 @@ with tab_forecast:
                 "with sequential 1-step-ahead predictions and see how the model did here."
             )
 
-# ---------------------------------------------------------------------------
 # TAB 4 — Kernel lab (test theory: learned moving-window covariance)
-# ---------------------------------------------------------------------------
 with tab_kernel:
     st.markdown("### 🧪 Learned temporal kernel — a test theory")
     st.caption(

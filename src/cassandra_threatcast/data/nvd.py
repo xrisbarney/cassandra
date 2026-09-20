@@ -1,8 +1,4 @@
-"""National Vulnerability Database (NVD) CVE 2.0 API client.
-
-Fetches CVE records, caches raw JSON by date range, and aggregates counts
-and mean CVSS scores into (K, T) monthly panels.
-"""
+"National Vulnerability Database (NVD) CVE 2.0 API client."
 
 from __future__ import annotations
 
@@ -33,30 +29,7 @@ def _cache_path(cache_dir: str, start_date: str, end_date: str) -> Path:
 
 
 def fetch_cves(start_date: str, end_date: str, cache_dir: str) -> pd.DataFrame:
-    """Fetch all CVEs published between *start_date* and *end_date* from NVD.
-
-    Parameters
-    ----------
-    start_date:
-        ISO-8601 date string, e.g. ``"2022-01-01"``.
-    end_date:
-        ISO-8601 date string, e.g. ``"2022-12-31"``.
-    cache_dir:
-        Directory used to cache raw API responses.
-
-    Returns
-    -------
-    pd.DataFrame
-        One row per CVE with columns: cve_id, published_date,
-        last_modified_date, cvss_base_score, cvss_version, cvss_vector,
-        cpe_list, description. CVEs with ``vulnStatus == "Rejected"`` are
-        dropped: a rejected CVE is a formal MITRE/CNA determination that the
-        ID does not correspond to a real vulnerability (duplicate, withdrawn,
-        assigned in error, ...), and its description is boilerplate rejection
-        text ("DO NOT USE THIS CANDIDATE NUMBER...") rather than vulnerability
-        content -- counting it as an incident or feeding it into topic
-        modeling only adds noise.
-    """
+    "Fetch all CVEs published between *start_date* and *end_date* from NVD."
     Path(cache_dir).mkdir(parents=True, exist_ok=True)
     cache_file = _cache_path(cache_dir, start_date, end_date)
 
@@ -92,7 +65,7 @@ _NVD_MAX_WINDOW_DAYS = 119  # NVD API 2.0 hard limit is 120 days per request
 
 
 def _date_windows(start_date: str, end_date: str) -> list[tuple[str, str]]:
-    """Split [start_date, end_date] into ≤119-day chunks required by NVD API."""
+    "Split [start_date, end_date] into ≤119-day chunks required by NVD API."
     from datetime import date, timedelta
     start = date.fromisoformat(start_date)
     end = date.fromisoformat(end_date)
@@ -110,14 +83,7 @@ def _window_cache_path(cache_dir: str, win_start: str, win_end: str) -> Path:
 
 
 def _fetch_all_pages(start_date: str, end_date: str, cache_dir: str) -> list[dict]:
-    """Page through the NVD API and return all raw CVE vulnerability items.
-
-    Splits the full date range into ≤119-day windows to stay within the
-    NVD API 2.0 limit of 120 days per pubStartDate/pubEndDate request.  Each
-    window is cached to ``nvd_window_<start>_<end>.json`` as soon as it
-    completes, so a crash or interruption loses at most one window and a
-    re-run resumes from where it stopped.
-    """
+    "Page through the NVD API and return all raw CVE vulnerability items."
     api_key = os.environ.get("NVD_API_KEY")
     headers: dict[str, str] = {}
     if api_key:
@@ -139,15 +105,13 @@ def _fetch_all_pages(start_date: str, end_date: str, cache_dir: str) -> list[dic
     for i, (win_start, win_end) in enumerate(windows, 1):
         win_cache = _window_cache_path(cache_dir, win_start, win_end)
 
-        # Resume: skip windows already fetched in a prior (possibly crashed) run.
+    # Skip previously fetched windows when resuming.
         if win_cache.exists():
             try:
                 with win_cache.open() as fh:
                     window_items = json.load(fh)
             except json.JSONDecodeError:
                 # The cache file itself was left truncated by an earlier crash
-                # mid-write. Treat it like a missing window and refetch rather
-                # than propagating the corruption forever.
                 print(f"  [{i:>2}/{n_windows}] {win_start} -> {win_end}  "
                       f"(cache corrupt, refetching)", flush=True)
                 win_cache.unlink()
@@ -168,11 +132,6 @@ def _fetch_all_pages(start_date: str, end_date: str, cache_dir: str) -> list[dic
                 "resultsPerPage": _RESULTS_PER_PAGE,
                 "startIndex": start_index,
                 # Server-side filter: excludes CVEs formally marked Rejected
-                # (not real vulnerabilities) so we never fetch/cache/pay
-                # pagination cost for them. fetch_cves() also filters
-                # client-side below, since this only helps *new* fetches --
-                # window files cached before this parameter was added can
-                # still contain Rejected records.
                 "noRejected": "",
             }
 
@@ -191,8 +150,6 @@ def _fetch_all_pages(start_date: str, end_date: str, cache_dir: str) -> list[dic
             time.sleep(inter_request_delay)
 
         # Persist this window immediately (crash-safe / resumable). Written to
-        # a temp file and atomically renamed so a crash mid-write can never
-        # leave a truncated, corrupt cache file at the final path.
         tmp_cache = win_cache.with_suffix(win_cache.suffix + ".tmp")
         with tmp_cache.open("w") as fh:
             json.dump(window_items, fh)
@@ -209,7 +166,7 @@ def _get_with_backoff(
     params: dict[str, Any],
     base_delay: float,
 ) -> dict:
-    """GET *url* with exponential backoff on 429 / 5xx responses."""
+    "GET *url* with exponential backoff on 429 / 5xx responses."
     backoff = base_delay
     for attempt in range(_MAX_RETRIES):
         try:
@@ -241,9 +198,6 @@ def _get_with_backoff(
             requests.exceptions.JSONDecodeError,
         ) as exc:
             # Transient network faults: dropped/incomplete responses, read
-            # timeouts, or a truncated body that fails JSON parsing. Retry with
-            # exponential backoff. (Genuine 4xx errors fall through
-            # raise_for_status above and are not retried.)
             logger.warning(
                 "NVD network error (attempt %d/%d): %s",
                 attempt + 1, _MAX_RETRIES, exc,
@@ -257,19 +211,7 @@ def _get_with_backoff(
 
 
 def _parse_cve_item(item: dict) -> dict:
-    """Parse one NVD CVE vulnerability item into a flat record dict.
-
-    Parameters
-    ----------
-    item:
-        A single element from the ``vulnerabilities`` list returned by NVD.
-
-    Returns
-    -------
-    dict
-        Keys: cve_id, published_date, last_modified_date, cvss_base_score,
-        cvss_version, cvss_vector, cpe_list, description.
-    """
+    "Parse one NVD CVE vulnerability item into a flat record dict."
     cve = item.get("cve", {})
     cve_id: str = cve.get("id", "")
     published_date: str = cve.get("published", "")
@@ -333,23 +275,7 @@ def aggregate_monthly(
     df: pd.DataFrame,
     topic_assignments: np.ndarray,
 ) -> tuple[np.ndarray, np.ndarray]:
-    """Aggregate CVE counts and mean CVSS scores into (K, T) monthly panels.
-
-    Parameters
-    ----------
-    df:
-        DataFrame with cve_id as index and at least columns ``published_date``
-        (datetime, tz-aware) and ``cvss_base_score`` (float).  Length == N.
-    topic_assignments:
-        Integer array of length N with values in ``0 .. K-1``, one per row of *df*.
-
-    Returns
-    -------
-    N_kt : np.ndarray, shape (K, T)
-        Monthly CVE counts per topic.
-    B_kt : np.ndarray, shape (K, T)
-        Monthly mean CVSS base score per topic (NaN where count is 0).
-    """
+    "Aggregate CVE counts and mean CVSS scores into (K, T) monthly panels."
     if len(df) != len(topic_assignments):
         raise ValueError(
             f"df length {len(df)} != topic_assignments length {len(topic_assignments)}"

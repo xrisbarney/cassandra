@@ -66,11 +66,10 @@ VARIANTS: dict[str, dict] = {
     "flat_priors": {"overrides": {"ablation.flat_priors": True},      "note": "no shrinkage (prior scales x10)"},
     "no_E":        {"overrides": {"ablation.drop_E": True},           "note": "CVE + 8-K only"},
     "no_D":        {"overrides": {"ablation.drop_D": True},           "note": "CVE + EPSS only"},
+    "no_E_no_D":   {"overrides": {"ablation.drop_E": True,
+                                  "ablation.drop_D": True},           "note": "CVE + severity only (both channels dropped)"},
     "no_effort":   {"overrides": {"ablation.no_effort": True},        "note": "raw counts as truth (e_t=0)"},
     # Addition rather than removal: the learned moving-window covariance
-    # kernel (config["kernel"]; PAPER_NOTES §9). Compare against "full" at
-    # the same settings to quantify what explicit local temporal covariance
-    # adds beyond the AR factor dynamics.
     "kernel":      {"overrides": {"kernel.enabled": True},            "note": "+ learned moving-window kernel"},
 }
 
@@ -213,9 +212,6 @@ def main() -> None:
                          "status": f"score_failed: {exc}"})
 
         # Write progressively so an interrupted run still leaves results.
-        # MERGE with any existing table: a partial invocation (e.g.
-        # --variants kernel) must update its own rows without discarding
-        # variants scored by earlier runs.
         df = pd.DataFrame(rows)
         csv_path = os.path.join(args.output_dir, "ablation.csv")
         if os.path.exists(csv_path):

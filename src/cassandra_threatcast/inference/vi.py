@@ -1,8 +1,4 @@
-"""
-vi.py
-=====
-Variational inference utilities wrapping NumPyro's AutoLowRankMultivariateNormal.
-"""
+"Variational inference utilities wrapping NumPyro's AutoLowRankMultivariateNormal."
 from __future__ import annotations
 
 import jax
@@ -14,21 +10,16 @@ from numpyro.optim import ClippedAdam
 
 
 class AutoGuide:
-    """Wraps NumPyro's AutoLowRankMultivariateNormal with rank from config."""
+    "Wraps NumPyro's AutoLowRankMultivariateNormal with rank from config."
 
     def __init__(self, model, rank: int = 10) -> None:
-        """
-        Parameters
-        ----------
-        model : NumPyro model function.
-        rank  : Rank of the low-rank multivariate normal approximation.
-        """
+        "model : NumPyro model function."
         self.model = model
         self.rank = rank
         self._guide: AutoLowRankMultivariateNormal | None = None
 
     def get_guide(self) -> AutoLowRankMultivariateNormal:
-        """Return (and lazily construct) the AutoLowRankMultivariateNormal guide."""
+        "Return (and lazily construct) the AutoLowRankMultivariateNormal guide."
         if self._guide is None:
             self._guide = AutoLowRankMultivariateNormal(self.model, rank=self.rank)
         return self._guide
@@ -43,25 +34,7 @@ def train_vi(
     seed: int = 0,
     num_particles: int = 4,
 ) -> tuple:
-    """
-    Run SVI training loop.
-
-    Parameters
-    ----------
-    model         : NumPyro model function (signature model(data, config) → None).
-    data          : Data dict forwarded to model/guide.
-    config        : Config dict; reads config["model"]["vi_rank"] (default 10).
-    num_steps     : Total number of SVI gradient steps.
-    learning_rate : Initial Adam learning rate.
-    seed          : JAX random seed.
-
-    Returns
-    -------
-    (guide, params, losses_list) where:
-        guide       : Fitted AutoLowRankMultivariateNormal guide.
-        params      : Dict of optimised variational parameters.
-        losses_list : List of ELBO values (length == num_steps).
-    """
+    "Run SVI training loop."
     model_cfg = config.get("model", {})
     rank = int(model_cfg.get("vi_rank", 10))
 
@@ -105,25 +78,7 @@ def vi_predictive_samples(
     n_samples: int = 1000,
     seed: int = 0,
 ) -> dict:
-    """
-    Draw posterior samples from the fitted VI guide.
-
-    Parameters
-    ----------
-    guide     : Fitted guide (AutoLowRankMultivariateNormal or compatible).
-    params    : Variational parameters dict from train_vi.
-    model     : Original NumPyro model function.
-    data      : Data dict forwarded to Predictive.
-    config    : Config dict forwarded to the model (REQUIRED for models that
-                read structure from it -- passing {} silently crashed the
-                predictive step for full_model, which needs config["model"]).
-    n_samples : Number of posterior samples to draw.
-    seed      : JAX random seed.
-
-    Returns
-    -------
-    dict mapping site name → sample array of shape (n_samples, *site_shape).
-    """
+    "Draw posterior samples from the fitted VI guide."
     config = config if config is not None else {}
     rng_key = jax.random.PRNGKey(seed)
 
@@ -137,8 +92,6 @@ def vi_predictive_samples(
     guide_samples = predictive(rng_key, data=data, config=config)
 
     # Draw from the full model conditioned on guide samples so the returned
-    # dict also carries the model's deterministic sites (loglik_regime_t,
-    # Gamma, f_t, ...) that downstream sequential evaluation requires.
     pred_model = Predictive(
         model=model,
         posterior_samples=guide_samples,

@@ -25,9 +25,7 @@ import yaml
 import numpy as np
 import pandas as pd
 
-# Force UTF-8 stdout/stderr: Windows' default console codepage cannot encode
-# many Unicode characters, which raises UnicodeEncodeError and kills the
-# process -- especially when output is redirected to a log file.
+# Force UTF-8 stdout/stderr: Windows' default console codepage cannot...
 if sys.platform == "win32":
     import io
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace", line_buffering=True)
@@ -39,9 +37,7 @@ from cassandra_threatcast.data import bea_io, pipeline
 from cassandra_threatcast.features import exposure_map as em, effort
 
 
-# ---------------------------------------------------------------------------
 # Argument parsing
-# ---------------------------------------------------------------------------
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Compute derived features from the processed panel."
@@ -72,9 +68,7 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-# ---------------------------------------------------------------------------
 # Main
-# ---------------------------------------------------------------------------
 def main() -> None:
     args = parse_args()
 
@@ -86,9 +80,7 @@ def main() -> None:
 
     os.makedirs(args.output_dir, exist_ok=True)
 
-    # -------------------------------------------------------------------------
-    # 1.  Load panel
-    # -------------------------------------------------------------------------
+    # 1. Load panel
     print("[1/4] Loading processed panel ...")
     panel = pipeline.load_panel(args.data_dir)
 
@@ -99,12 +91,9 @@ def main() -> None:
 
     print(f"      N shape={N_kt.shape}  D shape={D_st.shape}  T={T}")
 
-    # -------------------------------------------------------------------------
-    # 2.  Sector-topic exposure map M_skt
-    # -------------------------------------------------------------------------
+    # 2. Sector-topic exposure map M_skt
     print("[2/4] Loading exposure map M_skt ...")
     # M_skt is built by ingest_data.py from CVE-level CPE data (which is not
-    # available here). Load it if present; otherwise fall back to a uniform map.
     m_path = os.path.join(args.data_dir, "M_skt.npy")
     if os.path.exists(m_path):
         M_skt = np.load(m_path)
@@ -120,9 +109,7 @@ def main() -> None:
 
     np.save(os.path.join(args.output_dir, "M_skt.npy"), M_skt)
 
-    # -------------------------------------------------------------------------
-    # 3.  Reporting-effort index e_t
-    # -------------------------------------------------------------------------
+    # 3. Reporting-effort index e_t
     print("[3/4] Estimating reporting-effort index e_t ...")
     # Aggregate CVE counts across topics to get total monthly volume
     N_total = N_kt.sum(axis=0).astype(float)   # (T,)
@@ -133,9 +120,7 @@ def main() -> None:
 
     np.save(os.path.join(args.output_dir, "e_t.npy"), e_t)
 
-    # -------------------------------------------------------------------------
-    # 4.  BEA I-O Leontief inverse
-    # -------------------------------------------------------------------------
+    # 4. BEA I-O Leontief inverse
     print("[4/4] Computing Leontief inverse from BEA I-O table ...")
     try:
         A = bea_io.get_technical_coefficients(year=args.bea_year, n_sectors=S, cache_dir=args.data_dir)
@@ -148,9 +133,7 @@ def main() -> None:
 
     np.save(os.path.join(args.output_dir, "Lambda_L.npy"), Lambda_L)
 
-    # -------------------------------------------------------------------------
-    # Save sector output values x_s  (from BEA or config)
-    # -------------------------------------------------------------------------
+    # Save sector output values x_s (from BEA or config)
     if "sector_output" in config.get("model", {}):
         x_s = np.array(config["model"]["sector_output"], dtype=float)
     else:
@@ -164,9 +147,7 @@ def main() -> None:
     print(f"      x_s shape={x_s.shape}  "
           f"total output = ${x_s.sum() / 1e6:.2f} trillion")
 
-    # -------------------------------------------------------------------------
     # Done
-    # -------------------------------------------------------------------------
     print("\nDone.  Feature arrays written to:", args.output_dir)
     for fname in ["M_skt.npy", "e_t.npy", "Lambda_L.npy", "x_s.npy"]:
         fpath = os.path.join(args.output_dir, fname)

@@ -1,15 +1,5 @@
 #!/usr/bin/env python3
-"""
-Run the entire CASSANDRA pipeline end-to-end, unattended.
-
-Collect data -> Prepare inputs -> Train -> Evaluate -> Forecast, in order,
-stopping at the first failure. Optionally wipes all caches and outputs first
-(--fresh) for a true from-scratch run. Designed to be launched and left running
-(e.g. overnight); it logs clear step markers the dashboard can read.
-
-    python scripts/run_all.py --fresh            # full fresh run
-    python scripts/run_all.py --quick            # quick preview training
-"""
+"Run the entire CASSANDRA pipeline end-to-end, unattended."
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -21,11 +11,7 @@ import sys
 import time
 from pathlib import Path
 
-# Force UTF-8 stdout/stderr here (for run_all.py's own prints) AND propagate
-# it to every child script via PYTHONUTF8, since Windows' default console
-# codepage cannot encode many Unicode characters and kills a subprocess the
-# moment one is printed -- especially when output is redirected to a log
-# file, as this script's caller (the dashboard) does.
+# Force UTF-8 stdout/stderr here (for run_all.py's own prints) AND...
 if sys.platform == "win32":
     import io
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace", line_buffering=True)
@@ -41,7 +27,7 @@ def log(msg: str) -> None:
 
 
 def nuke() -> None:
-    """Delete all downloaded data, processed features, and results."""
+    "Delete all downloaded data, processed features, and results."
     for d in ("data/cache", "data/processed", "results"):
         p = ROOT / d
         if p.exists():
@@ -68,7 +54,6 @@ def main() -> None:
     ap.add_argument("--end", default="2024-12")
     ap.add_argument("--fresh", action="store_true", help="Delete all caches/outputs first.")
     ap.add_argument("--quick", action="store_true", help="Quick-preview training settings.")
-    ap.add_argument("--enhanced", action="store_true", help="Use the enhanced model variant.")
     args = ap.parse_args()
 
     t0 = time.time()
@@ -76,23 +61,20 @@ def main() -> None:
     if args.fresh:
         nuke()
 
-    run("1/5 Collect data", ["scripts/ingest_data.py", "--start", args.start,
+    run("1/6 Collect data", ["scripts/ingest_data.py", "--start", args.start,
                              "--end", args.end, "--cache-dir", "data/cache/"])
-    run("2/5 Prepare inputs", ["scripts/build_features.py"])
+    run("2/6 Prepare inputs", ["scripts/build_features.py"])
 
     train = ["scripts/train.py"]
     if args.quick:
-        train += ["--num-warmup", "150", "--num-samples", "150", "--num-chains", "1"]
-    if args.enhanced:
-        train += ["--enhanced-mode"]
-    run("3/5 Train the model", train)
+        train += ["--num-warmup", "50", "--num-samples", "30"]
+    run("3/6 Infer the posterior", train)
 
-    run("4/5 Check accuracy", ["scripts/evaluate.py"])
+    run("4/6 Calibrate damage functions", ["scripts/calibrate_damage.py"])
+    run("5/6 Check accuracy", ["scripts/evaluate.py"])
 
     forecast = ["scripts/forecast.py", "--horizon", "12"]
-    if args.enhanced:
-        forecast += ["--enhanced-mode"]
-    run("5/5 Forecast", forecast)
+    run("6/6 Forecast", forecast)
 
     log(f"ALL DONE in {(time.time() - t0) / 60.0:.1f} min total.")
 
