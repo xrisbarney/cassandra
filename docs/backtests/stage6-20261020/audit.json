@@ -1,0 +1,58 @@
+{
+  "files": {
+    "ensemble_check.json": "c619ab9f6f681fd7a54bb7b1274ab6a00c260089745a93dbe0afe25ebe9c634e",
+    "first_arima_failure.json": "ad5598d5bf12153592c3909b67a3b66b861e48b00f7307e5222d14e7fd6712c7",
+    "fit_failures.csv": "1743c99eae13f73e79a8759eb4f955d824788491d9047c2112d1fa6c8ba02f30",
+    "forecast_manifest.json": "e5a8bfc6502c3ecb68fdb32245b88d4063fd4dd49c5b946ac2329ecd81fb2ab8",
+    "run.json": "75799c74e227480aa8c6b0bf1e0324377a76cc8a914aa3c89b670f9c098b16c3",
+    "score_manifest.json": "2b054b1030d6166a2ba7f1fe7c086f6784747738a1043637dc048d6d85c6e585",
+    "summary.csv": "3f9844b0c52926c536d8de589a89d838cff01c45da299a43ec37b80bdb9f4c53"
+  },
+  "fit_and_forecast_wall_seconds": {
+    "arima_0_1_0_n": 12.536029499256983,
+    "historical_mean": 18.53221319965087,
+    "seasonal_naive": 19.067116799997166
+  },
+  "held_out_scoring_enabled": false,
+  "local_run": "artifacts/backtests/stage6-20261020",
+  "model_category_order": [
+    8,
+    2,
+    6,
+    1,
+    4,
+    9,
+    3,
+    5,
+    7,
+    10
+  ],
+  "origin_counts": {
+    "arima_0_1_0_n": {
+      "accepted": 0,
+      "failed": 60
+    },
+    "historical_mean": {
+      "accepted": 60,
+      "failed": 0
+    },
+    "seasonal_naive": {
+      "accepted": 60,
+      "failed": 0
+    }
+  },
+  "panel_manifest_sha256": "0448a3eb7f6d4a17d3808b98ad7a315105ed2cc72974cf7828afb4c3d5515840",
+  "score_rows": 7326,
+  "scored_rows": 4884,
+  "source_control": {
+    "dirty": false,
+    "revision": "ecf9cbab43d25ceb509daf630d5c06da68304980",
+    "status": "available"
+  },
+  "source_hashes_still_match": true,
+  "target_range": [
+    "2019-01",
+    "2023-12"
+  ],
+  "test_result": "77 passed; one PyTensor missing-BLAS warning"
+}

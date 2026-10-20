@@ -1,0 +1,231 @@
+{
+  "attempts": [
+    {
+      "attempts": [
+        {
+          "accepted_numerics": true,
+          "converged": true,
+          "error": null,
+          "maxiter": 1000,
+          "optimizer": "lbfgs",
+          "retry_number": 0,
+          "seconds": 0.012815499911084771,
+          "unresolved_warnings": [],
+          "warnings": []
+        }
+      ],
+      "category": 1,
+      "log_likelihood": -522.3079334748801,
+      "parameters": [
+        1017.2921140585096
+      ]
+    },
+    {
+      "attempts": [
+        {
+          "accepted_numerics": true,
+          "converged": true,
+          "error": null,
+          "maxiter": 1000,
+          "optimizer": "lbfgs",
+          "retry_number": 0,
+          "seconds": 0.009534900076687336,
+          "unresolved_warnings": [],
+          "warnings": []
+        }
+      ],
+      "category": 2,
+      "log_likelihood": -625.2853174403783,
+      "parameters": [
+        6972.2929192870015
+      ]
+    },
+    {
+      "attempts": [
+        {
+          "accepted_numerics": true,
+          "converged": true,
+          "error": null,
+          "maxiter": 1000,
+          "optimizer": "lbfgs",
+          "retry_number": 0,
+          "seconds": 0.008082799846306443,
+          "unresolved_warnings": [],
+          "warnings": []
+        }
+      ],
+      "category": 3,
+      "log_likelihood": -642.3079281087438,
+      "parameters": [
+        9584.272552337346
+      ]
+    },
+    {
+      "attempts": [
+        {
+          "accepted_numerics": true,
+          "converged": true,
+          "error": null,
+          "maxiter": 1000,
+          "optimizer": "lbfgs",
+          "retry_number": 0,
+          "seconds": 0.007477000122889876,
+          "unresolved_warnings": [],
+          "warnings": []
+        }
+      ],
+      "category": 4,
+      "log_likelihood": -619.3159877581694,
+      "parameters": [
+        6236.18131882622
+      ]
+    },
+    {
+      "attempts": [
+        {
+          "accepted_numerics": true,
+          "converged": true,
+          "error": null,
+          "maxiter": 1000,
+          "optimizer": "lbfgs",
+          "retry_number": 0,
+          "seconds": 0.007180800195783377,
+          "unresolved_warnings": [],
+          "warnings": []
+        }
+      ],
+      "category": 5,
+      "log_likelihood": -555.8338346087924,
+      "parameters": [
+        1903.6824216350485
+      ]
+    },
+    {
+      "attempts": [
+        {
+          "accepted_numerics": true,
+          "converged": true,
+          "error": null,
+          "maxiter": 1000,
+          "optimizer": "lbfgs",
+          "retry_number": 0,
+          "seconds": 0.00811309996061027,
+          "unresolved_warnings": [],
+          "warnings": []
+        }
+      ],
+      "category": 6,
+      "log_likelihood": -539.4814498832,
+      "parameters": [
+        1402.3377852182045
+      ]
+    },
+    {
+      "attempts": [
+        {
+          "accepted_numerics": true,
+          "converged": true,
+          "error": null,
+          "maxiter": 1000,
+          "optimizer": "lbfgs",
+          "retry_number": 0,
+          "seconds": 0.009752999991178513,
+          "unresolved_warnings": [],
+          "warnings": []
+        }
+      ],
+      "category": 7,
+      "log_likelihood": -613.3000554367956,
+      "parameters": [
+        5572.929638890799
+      ]
+    },
+    {
+      "attempts": [
+        {
+          "accepted_numerics": true,
+          "converged": true,
+          "error": null,
+          "maxiter": 1000,
+          "optimizer": "lbfgs",
+          "retry_number": 0,
+          "seconds": 0.007464200025424361,
+          "unresolved_warnings": [],
+          "warnings": []
+        }
+      ],
+      "category": 8,
+      "log_likelihood": -606.752411567139,
+      "parameters": [
+        4930.967646037558
+      ]
+    },
+    {
+      "attempts": [
+        {
+          "accepted_numerics": true,
+          "converged": true,
+          "error": null,
+          "maxiter": 1000,
+          "optimizer": "lbfgs",
+          "retry_number": 0,
+          "seconds": 0.008377799997106194,
+          "unresolved_warnings": [],
+          "warnings": []
+        }
+      ],
+      "category": 9,
+      "log_likelihood": -554.2264089794336,
+      "parameters": [
+        1847.3367490276146
+      ]
+    },
+    {
+      "attempts": [
+        {
+          "accepted_numerics": false,
+          "converged": false,
+          "error": null,
+          "maxiter": 1000,
+          "optimizer": "lbfgs",
+          "retry_number": 0,
+          "seconds": 0.04887389997020364,
+          "unresolved_warnings": [
+            "Maximum Likelihood optimization failed to converge. Check mle_retvals"
+          ],
+          "warnings": [
+            "Maximum Likelihood optimization failed to converge. Check mle_retvals"
+          ]
+        },
+        {
+          "accepted_numerics": true,
+          "converged": true,
+          "error": null,
+          "maxiter": 2000,
+          "optimizer": "powell",
+          "retry_number": 1,
+          "seconds": 0.05131540005095303,
+          "unresolved_warnings": [],
+          "warnings": []
+        },
+        {
+          "accepted_numerics": false,
+          "converged": false,
+          "error": null,
+          "maxiter": 1000,
+          "optimizer": "lbfgs",
+          "retry_number": 2,
+          "seconds": 0.02679780009202659,
+          "unresolved_warnings": [
+            "Maximum Likelihood optimization failed to converge. Check mle_retvals"
+          ],
+          "warnings": [
+            "Maximum Likelihood optimization failed to converge. Check mle_retvals"
+          ]
+        }
+      ],
+      "category": 10
+    }
+  ],
+  "error": "FitFailure: ARIMA failed at category 10."
+}

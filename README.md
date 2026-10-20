@@ -146,6 +146,8 @@ refuse held-out execution and refuse to overwrite runs or scores. Bayesian
 control adapters are implemented with diagnostic gates; their posterior
 validation and rolling fits remain outstanding. See the
 [category and KEV carry-forward decisions](docs/STAGE6_8_CARRY_FORWARD.md).
+The [Stage 6 report](docs/STAGE6_BACKTEST.md) contains the initial development
+tables, failed-fit register and remaining validation gates.
 
 Use locked commands to prevent unnoticed dependency resolution changes; see
 [uv locking and syncing](https://docs.astral.sh/uv/concepts/projects/sync/).
