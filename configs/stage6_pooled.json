@@ -1,0 +1,6 @@
+{
+  "split": "development",
+  "draws": 3000,
+  "methods": [{"method": "pooled_nb"}],
+  "purpose": "initial_controls_not_model_selection"
+}

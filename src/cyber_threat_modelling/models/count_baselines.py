@@ -9,6 +9,7 @@ import numpy as np
 from statsmodels.tsa.arima.model import ARIMA
 
 from ..forecasting.count_laws import CountForecast, integer_counts, round_counts
+from .boundaries import ZERO_SERIES_RULE, uses_zero_boundary
 
 
 def stream_seed(seed, *parts):
@@ -131,6 +132,19 @@ def fit_predict(train, category_ids, spec, draws, origin, seed=20261020):
     if spec["method"] == "arima":
         # Complete fitting first: do not simulate a partial panel after a failed fit.
         for j, category in enumerate(category_ids):
+            if uses_zero_boundary(y[:, j], "arima"):
+                fitted_series.append(None)
+                records.append(
+                    {
+                        "category": int(category),
+                        "fit_kind": "declared_boundary_point_mass",
+                        "boundary_rule": ZERO_SERIES_RULE,
+                        "training_cutoff": origin,
+                        "training_months": len(y),
+                        "attempts": [],
+                    }
+                )
+                continue
             try:
                 fitted, attempts = fit_arima(y[:, j].astype(float), spec)
             except FitFailure as exc:
@@ -159,6 +173,9 @@ def fit_predict(train, category_ids, spec, draws, origin, seed=20261020):
             )
             paths[:, :, j] = round_counts(rng.normal(means[:, j], scales[:, j], size=(draws, h)))
         elif spec["method"] == "arima":
+            if fitted_series[j] is None:
+                means[:, j], scales[:, j], paths[:, :, j] = 0, 0, 0
+                continue
             try:
                 fitted = fitted_series[j]
                 forecast = fitted.get_forecast(h)
@@ -181,10 +198,11 @@ def fit_predict(train, category_ids, spec, draws, origin, seed=20261020):
     parameters = {"rate": means} if family == "poisson" else {"location": means, "scale": scales}
     return CountForecast(family, paths, parameters).validate(), {
         "fit_status": "accepted",
-        "retry_number": max((len(r["attempts"]) - 1 for r in records), default=0),
+        "retry_number": max([0] + [len(r["attempts"]) - 1 for r in records]),
         "fit_and_simulate_seconds": time.perf_counter() - started,
         "per_category": records,
-        "parameter_uncertainty": "omitted; conditional fitted parameters",
+        "boundary_categories": [r["category"] for r in records if "boundary_rule" in r],
+        "parameter_uncertainty": "omitted for fitted parameters; declared boundary where recorded",
         "cross_category_dependence": "independent",
         "seed": seed,
     }

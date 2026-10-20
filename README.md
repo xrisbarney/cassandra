@@ -99,7 +99,7 @@ eligibility for modelling/scoring. No forecasts are produced by these commands.
 Stage 5's primary count panel is ready; see the
 [panel report](docs/STAGE5_PANELS.md) and [panel dictionary](docs/PANEL_DICTIONARY.md).
 The SEC sector panel remains masked because collection/population coverage is
-uncertified. No forecast scores have been computed.
+uncertified. Development count scores are available; held-out scores remain locked.
 
     uv run --locked --extra science ctm verify-panels docs/panels/stage5-20261020/panel_manifest.json
     uv run --locked --extra science python scripts/check_panels.py docs/panels/stage5-20261020/panel_manifest.json
@@ -148,6 +148,17 @@ validation and rolling fits remain outstanding. See the
 [category and KEV carry-forward decisions](docs/STAGE6_8_CARRY_FORWARD.md).
 The [Stage 6 report](docs/STAGE6_BACKTEST.md) contains the initial development
 tables, failed-fit register and remaining validation gates.
+
+The [2026-10-21 amendment](docs/amendments/ZERO_SERIES_20261021.md) is active for
+new ARIMA/ETS runs. It retains all categories and uses an explicit zero point
+mass for an entirely-zero observed training series. Historical runs retain
+their original definitions. New run provenance records the supplemental freeze.
+The frozen ARIMA screen can now be run with a fresh output directory:
+
+    .\.venv\Scripts\python.exe scripts/stage6_arima_screen.py --workers 2 --output artifacts/backtests/new-arima-screen
+
+It evaluates all 65 candidates at the 20 quarterly development origins. Its
+two valid finalists still require the frozen 60-origin monthly comparison.
 
 Use locked commands to prevent unnoticed dependency resolution changes; see
 [uv locking and syncing](https://docs.astral.sh/uv/concepts/projects/sync/).

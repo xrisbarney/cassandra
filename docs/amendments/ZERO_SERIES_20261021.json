@@ -1,0 +1,20 @@
+{
+  "amendment_id": "2026-10-21-zero-series",
+  "approval": "User accepted the explained methodological change in this session",
+  "approved_on": "2026-10-21",
+  "arima_screen_started_at_activation": false,
+  "files": [
+    {
+      "path": "docs/amendments/ZERO_SERIES_20261021.md",
+      "sha256": "beae05e1142d4ecb37e8760252fdc42422c696325b1381829a2b0cf55de3267f"
+    }
+  ],
+  "held_out_scored_at_activation": false,
+  "methods": [
+    "arima",
+    "ets"
+  ],
+  "parent_freeze_sha256": "7597b76276b837f8db9bc2baff63cb035e14cdfa8656885c782795d38cb598e7",
+  "rule": "all_zero_training_point_mass_v1",
+  "status": "active"
+}

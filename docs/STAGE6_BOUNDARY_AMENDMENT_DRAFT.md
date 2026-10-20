@@ -1,4 +1,8 @@
-# Proposed Stage 6 zero-series amendment — awaiting user decision
+# Historical draft: Stage 6 zero-series amendment
+
+Superseded on 2026-10-21 by the user-approved
+[active amendment](amendments/ZERO_SERIES_20261021.md). The original draft follows
+as a record of the proposal; its pending language no longer describes the active design.
 
 Drafted 2026-10-20, before ARIMA screening and before any 2024–2025 scoring.
 This draft is **not active** and does not change the frozen baseline behavior.

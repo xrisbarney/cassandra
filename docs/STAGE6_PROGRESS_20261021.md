@@ -1,5 +1,10 @@
 # Stage 6 continuation and review disposition
 
+**Subsequent update, 2026-10-21:** the user accepted the zero-series convention.
+The [active amendment](amendments/ZERO_SERIES_20261021.md) and its separate freeze
+now govern new ARIMA/ETS runs. Pending-decision and screening-lock statements
+below describe the preceding `e17a13c` checkpoint, not the amended implementation.
+
 Stage 6 remains **in progress**. No held-out outcomes have been scored, no ARIMA
 screen has started, and no Bayesian rolling benchmark has been admitted by this
 continuation. The completed fixed-control development results remain in

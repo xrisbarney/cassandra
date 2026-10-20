@@ -14,7 +14,7 @@ from ..features.build import verify_panels
 from ..forecasting.count_laws import CountForecast, integer_counts
 from ..models.count_baselines import FitFailure, fit_predict, method_id, stream_seed
 from ..models.ordering import loading_order
-from ..provenance import file_hash, prepare_run, verify_freeze
+from ..provenance import file_hash, prepare_run, verify_freeze, verify_zero_series_amendment
 from .scores import SCORING_VERSION, score_aggregate, score_cell
 
 
@@ -79,6 +79,7 @@ def _forecast_origin(task):
     meta = {
         "method": name,
         "configuration_sha256": task["configuration_hash"],
+        "design_amendment_sha256": task["amendment_sha256"],
         "origin": origin,
         "training_cutoff": origin,
         "split": "development",
@@ -132,6 +133,9 @@ def forecast_development(root, settings, panel_manifest, output, workers=1):
     if type(workers) is not int or not 1 <= workers <= 4:
         raise ValueError("Use one to four independent origin workers.")
     names = validate_settings(settings)
+    amendment = None
+    if any(spec["method"] == "arima" for spec in settings["methods"]):
+        amendment = verify_zero_series_amendment(root, required=True)
     config = load_config(root / "configs/pilot.toml")
     verify_freeze(root, config)
     verify_panels(root, panel_manifest)
@@ -144,7 +148,9 @@ def forecast_development(root, settings, panel_manifest, output, workers=1):
     initial = counts[:108]
     permutation, inverse = loading_order(initial, categories)
     prepare_run(root, config, output)
-    configuration_hash = hashlib.sha256(canonical_json(settings)).hexdigest()
+    amendment_sha256 = amendment["sha256"] if amendment else None
+    effective_settings = {"settings": settings, "amendment_sha256": amendment_sha256}
+    configuration_hash = hashlib.sha256(canonical_json(effective_settings)).hexdigest()
     write_json(output / "backtest_settings.json", settings)
     tasks = []
     for origin in development_origins():
@@ -157,6 +163,7 @@ def forecast_development(root, settings, panel_manifest, output, workers=1):
                     "folder": output / name / str(origin),
                     "output": output,
                     "configuration_hash": configuration_hash,
+                    "amendment_sha256": amendment_sha256,
                     "categories": categories,
                     "seed": config.settings["seed"],
                     "draws": settings["draws"],
@@ -194,6 +201,7 @@ def forecast_development(root, settings, panel_manifest, output, workers=1):
         "panel_manifest_sha256": file_hash(panel_manifest),
         "panel_file": panel_relative,
         "configuration_sha256": configuration_hash,
+        "design_amendment_sha256": amendment_sha256,
         "category_ids": categories,
         "model_category_order": np.asarray(categories)[permutation].tolist(),
         "inverse_model_permutation": inverse.tolist(),
@@ -262,7 +270,13 @@ def summarize(cells, names, categories, active):
                     # Category-equal means at each origin, then equally weighted origins.
                     for metric in METRICS:
                         row[metric] = (
-                            float(part.groupby("origin")[metric].mean().mean())
+                            float(
+                                np.mean(
+                                    part.groupby("origin")[metric]
+                                    .agg(lambda values: np.mean(values.to_numpy()))
+                                    .to_numpy()
+                                )
+                            )
                             if complete
                             else np.nan
                         )
@@ -334,6 +348,7 @@ def score_development(root, folder):
                 if forecast is not None
                 else "fit_failed",
                 scoring_version=SCORING_VERSION,
+                design_amendment_sha256=manifest.get("design_amendment_sha256"),
             )
             for j, category in enumerate(categories):
                 metrics = dict.fromkeys(METRICS, np.nan)
