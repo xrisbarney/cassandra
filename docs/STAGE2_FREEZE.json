@@ -1,0 +1,42 @@
+{
+  "design_version": "1.0.1",
+  "date": "2026-10-20",
+  "status": "design frozen; execution pending",
+  "held_out_target_period": [
+    "2024-01",
+    "2025-12"
+  ],
+  "development_target_period": [
+    "2019-01",
+    "2023-12"
+  ],
+  "external_preregistration": false,
+  "files": [
+    {
+      "path": "docs/EVALUATION_PROTOCOL.md",
+      "sha256": "41daf6ed5afbbd96461975f1b0719b88f80e93f455898ecbd41dfeb74500e12a"
+    },
+    {
+      "path": "docs/BASELINE_SPECIFICATIONS.md",
+      "sha256": "fa63c193cd2e264360e248794fa4f9e10f0a9396cf24ad6bb03b374483fa5721"
+    },
+    {
+      "path": "docs/STATISTICAL_ANALYSIS_PLAN.md",
+      "sha256": "d8debd52ba8da409afc8e008d4d7be4a4308b4208fb3e21dc99d44e85ed0eb2a"
+    },
+    {
+      "path": "docs/SPECIFICATION.md",
+      "sha256": "b7c0c32766d5afe05bbd90e9377c37392f438a0619a7ed239908fbe1a95ffd14"
+    },
+    {
+      "path": "docs/sources/USER_EVALUATION_EXTRACTS.md",
+      "sha256": "d84f7a6477c045d9d55d1012cadd15301e59f0bcc8eea6588e520e62dc26485a"
+    }
+  ],
+  "initial_training_period": [
+    "2010-01",
+    "2018-12"
+  ],
+  "amendment_record": "docs/AMENDMENTS.md",
+  "previous_freeze": "docs/freezes/STAGE2_FREEZE_v1.0.json"
+}

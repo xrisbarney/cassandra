@@ -1,0 +1,9 @@
+Finite checks: widths 6, 12, 12.5, 18; comparison lags 0..60.
+Two-sided reference support: -300..300; causal support: 0..60.
+b=6: lag12 reference=0.235386775 causal=0.235386772 error=2.10874715e-09; max_error_0_to_60=2.01367751e-06 at lag=32
+b=12: lag12 reference=0.598409982 causal=0.598409634 error=3.48121433e-07; max_error_0_to_60=1.88497011e-05 at lag=33
+b=12.5: lag12 reference=0.617088566 causal=0.617088023 error=5.43047065e-07; max_error_0_to_60=2.30949135e-05 at lag=33
+b=18: lag12 reference=0.748146113 causal=0.748085196 error=6.09166862e-05; max_error_0_to_60=0.000238432799 at lag=34
+b=18 retained edge weight: 0.002472623157
+b=18 largest discarded weight: 0.001501182257
+All finite-check assertions passed; no likelihood-error bound established.

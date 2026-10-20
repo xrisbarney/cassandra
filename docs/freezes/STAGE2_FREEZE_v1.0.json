@@ -1,0 +1,36 @@
+{
+  "design_version": "1.0",
+  "date": "2026-10-20",
+  "status": "design frozen; execution pending",
+  "held_out_target_period": [
+    "2024-01",
+    "2025-12"
+  ],
+  "development_target_period": [
+    "2019-01",
+    "2023-12"
+  ],
+  "external_preregistration": false,
+  "files": [
+    {
+      "path": "docs/EVALUATION_PROTOCOL.md",
+      "sha256": "dc862c3c82955bcb55cdc644d4bf9b1ea8ee209dcee8af3d198c75150811eb03"
+    },
+    {
+      "path": "docs/BASELINE_SPECIFICATIONS.md",
+      "sha256": "f8cb28257dd3de5c0500718af48a638a358b542687ce2f3a557cbd174a682c62"
+    },
+    {
+      "path": "docs/STATISTICAL_ANALYSIS_PLAN.md",
+      "sha256": "d8debd52ba8da409afc8e008d4d7be4a4308b4208fb3e21dc99d44e85ed0eb2a"
+    },
+    {
+      "path": "docs/SPECIFICATION.md",
+      "sha256": "34e02c72e46a549758dcf8b09b3fa0dddac371ecbbd0ce08fcab726e33a641e8"
+    },
+    {
+      "path": "docs/sources/USER_EVALUATION_EXTRACTS.md",
+      "sha256": "d84f7a6477c045d9d55d1012cadd15301e59f0bcc8eea6588e520e62dc26485a"
+    }
+  ]
+}

@@ -1,0 +1,611 @@
+% Template for producing ESWA-format journal articles using LaTeX
+% Written by Miha Ravber
+% Programming methodologies laboratory
+% Faculty of Electrical Engineering and Computer Science
+% University of Maribor
+% Koroška cesta 46, 2000 Maribor
+% E-mail: miha.ravber@um.si
+% WWW: https://lpm.feri.um.si/en/members/ravber/
+% Created: November 20, 2020 by Miha Ravber
+% Modified: November 9, 2023 by Miha Ravber
+% Modified: February 21, 2024 by Miha Ravber
+% Use at your own risk :)
+% Please submit your issues on the github page: https://github.com/Ravby/eswa-template
+
+
+\documentclass[review]{elsarticle}
+\graphicspath{ {./figures/} }
+\usepackage{hyperref}
+\usepackage{float}
+\usepackage{verbatim} %comments
+\usepackage{apalike}
+\restylefloat{figure}
+\floatstyle{plaintop} %table caption at top
+\restylefloat{table}
+%% \restylefloat resets the default placement to tbp (no h), so tables and
+%% figures drift to page tops or float pages. H pins them at their source position.
+\floatplacement{table}{H}
+\floatplacement{figure}{H}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{bm}
+\usepackage{graphicx}
+\usepackage[margin=1in]{geometry}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{tikz}
+\usetikzlibrary{calc}
+\usetikzlibrary{arrows.meta, positioning, fit, backgrounds}
+\usetikzlibrary{positioning,shapes.geometric,fit,backgrounds,calc,arrows.meta}
+\usepackage[mode=tex,subpreambles=true]{standalone}
+\usepackage{placeins}
+%% ------------------------------------------------------------------
+%% REVISION MARKUP: methodology changes driven by the implementation.
+%% Red text marks what changed relative to the previous draft; a red
+%% footnote beside each substantive change explains what changed and
+%% why (draft copy for co-author review). The same explanations sit in
+%% this source as comments beginning with "%% CHANGED". Flip
+%% \showrevfalse below to print a clean version: all red reverts to
+%% normal ink and every change-note footnote disappears.
+%% ------------------------------------------------------------------
+\usepackage{xcolor}
+\usepackage{colortbl}
+\newif\ifshowrev
+\showrevfalse
+\ifshowrev
+  \newcommand{\rev}[1]{\textcolor{red}{#1}}
+  \newcommand{\revnote}[2]{\textcolor{red}{#1}\footnote{\textcolor{red}{[change note]} #2}}
+\else
+  \newcommand{\rev}[1]{#1}
+  \newcommand{\revnote}[2]{#1}
+\fi
+
+\tikzset{
+  datanode/.style={rectangle, rounded corners=2pt, draw=black!60, fill=black!8,
+    minimum width=3.6cm, minimum height=1.05cm, align=center, font=\small},
+  modelnode/.style={rectangle, rounded corners=2pt, draw=violet!70!black, fill=violet!12,
+    minimum width=3.4cm, minimum height=1.05cm, align=center, font=\small},
+  econnode/.style={rectangle, rounded corners=2pt, draw=teal!70!black, fill=teal!12,
+    minimum width=3.4cm, minimum height=1.05cm, align=center, font=\small},
+  outnode/.style={rectangle, rounded corners=2pt, draw=teal!70!black, fill=teal!22,
+    minimum width=3.6cm, minimum height=1.05cm, align=center, font=\small},
+  layerbox/.style={rectangle, rounded corners=4pt, draw=black!40, dashed, inner sep=8pt},
+  flow/.style={-{Stealth[length=2.5mm]}, thick, black!70}
+}
+
+\newtheorem{problem}{Problem}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Prob}{\mathbb{P}}
+\journal{Insurance: Mathematics and Economics}
+
+%% Consistent author-year references are retained for initial submission.
+\bibliographystyle{model5-names}\biboptions{authoryear}
+
+\begin{document}
+\begin{frontmatter}
+
+%The title page must contain the title of the paper and the full name/full affiliation with country/e-mail address for each author and co-author of the manuscript. Please make sure you have included all elements listed below with your manuscript submission.
+
+% \begin{titlepage}
+% \begin{center}
+% \vspace*{1cm}
+
+% \textbf{ \large Predictive Modelling of Cyber Threats and Systemic Economic Risk: A Bayesian Hierarchical State-Space Approach}
+
+% \vspace{1.5cm}
+
+% % Author names and affiliations
+% Otobong Jerome$^{a}$ (o.jerome@laser.ci.ufpb.br), Ofuka Abung$^b$ (abungo@students.ufairfax.edu) \\
+% Christian Bassey$^{c,*}$ (chris@theshadowmatrix.org) \\
+
+% \hspace{10pt}
+
+% \begin{flushleft}
+% \small
+% $^a$ Universidade Federal da Para\'{i}ba, Brazil \\
+% $^b$ University of Fairfax, Kentucky, United States\\
+% $^c$ ShadowMatrix CDF, Prague, Czechia
+
+% \vspace{1cm}
+% \textbf{Corresponding author:} \\
+% Christian Bassey \\
+% ShadowMatrix CDF, Prague, Czechia \\
+% Email: chris@theshadowmatrix.org
+
+% \end{flushleft}
+% \end{center}
+% \end{titlepage}
+
+\title{Predictive Modelling of Cyber Threats and Systemic Economic Risk: A Bayesian Hierarchical State-Space Approach}
+
+\author[label1]{Otobong Jerome}
+\ead{o.jerome@laser.ci.ufpb.br}
+
+\author[label2]{Ofuka Abung}
+\ead{abungo@students.ufairfax.edu}
+
+\author[label3]{Christian Bassey\corref{cor1}}
+\ead{chris@theshadowmatrix.org}
+
+\cortext[cor1]{Corresponding author.}
+\address[label1]{Universidade Federal da Para\'{i}ba, Brazil}
+\address[label2]{University of Fairfax, Kentucky, United States}
+\address[label3]{ShadowMatrix CDF, Prague, Czechia}
+
+
+
+\begin{keyword}
+cyber-economic forecasting \sep systemic cyber risk \sep Bayesian state-space models \sep vulnerability forecasting \sep input--output analysis \sep probabilistic forecasting
+\end{keyword}
+
+\end{frontmatter}
+
+\section{Introduction}
+\label{introduction}
+Modern economies run on digital infrastructure under sustained attack, and a single systemic cyber event can impose losses measured in the trillions. Lloyd's estimates that a hypothetical attack on a major payments system would cost \$3.5 trillion globally over five years \citep{lloyds2023}. Recent incidents show how technical breaches translate into economic damage. The 2017 NotPetya attack stopped global logistics, causing estimated losses between \$3 billion and \$57 billion, depending on the model used \citep{welburn2022}. The 2021 Colonial Pipeline ransomware attack shut down a major fuel pipeline for days, and the 2024 Change Healthcare breach halted payments across a national healthcare system. Insurers, regulators, and companies all need to estimate these risks before they happen, whether for setting capital, measuring economic security, or planning defence budgets. To do this, a way is needed to predict how technical threats could lead to overall economic losses. However, this kind of predictive mapping is still missing, even though it is more important than simply identifying the next vulnerability or setting insurance prices.
+
+Four properties of cyber risk make such a mapping difficult to construct. First, the quantity of interest is \emph{latent}: true malicious activity is never observed, only channelled through dynamics of its own. Reported vulnerabilities are influenced by actual threat activity, detection efforts, and reporting delays at tracking organisations. Many incidents are reported late or not at all. Additionally, mandatory disclosure rules, such as SEC Form 8-K Item 1.05, require a filing only when a company judges an incident to be material, not simply when a breach occurs. Second,  attackers often share tools, code, or tactics, allowing threats to influence one another. Modelling these categories separately overlooks risks from their overlap, making the threats interconnected. Third, the threat landscape changes rapidly and is shaped by attackers. Events like the rise of ransomware, the Log4Shell vulnerability, and AI-powered attacks represent sudden shifts in trends. Fourth, the economy spreads risk; when companies use the same software, rely on the same  providers, or are linked through supply chains and payment networks, a technical problem in one place can quickly affect entire sectors and even the whole economy \citep{esrb2020,eisenbach2022}.
+
+Three bodies of literature each address one leg of this problem and stop at its boundary. Predictive models of the threat landscape are forward-looking and data-driven but terminate in a technical quantity (a count, a risk score, or a per-CVE exploitation probability) reported as a point forecast and estimated one series at a time \citep{kia2024,leverett2020,jacobs2021}. Actuarial models of cyber loss provide the probabilistic and dependence setup of the problem, including heavy-tailed severity, copula dependence, and self-exciting arrivals \citep{eling2019,xu2018,bessyroland2021,awiszus2023}. However, they are calibrated backwards on realised claims and admit no forward-looking technical signal, so a shift in the threat landscape registers only after it has produced losses. Macroeconomic models trace a shock through inter-sectoral linkages and payment networks to an aggregate cost \citep{welburn2022,eling2023,eisenbach2022}. But expert elicitation or a stylised scenario posits the triggering shock. The resulting estimates inherit order-of-magnitude uncertainty, and cannot be scored out of sample because a scenario has no realised counterpart. None of the three therefore solves the problem posed above. Solving it requires a model that forecasts the threat landscape all the way to an economic value, reports that value as a calibrated predictive distribution with tail-risk measures, captures cross-threat dependence in forward-looking data, and builds reporting bias and regime change into the estimation itself rather than merely describing them. To the authors’ knowledge, no existing work does any of these; this paper does all four.
+
+This paper introduces a framework that forecasts the technical threat landscape through to a calibrated predictive distribution of economic loss. Threat intensities for vulnerability topics are modelled as hidden processes; public data streams are treated as biased observations of them, with a reporting-effort process to distinguish real activity from disclosure rates, Markov-switching states to address structural breaks, and shared dynamic factors to capture co-movement between topics. The model marginalises the regime to keep the posterior differentiable and enable use of the No-U-Turn Sampler (NUTS) for inference. The samples are then processed through a software-to-sector exposure map, calibrated damage functions, and a Leontief input-output model to estimate sector-level and aggregate losses, along with value-at-risk and expected shortfall. When tested on vulnerability data from 2010 to 2024 that was not used in training, the model gets the lowest continuous ranked probability score (CRPS) and log score at the one-month mark. It covers 97\% of nominal 90\% intervals, while per-series baselines reach up to 66\%. Its predicted loss intervals overlap the documented loss ranges of three out of four major reference events.
+
+The contributions of this work are the following.
+\begin{itemize}
+\item A formulation of cyber-economic forecasting as a single estimation problem, in which forecast threat intensity is carried through a software-to-sector exposure map, calibrated damage functions, and a Leontief input--output model to sector-level and aggregate economic loss, in place of the posited scenario shock that macroeconomic cyber models currently require.
+
+\item A multivariate latent-state model of the threat landscape. Shared dynamic factors and a learned kernel that captures correlations and cross-excitation across threat topics. Markov-switching states that model structural breaks and return regime probabilities as an early-warning signal.
+
+\item An explicit measurement model for biased observation channels. Security records as biased views of a single latent state, and a reporting-effort process separates actual threat activity from disclosure throughput.
+
+\item A marginalisation of the regime that makes the posterior amenable to the No-U-Turn Sampler and yields predictive loss distributions with value-at-risk and expected shortfall in place of point estimates.
+
+\item An open-source implementation of the full pipeline, from data ingestion to loss forecasts, that reproduces every result reported here.
+\end{itemize}
+
+\section{Related Work}
+\label{related_work}
+Four areas of research bear on cyber-economic forecasting: predictive modelling of technical threats, actuarial modelling of cyber losses, macroeconomic analysis of systemic cyber shocks, and statistical inference with censored and non-stationary data. Rather than reviewing each area in turn, this section asks of every approach whether it could serve as a component of an end-to-end cyber-economic forecast, judged on six criteria. These are: the final result each method produces, how it handles uncertainty, whether it accounts for links between risks, whether it can adjust to changes over time, whether it treats data as a biased view of an underlying state, and testability with new data. Table~\ref{tab:relwork} provides an overview of the comparison, and the following discussion examines each dimension in detail. Two major surveys support these findings. \citet{woods2021} organise the quantitative cyber risk literature and note that most studies do not connect technical measurements with economic loss estimates. \citet{eling2020} list open questions in actuarial cyber research and point out that the main gap is the lack of forward-looking, data-driven risk factors.
+
+\begin{table}[H]
+\centering
+\caption{Existing approaches compared on the six dimensions required for a component in an end-to-end cyber-economic pipeline.}
+\label{tab:relwork}
+\small
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{lllllll}
+\toprule
+Strand & Terminal quantity & Uncertainty & Dependence & Regimes & Measurement & Validation \\
+\midrule
+Threat forecasting & Counts, risk scores & Point & None & No & No & Point error \\
+Exploit prediction & Per-CVE probability & Marginal & None & Refit & No & Classification \\
+Actuarial loss & Loss distribution & Full & Copula & No & No & Backward fit \\
+Contagion & Loss distribution & Full & Hawkes & No & No & Backward fit \\
+Macro propagation & Sector, aggregate loss & Scenario range & Input--output & No & No & None \\
+This work & Sector, aggregate loss & Full, VaR, ES & Factors, kernel & Markov & Multi-channel & CRPS, log score \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}
+
+The first dimension is the terminal quantity: what each method ultimately delivers, and whether that is the object a loss forecast needs.
+
+
+
+\citet{neuhaus2010} showed that latent topics fitted to CVE free-text can reveal understandable vulnerability classes with changing trends. \citet{kia2024} built on this by using supervised regressors to predict CVSS-weighted topic series. In contrast, \citet{leverett2020} forecast the total number of CVE publications, arguing that disclosure is an operational measure that can be predicted, not just a random event. All these approaches end with a technical measurement. A trade-off exists between detail and stability: using a single combined series is easier to model but does not show which specific exposures are increasing.
+
+
+
+Another direction of research focuses on forecasting exploitation rather than disclosure, but with a disagreement, \citet{allodi2014} used case-control studies to show that CVSS severity does not reliably predict real-world exploitation. This challenges the severity weighting used by \citet{kia2024} and much of the scoring literature. 
+
+Researchers have responded by using different signals, such as Twitter data \citep{sabottke2015}, disclosure-time artefacts \citep{suciu2022}, and exploitation telemetry \citep{jacobs2021,jacobs2023}. Every one of these ends at a count, a score, or a per-CVE probability. The actuarial literature then \emph{begins} where a loss has already been realised \citep{romanosky2016,eling2019}, and the macroeconomic literature begins from a shock that has already been posited \citep{welburn2022,eling2023,eisenbach2022}. Each strand therefore takes as given precisely the object the preceding one cannot deliver, which makes the field a relay in which the baton is never passed.
+
+The second dimension, uncertainty, divides the works differently, and the division does not favour the forward-looking ones. Actuarial models are the only group that routinely produces a full predictive distribution over the quantity of interest. Most forecasting studies are evaluated using point error. For example, \citet{almahmoud2023} uses a modified symmetric mean absolute percentage error, and \citet{bonhomme2026} note that their SARIMAX and Poisson models for vulnerability sighting data "indicate general trends" and should not be treated as exact predictions. None of the scoring rules discussed so far can measure this caution. The Exploit Prediction Scoring System is the only calibrated output \citep{jacobs2021,jacobs2023}. However, its main strength is also its limit: a well-calibrated marginal for each published CVE does not provide information about the joint portfolio behaviour needed for any systemic claim. Macroeconomic studies are even less likely to provide a full distribution, because their scenario ranges show sensitivity to assumptions rather than actual uncertainty. For example, the \$3–57 billion range for NotPetya \citep{welburn2022} and the \$0.7–35 billion range for six incidents in \citet{eling2023} depend more on the size of the assumed shock than on how it spreads. This is a choice, not a limitation, as the standard for evaluation has been established elsewhere for twenty years: proper scoring rules \citep{gneiting2007jasa} and the sharpness-subject-to-calibration approach \citep{gneiting2007calibration} are widely accepted for comparing probabilistic forecasts. However, the cyber forecasting literature discussed above uses neither CRPS nor log score.
+
+Dependence becomes most costly when separation is possible, since each field has developed its own, often incompatible, approach, and none have been used for forward-looking series. The importance of dependence is clear: severity is heavy-tailed, and heavy tails only undermine diversification when dependence exists. Disagreement remains about how heavy these tails are. For example, \citet{wheatley2016} finds a power-law tail for personal data breach sizes, while \citet{edwards2016} reports a log-normal distribution. This matters because these two models yield very different estimates of extreme losses and required capital. On dependence, the actuarial literature falls into two main groups.
+The copula group \citep{xu2018,eling2018,peng2018} examines how losses relate across cases. \citet{carannante2023} show that ignoring these relationships can distort regulatory capital.
+The point-process group looks at dynamic contagion rather than static dependence. For example, \citet{bessyroland2021} use multivariate Hawkes processes on breach data and find that breaches can trigger more breaches, depending on the type and target. They also find that non-exponential models work better than traditional exponential ones. \citet{zeller2022} model both the timing and size of breaches together, and \citet{fahrenwaldt2018} price contracts based on how breaches can spread like an epidemic through a network.
+This distinction is that a copula links losses that happen at the same time, while an excitation kernel means an event in one category can make another event more likely later, modelling how shared tools, codebases, and imitation among attackers can cause more breaches over time.
+The macroeconomic literature introduces a third method based on network dependence in production networks, which offers a different comparison point for the other strands. \citet{acemoglu2012} show that some shocks can remain at the aggregate level when input-output linkages are highly uneven, while \citet{barrot2016} show how shocks spread via supplier specificity and \citet{baqaee2019} examine aggregate effects beyond the first-order Hulten benchmark.
+
+
+Against these three, the forecasting strand models its series univariately, a restriction \citet{kia2024} explicitly acknowledge and defer; the nearest approach to dependence there is \citet{almahmoud2023,almahmoud2025}, who move from a Bayesian encoder-decoder LSTM to a Bayesian-adapted graph neural network to represent relations among 42 attack types. This suggests that they addressed dependence by changing the architecture rather than the probability model, but the broader gap remains: the forecasting strand still does not provide a forward-looking dependence model on the same terms as the actuarial and macroeconomic literatures.
+The conclusion of \citet{awiszus2023} is one of the most adequate ways to reconcile the different viewpoints, since it divides the components into idiosyncratic, systematic, and systemic ones. This conclusion also serves as a plea to integrate the different approaches: only the idiosyncratic element can be addressed with classical actuarial mathematics, so the other two must be drawn from outside. The study by \citet{chong2025} incorporates frequency-severity modelling into a two-pillar capital framework on the same terms.
+
+Regime change is the area where the field is most consistently silent, which is surprising because the literature documents the very breaks that should prompt comparison. This creates a gap, current approaches do not explain how cyber risk changes across regimes over time.
+
+Forecasting models assume a stable data-generating process, actuarial models fit stationary severity and frequency laws, and scenario analyses are timeless by construction. Yet ransomware industrialisation, Log4Shell, and AI-assisted exploitation are abrupt shifts rather than smooth drift. The literature records their observable traces: \citet{edwards2016} find apparent growth in breach frequency to be largely an artifact of changing reporting behaviour, \citet{avanzi2025} exploit variation in state-level mandatory notification laws to show that US reporting delays are lengthening and that frequency dynamics differ systematically between large and small breaches, and \citet{block2025} document an entirely new disclosure regime arriving in December 2023.
+
+ Markov-switching state-space formulations \citep{hamilton1989} have been the standard treatment of abrupt structural change for over three decades, returning posterior regime probabilities as a by-product,  but they have not been used in this literature.
+
+The measurement problem is identical in pattern to description without encoding. Initial studies used time series and state-space models to analyse security incident figures within individual organisations \citep{condon2008}. \citet{okutan2018} predicted attacks under class imbalance at various levels of granularity. Like the other approach, these methods operate at the organisational level and treat observed counts as direct measurements of the underlying process. The assumption is flawed in both directions.
+
+Regarding reporting, the behaviour distorts frequency trends \citep{edwards2016}. Delays are increasing and depend on breach size \citep{avanzi2025}. \citet{woods2021} point out that inconsistent and non-representative incident data is the main barrier to credible quantification. Regarding vulnerability, the bias works in the opposite direction because the number of CVE entries conflates actual threat activity with the amount of discovery work carried out, researcher incentives, and the administrative backlog at the numbering authorities. This point is mentioned in \citet{leverett2020} but is seldom incorporated into models. The third channel involving a third bias is included in the mandatory Form 8-K Item 1.05 filings \citep{block2025}. However, the filing is selective and delayed because it depends on a materiality determination rather than a technical compromise. It is rarely used because the regime comes after nearly all the models mentioned above. Outside the field of cyber, the corrective method is based on Bayesian nowcasting, which enables the recovery of the underlying epidemic curve from the partially reported counts in infectious disease surveillance \citep{hoehle2014};  the same can be applied to disclosure lags and under-reporting; the issue is therefore one of disciplinary distance and not methodological difficulty, because the field acknowledges its measurement problem yet proceeds to estimate as if it didn't exist.
+
+Validation becomes less common as research moves from technical topics to economic ones, even though the stakes are higher. Forecasting studies report errors, exploitation prediction studies provide classification metrics, and actuarial models show how well they fit past claims.
+
+Scenario studies provide nothing, since a supposed event has no actual counterpart against which to calculate a score. Even the most detailed macroeconomic analyses show both advanced methods and clear limits. For example, \citet{eisenbach2022} use a pre-mortem analysis to study an attack on the US wholesale payments system. They find that if any of the five largest banks are damaged, about 38\% of the network is affected, and lost payments can be several times the daily GDP when liquidity hoarding is considered. \citet{eisenbach2025} find that the impact is about 50\% higher during financial stress. However, neither study offers a forecast. Empirical evidence of this type only exists after the fact: \citet{crosignani2023} make use of NotPetya to demonstrate that cyberattacks spread through supply chains to customers who were not affected, and \citet{kotidis2025} record the way in which the attack spread through the financial system after a real attack on a service provider. These studies examine what actually happened, not validations of what was predicted. This situation is also true in the case of work carried out at the institutional and industry levels, whether it be the ESRB's formalisation of the shock--amplification--systemic-event chain \citep{esrb2020} and the loss-driver evidence covering more than 100,000 events \citep{aldasoro2020}, or the global macro-financial exposure assessment \citep{imf2024} and the trillion-dollar figures derived from a single hypothetical scenario \citep{lloyds2023}.
+
+Table~\ref{tab:relwork} shows that no existing approach combines an economic terminal quantity with a calibrated predictive distribution, and that none of the models that account for dependence is forward-looking. The statistical building blocks exist: hierarchical Bayesian state-space models provide latent-state inference with full posterior predictive distributions, Markov-switching models \citep{hamilton1989} handle structural breaks, self-exciting point processes \citep{hawkes1971} provide the contagion mechanism that \citet{bessyroland2021} show is present, latent Gaussian dynamic factor models \citep{kim2025} provide low-rank co-movement structure for thousands of sparse threat-topic series, and regularised shrinkage priors \citep{piironen2017} share information among sparse categories without over-shrinking the active ones. What does not exist is a model in which a forward-looking technical signal is estimated under an explicit measurement model for biased channels and a regime process for structural breaks, and in which the resulting posterior, rather than a posited scenario, drives economic propagation and is scored out of sample with proper scoring rules. Building that model is the contribution of this work, and the remainder of the paper sets it out.
+
+\FloatBarrier
+
+\section{Problem Formulation}\label{sec:formulation}
+
+Let $t = 1, \dots, T$ index discrete time periods (e.g., months).
+Let $\mathcal{K} = \{1, \dots, K\}$ index cyber threat categories. Let $\mathcal{S} = \{1, \dots, S\}$ index economic sectors, 
+and the latent threat intensity vector, $\bm{\lambda}_t = (\lambda_{1,t}, \dots, \lambda_{K,t})^\top \in \mathbb{R}_+^K$, where $\lambda_{k,t}$ denotes the true, unobserved level of malicious activity and exploitable exposure for category $k$ in period $t$.
+
+$\bm{\lambda}_t $ is not directly observable; instead, only noisy and potentially biased channels are available. These include \textbf{vulnerability disclosures} $N_{k,t} \in \mathbb{Z}_{\geq 0}$, the count of CVE records published in $t$ and assigned to $k$ using a topic-extraction map similar to \textsc{WikiTopic} \citep{kia2024}. They have associated severity marks $B_{k,t} \in [0,10]$ representing the mean CVSS base score. \textbf{Exploitation signals} $E_{k,t} \in [0,1]$ provide an aggregate exploitation-likelihood signal for $k$, such as the mean or upper-quantile Exploit Prediction Scoring System (EPSS) score or Cybersecurity and Infrastructure Security Agency (CISA) Known Exploited Vulnerabilities (KEV) inclusion counts. \textbf{Incident disclosures} $D_{s,t} \in \mathbb{Z}_{\geq 0}$ denote the count of material cyber incidents disclosed by sector-$s$ firms in $t$, based on regulatory incident-disclosure filings and curated repositories. Loss marks $L_{s,t} \geq 0$ are included where available. 
+
+Economic exposure to the threat landscape is a (possibly time-varying) map $\bm{M}_t \in [0,1]^{S \times K}$, $M_{s,k,t} \approx$ the share of sector $s$'s digital footprint exposed to category $k$, built from affected-product metadata (National Vulnerability Database (NVD) Common Platform Enumeration (CPE) fields) matched to sectoral technology-adoption data. Inter-sectoral linkages follow the economy's input--output structure: $\bm{A} \in \R_{+}^{S \times S}$ is the technical-coefficients matrix from national input--output accounts (in the empirical study, the Bureau of Economic Analysis (BEA) Use tables) and $\bm{\Lambda}_L = (\bm{I} - \bm{A})^{-1}$ its Leontief inverse.
+
+Building on the risk-as-likelihood-times-impact approach \citep{kia2024}, but applying it to the economic level, the sectoral cyber shock is defined as
+\begin{equation}\label{eq:shock}
+    g_{s,t} \;=\; \phi_s\!\Big( \textstyle\sum_{k=1}^{K} M_{s,k,t}\, \lambda_{k,t}\, \sigma_{k,t} \Big),
+\end{equation}
+
+Here, $\sigma_{k,t}$ represents the hidden severity of $k$ at time $t$, and $\phi_s(\cdot)$ is a sector-specific damage function that converts technical shock load into the share of sector output disrupted. This function is based on real historical events. Direct sector losses, $\bm{d}_t = (g_{1,t} x_{1,t}, \dots, g_{S,t} x_{S,t})^\top$, where $x_{s,t}$ is the gross output for each sector, then lead to total (direct and indirect) losses as follows:
+\begin{equation}\label{eq:leontief}
+    \bm{\ell}_t \;=\; \bm{\Lambda}_L\, \bm{d}_t,
+    \qquad
+    \ell_t^{\mathrm{agg}} \;=\; \bm{1}^\top \bm{\ell}_t .
+\end{equation}
+
+The main problems are outlined below.
+
+\textbf{(1) Probabilistic threat forecasting:} given the observation history
+\[
+\mathcal{F}_t = \sigma\big(\{N_{k,\tau}, B_{k,\tau}, E_{k,\tau}, D_{s,\tau}, L_{s,\tau}\}_{\tau \le t}\big),
+\]
+characterise the posterior predictive $p\big(\bm{\lambda}_{t+1:t+h} \mid \mathcal{F}_t\big)$, $h \geq 1$, including cross-category dependence and regime uncertainty, rather than point forecasts $\hat{\bm{\lambda}}_{t+h}$. 
+
+\textbf{(2) Systemic economic exposure:} characterise the induced posterior predictive of the aggregate loss $p\big(\ell^{\mathrm{agg}}_{t+1:t+h} \mid \mathcal{F}_t\big)$ and its tail functionals (predictive value-at-risk $\mathrm{VaR}_{\alpha}$, expected shortfall $\mathrm{ES}_{\alpha}$ of $\ell^{\mathrm{agg}}_{t+h}$, and the systemic-event probability $\Prob(\ell^{\mathrm{agg}}_{t+h} > c \mid \mathcal{F}_t)$ for policy-relevant thresholds $c$). 
+
+\textbf{(3) Inference under biased observation:} perform (1)-(2) while accounting for the fact that $N_{k,t}$ mixes true activity with discovery effort and administrative throughput. $D_{s,t}$ undercounts incidents with sector- and time-varying reporting propensity. The latent dynamics have structural breaks. Formally, the channels are conditionally independent given the latent state. Each has its own bias process. The latent state follows regime-switching dynamics.
+
+
+\section{Proposed Solution}\label{sec:solution}
+The proposed framework (shown in Figure~\ref{fig:pipeline}) is a single Bayesian hierarchical state-space model in which public data channels (NVD CVE+CPE vulnerability data $N_{k,t}, B_{k,t}$; EPSS/CISA KEV exploitation data $E_{k,t}$; SEC 8-K incident filings $D_{s,t}, L_{s,t}$) are treated as biased observations of latent, regime-switching threat dynamics, and posterior predictive draws are propagated through economic translation. This section states the framework as a procedure running from raw public data to the four delivered outputs.
+
+%% ------------------------------------------------------------------
+%% Pipeline figure, drawn inline. Nothing to upload, no external file.
+%% Uses only libraries main.tex already loads, plus the paper's own \E
+%% and \Prob. Styles scoped so they cannot leak into datanode etc.
+%% ------------------------------------------------------------------
+\begingroup
+%% elsarticle[review] is double spaced; \baselinestretch also applies inside
+%% tikz nodes, which would make every multi-line node taller than designed.
+\renewcommand{\baselinestretch}{1}\selectfont
+\providecommand{\ttl}[1]{\textcolor{blue!85!black}{\textbf{#1}}}
+\begin{figure}[p]
+\centering
+\tikzset{
+  base/.style   = {rounded corners=4pt, draw=black!45, line width=0.7pt,
+                   align=center, inner sep=4pt, font=\fontsize{7}{8}\selectfont},
+  proc/.style   = {base, fill=white},
+  data/.style   = {base, fill=cyan!25},
+  outp/.style   = {base, fill=pink!55},
+  optn/.style   = {base, fill=white, dashed},
+  dec/.style    = {diamond, aspect=2.1, draw=black!45, fill=white,
+                   align=center, inner sep=1pt, font=\fontsize{7}{8}\selectfont},
+  cbox/.style   = {rounded corners=9pt, draw=black!45, fill=black!5,
+                   line width=0.9pt, inner sep=8pt},
+  lab/.style    = {font=\fontsize{9}{11}\selectfont\bfseries, anchor=south west, xshift=5pt, yshift=3pt},
+  fl/.style     = {-{Stealth[length=5pt,width=4pt]}, draw=black!65, line width=0.7pt},
+  fld/.style    = {-{Stealth[length=5pt,width=4pt]}, draw=black!50, line width=0.7pt, dashed},
+  elab/.style   = {font=\fontsize{7}{8}\selectfont, inner sep=1.5pt, fill=white},
+  W/.style      = {text width=5.85cm},
+  H/.style      = {text width=2.6cm},
+}
+\resizebox{\textwidth}{!}{%
+\begin{tikzpicture}[node distance=0.26cm and 0.26cm]
+
+%% =====================================================================
+%% ROW 1 : data -> measurement -> latent dynamics -> inference
+%% =====================================================================
+
+% ---------- Group A : observed inputs --------------------------------
+\node[data, text width=3.8cm] (cve) at (0,0)
+  {\ttl{NVD: CVE $+$ CPE}\\[1pt] monthly counts $N_{k,t}$, severity marks $B_{k,t}$, CPE product metadata};
+\node[data, below=of cve, text width=3.8cm] (epss)
+  {\ttl{EPSS / CISA KEV}\\[1pt] exploitation signal $E_{k,t}$};
+\node[data, below=of epss, text width=3.8cm] (sec)
+  {\ttl{SEC 8-K filings}\\[1pt] incident counts $D_{s,t}$, loss marks $L_{s,t}$};
+\node[proc, below=0.8cm of sec, text width=3.8cm] (assemble)
+  {\ttl{Assemble inputs}\\[2pt]
+   $\mathcal{K}=\{1,\dots,K\}$, $\mathcal{S}=\{1,\dots,S\}$\\[2pt]
+   history $\mathcal{F}_t=\sigma\big(\{N,B,E,D,L\}_{\tau\le t}\big)$};
+
+% ---------- Group B : Layer 2 measurement ----------------------------
+\node[proc, W, anchor=north] (effort) at (7.179,0)
+  {\ttl{Reporting effort $e_t$}\\[2pt]
+   standardized smooth trend of aggregate $\log$ CVE volume (NVD throughput, backlog, secular growth)};
+\node[proc, H, below=of effort.south west, anchor=north west] (mvul)
+  {\ttl{Vulnerability}\\[2pt] $N_{k,t}\sim\mathrm{NegBin}\big(e^{e_t}\lambda_{k,t},\psi_k\big)$};
+\node[proc, H, right=of mvul] (mexp)
+  {\ttl{Exploitation}\\[2pt] $\operatorname{logit}E_{k,t}\sim\mathcal{N}\big(\alpha_k+\beta_k\log\lambda_{k,t},\varsigma_k^{2}\big)$};
+\node[proc, H, below=of mvul] (minc)
+  {\ttl{Incidents}\\[2pt] $D_{s,t}\sim\mathrm{Poisson}\big(\rho_s\Lambda_{s,t}+\pi_s\big)$,\\ $\Lambda_{s,t}=\sum_k M_{s,k,t}\lambda_{k,t}$};
+\node[proc, H, right=of minc] (msev)
+  {\ttl{Severity}\\[2pt] $B_{k,t}\sim\mathrm{LogNormal}$\\ $\big(\log\sigma_{k,t},\,\kappa_k^{2}\big)$};
+\node[proc, W, below=of minc.south west, anchor=north west] (cindep)
+  {\ttl{Masking and conditional independence}\\[2pt]
+   empty category-months masked, never imputed; channels independent given $\{\bm{\lambda}_t,\bm{\sigma}_t\}$};
+\begin{scope}[on background layer]
+  \node[cbox, fit=(effort)(mvul)(mexp)(minc)(msev)(cindep),
+        label={[lab]north west:Measurement model}] (layer2) {};
+\end{scope}
+
+% ---------- Group C : Layer 1 latent dynamics ------------------------
+\node[proc, H, anchor=north west] (reg) at (12.594,0)
+  {\ttl{Markov regimes}\\[2pt] $z_t\in\{1,\dots,R\}$, $\bm{\Pi}$; levels $\bm{\mu}_{z_t},\bm{\nu}_{z_t}$};
+\node[proc, H, right=of reg] (fac)
+  {\ttl{Dynamic factors}\\[2pt] $\bm{f}_t=\bm{\Phi}\bm{f}_{t-1}+\bm{w}_t$, $\bm{w}_t\sim\mathcal{N}(\bm{0},\bm{Q})$};
+\node[proc, W, below=of reg.south west, anchor=north west] (int)
+  {\ttl{Log-intensities}\\[2pt]
+   $\bm{\eta}_t=\bm{\mu}_{z_t}+\bm{\Gamma}\bm{f}_t+\bm{u}_t$, \quad $\bm{\lambda}_t=\exp(\bm{\eta}_t)$};
+\node[proc, W, below=of int] (sevl)
+  {\ttl{Log-severities}\\[2pt]
+   $\log\bm{\sigma}_t=\bm{\nu}_{z_t}+\bm{\Psi}\bm{h}_t$ \ (analogous low-dimensional latent process)};
+\node[proc, W, below=of sevl] (idn)
+  {\ttl{Identification and priors}\\[2pt]
+   leading $r\times r$ block of $\bm{\Gamma},\bm{\Psi}$ lower triangular, positive diagonal;
+   half-Normal scales bounded away from zero};
+\node[proc, W, below=of idn] (ker)
+  {\ttl{Learned temporal kernel}\\[2pt]
+   $g_t=\sigma_g\sum_d w_d(h)u_{t-d}$, \ $w_d(h)=\mathrm{sigmoid}\big((h-|d|)/2\big)$;
+   enters $\bm{\eta}_t$ as $a_kg_t$; posterior of $h$ gives the co-movement span};
+\begin{scope}[on background layer]
+  \node[cbox, fit=(reg)(fac)(int)(sevl)(idn)(ker),
+        label={[lab]north west:Latent threat dynamics}] (layer1) {};
+\end{scope}
+
+% ---------- Group D : Layer 4 inference ------------------------------
+\node[proc, W, anchor=north west] (marg) at (21.653,0)
+  {\ttl{Regime marginalization}\\[2pt]
+   HMM forward recursion integrates out $z_{1:T}$ inside the likelihood, jointly with all four channels};
+\node[proc, W, below=0.75cm of marg] (nuts)
+  {\ttl{NUTS sampling}\\[2pt]
+   joint posterior $p\big(\{\bm{f}_t,\bm{\lambda}_t\},\bm{\Theta}\mid\mathcal{F}_T\big)$ over all continuous unknowns, no discrete updates
+   (where $\bm{\Theta}$ collects the static parameters $\bm{\Phi},\bm{Q},\bm{\Gamma},\bm{\Psi},\bm{\Pi},\bm{\mu},\bm{\nu}$, the noise scales, and the channel parameters)};
+\node[inner sep=0pt, minimum size=0pt] (nbfit) at ($(nuts.west)+(-0.55,0)$) {};
+\node[dec, below=0.55cm of nuts] (conv)
+  {\ttl{Chains converged?}\\[1pt] $\widehat{R}\approx1$, ESS adequate,\\ no divergences\\ (where $\widehat{R}$ is the\\ between-chain variance ratio)};
+\node[proc, W, below=0.55cm of conv] (ffbs)
+  {\ttl{FFBS regime paths}\\[2pt] posterior draws of $z_{1:T}$ recovered after sampling};
+\begin{scope}[on background layer]
+  \node[cbox, fit=(marg)(nuts)(conv)(ffbs)(nbfit),
+        label={[lab]north west:Posterior inference}] (layer4) {};
+\end{scope}
+
+%% =====================================================================
+%% ROW 2 : forecast -> economic translation -> outputs -> validation
+%% =====================================================================
+\coordinate (r2) at (-1.756,-8.95);
+
+% ---------- Group E : Stage F forecast simulation --------------------
+\node[proc, W, anchor=north west] (floop) at (r2)
+  {\ttl{For every posterior draw $m$ and horizon $h=1,\dots,12$}};
+\node[proc, H, below=0.55cm of floop.south west, anchor=north west] (fz)
+  {\ttl{Regime path}\\[2pt] $z^{(m)}_{T+h}\sim$\\ $\bm{\Pi}^{(m)}_{z^{(m)}_{T+h-1},\,\cdot}$};
+\node[proc, H, right=of fz] (ff)
+  {\ttl{Factor propagation}\\[2pt] $\bm{f}^{(m)}_{T+h}=\bm{\Phi}^{(m)}\bm{f}^{(m)}_{T+h-1}+\bm{w}^{(m)}_{T+h}$};
+\node[proc, W, anchor=north west] (fl) at ($(fz.west |- ff.south)+(0,-0.55)$)
+  {\ttl{Latent state at the drawn regime}\\[2pt]
+   $\bm{\lambda}^{(m)}_{T+h}=\exp(\bm{\eta}^{(m)}_{T+h})$, $\bm{\sigma}^{(m)}_{T+h}$;
+   \ effort $e_t$ carried at its last observed value};
+\node[dec, below=0.55cm of fl] (hdec) {\ttl{$h=12$?}};
+\begin{scope}[on background layer]
+  \node[cbox, fit=(floop)(fz)(ff)(fl)(hdec),
+        label={[lab]north west:Forecast simulation}] (stageF) {};
+\end{scope}
+
+% ---------- Group F : Layer 3 economic translation -------------------
+\node[data, W, anchor=north west] (struct) at ($(r2)+(8.503,0)$)
+  {\ttl{Structural inputs}\\[2pt]
+   exposure map $\bm{M}_t\in[0,1]^{S\times K}$ (CPE $\to$ sector); BEA $\bm{A}$,
+   $\bm{\Lambda}_L=(\bm{I}-\bm{A})^{-1}$; gross output $x_{s,t}$};
+\node[data, W, below=of struct] (calib)
+  {\ttl{Calibration set}\\[2pt]
+   NotPetya, Colonial Pipeline, MOVEit, Change Healthcare loss ranges
+   $+$ aggregate annual US-loss anchor};
+\node[proc, W, below=of calib] (dmg)
+  {\ttl{Damage functions $\phi_s$}\\[2pt]
+   zero-anchored sigmoid family, three global parameters, MCMC-calibrated: each loss range a $90\%$ lognormal interval};
+\node[proc, H, below=of dmg.south west, anchor=north west] (shock)
+  {\ttl{Sectoral shock}\\[2pt] $g_{s,t}=\phi_s\big(S_{s,t}\big)$,\\ $S_{s,t}=\sum_k M_{s,k,t}\lambda_{k,t}\sigma_{k,t}$};
+\node[proc, H, right=of shock] (dir)
+  {\ttl{Direct losses}\\[2pt] $\bm{d}_t=\big(g_{s,t}\,x_{s,t}\big)_{s=1}^{S}$};
+\node[proc, W, below=of shock.south west, anchor=north west] (leon)
+  {\ttl{Leontief propagation}\\[2pt]
+   $\bm{\ell}_t=\bm{\Lambda}_L\bm{d}_t$, \quad $\ell^{\mathrm{agg}}_t=\bm{1}^{\!\top}\bm{\ell}_t$};
+\node[proc, W, below=of leon] (unc)
+  {\ttl{Joint uncertainty propagation}\\[2pt]
+   $\phi_s$, $\bm{M}_t$ and $\bm{\lambda}_{t+h}$ propagated together, so $\mathrm{VaR}_\alpha$ and $\mathrm{ES}_\alpha$ carry every layer};
+\begin{scope}[on background layer]
+  \node[cbox, fit=(struct)(calib)(dmg)(shock)(dir)(leon)(unc),
+        label={[lab]north west:Economic translation}] (layer3) {};
+\end{scope}
+
+% ---------- Group G : outputs ----------------------------------------
+\node[outp, text width=3.4cm, anchor=north west] (o1) at ($(r2)+(16.703,-0.9)$)
+  {\ttl{Threat forecasts}\\[2pt] predictive intensity by category with credible bands};
+\node[outp, text width=3.4cm, below=0.55cm of o1] (o2)
+  {\ttl{Sector exposure indices}\\[2pt] $\E[g_{s,t+h}\mid\mathcal{F}_t]$};
+\node[outp, text width=3.4cm, below=0.55cm of o2] (o3)
+  {\ttl{Aggregate loss distribution}\\[2pt]
+   $\mathrm{VaR}_{0.95}$, $\mathrm{ES}_{0.95}$, $\Prob(\ell^{\mathrm{agg}}_{t+h}>c\mid\mathcal{F}_t)$};
+\node[outp, text width=3.4cm, below=0.55cm of o3] (o4)
+  {\ttl{Regime alerts}\\[2pt] $\Prob(z_t=r\mid\mathcal{F}_T)$ as early warning};
+
+%% =====================================================================
+%% ARROWS
+%% =====================================================================
+% inputs -> assemble -> Layer 2
+\draw[fl] (cve.south)  -- (epss.north);
+\draw[fl] (epss.south) -- (sec.north);
+\draw[fl] (sec.south)  -- (assemble.north);
+\draw[fl] (assemble.east) -- ++(0.55,0) |- (layer2.west);
+
+% Layer 2 internals
+\draw[fl] (effort.south) -- ++(0,-0.12) -| (mvul.north);
+\draw[fl] (effort.south) -- ++(0,-0.12) -| (mexp.north);
+\draw[fl] (mvul.south) -- (minc.north);
+\draw[fl] (mexp.south) -- (msev.north);
+
+% Layer 2 -> Layer 1 -> Layer 4
+\draw[fl] (layer2.east) -- node[elab,above=1pt,pos=0.5,align=center]{biased views\\ of $\bm{\lambda}_t,\bm{\sigma}_t$} (layer1.west);
+\draw[fl] (layer1.east) -- node[elab,above=1pt,pos=0.5,align=center]{state-space\\ likelihood} (layer4.west);
+
+% Layer 1 internals
+\draw[fl] (reg.south) -- ++(0,-0.12) -| ($(int.north)+(-1.2cm,0)$);
+\draw[fl] (fac.south) -- ++(0,-0.12) -| ($(int.north)+(1.2cm,0)$);
+\draw[fl] (int.south) -- (sevl.north);
+\draw[fl] (sevl.south) -- (idn.north);
+\draw[fl] (ker.north) -- (idn.south);
+
+% Layer 4 internals
+\draw[fl] (marg.south) -- (nuts.north);
+\draw[fl] (nuts.south) -- (conv.north);
+\draw[fl] (conv.south) -- node[elab,pos=0.45]{yes} (ffbs.north);
+\coordinate (nb) at ($(nuts.west)+(-0.55,0)$);
+\draw[fl] (conv.west) -| (nb) -- (nuts.west);
+\node[elab, right=1pt] at ($(nb)!0.5!(nb |- conv.west)$) {no};
+
+% row wrap : Layer 4 -> Stage F
+\coordinate (wA) at ($(stageF.north)+(1.60,0)$);
+\coordinate (wy) at ($(stageF.north)+(0,0.62)$);
+\coordinate (wg) at ($(layer4.west)+(-1.08,0)$);
+\coordinate (w1) at ($(layer4.south)+(0,-0.45)$);
+\coordinate (w2) at (wg |- w1);
+\coordinate (w3) at (wg |- wy);
+\coordinate (w4) at (wA |- wy);
+\draw[fl] (layer4.south) -- (w1) -- (w2) -- (w3) -- (w4) -- (wA);
+\node[elab, above] at ($(w3)!0.5!(w4)$) {posterior draws $m=1,\dots,M$ carried forward into the forecast recursion};
+
+% Stage F internals
+\draw[fl] (floop.south -| fz.north) -- (fz.north);
+\draw[fl] (floop.south -| ff.north) -- (ff.north);
+\draw[fl] (fz.south) -- (fz.south |- fl.north);
+\draw[fl] (ff.south) -- (ff.south |- fl.north);
+\draw[fl] (fl.south) -- (hdec.north);
+\draw[fl] (hdec.west) -| ($(floop.west)+(-0.16,0)$) -- (floop.west);
+\node[elab, above] at ($(hdec.west)+(-1.0,0)$) {no: $h\!\leftarrow\!h+1$};
+
+% Stage F -> Layer 3 -> outputs -> Stage H
+\draw[fl] (stageF.east) -- node[elab,above,pos=0.5]{yes} (layer3.west);
+\draw[fl] (struct.south) -- (calib.north);
+\draw[fl] (calib.south) -- (dmg.north);
+\draw[fl] (dmg.south) -- ++(0,-0.12) -| (shock.north);
+\draw[fl] (shock.east) -- (dir.west);
+\draw[fl] (dir.south) -- ++(0,-0.12) -| (leon.north);
+\draw[fl] (leon.south) -- (unc.north);
+
+\draw[fl] (layer3.east) -- ++(0.5,0) |- (o1.west);
+\draw[fl] (layer3.east) -- ++(0.5,0) |- (o2.west);
+\draw[fl] (layer3.east) -- ++(0.5,0) |- (o3.west);
+\draw[fl] (layer3.east) -- ++(0.5,0) |- (o4.west);
+
+
+
+
+\end{tikzpicture}%
+}
+\caption{The channels $N, B, E, D, L$ are treated as draws from distributions parameterised by $\bm{\lambda}$, giving a biased view of $\bm{\lambda}$ and $\rho$. Instead of letting each category's $\lambda$ float freely, all $K$ are forced through a shared structure: $\bm{\eta}_t = \bm{\mu}_{z_t} + \bm{\Gamma}\bm{f}_t$. A month's $\bm{f}_t$ is the previous month's scaled by $\bm{\Phi}$ plus a shock. It is distributed over the various categories; thereafter, $\bm{\lambda}_t = \exp(\bm{\eta}_t)$, and the severity is treated in an analogous manner. Because $\bm{\Gamma}\bm{f}_t = (\bm{\Gamma}\bm{R})(\bm{R}^{-1}\bm{f}_t)$ does not affect the likelihood, the leading $r \times r$ block of $\bm{\Gamma}$ (and also that of $\bm{\Psi}$) is a fixed lower triangular matrix with positive diagonal elements. Priors are intended to be only weakly informative, consisting of half-Normal distributions on the noise scales with the lower bound removed and standard Normal distributions on the free loadings. The learned kernel contributes a term showing how much the months still tend to move together. The regime $z_t$ is integrated out so that NUTS never encounters a categorical variable. Once the chains have converged on $\bm{f}_t$, $\bm{\lambda}_t$, and $\bm{\Theta}$, FFBS recovers the regime paths from which the alerts are obtained. Each draw is advanced by twelve months by drawing the regimes from $\bm{\Pi}$, passing $\bm{f}_t$ through $\bm{\Phi}$, adding new kernel innovations and keeping $e_t$ at its most recent observed value. As a result,  a range of possible future scenarios is obtained. The threat is then converted into monetary terms: $\bm{M}_t$ shows which sectors use the affected software. The quantity $\sum_k M_{s,k,t}\lambda_{k,t}\sigma_{k,t}$ assigns a shock load to each sector. Using a three-parameter sigmoid function calibrated to four recorded events and an aggregate anchor, the shock load is transformed into the fraction of output that is disrupted. The total output is then used to calculate the direct losses $\bm{d}_t$. Because sectors buy from each other, the disruption is propagated by the Leontief inverse, $\bm{\ell}_t = \bm{\Lambda}_L \bm{d}_t$. Every draw carries its own $\bm{\lambda}$, $\bm{\sigma}$, $\phi_s$, and $\bm{M}_t$ through all of this. The spread in the final numbers comes from uncertainty in every layer, and the four outputs are read straight off the draws.}
+\label{fig:pipeline}
+\end{figure}
+\endgroup
+
+\subsection{Inputs and outputs}
+
+The following four items are taken to be available: the channels described in Section~\ref{sec:formulation}, namely vulnerability disclosures $N_{k,t}$ together with their severity ratings $B_{k,t}$, exploitation signals $E_{k,t}$, and incident disclosures $D_{s,t}$ together with their loss ratings $L_{s,t}$, where $k \in \mathcal{K}$, $s \in \mathcal{S}$, and $t \in \{1, \dots, T\}$.
+
+ The exposure map $\bm{M}_t \in [0,1]^{S \times K}$ is constructed using the product metadata from the NVD CPE fields that have been matched with sectoral technology-adoption data, along with the technical-coefficient matrix $\bm{A}$ derived from the BEA Use table, from which the Leontief inverse $\bm{\Lambda}_L = (\bm{I} - \bm{A})^{-1}$ is derived. Sectoral gross output is denoted $x_{s,t}$.
+
+A reference set of well-documented incidents (NotPetya, Colonial Pipeline, MOVEit, Change Healthcare), including documented loss figures, together with a public estimate of aggregate annual cyber losses, is used in order to calibrate the damage functions. The index sets are $\mathcal{K} = \{1, \dots, K\}$ and $\mathcal{S} = \{1, \dots, S\}$, fixed at the beginning, and the observation history is expressed as
+\begin{equation}
+    \mathcal{F}_t = \sigma\left(\{N_{k,\tau}, B_{k,\tau}, E_{k,\tau}, D_{s,\tau}, L_{s,\tau}\}_{\tau \leq t}\right).
+\end{equation}
+The channels listed reflect the public APIs that were available at the time of writing, not a requirement of the framework; since the channels are conditionally independent given the latent state, any stream that can be expressed as a parametrised observation of $\bm{\lambda}_t$ and $\bm{\sigma}_t$ can take the place of or be joined with them without altering the latent dynamics, the inference process or the economic layer.
+
+The procedure, which is carried out on a monthly basis, produces for each horizon $h = 1, \dots, 12$ four types of output: the predictive distributions of threat intensity by category together with their credible bands; the sector-level exposure indices $\mathbb{E}[g_{s,t+h} \mid \mathcal{F}_t]$ for the US economy; the predictive distribution of total economic loss together with its $\mathrm{VaR}_{0.95}$, $\mathrm{ES}_{0.95}$, and the probabilities of a systemic event; and warnings regarding possible regime changes.
+
+\subsection{Latent threat dynamics}
+
+Rather than letting each category's intensity float freely, all $K$ of them are forced through a small shared structure. A latent Markov regime $z_t \in \{1, \dots, R\}$ with transition matrix $\bm{\Pi}$ shifts the intensity and severity \emph{levels} $\bm{\mu}_{z_t}$ and $\bm{\nu}_{z_t}$ at structural breaks; this is a Markov-switching mean rather than a full Markov-switching vector autoregression (VAR). Common threat factors $\bm{f}_t \in \R^{r}$, with $r \ll K$, carry the persistence, with autoregressive dynamics shared by all regimes,
+\begin{equation}\label{eq:factordyn}
+    \bm{f}_t = \bm{\Phi} \bm{f}_{t-1} + \bm{w}_t,
+    \qquad \bm{w}_t \sim \mathcal{N}(\bm{0}, \bm{Q}),
+\end{equation}
+so this month's value is last month's scaled by $\bm{\Phi}$ plus a shock. Writing $\bm{\eta}_t = \log \bm{\lambda}_t \in \R^{K}$, cross-category dependence is captured parsimoniously by the dynamic factor structure
+\begin{equation}\label{eq:factor}
+    \bm{\eta}_t \;=\; \bm{\mu}_{z_t} + \bm{\Gamma} \bm{f}_t + \bm{a}\, g_t + \bm{u}_t,
+    \qquad
+    \bm{u}_t \sim \mathcal{N}\big(\bm{0}, \operatorname{diag}(\tau_1^2, \dots, \tau_K^2)\big),
+\end{equation}
+where the loading matrix $\bm{\Gamma} \in \R^{K \times r}$ spreads the factors across categories, $g_t$ is the shared temporal-kernel component described below with category loadings $\bm{a} \in \R^{K}$, and the intensities used downstream are recovered as $\bm{\lambda}_t = \exp(\bm{\eta}_t)$. The category-specific severities $\log \sigma_{k,t}$ are given an analogous lower-dimensional latent process, with regime level $\bm{\nu}_{z_t}$, loadings $\bm{\Psi}$ and factor state $\bm{h}_t$.
+
+Free loadings are identified only up to rotation, scale and sign, since $(\bm{\Gamma}, \bm{f}_t)$ and $(\bm{\Gamma}\bm{R}, \bm{R}^{-1}\bm{f}_t)$ give the same likelihood for any invertible $\bm{R}$, and the sampler would otherwise wander over that flat ridge. One representative is picked by constraining the leading $r \times r$ block of $\bm{\Gamma}$ to be lower triangular with a strictly positive diagonal; the same constraint is applied to $\bm{\Psi}$. Idiosyncratic and innovation scales are given weakly informative half-Normal priors bounded away from zero, a small floor keeps every state transition strictly stochastic, and the free entries of $\bm{\Gamma}$ are given standard normal priors. These priors encode no beliefs about cyber threats; they keep the sampler out of regions the data cannot constrain. Pooling across the long tail of sparse categories comes from the shared factors, the common regime and the common effort process.
+
+Where $\bm{\Phi}$ supplies geometrically decaying persistence, a learned temporal kernel supplies a bounded window of co-movement with a directly interpretable width. A smooth-edged square window of learnable half-width $h$ (months) is slid over independent innovations $u_t \sim \mathcal{N}(0,1)$,
+\begin{equation}\label{eq:kernel}
+    g_t = \sigma_g \sum_{d} w_d(h)\, u_{t-d},
+    \qquad
+    w_d(h) = \operatorname{sigmoid}\!\big((h - |d|)/2\big),
+\end{equation}
+with unit-normalised weights, and each category loads on it as $a_k\, g_t$ through Eq.~\ref{eq:factor}. The implied covariance
+\begin{equation}\label{eq:kernelcov}
+    \operatorname{Cov}(g_t, g_{t+d}) = \sigma_g^2 \sum_{j} w_j(h)\, w_{j+d}(h)
+\end{equation}
+is nonzero exactly when two months fall inside overlapping windows, so the posterior of $h$ answers how far apart months still co-move and $\sigma_g$ measures how much this local covariance adds beyond the factor dynamics and trends. The component is positive semidefinite by construction for any learned width, forecasts naturally since future innovations are simply fresh draws, and shrinks to zero in the posterior if the data do not support a distinct local dependence beyond $\bm{\Phi}$. A multivariate Hawkes-type intensity remains a natural alternative for event-level contagion \citep{bessyroland2021}.
+
+\subsection{Measurement}
+
+Each data stream is an imperfect view of the latent state, so each is attached to it through its own bias process. Discovery and reporting effort $e_t$ is estimated as the standardised smooth trend of aggregate log CVE volume, capturing NVD throughput, backlog episodes and secular growth in vulnerability research. The vulnerability channel is then
+\begin{equation}\label{eq:obs-cve}
+    N_{k,t} \sim \text{NegBin}(e^{e_t} \lambda_{k,t}, \psi_k),
+\end{equation}
+with $\psi_k$ governing overdispersion; the exploitation channel is
+\begin{equation}\label{eq:obs-epss}
+    \operatorname{logit} E_{k,t} \sim \mathcal{N}(\alpha_k + \beta_k \log \lambda_{k,t}, \varsigma_k^2);
+\end{equation}
+the incident-disclosure channel is
+\begin{equation}\label{eq:obs-8k}
+    D_{s,t} \sim \text{Poisson}\Big(\rho_s \textstyle\sum_k M_{s,k,t}\, \lambda_{k,t} \;+\; \pi_s\Big),
+\end{equation}
+where $\pi_s > 0$ is a sector-specific baseline disclosure rate, constant over time and additive in the rate, identified in the recent period by the mandatory SEC disclosure regime; and the severity channel is
+\begin{equation}\label{eq:obs-cvss}
+    B_{k,t} \sim \text{LogNormal}\big(\log \sigma_{k,t},\, \kappa_k^2\big).
+\end{equation}
+Missing severity and exploitation entries, which arise in months where a category records no CVEs, are handled by masking rather than imputation. Given $\{\bm{\lambda}_t, \bm{\sigma}_t\}$ the four channels are asserted to be conditionally independent, so each source sharpens and cross-validates the latent state rather than double-counting it.
+
+\subsection{Economic translation}
+
+Threat is then turned into money through the sectoral cyber shock of Eq.~\ref{eq:shock}: the exposure map says which sectors run the affected software, so the technical shock load borne by a sector is obtained by summing intensity against severity across categories, and the sector-specific damage function $\phi_s(\cdot)$ maps that load to the fraction of sectoral output disrupted. The damage functions are taken from a zero-anchored sigmoid family with sector-relative operating points: three global parameters (a dimensionless steepness, a scale factor placing each sector's sigmoid centre at that sector's own typical shock load, and a maximum disruption fraction) are shared across sectors, so that four documented events can identify three parameters instead of $3S$. They are given weakly informative priors and calibrated by MCMC against the reference set, each documented loss range entering as a $90\%$ lognormal interval around its midpoint, together with the aggregate anchor on total annual US cyber losses; the events identify the response to event-scale shocks and the anchor identifies the overall level, which four events alone cannot pin down. Direct sectoral losses are then formed as $\bm{d}_t = (g_{1,t} x_{1,t}, \dots, g_{S,t} x_{S,t})^\top$. Because sectors buy from each other, a disruption in one shows up downstream in the rest, so the direct losses are propagated to total (direct plus indirect) losses through the Leontief inverse, Eq.~\ref{eq:leontief}.
+
+\subsection{Inference}
+
+Inference targets the joint posterior over the latent states and the static parameters,
+\[
+    p\big( \{\bm{f}_t, z_t, \bm{\lambda}_t\}_{t \le T},\, \bm{\Theta} \mid \mathcal{F}_T \big),
+\]
+where $\bm{\Theta}$ collects the static parameters introduced above. The discrete regime path is marginalised analytically inside the likelihood by the hidden-Markov forward recursion, evaluated jointly with the four observation channels at every time step, so that no categorical variable is ever sampled. All remaining unknowns are continuous and are sampled directly with NUTS, with no discrete updates required. The draws are accepted only once the chains are found to agree, judged by $\widehat{R} \approx 1$, adequate effective sample size and an absence of divergences. Posterior regime paths are then recovered by forward-filtering backward-sampling: the regime is marginalised to make sampling possible and recovered afterwards, and it is from these paths that the regime alerts are read.
+
+\subsection{Forecast simulation and outputs}
+
+For each posterior draw $m$ and each horizon $h = 1, \dots, 12$, the latent state is rolled forward from its terminal value. The regime path is drawn from the sampled transition matrix,
+\[
+    z^{(m)}_{T+h} \sim \bm{\Pi}^{(m)}_{z^{(m)}_{T+h-1}, \,\cdot\,},
+\]
+the factors are propagated through Eq.~\ref{eq:factordyn},
+\[
+    \bm{f}^{(m)}_{T+h} = \bm{\Phi}^{(m)} \bm{f}^{(m)}_{T+h-1} + \bm{w}^{(m)}_{T+h},
+    \qquad \bm{w}^{(m)}_{T+h} \sim \mathcal{N}\big(\bm{0}, \bm{Q}^{(m)}\big),
+\]
+fresh kernel innovations are drawn and $g^{(m)}_{T+h}$ formed from Eq.~\ref{eq:kernel} at the posterior width, and Eq.~\ref{eq:factor} is evaluated at the drawn regime level to obtain $\bm{\lambda}^{(m)}_{T+h} = \exp(\bm{\eta}^{(m)}_{T+h})$, with $\bm{\sigma}^{(m)}_{T+h}$ from the analogous severity recursion. Effort is carried into every forecast at its last observed value rather than reset to its historical mean. Each draw therefore traces a different path, and the result is a distribution of futures rather than a single one. Those draws are pushed through the exposure map and damage functions, Eq.~\ref{eq:shock}, to obtain $g^{(m)}_{s,t+h}$, and through the Leontief propagation, Eq.~\ref{eq:leontief}, to obtain $\ell^{\mathrm{agg},(m)}_{t+h}$. Since every draw carries its own $\phi_s$, $\bm{M}_t$ and $\bm{\lambda}_{t+h}$ through all of this, the spread in the resulting loss figures is uncertainty from every layer rather than a point estimate with error bars attached, and the $\mathrm{VaR}_\alpha$ and $\mathrm{ES}_\alpha$ statements inherit it.
+
+The four outputs are then read straight off the draws. Predictive distributions of threat intensity by category are reported with credible bands. Sector-level exposure indices $\E[g_{s,t+h} \mid \mathcal{F}_t]$ are reported for the US economy. The predictive distribution of aggregate economic loss is reported with $\mathrm{VaR}_{0.95}$, $\mathrm{ES}_{0.95}$ and the systemic-event probabilities $\Prob(\ell^{\mathrm{agg}}_{t+h} > c \mid \mathcal{F}_t)$ for policy-relevant thresholds $c$. And the posterior regime probabilities $\Prob(z_t = r \mid \mathcal{F}_T)$ are reported as an interpretable early-warning indicator.

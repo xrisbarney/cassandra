@@ -1,0 +1,4 @@
+two-sided lag12: 0.59840998205439
+causal lag12: 0.5498805137576801
+causal wide-truncation lag12 (integer shift 200): 0.59840998205439
+sigmoid at edge b=18,d=48: 0.0024726231566347743
