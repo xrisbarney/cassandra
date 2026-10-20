@@ -4,8 +4,9 @@ Repository: [xrisbarney/cassandra](https://github.com/xrisbarney/cassandra).
 
 Python implementation of the staged research plan. Stage 3 supplies packaging,
 configuration validation and run provenance. Stage 4 adds raw source adapters,
-coverage audits and hash-verified data manifests. Topic panels, models, backtesting,
-economic calibration and paper results remain later-stage work.
+coverage audits and hash-verified data manifests. Stage 5 adds frozen initial-window
+topics, monthly panels and cell eligibility. Models, backtesting, economic
+calibration and paper results remain later-stage work.
 
 The held-out forecast period is January 2024–December 2025. The initial pilot
 has ten categories including unknown, two factors, one regime, counts only,
@@ -94,6 +95,21 @@ values, vintage limitations, and the distinction between source coverage and
 eligibility for modelling/scoring. No forecasts are produced by these commands.
 
 ## Design and scope
+
+Stage 5's primary count panel is ready; see the
+[panel report](docs/STAGE5_PANELS.md) and [panel dictionary](docs/PANEL_DICTIONARY.md).
+The SEC sector panel remains masked because collection/population coverage is
+uncertified. No forecast scores have been computed.
+
+    uv run --locked --extra science ctm verify-panels docs/panels/stage5-20261020/panel_manifest.json
+    uv run --locked --extra science python scripts/check_panels.py docs/panels/stage5-20261020/panel_manifest.json
+
+To rebuild from the pinned local source data, choose a fresh panel ID:
+
+    uv run --locked --extra science ctm build-panels --data-manifest docs/audits/stage4-20261020/data_manifest.json --panel-id new-panel-id
+
+The builder fits text features only on 2010–2018, freezes them for all later
+assignments, and refuses to overwrite an existing panel directory.
 
 See [implementation plan](IMPLEMENTATION_PLAN.md),
 [evaluation protocol](docs/EVALUATION_PROTOCOL.md),

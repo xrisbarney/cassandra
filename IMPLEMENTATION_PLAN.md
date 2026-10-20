@@ -4,7 +4,7 @@ This plan develops the framework in `main.tex` from an empty Python project thro
 
 The aim is to test the paper's claims and establish which ones the evidence supports. The numerical results currently in the introduction are unsupported by the available artifacts and must be replaced by new, valid evaluation results rather than treated as targets to reproduce.
 
-Status, 2026-10-20: Stages 1–3 are complete; Stage 2 remains frozen as protocol v1.0.1. Stage 4 source adapters, retrieval and coverage audit are complete, with explicit incident/economic eligibility limitations. See [specification](docs/SPECIFICATION.md), [evaluation protocol](docs/EVALUATION_PROTOCOL.md), [baseline specifications](docs/BASELINE_SPECIFICATIONS.md), [statistical analysis plan](docs/STATISTICAL_ANALYSIS_PLAN.md), [manuscript-change record](docs/MANUSCRIPT_CHANGES.md), [Stage 3 setup](docs/STAGE3_SETUP.md), and [Stage 4 data audit](docs/STAGE4_DATA_AUDIT.md). [Original comparator/metric extracts](docs/sources/USER_EVALUATION_EXTRACTS.md) document the user-supplied source. The package now ingests and audits sources as well as preparing run provenance. No cyber model or forecast evaluation has been implemented. Next is Stage 5, constructing the monthly panels from the pinned revised-history snapshot. Full-model inference feasibility and compatible economic evidence remain later-stage work.
+Status, 2026-10-20: Stages 1-4 are complete; Stage 2 remains frozen as protocol v1.0.1. Stage 5 has built and independently reconciled the primary revised-history topic panel and auxiliary mark targets. See [Stage 5 panel report](docs/STAGE5_PANELS.md), [panel dictionary](docs/PANEL_DICTIONARY.md), and [Stage 4 source audit](docs/STAGE4_DATA_AUDIT.md). SEC disclosures have been reviewed and linked within the candidate sample, but their sector panel remains masked because collection recall, first-disclosure dates and reporting population are uncertified. The primary counts-only benchmark is ready for Stage 6. No forecast model or evaluation scores have been run. Full-model inference feasibility and compatible economic evidence remain later-stage work.
 
 ## 1 Resolve the mathematical specification
 
@@ -120,7 +120,7 @@ Define precisely:
 - How filing amendments and repeat reports are deduplicated.
 - How changing reporting-population size enters sectoral incident rates.
 
-**Deliverable:** validated modelling panels, a data dictionary, and descriptive coverage plots.
+**Deliverable (primary panel complete):** validated 2010-2025 topic-month panels, a masked sector-month panel with reviewed incident links, [panel dictionary](docs/PANEL_DICTIONARY.md), origin/cell eligibility, hash manifests and descriptive coverage plots. See [Stage 5 verification](docs/STAGE5_PANELS.md). The auxiliary SEC channel remains ineligible pending collection/population certification; no forecast scores are computed.
 
 ## 6 Build the backtesting engine and simple baselines
 

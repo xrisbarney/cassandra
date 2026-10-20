@@ -1,0 +1,191 @@
+[
+  {
+    "category": 1,
+    "representative_initial_cves": [
+      "CVE-2009-4743",
+      "CVE-2010-1464",
+      "CVE-2010-1486"
+    ],
+    "top_terms": [
+      "site scripting",
+      "cross site",
+      "web script",
+      "script html",
+      "inject arbitrary",
+      "cross",
+      "scripting xss",
+      "arbitrary web",
+      "scripting",
+      "inject"
+    ],
+    "training_document_npmi": 0.8945371030635729
+  },
+  {
+    "category": 2,
+    "representative_initial_cves": [
+      "CVE-2009-4553",
+      "CVE-2010-0212",
+      "CVE-2010-0300"
+    ],
+    "top_terms": [
+      "denial",
+      "denial service",
+      "service",
+      "cause denial",
+      "attackers cause",
+      "cause",
+      "remote attackers",
+      "attackers",
+      "function",
+      "crash"
+    ],
+    "training_document_npmi": 0.4703564644024363
+  },
+  {
+    "category": 3,
+    "representative_initial_cves": [
+      "CVE-2013-3641",
+      "CVE-2013-4488",
+      "CVE-2013-6396"
+    ],
+    "top_terms": [
+      "servers",
+      "verify certificates",
+      "ssl servers",
+      "spoof servers",
+      "certificates ssl",
+      "servers allows",
+      "crafted certificate",
+      "servers obtain",
+      "allows man",
+      "certificate"
+    ],
+    "training_document_npmi": 0.9353705154963806
+  },
+  {
+    "category": 4,
+    "representative_initial_cves": [
+      "CVE-2009-3410",
+      "CVE-2010-0866",
+      "CVE-2010-0885"
+    ],
+    "top_terms": [
+      "oracle",
+      "unspecified vulnerability",
+      "affect",
+      "vectors",
+      "unknown",
+      "unknown vectors",
+      "unspecified",
+      "vectors related",
+      "related",
+      "vulnerability oracle"
+    ],
+    "training_document_npmi": 0.5985021661437969
+  },
+  {
+    "category": 5,
+    "representative_initial_cves": [
+      "CVE-2015-4435",
+      "CVE-2015-4438",
+      "CVE-2015-4441"
+    ],
+    "top_terms": [
+      "cve cve",
+      "cve",
+      "adobe",
+      "vulnerability cve",
+      "different vulnerability",
+      "different",
+      "vectors different",
+      "acrobat",
+      "adobe air",
+      "air"
+    ],
+    "training_document_npmi": 0.582238191645468
+  },
+  {
+    "category": 6,
+    "representative_initial_cves": [
+      "CVE-2008-7267",
+      "CVE-2009-4540",
+      "CVE-2009-4551"
+    ],
+    "top_terms": [
+      "sql",
+      "sql injection",
+      "injection",
+      "sql commands",
+      "arbitrary sql",
+      "commands",
+      "php",
+      "injection vulnerability",
+      "parameter",
+      "execute arbitrary"
+    ],
+    "training_document_npmi": 0.6090998563921208
+  },
+  {
+    "category": 7,
+    "representative_initial_cves": [
+      "CVE-2016-5551",
+      "CVE-2016-8301",
+      "CVE-2016-8308"
+    ],
+    "top_terms": [
+      "cvss",
+      "oracle",
+      "access",
+      "attacks",
+      "successful attacks",
+      "unauthorized",
+      "successful",
+      "attacker",
+      "accessible data",
+      "accessible"
+    ],
+    "training_document_npmi": 0.659521419281693
+  },
+  {
+    "category": 8,
+    "representative_initial_cves": [
+      "CVE-2007-6753",
+      "CVE-2010-0232",
+      "CVE-2010-0237"
+    ],
+    "top_terms": [
+      "windows",
+      "windows server",
+      "server",
+      "local",
+      "users",
+      "local users",
+      "kernel",
+      "windows windows",
+      "allows local",
+      "privileges"
+    ],
+    "training_document_npmi": 0.3475021858644477
+  },
+  {
+    "category": 9,
+    "representative_initial_cves": [
+      "CVE-2018-14325",
+      "CVE-2013-3116",
+      "CVE-2013-3147"
+    ],
+    "top_terms": [
+      "memory corruption",
+      "corruption",
+      "memory",
+      "service memory",
+      "code cause",
+      "internet explorer",
+      "explorer",
+      "arbitrary code",
+      "crafted web",
+      "web site"
+    ],
+    "training_document_npmi": 0.5905240912122108
+  }
+]

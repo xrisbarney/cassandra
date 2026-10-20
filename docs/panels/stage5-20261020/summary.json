@@ -1,0 +1,39 @@
+{
+  "active_categories": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9
+  ],
+  "assignment_reasons": {
+    "assigned": 269057
+  },
+  "excluded_rejected": 16010,
+  "kev_additions_scored_calendar": 1193,
+  "kev_unknown_in_scored_calendar": 21,
+  "missing_selected_cvss": 908,
+  "nmf_iterations": 58,
+  "observed_cells": {
+    "B": 1668,
+    "E": 513,
+    "N": 1920,
+    "V": 490
+  },
+  "retained_cves": 269057,
+  "sec_first_in_sample_pairs": 39,
+  "sec_incident_groups": 38,
+  "sec_observed_cells": 0,
+  "sec_reviewed_filing_registrant_links": 60,
+  "sector_month_cells": 13824,
+  "topic_fit_seconds": 11.911031999858096,
+  "topic_month_cells": 1920,
+  "training_cves": 71287,
+  "transform_and_assembly_seconds": 61.182073400123045,
+  "unknown_cves": 0,
+  "vocabulary_size": 20000
+}

@@ -1,0 +1,62 @@
+[
+  {
+    "active": true,
+    "category": 1,
+    "initial_assignments": 7343,
+    "initial_nonzero_months": 108
+  },
+  {
+    "active": true,
+    "category": 2,
+    "initial_assignments": 16043,
+    "initial_nonzero_months": 108
+  },
+  {
+    "active": true,
+    "category": 3,
+    "initial_assignments": 3583,
+    "initial_nonzero_months": 108
+  },
+  {
+    "active": true,
+    "category": 4,
+    "initial_assignments": 5127,
+    "initial_nonzero_months": 108
+  },
+  {
+    "active": true,
+    "category": 5,
+    "initial_assignments": 3517,
+    "initial_nonzero_months": 108
+  },
+  {
+    "active": true,
+    "category": 6,
+    "initial_assignments": 9317,
+    "initial_nonzero_months": 108
+  },
+  {
+    "active": true,
+    "category": 7,
+    "initial_assignments": 3313,
+    "initial_nonzero_months": 49
+  },
+  {
+    "active": true,
+    "category": 8,
+    "initial_assignments": 18685,
+    "initial_nonzero_months": 108
+  },
+  {
+    "active": true,
+    "category": 9,
+    "initial_assignments": 4359,
+    "initial_nonzero_months": 107
+  },
+  {
+    "active": false,
+    "category": 10,
+    "initial_assignments": 0,
+    "initial_nonzero_months": 0
+  }
+]
