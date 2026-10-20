@@ -1,4 +1,4 @@
-"""Version A and pooled NB controls; substantive use awaits Stage 7 validation."""
+"""Stage 6 Bayesian controls with frozen laws and explicit diagnostic gates."""
 
 import time
 import warnings
@@ -8,6 +8,16 @@ import numpy as np
 from ..data.store import write_json
 from ..forecasting.count_laws import CountForecast, integer_counts
 from .count_baselines import FitFailure, stream_seed
+
+
+def pooled_prior_covariance(categories, center):
+    """Covariance of (b0+b[k]+beta*center, beta) under the frozen independent priors."""
+    cov = np.empty((categories + 1, categories + 1))
+    cov[:categories, :categories] = np.eye(categories) + (4 + 0.25 * center**2)
+    cov[:categories, categories] = 0.25 * center
+    cov[categories, :categories] = 0.25 * center
+    cov[categories, categories] = 0.25
+    return cov
 
 
 def build_model(train, initial_counts, method):
@@ -23,25 +33,39 @@ def build_model(train, initial_counts, method):
         log_psi = pm.Normal("log_psi", 0, 1, dims="category")
         psi = pm.Deterministic("psi", pt.exp(log_psi), dims="category")
         if method == "independent_nb_ar1":
+            from .ar1_transform import ar1_transform
+
             m = pm.Normal("m", np.log(initial.mean(axis=0) + 0.5), 2, dims="category")
             tau = pm.HalfNormal("tau", 0.3, dims="category")
             phi = pm.Uniform("phi", -1, 1, dims="category")
-            unit = pm.AR(
-                "unit_state",
-                rho=phi[:, None],
-                sigma=1,
-                init_dist=pm.Normal.dist(0, 1 / pt.sqrt(1 - phi[:, None] ** 2), shape=(k, 1)),
-                ar_order=1,
-                shape=(k, t),
-                dims=("category", "month"),
+            innovations = pm.Normal("innovations", 0, 1, shape=(k, t), dims=("category", "month"))
+            unit = pm.Deterministic(
+                "unit_state", ar1_transform(innovations, phi), dims=("category", "month")
             )
             eta = m[:, None] + tau[:, None] * unit
             pm.Deterministic("terminal_u", tau * unit[:, -1], dims="category")
         elif method == "pooled_nb":
-            b0 = pm.Normal("b0", np.log(initial.mean() + 0.5), 2)
-            b = pm.Normal("b", 0, 1, dims="category")
-            beta = pm.Normal("beta", 0, 0.5)
-            eta = b0 + b[:, None] + beta * np.arange(t)[None, :] / 12
+            # Exact Gaussian reparameterization: eliminate the b0/b ridge from
+            # the likelihood and center time, without changing any prior/law.
+            center = (t - 1) / 24
+            prior_mean = np.log(initial.mean() + 0.5)
+            coefficients = pm.MvNormal(
+                "centered_coefficients",
+                mu=np.r_[np.full(k, prior_mean), 0.0],
+                cov=pooled_prior_covariance(k, center),
+                shape=k + 1,
+            )
+            beta = pm.Deterministic("beta", coefficients[-1])
+            alpha = coefficients[:k] - beta * center
+            b0_residual = pm.Normal("b0_residual", 0, 1)
+            b0 = pm.Deterministic(
+                "b0",
+                prior_mean
+                + 4 / (1 + 4 * k) * pt.sum(alpha - prior_mean)
+                + np.sqrt(4 / (1 + 4 * k)) * b0_residual,
+            )
+            pm.Deterministic("b", alpha - b0, dims="category")
+            eta = coefficients[:k, None] + beta * (np.arange(t)[None, :] / 12 - center)
         else:
             raise ValueError("Unknown Bayesian control.")
         pm.NegativeBinomial(
@@ -55,12 +79,19 @@ def diagnostic_report(idata, depth):
 
     summary = az.summary(idata, kind="diagnostics", round_to="none")
     finite = np.isfinite(summary[["r_hat", "ess_bulk", "ess_tail"]]).all().all()
+    stats = idata.sample_stats
+    if "tree_depth" in stats:
+        saturated = stats.tree_depth >= depth
+    elif "maxdepth_reached" in stats:
+        saturated = stats.maxdepth_reached
+    else:
+        raise ValueError("Sampler output lacks a maximum-tree-depth diagnostic.")
     report = {
         "max_rhat": float(summary.r_hat.max()),
         "min_bulk_ess": float(summary.ess_bulk.min()),
         "min_tail_ess": float(summary.ess_tail.min()),
         "divergences": int(idata.sample_stats.diverging.sum()),
-        "tree_depth_saturations": int((idata.sample_stats.tree_depth >= depth).sum()),
+        "tree_depth_saturations": int(saturated.sum()),
         "min_bfmi": float(np.min(az.bfmi(idata))),
         "all_diagnostics_finite": bool(finite),
     }
@@ -128,17 +159,46 @@ def fit_predict_bayesian(train, initial_counts, spec, draws, origin, folder, see
         with model, warnings.catch_warnings(record=True) as caught:
             warnings.simplefilter("always")
             start = time.perf_counter()
-            step = pm.NUTS(target_accept=accept, max_treedepth=depth)
+            step = pm.NUTS(
+                target_accept=accept, max_treedepth=depth, compile_kwargs={"mode": "NUMBA"}
+            )
             compile_seconds = time.perf_counter() - start
             start = time.perf_counter()
+            chain_timing = {}
+            point = model.initial_point()
+            initial_points = []
+            for chain in range(4):
+                rng = np.random.default_rng(stream_seed(seed, name, origin, retry, chain, "init"))
+                initial_points.append(
+                    {
+                        key: value + rng.normal(0, 0.1, size=value.shape)
+                        for key, value in point.items()
+                    }
+                )
+
+            def progress(trace, draw):
+                now = time.perf_counter() - start
+                record = chain_timing.setdefault(str(draw.chain), {"first_draw_seconds": now})
+                if not draw.tuning and "first_retained_draw_seconds" not in record:
+                    record["first_retained_draw_seconds"] = now
+                if draw.is_last:
+                    record["last_draw_seconds"] = now
+                if draw.chain == 0 and (draw.draw_idx + 1) % 500 == 0:
+                    print(
+                        f"{name} {origin} retry {retry}: chain 0 draw {draw.draw_idx + 1}",
+                        flush=True,
+                    )
+
             idata = pm.sample(
                 draws=retained,
                 tune=warmup,
                 chains=4,
-                cores=4,
+                cores=1,
                 step=step,
                 random_seed=stream_seed(seed, name, origin, retry, "posterior"),
                 progressbar=False,
+                callback=progress,
+                initvals=initial_points,
             )
             sample_seconds = time.perf_counter() - start
         diag, table = diagnostic_report(idata, depth)
@@ -147,17 +207,32 @@ def fit_predict_bayesian(train, initial_counts, spec, draws, origin, folder, see
             "warmup": warmup,
             "draws": retained,
             "chains": 4,
+            "cores": 1,
+            "backend": "PyMC NUTS with PyTensor NUMBA log-density/gradient",
+            "initialization": "distinct seeded 0.1-SD jitter in unconstrained coordinates",
             "target_accept": accept,
             "max_treedepth": depth,
             "graph_seconds": construction,
             "step_construction_compile_seconds": compile_seconds,
             "sample_call_including_startup_and_warmup_seconds": sample_seconds,
+            "chain_wall_markers": chain_timing,
             "warnings": [str(w.message) for w in caught],
             "diagnostics": diag,
         }
-        # Unknown warnings require inspection; no fit is accepted just for exiting.
-        attempt["fit_status"] = "accepted" if diag["accepted"] and not caught else "failed"
+        # A documented missing-BLAS performance warning does not invalidate NUTS
+        # arithmetic. Preserve it; reject every unresolved numerical warning.
+        environment = [
+            str(w.message)
+            for w in caught
+            if str(w.message).startswith("PyTensor could not link to a BLAS installation.")
+        ]
+        unresolved = [str(w.message) for w in caught if str(w.message) not in environment]
+        attempt["environment_warnings"] = environment
+        attempt["unresolved_warnings"] = unresolved
+        attempt["fit_status"] = "accepted" if diag["accepted"] and not unresolved else "failed"
+        serialization_start = time.perf_counter()
         idata.to_netcdf(folder / f"posterior_attempt_{retry}.nc")
+        attempt["posterior_serialization_seconds"] = time.perf_counter() - serialization_start
         table.to_csv(folder / f"diagnostics_attempt_{retry}.csv")
         # JSON explicitly represents undefined diagnostics as null, not fabricated values.
         safe = {
@@ -170,6 +245,10 @@ def fit_predict_bayesian(train, initial_counts, spec, draws, origin, folder, see
         write_json(folder / f"attempt_{retry}.json", safe)
         attempts.append(safe)
         if attempt["fit_status"] == "accepted":
+            from ..evaluation.control_checks import predictive_checks
+
+            checks = predictive_checks(idata.posterior, name, train, initial_counts, origin)
+            write_json(folder / "predictive_checks.json", checks)
             future = posterior_forecast(
                 idata.posterior, name, len(train), draws, stream_seed(seed, name, origin, "future")
             )

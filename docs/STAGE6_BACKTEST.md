@@ -124,6 +124,11 @@ combined sampling call, not a complete timing decomposition.
 
 ## Outstanding gates
 
+The [2026-10-21 continuation record](STAGE6_PROGRESS_20261021.md) documents
+subsequent Bayesian validation work and the unresolved structural zero-series
+decision. The earlier run and its source hashes are a historical snapshot;
+they are not a claim that later source revisions match that run.
+
 1. Validate the Bayesian controls' posterior behavior and computational budget;
    run their development fits under the frozen convergence requirements.
 2. Execute frozen ARIMA screening and finalist selection. Investigate the

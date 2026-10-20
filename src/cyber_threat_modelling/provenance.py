@@ -79,6 +79,9 @@ def prepare_run(root: Path, config: ExperimentConfig, output: Path, data_manifes
 
         data_record = verify_data_manifest(root, data_manifest, config.settings["vintage"])
     sources = [root / "pyproject.toml", root / "uv.lock"]
+    runtime_lock = root / "configs" / "nuts-runtime.lock"
+    if runtime_lock.is_file():
+        sources.append(runtime_lock)
     sources.extend(sorted((root / "src").rglob("*.py")))
     if not sources[1].is_file():
         raise ConfigurationError("Resolve and lock dependencies before preparing a run.")

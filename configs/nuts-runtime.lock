@@ -1,0 +1,4 @@
+# Optional Windows CPython 3.12 NUTS execution add-on.
+# Existing scientific package versions remain pinned by uv.lock.
+# Wheel hash from the PyPI nutpie 0.15.2 release metadata.
+nutpie==0.15.2 --hash=sha256:9d6f8b6d54d855d407e2f1da3fdbc9fe4d7fbdef32374bfffa55730d374fd2a6

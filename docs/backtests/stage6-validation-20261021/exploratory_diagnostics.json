@@ -1,0 +1,268 @@
+{
+  "compiled_pooled_diagnostics": {
+    "accepted": true,
+    "all_diagnostics_finite": true,
+    "divergences": 0,
+    "max_rhat": 1.0033895556079027,
+    "min_bfmi": 0.9993941068991977,
+    "min_bulk_ess": 4882.205468368608,
+    "min_tail_ess": 2533.6994022114227,
+    "tree_depth_saturations": 0
+  },
+  "records": [
+    {
+      "chains": 4,
+      "diagnostics": {
+        "accepted": true,
+        "all_diagnostics_finite": true,
+        "divergences": 0,
+        "max_rhat": 1.0045427442474046,
+        "min_bfmi": 0.9332203971944496,
+        "min_bulk_ess": 574.9711274490942,
+        "min_tail_ess": 787.712975703161,
+        "tree_depth_saturations": 0
+      },
+      "draws": 1000,
+      "fit_status": "accepted",
+      "graph_seconds": 0.052283399971202016,
+      "max_treedepth": 12,
+      "probe": "probe-pooled",
+      "record": "attempt_0.json",
+      "retry_number": 0,
+      "sample_call_including_startup_and_warmup_seconds": 282.65944050019607,
+      "step_construction_compile_seconds": 61.8011001998093,
+      "target_accept": 0.95,
+      "warmup": 1000,
+      "warnings": []
+    },
+    {
+      "chain_wall_markers": {
+        "0": {
+          "first_draw_seconds": 109.32308969995938,
+          "first_retained_draw_seconds": 146.95813989988528,
+          "last_draw_seconds": 166.82870909990743
+        },
+        "1": {
+          "first_draw_seconds": 109.32505739992484,
+          "first_retained_draw_seconds": 143.22888500010595,
+          "last_draw_seconds": 159.20913510001265
+        },
+        "2": {
+          "first_draw_seconds": 109.32561840000562,
+          "first_retained_draw_seconds": 150.29619810008444,
+          "last_draw_seconds": 170.84253120003268
+        },
+        "3": {
+          "first_draw_seconds": 121.11836669989862,
+          "first_retained_draw_seconds": 161.72877650009468,
+          "last_draw_seconds": 177.68828050000593
+        }
+      },
+      "chains": 4,
+      "diagnostics": {
+        "accepted": true,
+        "all_diagnostics_finite": true,
+        "divergences": 0,
+        "max_rhat": 1.002479679735872,
+        "min_bfmi": 0.9854449769201936,
+        "min_bulk_ess": 5425.843906976888,
+        "min_tail_ess": 2689.3060939344964,
+        "tree_depth_saturations": 0
+      },
+      "draws": 1000,
+      "fit_status": "failed",
+      "graph_seconds": 0.20110430009663105,
+      "max_treedepth": 12,
+      "posterior_serialization_seconds": 0.8733951998874545,
+      "probe": "probe-pooled-centered",
+      "record": "attempt_0.json",
+      "retry_number": 0,
+      "sample_call_including_startup_and_warmup_seconds": 178.729571999982,
+      "step_construction_compile_seconds": 64.28156320005655,
+      "target_accept": 0.95,
+      "warmup": 1000,
+      "warnings": [
+        "PyTensor could not link to a BLAS installation. Operations that might benefit from BLAS will be severely degraded.\nThis usually happens when PyTensor is installed via pip. We recommend it be installed via conda/mamba/pixi instead.\nAlternatively, you can use an experimental backend such as Numba or JAX that perform their own BLAS optimizations, by setting `pytensor.config.mode == 'NUMBA'` or passing `mode='NUMBA'` when compiling a PyTensor function.\nFor more options and details see https://pytensor.readthedocs.io/en/latest/troubleshooting.html#how-do-i-configure-test-my-blas-library"
+      ]
+    },
+    {
+      "chain_wall_markers": {
+        "0": {
+          "first_draw_seconds": 72.44821099983528,
+          "first_retained_draw_seconds": 163.410967099946,
+          "last_draw_seconds": 199.344171699835
+        },
+        "1": {
+          "first_draw_seconds": 72.44874949986115,
+          "first_retained_draw_seconds": 156.13066069991328,
+          "last_draw_seconds": 222.8996267998591
+        },
+        "2": {
+          "first_draw_seconds": 72.44924829993397,
+          "first_retained_draw_seconds": 177.1595931998454,
+          "last_draw_seconds": 239.13474679994397
+        },
+        "3": {
+          "first_draw_seconds": 80.2683767999988,
+          "first_retained_draw_seconds": 178.38061919994652,
+          "last_draw_seconds": 236.39084419980645
+        }
+      },
+      "chains": 4,
+      "diagnostics": {
+        "accepted": true,
+        "all_diagnostics_finite": true,
+        "divergences": 0,
+        "max_rhat": 1.0039835252148779,
+        "min_bfmi": 0.9748231388090133,
+        "min_bulk_ess": 4486.612607256861,
+        "min_tail_ess": 2438.2399498676277,
+        "tree_depth_saturations": 0
+      },
+      "draws": 1000,
+      "fit_status": "accepted",
+      "graph_seconds": 0.20110430009663105,
+      "max_treedepth": 15,
+      "posterior_serialization_seconds": 1.0475504999049008,
+      "probe": "probe-pooled-centered",
+      "record": "attempt_1.json",
+      "retry_number": 1,
+      "sample_call_including_startup_and_warmup_seconds": 239.5048507999163,
+      "step_construction_compile_seconds": 3.2157751000486314,
+      "target_accept": 0.99,
+      "warmup": 2000,
+      "warnings": []
+    },
+    {
+      "backend": "PyMC NUTS with PyTensor NUMBA log-density/gradient",
+      "chain_wall_markers": {
+        "0": {
+          "first_draw_seconds": 34.1708955001086,
+          "first_retained_draw_seconds": 61.16085540014319
+        },
+        "1": {
+          "first_draw_seconds": 74.80527080013417,
+          "first_retained_draw_seconds": 104.8003244001884
+        },
+        "2": {
+          "first_draw_seconds": 118.22461190004833,
+          "first_retained_draw_seconds": 149.86056780000217
+        },
+        "3": {
+          "first_draw_seconds": 165.04057100019418,
+          "first_retained_draw_seconds": 196.28656110004522
+        }
+      },
+      "chains": 4,
+      "cores": 1,
+      "diagnostics": {
+        "accepted": true,
+        "all_diagnostics_finite": true,
+        "divergences": 0,
+        "max_rhat": 1.0027770525563235,
+        "min_bfmi": 0.9084084977221869,
+        "min_bulk_ess": 5358.8675626075465,
+        "min_tail_ess": 2202.150306192573,
+        "tree_depth_saturations": 0
+      },
+      "draws": 1000,
+      "environment_warnings": [
+        "PyTensor could not link to a BLAS installation. Operations that might benefit from BLAS will be severely degraded.\nThis usually happens when PyTensor is installed via pip. We recommend it be installed via conda/mamba/pixi instead.\nAlternatively, you can use an experimental backend such as Numba or JAX that perform their own BLAS optimizations, by setting `pytensor.config.mode == 'NUMBA'` or passing `mode='NUMBA'` when compiling a PyTensor function.\nFor more options and details see https://pytensor.readthedocs.io/en/latest/troubleshooting.html#how-do-i-configure-test-my-blas-library"
+      ],
+      "fit_status": "accepted",
+      "graph_seconds": 0.12740460014902055,
+      "initialization": "distinct seeded 0.1-SD jitter in unconstrained coordinates",
+      "max_treedepth": 12,
+      "posterior_serialization_seconds": 1.101609000004828,
+      "probe": "probe-pooled-numba",
+      "record": "attempt_0.json",
+      "retry_number": 0,
+      "sample_call_including_startup_and_warmup_seconds": 210.43295960011892,
+      "step_construction_compile_seconds": 7.0500095000024885,
+      "target_accept": 0.95,
+      "unresolved_warnings": [],
+      "warmup": 1000,
+      "warnings": [
+        "PyTensor could not link to a BLAS installation. Operations that might benefit from BLAS will be severely degraded.\nThis usually happens when PyTensor is installed via pip. We recommend it be installed via conda/mamba/pixi instead.\nAlternatively, you can use an experimental backend such as Numba or JAX that perform their own BLAS optimizations, by setting `pytensor.config.mode == 'NUMBA'` or passing `mode='NUMBA'` when compiling a PyTensor function.\nFor more options and details see https://pytensor.readthedocs.io/en/latest/troubleshooting.html#how-do-i-configure-test-my-blas-library"
+      ]
+    },
+    {
+      "chains": 4,
+      "diagnostics": {
+        "accepted": false,
+        "all_diagnostics_finite": true,
+        "divergences": 0,
+        "max_rhat": 1.2168044489088878,
+        "min_bfmi": 0.5885252607757707,
+        "min_bulk_ess": 15.941839943478893,
+        "min_tail_ess": 54.39786239978629,
+        "tree_depth_saturations": 71
+      },
+      "draws": 1000,
+      "fit_status": "failed",
+      "graph_seconds": 0.17785700014792383,
+      "max_treedepth": 12,
+      "probe": "probe-independent",
+      "record": "attempt_0.json",
+      "retry_number": 0,
+      "sample_call_including_startup_and_warmup_seconds": 1045.8361277999356,
+      "step_construction_compile_seconds": 99.47929139994085,
+      "target_accept": 0.95,
+      "warmup": 1000,
+      "warnings": [
+        "PyTensor could not link to a BLAS installation. Operations that might benefit from BLAS will be severely degraded.\nThis usually happens when PyTensor is installed via pip. We recommend it be installed via conda/mamba/pixi instead.\nAlternatively, you can use an experimental backend such as Numba or JAX that perform their own BLAS optimizations, by setting `pytensor.config.mode == 'NUMBA'` or passing `mode='NUMBA'` when compiling a PyTensor function.\nFor more options and details see https://pytensor.readthedocs.io/en/latest/troubleshooting.html#how-do-i-configure-test-my-blas-library"
+      ]
+    },
+    {
+      "chain_wall_markers": {
+        "0": {
+          "first_draw_seconds": 69.21941410005093,
+          "first_retained_draw_seconds": 436.2109213001095,
+          "last_draw_seconds": 908.2456205000635
+        },
+        "1": {
+          "first_draw_seconds": 69.22069570003077,
+          "first_retained_draw_seconds": 444.2250286000781,
+          "last_draw_seconds": 914.044140700018
+        },
+        "2": {
+          "first_draw_seconds": 69.19677130016498,
+          "first_retained_draw_seconds": 417.6200739000924,
+          "last_draw_seconds": 887.1117913001217
+        },
+        "3": {
+          "first_draw_seconds": 73.70774880005047,
+          "first_retained_draw_seconds": 447.0779035000596,
+          "last_draw_seconds": 916.3382158000022
+        }
+      },
+      "chains": 4,
+      "diagnostics": {
+        "accepted": false,
+        "all_diagnostics_finite": true,
+        "divergences": 47,
+        "max_rhat": 1.0070783211327492,
+        "min_bfmi": 0.559668109128403,
+        "min_bulk_ess": 480.0344289902356,
+        "min_tail_ess": 585.918568045279,
+        "tree_depth_saturations": 0
+      },
+      "draws": 1000,
+      "environment_warnings": [],
+      "fit_status": "failed",
+      "graph_seconds": 0.4166778000071645,
+      "max_treedepth": 12,
+      "posterior_serialization_seconds": 3.7331509001087397,
+      "probe": "probe-independent-whitened",
+      "record": "attempt_0.json",
+      "retry_number": 0,
+      "sample_call_including_startup_and_warmup_seconds": 922.1537648001686,
+      "step_construction_compile_seconds": 99.99864030000754,
+      "target_accept": 0.95,
+      "unresolved_warnings": [],
+      "warmup": 1000,
+      "warnings": []
+    }
+  ],
+  "scope": "initial development origin 2018-12; working-tree implementation probes; no development selection or held-out scores"
+}

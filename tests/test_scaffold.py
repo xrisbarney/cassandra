@@ -61,6 +61,7 @@ def test_preparation_records_provenance_without_credentials(project, monkeypatch
     secret = "not-a-real-secret-do-not-record"
     monkeypatch.setenv("NVD_API_KEY", secret)
     (project / ".env").write_text(f"NVD_API_KEY={secret}", encoding="utf-8")
+    (project / "configs" / "nuts-runtime.lock").write_text("# optional execution dependency\n")
     config = load_config(project / "configs" / "pilot.toml")
     result = prepare_run(project, config, project / "artifacts" / "run")
     text = result.read_text(encoding="utf-8")
@@ -70,6 +71,7 @@ def test_preparation_records_provenance_without_credentials(project, monkeypatch
     assert record["status"] == "prepared_not_executed"
     assert record["data_manifest"] is None
     assert "uv.lock" in record["source_sha256"]
+    assert "configs/nuts-runtime.lock" in record["source_sha256"]
     assert "installed_packages" in record
     original = result.read_bytes()
     with pytest.raises(FileExistsError):

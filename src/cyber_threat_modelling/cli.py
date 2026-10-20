@@ -41,6 +41,7 @@ def main(argv: list[str] | None = None) -> int:
     forecasts.add_argument("settings", type=Path)
     forecasts.add_argument("--panel-manifest", type=Path, required=True)
     forecasts.add_argument("--output", type=Path, required=True)
+    forecasts.add_argument("--workers", type=int, default=1)
     scores = commands.add_parser("score-development", help="Score saved development forecasts")
     scores.add_argument("run", type=Path)
     args = parser.parse_args(argv)
@@ -51,7 +52,13 @@ def main(argv: list[str] | None = None) -> int:
 
             settings = json.loads((root / args.settings).read_text(encoding="utf-8"))
             print(
-                forecast_development(root, settings, root / args.panel_manifest, root / args.output)
+                forecast_development(
+                    root,
+                    settings,
+                    root / args.panel_manifest,
+                    root / args.output,
+                    workers=args.workers,
+                )
             )
             return 0
         if args.command == "score-development":

@@ -71,7 +71,66 @@ def verify_artifacts(folder, manifest):
             raise ValueError("A saved forecast artifact changed.")
 
 
-def forecast_development(root, settings, panel_manifest, output):
+def _forecast_origin(task):
+    """Fresh model per origin; persistent workers share code caches, never fitted states."""
+    folder = task["folder"]
+    folder.mkdir(parents=True)
+    name, origin = task["name"], task["origin"]
+    meta = {
+        "method": name,
+        "configuration_sha256": task["configuration_hash"],
+        "origin": origin,
+        "training_cutoff": origin,
+        "split": "development",
+        "vintage": "revised",
+        "target_kind": "publication_count",
+        "category_ids": task["categories"],
+        "seed": task["seed"],
+        "forecast_sha256": None,
+        "fit_status": "failed",
+        "retry_number": None,
+    }
+    started = time.perf_counter()
+    try:
+        if name in ("independent_nb_ar1", "pooled_nb"):
+            from ..models.bayesian_controls import fit_predict_bayesian
+
+            forecast, fit = fit_predict_bayesian(
+                task["train"],
+                task["initial"],
+                task["spec"],
+                task["draws"],
+                origin,
+                folder,
+                task["seed"],
+            )
+        else:
+            forecast, fit = fit_predict(
+                task["train"], task["categories"], task["spec"], task["draws"], origin, task["seed"]
+            )
+        forecast.save(folder / "forecast.npz")
+        write_json(folder / "fit.json", fit)
+        meta.update(
+            fit_status="accepted",
+            retry_number=fit["retry_number"],
+            forecast_sha256=file_hash(folder / "forecast.npz"),
+        )
+    except (ValueError, FloatingPointError, np.linalg.LinAlgError, RuntimeError) as exc:
+        write_json(
+            folder / "failure.json",
+            {
+                "error": type(exc).__name__ + ": " + str(exc),
+                "attempts": exc.attempts if isinstance(exc, FitFailure) else [],
+            },
+        )
+    meta["total_seconds"] = time.perf_counter() - started
+    write_json(folder / "metadata.json", meta)
+    return {**meta, "directory": folder.relative_to(task["output"]).as_posix()}
+
+
+def forecast_development(root, settings, panel_manifest, output, workers=1):
+    if type(workers) is not int or not 1 <= workers <= 4:
+        raise ValueError("Use one to four independent origin workers.")
     names = validate_settings(settings)
     config = load_config(root / "configs/pilot.toml")
     verify_freeze(root, config)
@@ -87,71 +146,48 @@ def forecast_development(root, settings, panel_manifest, output):
     prepare_run(root, config, output)
     configuration_hash = hashlib.sha256(canonical_json(settings)).hexdigest()
     write_json(output / "backtest_settings.json", settings)
+    tasks = []
+    for origin in development_origins():
+        for spec, name in zip(settings["methods"], names, strict=True):
+            tasks.append(
+                {
+                    "spec": spec,
+                    "name": name,
+                    "origin": str(origin),
+                    "folder": output / name / str(origin),
+                    "output": output,
+                    "configuration_hash": configuration_hash,
+                    "categories": categories,
+                    "seed": config.settings["seed"],
+                    "draws": settings["draws"],
+                    "train": training_prefix(wide, origin),
+                    "initial": initial,
+                }
+            )
     index = []
-    for spec, name in zip(settings["methods"], names, strict=True):
-        for origin in development_origins():
-            folder = output / name / str(origin)
-            folder.mkdir(parents=True)
-            meta = {
-                "method": name,
-                "configuration_sha256": configuration_hash,
-                "origin": str(origin),
-                "training_cutoff": str(origin),
-                "split": "development",
-                "vintage": "revised",
-                "target_kind": "publication_count",
-                "category_ids": categories,
-                "seed": config.settings["seed"],
-                "forecast_sha256": None,
-                "fit_status": "failed",
-                "retry_number": None,
-            }
-            started = time.perf_counter()
-            try:
-                train = training_prefix(wide, origin)
-                if name in ("independent_nb_ar1", "pooled_nb"):
-                    from ..models.bayesian_controls import fit_predict_bayesian
+    if workers == 1:
+        results = map(_forecast_origin, tasks)
+        for result in results:
+            index.append(result)
+            print(
+                f"Saved {result['method']} {result['origin']}: {result['fit_status']}", flush=True
+            )
+    else:
+        from concurrent.futures import ProcessPoolExecutor, as_completed
 
-                    forecast, fit = fit_predict_bayesian(
-                        train,
-                        initial,
-                        spec,
-                        settings["draws"],
-                        str(origin),
-                        folder,
-                        config.settings["seed"],
-                    )
-                else:
-                    forecast, fit = fit_predict(
-                        train,
-                        categories,
-                        spec,
-                        settings["draws"],
-                        str(origin),
-                        config.settings["seed"],
-                    )
-                forecast.save(folder / "forecast.npz")
-                write_json(folder / "fit.json", fit)
-                meta.update(
-                    fit_status="accepted",
-                    retry_number=fit["retry_number"],
-                    forecast_sha256=file_hash(folder / "forecast.npz"),
+        with ProcessPoolExecutor(max_workers=workers) as executor:
+            futures = [executor.submit(_forecast_origin, task) for task in tasks]
+            for future in as_completed(futures):
+                result = future.result()
+                index.append(result)
+                print(
+                    f"Saved {result['method']} {result['origin']}: {result['fit_status']}",
+                    flush=True,
                 )
-            except (ValueError, FloatingPointError, np.linalg.LinAlgError, RuntimeError) as exc:
-                write_json(
-                    folder / "failure.json",
-                    {
-                        "error": type(exc).__name__ + ": " + str(exc),
-                        "attempts": exc.attempts if isinstance(exc, FitFailure) else [],
-                    },
-                )
-            meta["total_seconds"] = time.perf_counter() - started
-            write_json(folder / "metadata.json", meta)
-            index.append({**meta, "directory": folder.relative_to(output).as_posix()})
-        accepted = sum(r["fit_status"] == "accepted" for r in index if r["method"] == name)
-        print(f"Saved {name}: {accepted}/60 origins", flush=True)
+    index.sort(key=lambda r: (names.index(r["method"]), r["origin"]))
     manifest = {
         "schema_version": 1,
+        "execution": {"origin_workers": workers, "chains_per_bayesian_fit": 4, "cores_per_fit": 1},
         "status": "forecasts_saved_not_scored",
         "settings": settings,
         "panel_manifest": panel_manifest.relative_to(root).as_posix(),
