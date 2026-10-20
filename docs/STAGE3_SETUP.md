@@ -99,7 +99,16 @@ a synthetic NUTS fit. Record the chosen execution environment and timings. Other
 operating systems, GPU execution, and the future neural-comparator runtime were
 not tested here.
 
-## Next stage
+## Compiler follow-up, 2026-10-20
+
+The missing compiler described above was subsequently resolved with a pinned
+WinLibs GCC 14.2.0 installation. Native PyTensor expression, log-density and gradient
+execution passed, followed by a four-chain synthetic NUTS fit with R-hat 1.0011
+and zero divergences. The [compiler report](COMPILER_SETUP.md) records installation,
+activation, diagnostics and timings. This clears the environment prerequisite;
+Stage 7's model-specific simulation checks remain future work. Stage 5 is paused.
+
+## Next stage (at the original Stage 3 verification)
 
 Stage 4 audits and ingests the sources, populates availability/vintage and source
 manifests, verifies coverage, and creates an auditable panel. Existing-file metadata

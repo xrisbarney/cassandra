@@ -104,8 +104,16 @@ Clarifications to the frozen design are recorded in [amendments](docs/AMENDMENTS
 The dependency lock is a software-resolution artifact, not proof that a future
 high-dimensional HMM model will converge. The small synthetic environment probe
 passed on Windows/Python 3.12; see [Stage 3 verification](docs/STAGE3_SETUP.md).
-PyTensor currently uses its Python fallback because no C++ compiler was detected.
-The compiler must be configured and verified before Stage 7's synthetic test suite.
+The Windows GCC 14.2.0 compiler is installed and native PyTensor density/gradient
+execution plus a four-chain synthetic NUTS probe passed. See
+[compiler setup and verification](docs/COMPILER_SETUP.md). To reproduce the setup:
+
+    .\.venv\Scripts\python.exe scripts/setup_compiler.py
+    . .\scripts\Use-Compiler.ps1
+    .\.venv\Scripts\python.exe scripts/check_compiler.py --output artifacts/compiler/new-check.json
+
+The installer verifies the pinned archive checksum and adds the compiler to the
+Windows user PATH. Dot-sourcing configures an already-open PowerShell session.
 Full-model runtime and convergence also require assessment before substantial fitting.
 
 Packaging follows the [Python packaging guide](https://packaging.python.org/en/latest/guides/writing-pyproject-toml/).

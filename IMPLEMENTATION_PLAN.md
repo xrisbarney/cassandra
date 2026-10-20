@@ -71,7 +71,7 @@ Implemented package namespaces and their planned responsibilities:
 | `evaluation` | Backtests, scoring, ablations, sensitivity analysis |
 | `reporting` | Tables and figures generated from saved results |
 
-The project uses NumPy/SciPy, pandas, Parquet/PyArrow, PyMC/PyTensor, ArviZ/xarray, scikit-learn, statsmodels, and pytest. Exact versions are recorded in `uv.lock`; a synthetic inference and library compatibility probe passed on Windows/Python 3.12. See [Stage 3 verification](docs/STAGE3_SETUP.md) for results and the missing C++ compiler limitation. Neural-comparator dependencies will be added when that adapter is implemented.
+The project uses NumPy/SciPy, pandas, Parquet/PyArrow, PyMC/PyTensor, ArviZ/xarray, scikit-learn, statsmodels, and pytest. Exact versions are recorded in `uv.lock`; a synthetic inference and library compatibility probe passed on Windows/Python 3.12. See [Stage 3 verification](docs/STAGE3_SETUP.md) for the original results and [compiler verification](docs/COMPILER_SETUP.md) for the subsequent GCC installation and compiled synthetic NUTS check. Neural-comparator dependencies will be added when that adapter is implemented.
 
 PyMC is a suitable starting point because its documented workflows support marginalizing hidden Markov chains before NUTS sampling and recovering states afterward. Verify compatibility with the particular model graph before relying on automatic marginalization. [PyMC HMM example](https://www.pymc.io/projects/examples/en/latest/mixture_models/discrete_markov_chain_marginalization.html).
 
@@ -148,7 +148,7 @@ These initial controls do not replace the requested comparison suite: RF, ARIMA,
 
 Corresponds to: a new Simulation Study section.
 
-**Entry gate:** resolve the missing PyTensor C++ compiler before Stage 7. Verify compiler detection, compiled log-density/gradient execution, and a timed synthetic NUTS fit in the chosen execution environment. Record the environment and timings before starting the simulation suite; do not defer this to Stage 9. Data ingestion in Stage 4 can proceed independently.
+**Entry gate:** verify PyTensor compiler detection, compiled log-density/gradient execution, and a timed synthetic NUTS fit in the chosen execution environment before Stage 7. This environment prerequisite passed on Windows on 2026-10-20; [compiler verification](docs/COMPILER_SETUP.md) records the setup and timings. Repeat it if the execution environment changes. Full-model simulation and recovery checks below remain outstanding.
 
 Generate datasets with known factors, regimes, intensities, severities, observation biases, and missingness.
 
