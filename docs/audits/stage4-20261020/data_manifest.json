@@ -1,0 +1,79 @@
+{
+  "artifacts": {
+    "data/interim/stage4-20261020/bea_259.parquet": "29717da70b2a0fce734b5ed4a0262a477347b570365f921f1839f401c00b92ef",
+    "data/interim/stage4-20261020/bea_262.parquet": "f74e3b6ada134c6df1d7fd3cb217f7a0e088829b5bbf83cbc3d50ba296f22fe4",
+    "data/interim/stage4-20261020/bea_61.parquet": "6f372ce44333dbbe7c32429f04e4f856c86301346518faae7e82eaee80dfb6cf",
+    "data/interim/stage4-20261020/bea_audit.json": "6c036339b1712f1c88c94c4a4ab34fb87ffb43040a861995fc7b2b063d43d9b5",
+    "data/interim/stage4-20261020/bea_sources.json": "eb5965091f90007f4c99ba1e1a37bbeb13a5ec64001dc4ef46b9c791c15867a5",
+    "data/interim/stage4-20261020/epss_audit.json": "c2758a65c36a9de68f562a0553511939072f057a72692a91ebf7cbab65c4c88c",
+    "data/interim/stage4-20261020/epss_cohort_scores.parquet": "5deb6543baffb79d296f7ad460ac7dac8f1bfe609b803c1992fc37f7d89b4ee1",
+    "data/interim/stage4-20261020/epss_monthly_coverage.csv": "317ee3dec99784305c1075b244963c00ec76365637049c12063db25491045d72",
+    "data/interim/stage4-20261020/epss_sources.json": "fc10ad1ab6fed60df52bf415b66f82c6b3f805d8dd195cd23866e4aca8f4b1a1",
+    "data/interim/stage4-20261020/event_evidence.json": "c72bc59161df1ac2e69fc3eaf5812841d964375dca96ff2c65260504efb50202",
+    "data/interim/stage4-20261020/events_audit.json": "e9ddfe937f8e72c2ab356b333fbfc43039a9c0fc65263b7fb47e24d22eb89c1f",
+    "data/interim/stage4-20261020/events_sources.json": "f586e5520dc7ca3e6d0cda670dfb3685181c1e2e055c93e8123fbe87925c9928",
+    "data/interim/stage4-20261020/history_audit.json": "d681ad5c8fd9242d26ec09f3b919656dc7e10c5b1b043e4995903a9c57e07db1",
+    "data/interim/stage4-20261020/history_sources.json": "f6849683f076c844b8e296cce6bcacc0c224067c52bec1aeafeb7abfc56951b1",
+    "data/interim/stage4-20261020/kev_audit.json": "251c81c0a581954eda5e0482889a7ca1380ee3ca8508b5775f24472a3e8aefba",
+    "data/interim/stage4-20261020/kev_catalog.parquet": "a64e4574fa9ddb02f1d23f595f42b3f2f87a77a1db496d64a2988bfc6bca0294",
+    "data/interim/stage4-20261020/kev_sources.json": "8171068357d0fa5fb89d66358116b6db5839780e79890142014e04cc57215c4e",
+    "data/interim/stage4-20261020/nvd_audit.json": "22ad67d25d73c18824417848f486057ed76d31517a8a34451e9a363e7e9d0fad",
+    "data/interim/stage4-20261020/nvd_monthly_coverage.csv": "7a9ad98bec0e66fe9949a65938a73603aed8010bed9aec631ba0a549ad4a8e54",
+    "data/interim/stage4-20261020/nvd_records.parquet": "01333621a2228b3c66ff695ff9d18efcdd5e40b9523f933a3a40d78849ebc16d",
+    "data/interim/stage4-20261020/nvd_sources.json": "d4b49f92ca93cc880b49b1a10f8a68ea7a2679f106ef3d445295a5c647cc17ee",
+    "data/interim/stage4-20261020/sec_audit.json": "796dda3437078d186afd38df4c5c38cbd932655484093fca53aabb3795f814c9",
+    "data/interim/stage4-20261020/sec_candidates.parquet": "ae483fe068272fcace73c07796c1cf423a420791a73f15bbdc66e1f6af8cd3b6",
+    "data/interim/stage4-20261020/sec_search_coverage.csv": "e1af076e95360248813c3e43a0beb53d9886bde623bd10f5bc9b19b4b958efca",
+    "data/interim/stage4-20261020/sec_sources.json": "5a5cecadc48bfff7ca4dc6ed59040257ffed6f7b1ae172ada841a9b44eba1350",
+    "docs/audits/stage4-20261020/coverage_summary.json": "dce89c5370022d342ce5bd0fee61a84db16a081be04b129807c9232a79cd8da2",
+    "docs/audits/stage4-20261020/epss_monthly_coverage.csv": "317ee3dec99784305c1075b244963c00ec76365637049c12063db25491045d72",
+    "docs/audits/stage4-20261020/nvd_monthly_coverage.csv": "7a9ad98bec0e66fe9949a65938a73603aed8010bed9aec631ba0a549ad4a8e54",
+    "docs/audits/stage4-20261020/sec_search_coverage.csv": "e1af076e95360248813c3e43a0beb53d9886bde623bd10f5bc9b19b4b958efca",
+    "docs/audits/stage4-20261020/source_eligibility.csv": "1b2687d53b21e2454b2ea736286428807f8df86c33a1b587d45fed2af21d8485",
+    "docs/audits/stage4-20261020/source_manifest.json": "1dbc74a54a15544be14ae8cc0d425fe4e63759256ca787476bbc1fd2f5d218a1"
+  },
+  "created_at": "2026-10-20T20:05:19.580639+00:00",
+  "dependency_lock_sha256": "78085a93261539225f90e8e6a2595b71b0f9ae0a46fc9822d93bbe550cbbf05a",
+  "event_register_sha256": "3622c1af4ee70e65d461fa954eb89b32280e8752983828f4447568bcbcbbb08d",
+  "ingestion_source_sha256": {
+    "src/cyber_threat_modelling/data/__init__.py": "72edef16e28ab678d0ffcd0bb74758685c228fc831c7fe60183c85d8104470e6",
+    "src/cyber_threat_modelling/data/audit.py": "32003ff51046fa5649d0a0dbd9b81de48a25fca0419711a5dab23857aeb32a89",
+    "src/cyber_threat_modelling/data/economics.py": "7d227c5a03c3d9e178501a1c4928871c21fbe9f1cd0a20cd898e613eeff04003",
+    "src/cyber_threat_modelling/data/history.py": "30e1a5bad35c8d9a87f088ceea0421164c93e6412734d0f0e8a6094453bf586f",
+    "src/cyber_threat_modelling/data/nvd.py": "241f92b018873dd62c183ea1e35bc2055f43e3812002d575edfc3b9dc0eaf034",
+    "src/cyber_threat_modelling/data/sec.py": "9adb45f889a7283c169c6469f5d2e2fdb11cdcfece6a3686344f3f083004658c",
+    "src/cyber_threat_modelling/data/signals.py": "ec59a8a24cbe8274ddcf0be1f186412b48d943faca2871e841ea0579076cb375",
+    "src/cyber_threat_modelling/data/store.py": "2df8fc5608ca0e24ac35c12241d716459d4f1e756487cc359b3d632ad2a3f7ce"
+  },
+  "point_in_time_certified": false,
+  "policy_sha256": "f379fc1cc125ab98c6ed85613bd5c382f40fb931d7fc55286fa5c29024c4ce49",
+  "primary_source_ready_for_stage5": true,
+  "protocol_freeze_sha256": "7597b76276b837f8db9bc2baff63cb035e14cdfa8656885c782795d38cb598e7",
+  "publication_window": [
+    "2010-01",
+    "2025-12"
+  ],
+  "python": "3.12.0 (tags/v3.12.0:0fb18b0, Oct  2 2023, 13:03:39) [MSC v.1935 64 bit (AMD64)]",
+  "remaining_gates": [
+    "Stage5_topic_panel_and_cell_masks",
+    "SEC_incident_adjudication",
+    "economic_target_compatibility",
+    "pre_scoring_execution_checks"
+  ],
+  "schema_version": 1,
+  "scoring_ready": false,
+  "snapshot": "stage4-20261020",
+  "software_versions": {
+    "numpy": "2.3.5",
+    "pandas": "2.3.3",
+    "pyarrow": "26.0.0"
+  },
+  "source_control": {
+    "dirty": true,
+    "revision": "fe22ea83d16867cc38c3d6bf312c4afa94c20601",
+    "status": "available"
+  },
+  "source_manifest": "docs/audits/stage4-20261020/source_manifest.json",
+  "source_manifest_sha256": "1dbc74a54a15544be14ae8cc0d425fe4e63759256ca787476bbc1fd2f5d218a1",
+  "vintage_track": "revised"
+}

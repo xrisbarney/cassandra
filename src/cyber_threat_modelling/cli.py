@@ -1,4 +1,4 @@
-"""Stage 3 commands: validate configuration and prepare an unexecuted run."""
+"""Validate experiments, prepare run records, and audit source data."""
 
 import argparse
 import json
@@ -17,9 +17,36 @@ def main(argv: list[str] | None = None) -> int:
     prepare = commands.add_parser("prepare-run", help="Record provenance; does not fit or ingest")
     prepare.add_argument("config", type=Path)
     prepare.add_argument("--output", required=True, type=Path)
+    prepare.add_argument("--data-manifest", type=Path)
+    audit = commands.add_parser("audit-data", help="Download raw sources and audit coverage")
+    audit.add_argument("--snapshot", required=True)
+    audit.add_argument("--credentials-file", type=Path)
+    audit.add_argument(
+        "--sources", nargs="+", choices=["nvd", "history", "epss", "kev", "sec", "bea", "events"]
+    )
+    audit.add_argument("--finalize-only", action="store_true")
+    audit.add_argument("--finalize", action="store_true")
+    check_data = commands.add_parser(
+        "verify-data", help="Verify source and derived artifact hashes"
+    )
+    check_data.add_argument("manifest", type=Path)
     args = parser.parse_args(argv)
     root = args.project_root.resolve()
     try:
+        if args.command == "audit-data":
+            from .data.audit import COMPONENTS, finalize_audit, run_audit
+
+            verify_freeze(root, load_config(root / "configs" / "pilot.toml"))
+            if not args.finalize_only:
+                run_audit(root, args.snapshot, args.credentials_file, args.sources or COMPONENTS)
+            if args.finalize or args.finalize_only:
+                print(finalize_audit(root, args.snapshot))
+            return 0
+        if args.command == "verify-data":
+            from .data.audit import verify_data_manifest
+
+            print(json.dumps(verify_data_manifest(root, root / args.manifest), indent=2))
+            return 0
         config = load_config(root / args.config)
         verify_freeze(root, config)
         if args.command == "validate":
@@ -35,7 +62,12 @@ def main(argv: list[str] | None = None) -> int:
                 )
             )
         else:
-            destination = prepare_run(root, config, root / args.output)
+            destination = prepare_run(
+                root,
+                config,
+                root / args.output,
+                root / args.data_manifest if args.data_manifest else None,
+            )
             print(f"Prepared {destination}; no data ingested and no model fitted.")
     except (ConfigurationError, OSError, ValueError, KeyError) as exc:
         # Configuration validation messages never include unknown values or environment data.

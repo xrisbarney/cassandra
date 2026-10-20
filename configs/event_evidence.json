@@ -1,0 +1,54 @@
+[
+  {
+    "event_id": "notpetya",
+    "source_url": "https://investor.maersk.com/static-files/250c3398-7850-4c00-8afe-4dbd874e2a85",
+    "publication_date": "2018-02-09",
+    "geography": "Maersk global operations; not US sector aggregate",
+    "loss_definition": "Company annual-report cyberattack impact; national gross-output loss not established",
+    "currency": "USD", "price_year": 2017,
+    "period_start": "2017-01-01", "period_end": "2017-12-31",
+    "amount_lower": null, "amount_upper": null,
+    "evidence_type": "company_report_scope_review",
+    "calibration_eligible": false,
+    "exclusion_reason": "Geography and accounting target mismatch; no national monthly loss extracted"
+  },
+  {
+    "event_id": "colonial_pipeline",
+    "source_url": "https://www.justice.gov/archives/opa/pr/department-justice-seizes-23-million-cryptocurrency-paid-ransomware-extortionists-darkside",
+    "publication_date": "2021-06-07",
+    "geography": "United States; Colonial Pipeline ransom recovery",
+    "loss_definition": "Seized cryptocurrency valued on the recovery date; not production loss",
+    "currency": "USD", "price_year": 2021,
+    "period_start": "2021-06-07", "period_end": "2021-06-07",
+    "amount_lower": 2300000, "amount_upper": 2300000,
+    "evidence_type": "asset_recovery",
+    "calibration_eligible": false,
+    "exclusion_reason": "Recovered financial transfer is not direct or aggregate gross-output disruption"
+  },
+  {
+    "event_id": "moveit",
+    "source_url": "https://investors.progress.com/node/27321",
+    "publication_date": "2024-06-25",
+    "geography": "Progress Software reporting entity; not all affected firms",
+    "loss_definition": "Cyber response expenses net of expected insurance recoveries; release discusses multiple cyber matters",
+    "currency": "USD", "price_year": 2024,
+    "period_start": "2024-03-01", "period_end": "2024-05-31",
+    "amount_lower": null, "amount_upper": null,
+    "evidence_type": "company_report_scope_review",
+    "calibration_eligible": false,
+    "exclusion_reason": "Company costs and mixed incident scope do not identify national monthly output loss"
+  },
+  {
+    "event_id": "change_healthcare",
+    "source_url": "https://www.unitedhealthgroup.com/content/dam/UHG/PDF/investors/2024/2025-16-01-uhg-reports-fourth-quarter-results.pdf",
+    "publication_date": "2025-01-16",
+    "geography": "UnitedHealth Group reporting entity; not national healthcare sector",
+    "loss_definition": "2024 company cyberattack impacts: response costs plus reduced revenues; source PDF page 12",
+    "currency": "USD", "price_year": 2024,
+    "period_start": "2024-01-01", "period_end": "2024-12-31",
+    "amount_lower": 3090000000, "amount_upper": 3090000000,
+    "evidence_type": "company_annual_accounting_impact",
+    "calibration_eligible": false,
+    "exclusion_reason": "Annual company expense/revenue aggregate is not a national monthly gross-output loss observation"
+  }
+]

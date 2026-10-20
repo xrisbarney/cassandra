@@ -69,10 +69,15 @@ def git_revision(root: Path) -> dict:
     return {"revision": revision, "dirty": bool(status), "status": "available"}
 
 
-def prepare_run(root: Path, config: ExperimentConfig, output: Path) -> Path:
+def prepare_run(root: Path, config: ExperimentConfig, output: Path, data_manifest=None) -> Path:
     """Write a new preparation record. Never overwrite a prior run directory."""
     root = root.resolve()
     freeze = verify_freeze(root, config)
+    data_record = None
+    if data_manifest:
+        from .data.audit import verify_data_manifest
+
+        data_record = verify_data_manifest(root, data_manifest, config.settings["vintage"])
     sources = [root / "pyproject.toml", root / "uv.lock"]
     sources.extend(sorted((root / "src").rglob("*.py")))
     if not sources[1].is_file():
@@ -98,8 +103,8 @@ def prepare_run(root: Path, config: ExperimentConfig, output: Path) -> Path:
         "source_control": git_revision(root),
         "source_sha256": source_hashes,
         "source_bundle_sha256": hashlib.sha256(canonical_json(source_hashes)).hexdigest(),
-        "data_manifest": None,
-        "data_status": "not_ingested",
+        "data_manifest": data_record,
+        "data_status": "source_audited_panel_pending" if data_record else "not_ingested",
     }
     payload = json.dumps(record, indent=2, sort_keys=True, allow_nan=False) + "\n"
     # All reads and validation finish before creating the new output directory.

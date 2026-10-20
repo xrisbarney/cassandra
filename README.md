@@ -3,8 +3,9 @@
 Repository: [xrisbarney/cassandra](https://github.com/xrisbarney/cassandra).
 
 Python implementation of the staged research plan. Stage 3 supplies packaging,
-configuration validation and run provenance. Models, ingestion, backtesting,
-economic calibration and paper results are not implemented yet.
+configuration validation and run provenance. Stage 4 adds raw source adapters,
+coverage audits and hash-verified data manifests. Topic panels, models, backtesting,
+economic calibration and paper results remain later-stage work.
 
 The held-out forecast period is January 2024–December 2025. The initial pilot
 has ten categories including unknown, two factors, one regime, counts only,
@@ -65,6 +66,32 @@ An explicit project location can be used from another directory:
 | notebooks | Later exploration; reusable logic belongs in the package |
 | data/raw, data/interim, data/processed | Local data, excluded from version control |
 | artifacts | Generated run records and results, excluded from version control |
+
+## Audit source data
+
+Use the science environment for the data adapters. A full audit retrieves NVD
+feeds, EPSS month-end archives, KEV, SEC candidates and filing documents, BEA
+tables, and the event evidence register. The existing audited snapshot is
+`stage4-20261020`; its report is [Stage 4 data audit](docs/STAGE4_DATA_AUDIT.md).
+
+    uv run --locked --extra science ctm audit-data --snapshot new-audit-id --credentials-file C:\path\to\.env --finalize
+    uv run --locked --extra science ctm verify-data docs/audits/stage4-20261020/data_manifest.json
+    uv run --locked --extra science ctm prepare-run configs/pilot.toml --output artifacts/runs/pilot-with-data --data-manifest docs/audits/stage4-20261020/data_manifest.json
+
+Credentials are optional for public feeds; BEA needs BEA_API_KEY, SEC needs a
+declared SEC_USER_AGENT, and NVD_API_KEY changes the API request interval. They
+are not stored in the experiment config. BEA raw responses echo the API key, so
+keep raw data local. The audit exports contain redacted request URLs and hashes.
+`--sources nvd epss` limits an unfinished audit to named components. Successful
+raw downloads are reused after checksum verification. `--finalize-only` freezes
+completed component outputs without rerunning them; a frozen snapshot cannot be
+overwritten. A fresh checkout has the manifests, but needs the corresponding
+local data to pass `verify-data`. Current-source downloads may have changed since
+the snapshot; use a new ID rather than claiming a newer download has its hashes.
+
+See the [data dictionary](docs/DATA_DICTIONARY.md) for record exclusions, missing
+values, vintage limitations, and the distinction between source coverage and
+eligibility for modelling/scoring. No forecasts are produced by these commands.
 
 ## Design and scope
 
