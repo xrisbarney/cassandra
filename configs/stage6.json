@@ -1,0 +1,10 @@
+{
+  "split": "development",
+  "draws": 3000,
+  "purpose": "initial_controls_not_model_selection",
+  "methods": [
+    {"method": "historical_mean"},
+    {"method": "seasonal_naive"},
+    {"method": "arima", "order": [0, 1, 0], "trend": "n"}
+  ]
+}

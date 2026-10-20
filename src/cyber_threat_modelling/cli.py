@@ -35,9 +35,30 @@ def main(argv: list[str] | None = None) -> int:
     panel.add_argument("--panel-id", required=True)
     check_panel = commands.add_parser("verify-panels", help="Verify panel and upstream hashes")
     check_panel.add_argument("manifest", type=Path)
+    forecasts = commands.add_parser(
+        "forecast-development", help="Save development-only control forecasts"
+    )
+    forecasts.add_argument("settings", type=Path)
+    forecasts.add_argument("--panel-manifest", type=Path, required=True)
+    forecasts.add_argument("--output", type=Path, required=True)
+    scores = commands.add_parser("score-development", help="Score saved development forecasts")
+    scores.add_argument("run", type=Path)
     args = parser.parse_args(argv)
     root = args.project_root.resolve()
     try:
+        if args.command == "forecast-development":
+            from .evaluation.backtest import forecast_development
+
+            settings = json.loads((root / args.settings).read_text(encoding="utf-8"))
+            print(
+                forecast_development(root, settings, root / args.panel_manifest, root / args.output)
+            )
+            return 0
+        if args.command == "score-development":
+            from .evaluation.backtest import score_development
+
+            print(score_development(root, root / args.run))
+            return 0
         if args.command == "build-panels":
             from .features.build import build_panels
 

@@ -133,5 +133,19 @@ Windows user PATH. Dot-sourcing configures an already-open PowerShell session.
 Full-model runtime and convergence also require assessment before substantial fitting.
 
 Packaging follows the [Python packaging guide](https://packaging.python.org/en/latest/guides/writing-pyproject-toml/).
+
+Stage 6 now provides separate development forecast and scoring commands:
+
+    .\.venv\Scripts\python.exe -m cyber_threat_modelling forecast-development configs/stage6.json --panel-manifest docs/panels/stage5-20261020/panel_manifest.json --output artifacts/backtests/new-development-run
+    .\.venv\Scripts\python.exe -m cyber_threat_modelling score-development artifacts/backtests/new-development-run
+    .\.venv\Scripts\python.exe scripts/check_stage6_ensemble.py --run artifacts/backtests/new-development-run --output artifacts/backtests/new-development-run/ensemble_check.json
+
+The initial run contains historical mean, seasonal naive, and a diagnostic
+ARIMA(0,1,0) candidate. This is not the frozen ARIMA grid selection. Commands
+refuse held-out execution and refuse to overwrite runs or scores. Bayesian
+control adapters are implemented with diagnostic gates; their posterior
+validation and rolling fits remain outstanding. See the
+[category and KEV carry-forward decisions](docs/STAGE6_8_CARRY_FORWARD.md).
+
 Use locked commands to prevent unnoticed dependency resolution changes; see
 [uv locking and syncing](https://docs.astral.sh/uv/concepts/projects/sync/).

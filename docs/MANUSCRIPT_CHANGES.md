@@ -74,3 +74,19 @@ accurately without claiming the period has never been examined in earlier work.
 - NUTS on the continuous posterior; FFBS regime recovery after sampling (§4.5).
 - Hold-last effort projection as the default forecast rule (§4.6).
 - Twelve-month horizon, four outputs (§4.1, §4.6).
+
+## Stage 5 review carried into implementation (2026-10-20)
+
+- Describe the learned categories as vulnerability-description topics. Three of
+  the nine known topics prominently reflect Oracle/Adobe/template wording;
+  they are not established independent mechanisms of malicious activity.
+- Distinguish stable panel IDs from loading-matrix row order. The initial-count
+  order is 8, 2, 6, 1, 4, 9, 3, 5, 7, then unknown (10).
+- Keep unknown in the primary count score, and report its contribution alongside
+  the active stratum. Its observed zero counts inform the count likelihood; a
+  near-zero error on this fallback series is not substantive forecasting evidence.
+- Preserve the 21 unmatched KEV additions. Version G must explicitly choose
+  masking unknown in its KEV likelihood or a separate intercept-only rate that
+  does not depend on the count-linked intensity. The choice remains open.
+
+These requirements are also recorded in [the carry-forward note](STAGE6_8_CARRY_FORWARD.md).
