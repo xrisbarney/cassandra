@@ -30,9 +30,24 @@ def main(argv: list[str] | None = None) -> int:
         "verify-data", help="Verify source and derived artifact hashes"
     )
     check_data.add_argument("manifest", type=Path)
+    panel = commands.add_parser("build-panels", help="Freeze initial topics and monthly panels")
+    panel.add_argument("--data-manifest", required=True, type=Path)
+    panel.add_argument("--panel-id", required=True)
+    check_panel = commands.add_parser("verify-panels", help="Verify panel and upstream hashes")
+    check_panel.add_argument("manifest", type=Path)
     args = parser.parse_args(argv)
     root = args.project_root.resolve()
     try:
+        if args.command == "build-panels":
+            from .features.build import build_panels
+
+            print(build_panels(root, args.data_manifest, args.panel_id))
+            return 0
+        if args.command == "verify-panels":
+            from .features.build import verify_panels
+
+            print(json.dumps(verify_panels(root, root / args.manifest), indent=2))
+            return 0
         if args.command == "audit-data":
             from .data.audit import COMPONENTS, finalize_audit, run_audit
 

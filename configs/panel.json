@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "training_start": "2010-01",
+  "training_end": "2018-12",
+  "panel_start": "2010-01",
+  "panel_end": "2025-12",
+  "learned_topics": 9,
+  "seed": 20261020,
+  "vectorizer": {
+    "lowercase": true,
+    "strip_accents": "unicode",
+    "stop_words": "english",
+    "token_pattern": "(?u)\\b[a-zA-Z][a-zA-Z_]{1,}\\b",
+    "ngram_range": [1, 2],
+    "min_df": 5,
+    "max_df": 0.95,
+    "max_features": 20000,
+    "sublinear_tf": true,
+    "norm": "l2"
+  },
+  "nmf": {
+    "init": "nndsvda",
+    "solver": "cd",
+    "beta_loss": "frobenius",
+    "tol": 0.0001,
+    "max_iter": 1000,
+    "alpha_W": 0.0,
+    "alpha_H": 0.0,
+    "l1_ratio": 0.0,
+    "shuffle": false
+  },
+  "transform_batch_size": 4096,
+  "threads": 1,
+  "active_min_assignments": 50,
+  "active_min_nonzero_months": 24,
+  "cvss_version_order": ["4.0", "3.1", "3.0", "2.0"],
+  "severity_clip": [0.05, 9.95],
+  "epss_clip": [0.0001, 0.9999]
+}

@@ -209,7 +209,7 @@ For final fits, assess:
 - Prior and posterior predictive behavior.
 - Runtime and peak memory.
 
-Benchmark a representative fit early, then estimate the cost of all backtest origins and ablations. Use a reduced development schedule if necessary, and freeze the final schedule before evaluating the test set.
+Benchmark a representative fit early, then estimate the cost of all backtest origins and ablations. Separate graph construction/compilation, cold versus warm cache, worker startup, warmup, retained sampling, diagnostics and serialization; report wall time and per-chain sampling time. Multiply fixed and variable costs separately across the 60 development and 24 evaluation origins and the candidate configurations. Stage 7 supplies the first real model timing evidence; the two-observation compiler probe is only a toolchain check. Use the frozen screening schedule for development; any change to the main origin schedule requires a dated protocol amendment before held-out score access.
 
 **Deliverable:** a documented inference configuration and an affordable experiment budget.
 
