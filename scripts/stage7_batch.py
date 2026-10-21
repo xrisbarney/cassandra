@@ -20,6 +20,7 @@ def main():
     parser.add_argument('--root', type=Path, required=True)
     parser.add_argument('--workers', type=int, choices=[1, 2, 3], default=2)
     parser.add_argument('--exclude', nargs='*', default=[])
+    parser.add_argument('--center-factors', action='store_true')
     args = parser.parse_args()
     args.root.mkdir(parents=True, exist_ok=True)
     jobs = [(name, seed) for name in SCENARIOS for seed in (7101, 7102, 7103)
@@ -38,10 +39,13 @@ def main():
             return {'scenario': name, 'seed': seed, 'status': record['status'], 'resumed': True}
         log = args.root / f'{name}-{seed}.log'
         with log.open('xb') as stream:
-            process = subprocess.run([
+            command = [
                 sys.executable, '-u', 'scripts/run_stage7.py', '--scenario', name,
                 '--seed', str(seed), '--output', str(folder),
-            ], stdout=stream, stderr=subprocess.STDOUT)
+            ]
+            if args.center_factors:
+                command.append('--center-factors')
+            process = subprocess.run(command, stdout=stream, stderr=subprocess.STDOUT)
         record = json.loads((folder / 'result.json').read_text()) if (
             folder / 'result.json'
         ).exists() else {'status': 'execution_failed'}

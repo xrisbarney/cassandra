@@ -195,3 +195,20 @@ def test_regime_model_native_numba_gradient_and_independent_emission_enumeration
     e, p = fn(point)
     exact, _ = enumerate_hmm(e, np.log(p))
     assert np.allclose(model.compile_logp(vars=model.potentials)(point), exact)
+
+
+def test_centered_factor_prior_matches_stationary_gaussian_covariance():
+    data, truth, options = generate('factors_sparse', 7101)
+    for name in data:
+        data[name] = data[name][:4]
+    options['months'], options['factor_parameterization'] = 4, 'centered'
+    model = build_model(data, options, truth)
+    point = model.initial_point()
+    point['f_states'] = np.array([[.2], [-.3], [.1], [.7], [.5]])
+    phi = .4
+    covariance = phi ** np.abs(np.arange(5)[:, None] - np.arange(5)) / (1 - phi**2)
+    expected = multivariate_normal.logpdf(point['f_states'][:, 0], np.zeros(5), covariance)
+    actual = model.compile_logp(vars=[model['f_state_prior']])(point)
+    assert np.allclose(actual, expected, atol=1e-10)
+    native = model.compile_dlogp()(point)
+    assert np.allclose(model.compile_dlogp(mode='NUMBA')(point), native, atol=1e-8)

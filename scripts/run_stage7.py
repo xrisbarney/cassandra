@@ -48,11 +48,13 @@ def main():
     parser.add_argument('--scenario', choices=SCENARIOS, required=True)
     parser.add_argument('--seed', type=int, choices=[7101, 7102, 7103], required=True)
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--center-factors', action='store_true')
     args = parser.parse_args()
     root = Path(__file__).resolve().parents[1]
     folder = args.output.resolve()
     folder.mkdir(parents=True, exist_ok=False)
     data, truth, options = generate(args.scenario, args.seed)
+    options['factor_parameterization'] = 'centered' if args.center_factors else 'innovations'
     effort = None
     if args.scenario == 'effort_proxy':
         data['effort'], effort = fitted_effort(data['N'], data['mask_N'].all(axis=1))

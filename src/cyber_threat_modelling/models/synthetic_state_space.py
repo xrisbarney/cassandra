@@ -22,10 +22,21 @@ def loading_matrix(prefix, categories, rank):
     return pt.set_subtensor(matrix[rows, cols], free)
 
 
-def factors(prefix, categories, rank, months):
+def factors(prefix, categories, rank, months, parameterization='innovations'):
     phi = pm.Uniform(prefix + "_phi", -1, 1, shape=rank, initval=np.full(rank, 0.4))
-    innovations = pm.Normal(prefix + "_innovations", 0, 1, shape=(rank, months + 1))
-    states = pm.Deterministic(prefix + "_states", ar1_transform(innovations, phi).T)
+    if parameterization == 'centered':
+        # The Flat base measure plus this normalized AR density is exactly the
+        # same stationary Gaussian prior. Its density remains outside the HMM.
+        states = pm.Flat(prefix + '_states', shape=(months + 1, rank),
+                         initval=np.zeros((months + 1, rank)))
+        initial = pm.logp(pm.Normal.dist(0, 1 / pt.sqrt(1 - phi**2)), states[0]).sum()
+        transitions = pm.logp(pm.Normal.dist(phi * states[:-1], 1), states[1:]).sum()
+        pm.Potential(prefix + '_state_prior', initial + transitions)
+    elif parameterization == 'innovations':
+        innovations = pm.Normal(prefix + "_innovations", 0, 1, shape=(rank, months + 1))
+        states = pm.Deterministic(prefix + "_states", ar1_transform(innovations, phi).T)
+    else:
+        raise ValueError('Unknown factor coordinates.')
     matrix = loading_matrix(prefix, categories, rank)
     contribution = pm.Deterministic(prefix + "_contribution", states[1:] @ matrix.T)
     return contribution
@@ -55,7 +66,8 @@ def build_model(data, options, conditional=None):
         psi = pm.LogNormal("psi", np.log(10), 1, shape=k, initval=np.full(k, 10))
         base = pt.broadcast_to(m, (t, k))
         if rank:
-            base = base + factors("f", k, rank, t)
+            base = base + factors("f", k, rank, t,
+                                  options.get('factor_parameterization', 'innovations'))
         if options["residual"] != "none":
             tau = pm.Deterministic("tau", 0.01 + pm.HalfNormal("tau_excess", 1, shape=k))
             if options["residual"] == "iid":
@@ -96,7 +108,8 @@ def build_model(data, options, conditional=None):
         emissions = add_masked(emissions, nterm, months)
         if options["severity_factors"]:
             n = hierarchical_level("n", k, 1, 1, 1, np.ones(k))
-            loc = n + factors("h", k, options["severity_factors"], t)
+            loc = n + factors("h", k, options["severity_factors"], t,
+                              options.get('factor_parameterization', 'innovations'))
             kappa = pm.HalfNormal("kappa", 0.5, shape=k, initval=np.full(k, 0.3))
             # This fixture has R=1. Severity-regime shifts get separate component tests.
             loc = pm.Deterministic("severity_location", loc)
