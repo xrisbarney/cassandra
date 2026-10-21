@@ -4,6 +4,7 @@ import argparse
 import time
 from pathlib import Path
 
+import numpy as np
 import nutpie
 import pandas as pd
 
@@ -16,6 +17,9 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("method", choices=["pooled_nb", "independent_nb_ar1"])
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--center-prefix", type=int)
+    parser.add_argument("--low-rank", action="store_true")
+    parser.add_argument("--center-categories", type=int, nargs="+")
     args = parser.parse_args()
     args.output.mkdir(parents=True, exist_ok=False)
     root = Path(__file__).resolve().parents[1]
@@ -23,6 +27,16 @@ def main():
         pd.read_parquet(root / "data/processed/stage5-20261020/topic_month.parquet")
     )
     model = build_model(training_prefix(wide, "2018-12"), counts[:108], args.method)
+    if args.center_prefix is not None or args.center_categories is not None:
+        from cyber_threat_modelling.models.independent_geometry import build_conditioned_model
+
+        model = build_conditioned_model(
+            training_prefix(wide, "2018-12"),
+            counts[:108],
+            center_states=np.array(args.center_categories) - 1
+            if args.center_categories is not None
+            else np.arange(args.center_prefix),
+        )
     start = time.perf_counter()
     compiled = nutpie.compile_pymc_model(model, backend="numba")
     compile_seconds = time.perf_counter() - start
@@ -38,6 +52,11 @@ def main():
         target_accept=0.95,
         maxdepth=12,
         progress_bar=False,
+        **(
+            {"low_rank_modified_mass_matrix": True, "mass_matrix_eigval_cutoff": 3.0}
+            if args.low_rank
+            else {}
+        ),
     )
     sample_seconds = time.perf_counter() - start
     write_json(
@@ -49,7 +68,10 @@ def main():
     table.to_csv(args.output / "diagnostics.csv")
     result = {
         "method": args.method,
-        "backend": "nutpie 0.15.2, numba, diagonal gradient-based mass adaptation",
+        "backend": "nutpie 0.15.2, numba",
+        "mass_adaptation": "low rank, eigenvalue cutoff 3"
+        if args.low_rank
+        else "gradient diagonal",
         "compile_seconds": compile_seconds,
         "sample_seconds": sample_seconds,
         "diagnostics": diag,

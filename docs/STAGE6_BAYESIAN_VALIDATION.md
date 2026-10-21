@@ -42,6 +42,83 @@ documentation also describes `pullback` APIs.
 
 ## Checks and execution
 
+### Independent-control geometry investigation (2026-10-21)
+
+The first non-centered four-chain probe exhausted the frozen retry budgets with
+remaining divergences. Its final attempt had six divergences despite a maximum
+R-hat near 1.006; those draws are rejected. A separate dense-metric probe on the
+most persistent populated category also failed chain agreement. Neither a small
+R-hat nor zero divergences alone establishes acceptance. Failed probe artifacts
+are retained under `artifacts/stage6-completion/` and are not forecast results.
+
+The methodological basis for the follow-up is that centered and non-centered
+coordinates are complementary, with their performance depending on the
+information in the observations. See
+[Papaspiliopoulos, Roberts and Sköld (2007)](https://doi.org/10.1214/088342307000000014)
+and the [Stan efficiency guidance](https://mc-stan.org/docs/stan-users-guide/efficiency-tuning.html).
+The latter also distinguishes constant posterior correlation, which a mass
+matrix can address, from varying curvature, which may require different
+coordinates. PyMC documents diagonal and dense adaptation in
+[`init_nuts`](https://www.pymc.io/projects/docs/en/stable/api/generated/pymc.init_nuts.html);
+the installed implementation, rather than an unpinned online API, determines
+the actual calls. These references motivate computational investigations; they
+do not guarantee that this particular control will pass its diagnostic gates.
+
+For exact initial-state conditioning, let `m0=log(initial_mean+0.5)` and
+`s²=tau²/(1-phi²)`. The original law is `m~N(m0,4)`, independently
+`u0~N(0,s²)`, with `eta0=m+u0`. Equivalently,
+
+`eta0 ~ N(m0,4+s²)`;
+
+`m | eta0,tau,phi ~ N(m0+4/(4+s²)*(eta0-m0), 4*s²/(4+s²))`.
+
+Sample the conditional residual as a standard Normal and propagate subsequent
+states with the original independent standard-Normal innovations. This centers
+the initial observable log intensity while leaving subsequent innovations
+non-centered. No stationary tail, coefficient prior, likelihood, or forecast
+law changes. Analytic covariance tests reconstruct the independent original
+`(m,u0)` prior for positive, negative and near-unit persistence; native and
+Numba gradients are compared at perturbed coordinates. This representation is
+being probed before production admission.
+
+The independent control's joint posterior factorizes by category, because all
+its priors and observations do. Separate category fits therefore target the
+same posterior law, and permit independent step-size/mass adaptation. They do
+not permit accepting a panel when any category fails. The implementation test
+compares the joint log density with the sum of single-category log densities.
+This factorization would not be valid for the pooled or proposed factor model.
+
+Additional initial-window probes show why a single centered/non-centered choice
+for the entire panel is insufficient. Initial-state conditioning with innovation
+coordinates passes the all-zero category's gate (four chains, no divergences,
+maximum R-hat 1.0067, minimum bulk/tail ESS 2038/1118). Centering subsequent states
+passes the strongly persistent category 8's gate (R-hat 1.0070, ESS 644/1464,
+zero divergences). But centering the first eight or nine categories jointly
+fails: several innovation scales mix poorly. These joint attempts are rejected,
+including the zero-divergence nutpie attempt whose BFMI and ESS fail.
+
+The next exact representation centers only category 8 and keeps all other
+categories in innovation coordinates, with initial-state conditioning for all.
+The split uses initial-window posterior geometry only. It must still pass the
+full-panel and rolling-origin gates. Centered transition states are represented
+by a flat base measure plus the complete normalized Gaussian transition log
+density; this is the original proper AR prior, not a replacement flat state
+prior. Tests compare centered and non-centered log densities with the exact
+`(T-1)*sum(log(tau))` Jacobian and compare native/Numba derivatives. Basic slices
+and concatenation preserve the original category order without an object-mode
+Numba fallback.
+
+The backend investigation includes nutpie's diagonal and low-rank covariance
+adaptations, at the same four-chain 1000/1000 initial budget. The low-rank probe
+uses eigenvalue cutoff 3 and default regularization 1e-5; it is experimental in
+the installed nutpie 0.15.2 API. The current
+[official sampling guide](https://pymc-devs.github.io/nutpie/sampling-options.html)
+describes its purpose and a cutoff-3 example, but uses a newer argument name.
+Code follows the installed version's `low_rank_modified_mass_matrix` argument.
+No backend or coordinate variant is accepted on speed alone, and no forecasting
+score is consulted for these choices. Exploratory scripts changed during this
+investigation; production evidence must come from a separately source-pinned run.
+
 Every production fit retains four chains and the frozen warmup/draw/retry
 budgets. Persistent outer workers run independent origins; each worker executes
 the four chains sequentially to avoid repeatedly launching Windows sampling

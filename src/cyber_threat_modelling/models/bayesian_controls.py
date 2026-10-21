@@ -29,22 +29,20 @@ def build_model(train, initial_counts, method):
     if y.ndim != 2 or initial.ndim != 2 or initial.shape[1] != y.shape[1]:
         raise ValueError("Incompatible training and initial-prior anchor arrays.")
     t, k = y.shape
+    if method == "independent_nb_ar1":
+        from .independent_geometry import build_conditioned_model
+
+        # Frozen Stage 5 row order: category 8 is the strongly informed persistent
+        # series. Other states use innovations. This is an exact coordinate choice
+        # from initial-window diagnostics, not forecast-score tuning.
+        centered = (
+            np.array([7], dtype=int) if k > 7 and initial[:, 7].sum() else np.array([], dtype=int)
+        )
+        return build_conditioned_model(y, initial, center_states=centered)
     with pm.Model(coords={"category": np.arange(k), "month": np.arange(t)}) as model:
         log_psi = pm.Normal("log_psi", 0, 1, dims="category")
         psi = pm.Deterministic("psi", pt.exp(log_psi), dims="category")
-        if method == "independent_nb_ar1":
-            from .ar1_transform import ar1_transform
-
-            m = pm.Normal("m", np.log(initial.mean(axis=0) + 0.5), 2, dims="category")
-            tau = pm.HalfNormal("tau", 0.3, dims="category")
-            phi = pm.Uniform("phi", -1, 1, dims="category")
-            innovations = pm.Normal("innovations", 0, 1, shape=(k, t), dims=("category", "month"))
-            unit = pm.Deterministic(
-                "unit_state", ar1_transform(innovations, phi), dims=("category", "month")
-            )
-            eta = m[:, None] + tau[:, None] * unit
-            pm.Deterministic("terminal_u", tau * unit[:, -1], dims="category")
-        elif method == "pooled_nb":
+        if method == "pooled_nb":
             # Exact Gaussian reparameterization: eliminate the b0/b ridge from
             # the likelihood and center time, without changing any prior/law.
             center = (t - 1) / 24

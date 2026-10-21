@@ -29,6 +29,93 @@ def test_centered_pooled_parameterization_preserves_frozen_joint_prior():
     assert np.max(np.abs(np.cov(recovered, rowvar=False) - np.diag([4] + [1] * k + [0.25]))) < 0.04
 
 
+@pytest.mark.parametrize("tau,phi", [(0.01, 0), (0.3, 0.999), (0.3, -0.95), (0.5, 0.7)])
+def test_initial_conditioning_preserves_original_gaussian_prior(tau, phi):
+    from cyber_threat_modelling.models.independent_geometry import initial_conditioning
+
+    variance, weight, conditional = initial_conditioning(tau, phi)
+    # Linear transform from independent (initial_eta, conditional m residual).
+    matrix = np.array([[weight, 1], [1 - weight, -1]])
+    recovered = matrix @ np.diag([variance, conditional]) @ matrix.T
+    assert np.allclose(recovered, np.diag([4, tau**2 / (1 - phi**2)]), atol=1e-12)
+
+
+def test_initial_conditioning_density_and_gradient():
+    from cyber_threat_modelling.models.independent_geometry import build_conditioned_model
+
+    y = np.column_stack([np.arange(8), np.zeros(8)])
+    model = build_conditioned_model(y, y[:4])
+    point = model.initial_point()
+    rng = np.random.default_rng(519)
+    point = {key: value + rng.normal(0, 0.2, size=value.shape) for key, value in point.items()}
+    native = model.compile_dlogp()(point)
+    assert np.isfinite(native).all()
+    assert np.allclose(model.compile_dlogp(mode="NUMBA")(point), native, rtol=1e-9, atol=1e-9)
+
+
+def test_independent_joint_density_equals_sum_of_category_densities():
+    from cyber_threat_modelling.models.independent_geometry import build_conditioned_model
+
+    y = np.column_stack([np.arange(8), np.zeros(8)])
+    joint = build_conditioned_model(y, y[:4])
+    point = joint.initial_point()
+    rng = np.random.default_rng(51)
+    point = {key: value + rng.normal(0, 0.2, size=value.shape) for key, value in point.items()}
+    separate = 0.0
+    for j in range(2):
+        model = build_conditioned_model(y[:, j : j + 1], y[:4, j : j + 1])
+        separate += model.compile_logp()({key: value[j : j + 1] for key, value in point.items()})
+    assert np.allclose(joint.compile_logp()(point), separate, rtol=1e-12, atol=1e-12)
+
+
+@pytest.mark.parametrize("centered", [[0], [1], [0, 1]])
+def test_centered_state_density_has_exact_change_of_variables(centered):
+    from scipy.special import expit
+
+    from cyber_threat_modelling.models.ar1_transform import transform
+    from cyber_threat_modelling.models.independent_geometry import (
+        build_conditioned_model,
+        initial_conditioning,
+    )
+
+    y = np.column_stack([np.arange(8), np.zeros(8)])
+    noncentered = build_conditioned_model(y, y[:4])
+    point = noncentered.initial_point()
+    rng = np.random.default_rng(84)
+    point = {key: value + rng.normal(0, 0.2, size=value.shape) for key, value in point.items()}
+    tau = np.exp(point["tau_log__"])
+    phi = 2 * expit(point["phi_interval__"]) - 1
+    _, weight, variance = initial_conditioning(tau, phi)
+    m0 = np.log(y[:4].mean(axis=0) + 0.5)
+    m = m0 + weight * (point["initial_eta"] - m0) + np.sqrt(variance) * point["m_residual"]
+    states = (
+        transform(
+            np.column_stack(
+                [
+                    (point["initial_eta"] - m) * np.sqrt(1 - phi**2),
+                    tau[:, None] * point["innovations"],
+                ]
+            ),
+            phi,
+        )
+        + m[:, None]
+    )
+    changed = {key: value for key, value in point.items() if key != "innovations"}
+    changed["future_eta"] = states[centered, 1:]
+    remaining = [j for j in range(2) if j not in centered]
+    if remaining:
+        changed["innovations"] = point["innovations"][remaining]
+    model = build_conditioned_model(y, y[:4], center_states=centered)
+    assert np.allclose(
+        model.compile_logp()(changed),
+        noncentered.compile_logp()(point) - 7 * np.log(tau[centered]).sum(),
+        atol=1e-10,
+    )
+    native = model.compile_dlogp()(changed)
+    assert np.isfinite(native).all()
+    assert np.allclose(model.compile_dlogp(mode="NUMBA")(changed), native, atol=1e-9, rtol=1e-9)
+
+
 @pytest.mark.parametrize("method", ["pooled_nb", "independent_nb_ar1"])
 def test_bayesian_graph_has_finite_logp_and_gradient(method):
     y = np.column_stack([np.arange(8), np.zeros(8)])
