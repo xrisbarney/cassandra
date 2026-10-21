@@ -139,8 +139,15 @@ def main():
                 record = timing.setdefault(str(draw.chain), {'first_draw_seconds': elapsed})
                 if not draw.tuning and 'first_retained_seconds' not in record:
                     record['first_retained_seconds'] = elapsed
-                if draw.is_last:
-                    record['last_draw_seconds'] = elapsed
+                # The installed callback's is_last flag compares i == draws
+                # inside range(draws), so record the latest time explicitly.
+                record['last_draw_seconds'] = elapsed
+                phase = 'warmup' if draw.tuning else 'retained'
+                for clock in ('perf_counter_diff', 'process_time_diff'):
+                    key = f'{phase}_{clock}_sum'
+                    record[key] = record.get(key, 0.) + sum(
+                        float(stat[clock]) for stat in draw.stats
+                    )
                 if (draw.draw_idx + 1) % 500 == 0:
                     print(args.scenario, args.seed, retry, draw.chain, draw.draw_idx + 1,
                           flush=True)
