@@ -23,21 +23,50 @@ def development_origins():
 
 
 def validate_settings(settings):
-    require_keys(settings, {"split", "draws", "methods", "purpose"}, "backtest")
+    keys = {"split", "draws", "methods", "purpose"}
+    if settings.get("purpose") == "arima_finalist_selection":
+        keys.add("screening_record")
+    require_keys(settings, keys, "backtest")
     if settings["split"] != "development":
         raise ValueError(
             "Held-out execution is locked pending development selection and validation."
         )
-    if settings["draws"] != 3000 or settings["purpose"] != "initial_controls_not_model_selection":
+    if settings["draws"] != 3000 or settings["purpose"] not in (
+        "initial_controls_not_model_selection",
+        "arima_finalist_selection",
+    ):
         raise ValueError(
             "Initial controls require 3000 paths and the documented diagnostic purpose."
         )
     if not isinstance(settings["methods"], list) or not settings["methods"]:
         raise ValueError("Specify at least one frozen baseline.")
     names = [method_id(spec) for spec in settings["methods"]]
+    if settings["purpose"] == "arima_finalist_selection":
+        require_keys(settings["screening_record"], {"path", "sha256"}, "screening_record")
+        if len(names) != 2 or any(s["method"] != "arima" for s in settings["methods"]):
+            raise ValueError("Finalist evaluation requires the two screened ARIMA candidates.")
     if len(names) != len(set(names)):
         raise ValueError("Duplicate baseline settings.")
     return names
+
+
+def verify_finalists(root, settings):
+    if settings["purpose"] != "arima_finalist_selection":
+        return
+    ref = settings["screening_record"]
+    path = artifact_path(root, ref["path"])
+    if file_hash(path) != ref["sha256"]:
+        raise ValueError("The screening selection record changed.")
+    record = json.loads(path.read_text())
+    verify_artifacts(path.parent, record)
+    if (
+        record["status"] != "screen_complete"
+        or record["candidates"] != 65
+        or record["origins_per_candidate"] != 20
+        or record["finalists"] != [method_id(s) for s in settings["methods"]]
+        or record["held_out_scoring_enabled"]
+    ):
+        raise ValueError("Settings do not match the frozen ARIMA screening result.")
 
 
 def count_matrix(panel):
@@ -133,6 +162,7 @@ def forecast_development(root, settings, panel_manifest, output, workers=1):
     if type(workers) is not int or not 1 <= workers <= 4:
         raise ValueError("Use one to four independent origin workers.")
     names = validate_settings(settings)
+    verify_finalists(root, settings)
     amendment = None
     if any(spec["method"] == "arima" for spec in settings["methods"]):
         amendment = verify_zero_series_amendment(root, required=True)

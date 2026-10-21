@@ -128,6 +128,39 @@ def test_heldout_and_unapproved_settings_locked():
         validate_settings({**settings, "draws": 20})
 
 
+def test_finalists_bound_to_verified_screening_record(tmp_path):
+    from cyber_threat_modelling.evaluation.backtest import verify_finalists
+
+    specs = [
+        {"method": "arima", "order": [2, 1, 1], "trend": "n"},
+        {"method": "arima", "order": [3, 1, 1], "trend": "t"},
+    ]
+    record = {
+        "status": "screen_complete",
+        "candidates": 65,
+        "origins_per_candidate": 20,
+        "finalists": ["arima_2_1_1_n", "arima_3_1_1_t"],
+        "held_out_scoring_enabled": False,
+        "artifacts": {},
+    }
+    path = tmp_path / "selection.json"
+    path.write_text(json.dumps(record))
+    settings = {
+        "split": "development",
+        "draws": 3000,
+        "methods": specs,
+        "purpose": "arima_finalist_selection",
+        "screening_record": {"path": path.name, "sha256": file_hash(path)},
+    }
+    assert validate_settings(settings) == record["finalists"]
+    verify_finalists(tmp_path, settings)
+    with pytest.raises(ValueError, match="screening result"):
+        verify_finalists(tmp_path, {**settings, "methods": list(reversed(specs))})
+    path.write_text("{}")
+    with pytest.raises(ValueError, match="changed"):
+        verify_finalists(tmp_path, settings)
+
+
 def test_artifact_corruption_and_path_escape_refused(tmp_path):
     path = tmp_path / "forecast.json"
     path.write_text(json.dumps({"saved": True}))

@@ -1,0 +1,29 @@
+{
+  "split": "development",
+  "draws": 3000,
+  "purpose": "arima_finalist_selection",
+  "methods": [
+    {
+      "method": "arima",
+      "order": [
+        2,
+        1,
+        1
+      ],
+      "trend": "n"
+    },
+    {
+      "method": "arima",
+      "order": [
+        3,
+        1,
+        1
+      ],
+      "trend": "t"
+    }
+  ],
+  "screening_record": {
+    "path": "artifacts/backtests/stage6-arima-screen-20261021/selection.json",
+    "sha256": "6a3134c87beeb136927abd0588c06cc33f4c90dbf88da434edc4d414a286dc64"
+  }
+}
