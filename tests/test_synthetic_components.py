@@ -6,7 +6,7 @@ import pytensor.tensor as pt
 import pytest
 from scipy.integrate import quad
 from scipy.special import logsumexp
-from scipy.stats import nbinom
+from scipy.stats import multivariate_normal, nbinom, norm
 
 from cyber_threat_modelling.evaluation.synthetic import generate
 from cyber_threat_modelling.inference.hmm import forward, forward_backward, hmm_logp, recover
@@ -118,7 +118,7 @@ def test_count_likelihood_independent_oracle_and_no_double_counted_prior():
     data, truth, options = generate("independent", 7101)
     model = build_model(data, options, truth)
     point = model.initial_point()
-    m = point['m_mean'] + np.exp(point['m_sd_log__']) * point['m_raw']
+    m = point['m']
     psi = np.exp(point['psi_log__'])
     expected = nbinom.logpmf(data['N'], psi, psi / (psi + np.exp(m))).sum()
     actual = model.compile_logp(vars=model.potentials)(point)
@@ -126,6 +126,24 @@ def test_count_likelihood_independent_oracle_and_no_double_counted_prior():
     full = model.compile_logp()(point)
     prior = model.compile_logp(vars=model.free_RVs)(point)
     assert np.allclose(full, prior + expected, atol=1e-8)
+
+
+def test_collapsed_hierarchical_level_matches_integrated_original_prior():
+    levels, sd = np.array([0.3, 1.2, -0.8, 0.5]), 1.6
+    integrated = quad(
+        lambda mean: norm.pdf(mean, 0, 3) * np.prod(norm.pdf(levels, mean, sd)),
+        -30, 30, epsabs=1e-13,
+    )[0]
+    covariance = sd**2 * np.eye(4) + 9 * np.ones((4, 4))
+    expected = multivariate_normal.logpdf(levels, np.zeros(4), covariance)
+    assert np.allclose(np.log(integrated), expected, atol=1e-10)
+    data, truth, options = generate('independent', 7101)
+    model = build_model(data, options, truth)
+    point = model.initial_point()
+    point['m'] = levels
+    point['m_sd_log__'] = np.log(sd)
+    actual = model.compile_logp(vars=[model['m']])(point)
+    assert np.allclose(actual, expected, atol=1e-10)
 
 
 def test_masked_invalid_values_never_enter_likelihood_or_gradient():

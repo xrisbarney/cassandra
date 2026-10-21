@@ -32,10 +32,12 @@ def factors(prefix, categories, rank, months):
 
 
 def hierarchical_level(prefix, categories, center, hyper_sd, scale_sd, init):
-    mean = pm.Normal(prefix + "_mean", center, hyper_sd, initval=float(np.mean(init)))
+    # Integrate the Gaussian group mean exactly. The marginal covariance is
+    # s^2 I + hyper_sd^2 11'; this preserves the frozen hierarchical prior while
+    # avoiding a likelihood ridge between a group mean and standardized levels.
     sd = pm.HalfNormal(prefix + "_sd", scale_sd, initval=1)
-    raw = pm.Normal(prefix + "_raw", 0, 1, shape=categories, initval=init - np.mean(init))
-    return pm.Deterministic(prefix, mean + sd * raw)
+    covariance = sd**2 * np.eye(categories) + hyper_sd**2 * np.ones((categories, categories))
+    return pm.MvNormal(prefix, mu=np.full(categories, center), cov=covariance, initval=init)
 
 
 def build_model(data, options, conditional=None):
@@ -84,7 +86,7 @@ def build_model(data, options, conditional=None):
         nterm = pm.logp(
             pm.NegativeBinomial.dist(
                 mu=pt.exp(eta[months, :, cats] + data["effort"][months, None]),
-                alpha=psi[cats, None],
+                alpha=psi[cats][:, None],
             ), data["N"][months, cats, None],
         )
         emissions = add_masked(emissions, nterm, months)
@@ -96,8 +98,8 @@ def build_model(data, options, conditional=None):
             loc = pm.Deterministic("severity_location", loc)
             months, cats = np.where(data["mask_B"])
             term = symbolic_mark_logp(
-                data["B"][months, cats, None], loc[months, cats, None],
-                kappa[cats, None], upper=10, epsilon=0.005,
+                data["B"][months, cats, None], loc[months, cats][:, None],
+                kappa[cats][:, None], upper=10, epsilon=0.005,
             )
             emissions = add_masked(emissions, term, months)
         if options["known_auxiliary_coefficients"]:

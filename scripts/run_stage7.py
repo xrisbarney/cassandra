@@ -87,8 +87,14 @@ def main():
         diagnostics, table = diagnostic_report(idata, depth)
         diagnostic_seconds = time.perf_counter() - start
         messages = list(dict.fromkeys(str(w.message) for w in caught))
-        unresolved = [m for m in messages if not m.startswith(
-            'PyTensor could not link to a BLAS installation.')]
+        # These narrowly identified messages describe execution speed, not a
+        # numerical failure. Native/NUMBA value and gradient agreement is tested.
+        performance = [m for m in messages if (
+            m.startswith('PyTensor could not link to a BLAS installation.')
+            or m.startswith("Numba will use object mode to run AdvancedIncSubtensor's")
+            or 'np.dot() is faster on contiguous arrays' in m
+        )]
+        unresolved = [m for m in messages if m not in performance]
         accepted = diagnostics['accepted'] and not unresolved
         table.to_csv(folder / f'diagnostics_{retry}.csv')
         start = time.perf_counter()
@@ -102,7 +108,8 @@ def main():
             'graph_seconds': graph_seconds, 'step_compile_seconds': compile_seconds,
             'sample_call_seconds': sample_seconds, 'chain_wall_markers': timing,
             'diagnostic_seconds': diagnostic_seconds, 'serialization_seconds': serialization,
-            'warnings': messages, 'unresolved_warnings': unresolved,
+            'warnings': messages, 'performance_warnings': performance,
+            'unresolved_warnings': unresolved,
         }
         write_json(folder / f'attempt_{retry}.json', attempt)
         attempts.append(attempt)
