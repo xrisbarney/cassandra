@@ -15,6 +15,20 @@ from cyber_threat_modelling.models.components import fitted_effort
 from cyber_threat_modelling.provenance import file_hash, git_revision
 
 
+class IrrecoverableSamplingGate(RuntimeError):
+    """A retained divergence/depth hit makes this attempt ineligible permanently."""
+
+
+def retained_failure(stats, tuning, depth):
+    if tuning:
+        return None
+    divergences = sum(bool(s.get('diverging', False)) for s in stats)
+    saturations = sum(int(s.get('depth', 0)) >= depth for s in stats)
+    return {'divergences': divergences, 'tree_depth_saturations': saturations} if (
+        divergences or saturations
+    ) else None
+
+
 def peak_memory_bytes():
     """Process peak working set on Windows; unavailable platforms are explicit."""
     if os.name != 'nt':
@@ -110,7 +124,7 @@ def main():
     budgets = [(1000, 1000, .95, 12), (2000, 1000, .99, 15), (2000, 2000, .99, 15)]
     attempts = []
     for retry, (warmup, draws, accept, depth) in enumerate(budgets):
-        timing = {}
+        timing, failure = {}, {}
         with model, warnings.catch_warnings(record=True) as caught:
             warnings.simplefilter('always')
             start = time.perf_counter()
@@ -143,6 +157,7 @@ def main():
                 # inside range(draws), so record the latest time explicitly.
                 record['last_draw_seconds'] = elapsed
                 phase = 'warmup' if draw.tuning else 'retained'
+                record[phase + '_draws_completed'] = record.get(phase + '_draws_completed', 0) + 1
                 for clock in ('perf_counter_diff', 'process_time_diff'):
                     key = f'{phase}_{clock}_sum'
                     record[key] = record.get(key, 0.) + sum(
@@ -151,13 +166,33 @@ def main():
                 if (draw.draw_idx + 1) % 500 == 0:
                     print(args.scenario, args.seed, retry, draw.chain, draw.draw_idx + 1,
                           flush=True)
+                reason = retained_failure(draw.stats, draw.tuning, depth)
+                if reason:
+                    failure.update(reason, chain=int(draw.chain), draw_index=int(draw.draw_idx),
+                                   reason='Retained draw failed a zero-tolerance gate.')
+                    # This is a diagnostic checkpoint, never an admitted posterior.
+                    np.savez_compressed(folder/f'failed_state_{retry}.npz', **draw.point)
+                    write_json(folder/f'early_failure_{retry}.json', failure)
+                    raise IrrecoverableSamplingGate(failure['reason'])
 
-            idata = pm.sample(draws=draws, tune=warmup, chains=4, cores=1, step=step,
-                              random_seed=args.seed + retry, initvals=initvals,
-                              callback=callback, progressbar=False)
+            try:
+                idata = pm.sample(draws=draws, tune=warmup, chains=4, cores=1, step=step,
+                                  random_seed=args.seed + retry, initvals=initvals,
+                                  callback=callback, progressbar=False)
+            except IrrecoverableSamplingGate:
+                idata = None
             sample_seconds = time.perf_counter() - start
         start = time.perf_counter()
-        diagnostics, table = diagnostic_report(idata, depth)
+        if idata is None:
+            diagnostics = {
+                'accepted': False, 'all_diagnostics_finite': False,
+                'max_rhat': None, 'min_bulk_ess': None, 'min_tail_ess': None, 'min_bfmi': None,
+                'divergences': failure['divergences'],
+                'tree_depth_saturations': failure['tree_depth_saturations'],
+            }
+            table = None
+        else:
+            diagnostics, table = diagnostic_report(idata, depth)
         diagnostic_seconds = time.perf_counter() - start
         messages = list(dict.fromkeys(str(w.message) for w in caught))
         # These narrowly identified messages describe execution speed, not a
@@ -171,9 +206,11 @@ def main():
                                   m == 'QuadPotentialFullAdapt is an experimental feature']
         unresolved = [m for m in messages if m not in performance + configuration_warnings]
         accepted = diagnostics['accepted'] and not unresolved
-        table.to_csv(folder / f'diagnostics_{retry}.csv')
+        if table is not None:
+            table.to_csv(folder / f'diagnostics_{retry}.csv')
         start = time.perf_counter()
-        idata.to_netcdf(folder / f'posterior_{retry}.nc')
+        if idata is not None:
+            idata.to_netcdf(folder / f'posterior_{retry}.nc')
         serialization = time.perf_counter() - start
         attempt = {
             'retry': retry, 'warmup': warmup, 'draws': draws, 'chains': 4, 'cores': 1,
@@ -187,6 +224,7 @@ def main():
             'warnings': messages, 'performance_warnings': performance,
             'sampler_configuration_warnings': configuration_warnings,
             'unresolved_warnings': unresolved,
+            'early_failure': failure or None,
         }
         write_json(folder / f'attempt_{retry}.json', attempt)
         attempts.append(attempt)

@@ -38,11 +38,26 @@ def main():
                       'source_control': run['source_control'],
                       'data_sha256': run['data_sha256'], 'truth_sha256': run['truth_sha256']})
         for attempt in record['attempts']:
+            markers = list(attempt.get('chain_wall_markers', {}).values())
+            measured = bool(markers) and all('warmup_perf_counter_diff_sum' in m for m in markers)
             diagnostics.append({
                 'scenario': name, 'seed': seed, 'retry': attempt['retry'],
-                'accepted': attempt['accepted'], **attempt['diagnostics'],
+                **attempt['diagnostics'], 'accepted': attempt['accepted'],
                 **{k: v for k, v in attempt.items() if k.endswith('_seconds')},
                 'unresolved_warnings': json.dumps(attempt['unresolved_warnings']),
+                'early_terminated': bool(attempt.get('early_failure')),
+                'early_failure': json.dumps(attempt.get('early_failure')),
+                'diagnostic_counts_are_lower_bounds': bool(attempt.get('early_failure')),
+                'peak_working_set_bytes': attempt.get('peak_working_set_bytes'),
+                'warmup_sampler_wall_seconds': sum(
+                    m['warmup_perf_counter_diff_sum'] for m in markers
+                ) if measured else None,
+                'retained_sampler_wall_seconds': sum(
+                    m.get('retained_perf_counter_diff_sum', 0) for m in markers
+                ) if measured else None,
+                'retained_draws_completed': sum(
+                    m.get('retained_draws_completed', 0) for m in markers
+                ) if markers and all('retained_draws_completed' in m for m in markers) else None,
             })
         if record['status'] != 'accepted':
             continue
