@@ -1,0 +1,21 @@
+{
+  "diagnostics": {
+    "accepted": true,
+    "all_diagnostics_finite": true,
+    "divergences": 0,
+    "max_rhat": 1.001498754114897,
+    "min_bfmi": 0.9759850165785361,
+    "min_bulk_ess": 5807.170355469295,
+    "min_tail_ess": 2746.485262056634,
+    "tree_depth_saturations": 0
+  },
+  "max_absolute_covariance_error": 0.031130410776458284,
+  "max_mean_error_in_mcse": 1.1816697972125398,
+  "purpose": "Sampler configuration check, not state-space recovery or performance.",
+  "source_sha256": "acc1823579712f0b8a3d8f5e16a8efedd6e66a7cde91a2e3f812afa1428e41e6",
+  "status": "passed",
+  "warnings": [
+    "QuadPotentialFullAdapt is an experimental feature",
+    "PyTensor could not link to a BLAS installation. Operations that might benefit from BLAS will be severely degraded.\nThis usually happens when PyTensor is installed via pip. We recommend it be installed via conda/mamba/pixi instead.\nAlternatively, you can use an experimental backend such as Numba or JAX that perform their own BLAS optimizations, by setting `pytensor.config.mode == 'NUMBA'` or passing `mode='NUMBA'` when compiling a PyTensor function.\nFor more options and details see https://pytensor.readthedocs.io/en/latest/troubleshooting.html#how-do-i-configure-test-my-blas-library"
+  ]
+}
