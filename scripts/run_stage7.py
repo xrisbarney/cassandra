@@ -8,6 +8,7 @@ import warnings
 from pathlib import Path
 
 import numpy as np
+from threadpoolctl import threadpool_info
 
 from cyber_threat_modelling.data.store import write_json
 from cyber_threat_modelling.evaluation.synthetic import SCENARIOS, generate
@@ -114,6 +115,8 @@ def main():
         'held_out_scoring_enabled': False,
         'prior_amendment': activation,
         'prior_predictive_audit_sha256': file_hash(audit_path),
+        'compute_threadpools': threadpool_info(),
+        'compute_thread_policy': 'One native numerical thread per sequential-chain fit process.',
         'truth_original_coordinates_sha256': file_hash(folder/'truth_original_coordinates.npz'),
     })
     import pymc as pm
@@ -272,4 +275,13 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    # Three outer fit workers should not each claim all eight logical CPUs.
+    # Set defaults for subsequently loaded libraries, then limit loaded BLAS.
+    for variable in ('OPENBLAS_NUM_THREADS', 'OMP_NUM_THREADS', 'MKL_NUM_THREADS',
+                     'NUMBA_NUM_THREADS'):
+        os.environ[variable] = '1'
+    import pymc  # noqa: F401
+    from threadpoolctl import threadpool_limits
+
+    with threadpool_limits(limits=1):
+        main()
