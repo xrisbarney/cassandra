@@ -121,6 +121,8 @@ def main():
         files.append(root/'docs/decisions/STAGE7_SEVERITY_COORDINATES_20261021.md')
     if args.conditional_counts:
         files.append(root/'docs/decisions/STAGE7_COUNT_COORDINATES_20261021.md')
+        if args.scenario in {'effort_oracle', 'effort_none', 'factors_sparse'}:
+            files.append(root/'docs/decisions/STAGE7_MATCHED_COUNT_REPAIRS_20261022.md')
         if not args.dense_mass:
             files.append(root/'docs/decisions/STAGE7_WHITENED_METRIC_20261022.md')
     write_json(folder / 'run.json', {
