@@ -111,7 +111,17 @@ def build_model(data, options, conditional=None):
                 m = hierarchical_level("m", k, 0, 3, 2, np.log(initial_rate + 0.5), revised)
         psi = pm.LogNormal("psi", np.log(10), 1, shape=k, initval=np.full(k, 10))
         base = pt.broadcast_to(m, (t, k))
-        if rank:
+        if options.get('count_parameterization') == 'conditional':
+            if not revised or not rank or r != 1 or options['residual'] != 'none' \
+                    or options['kernel']:
+                raise ValueError('Conditional count coordinates require the factor-only R=1 model.')
+            from .gaussian_coordinates import count_states
+
+            phi_f = pm.Uniform('f_phi', -1, 1, shape=rank, initval=np.full(rank, .4))
+            matrix_f = loading_matrix('f', k, rank, revised, multiplier)
+            base = base + count_states(t, rank, phi_f, matrix_f, m, psi,
+                                       data['N'], data['mask_N'], data['effort'])
+        elif rank:
             base = base + factors("f", k, rank, t,
                                   options.get('factor_parameterization', 'innovations'), revised,
                                   multiplier)

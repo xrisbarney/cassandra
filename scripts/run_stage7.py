@@ -76,6 +76,7 @@ def main():
     parser.add_argument('--dense-mass', action='store_true')
     parser.add_argument('--prior-candidate', choices=CANDIDATES, default='primary')
     parser.add_argument('--conditional-severity', action='store_true')
+    parser.add_argument('--conditional-counts', action='store_true')
     args = parser.parse_args()
     if args.conditional_severity and args.scenario != 'severity_missing':
         parser.error('Conditional severity coordinates apply only to the severity fixture.')
@@ -98,6 +99,8 @@ def main():
     options['prior_candidate'] = args.prior_candidate
     if args.conditional_severity:
         options['severity_parameterization'] = 'conditional'
+    if args.conditional_counts:
+        options['count_parameterization'] = 'conditional'
     options['factor_parameterization'] = ('anchored' if args.anchor_factors else
                                           'centered' if args.center_factors else 'innovations')
     options['mass_matrix'] = 'dense' if args.dense_mass else 'diagonal'
@@ -113,6 +116,8 @@ def main():
         files.append(root/'docs/decisions/STAGE7_AMPLITUDE_COORDINATES_20261021.md')
     if args.conditional_severity:
         files.append(root/'docs/decisions/STAGE7_SEVERITY_COORDINATES_20261021.md')
+    if args.conditional_counts:
+        files.append(root/'docs/decisions/STAGE7_COUNT_COORDINATES_20261021.md')
     write_json(folder / 'run.json', {
         'source_control': git_revision(root), 'options': options, 'effort_fit': effort,
         'pid': os.getpid(), 'source_sha256': {
@@ -262,6 +267,9 @@ def main():
             'diagnostic_seconds': diagnostic_seconds, 'serialization_seconds': serialization,
             'peak_working_set_bytes': peak_memory_bytes(),
             'warnings': messages, 'performance_warnings': performance,
+            'warning_locations': [{'message': str(w.message), 'filename': w.filename,
+                                   'lineno': w.lineno, 'category': w.category.__name__}
+                                  for w in caught],
             'sampler_configuration_warnings': configuration_warnings,
             'unresolved_warnings': unresolved,
             'early_failure': failure or None,

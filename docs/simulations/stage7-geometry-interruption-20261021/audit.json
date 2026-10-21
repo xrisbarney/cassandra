@@ -1,0 +1,64 @@
+{
+  "runs": [
+    {
+      "directory": "artifacts/stage7/sensitivity-v2/level_tight/representative-7101",
+      "status": "interrupted_geometry_comparison",
+      "time_utc": "2026-10-21T21:42:14.317071+00:00",
+      "reason": "Stalled rank-two warmup; preserve partial attempt while verifying exact conditional coordinates.",
+      "decision": "docs/decisions/STAGE7_COUNT_COORDINATES_20261021.md",
+      "counts_as_completed_schedule": false,
+      "replacement_required": true,
+      "artifacts": {
+        "attempt_0.json": "089d14b70e304873b7677658efe8dc39c74dd175a9821aeb08e5752904268a3b",
+        "data.npz": "2f16c14da6f108731a36c429e2d532a6c4f7ab343a4e989a3cda9c5473faef19",
+        "early_failure_0.json": "c7db8941be48c23c8f6927b89ea4bbaa9bd90c2e67d9a705f5175ef113545881",
+        "failed_state_0.npz": "04c5dab1048ad2516425b28a99bd1ff0970a549bf8d92fbea8414e2722533052",
+        "gradient_timing.json": "3570dee856b8975c8c78e3672ee3a36d621cb0f3c660677aedee560b16552e0d",
+        "interruption.json": "5171188fea0c6f6c6ca153a8c2eca8bcf46a1fb564ca0cb06e21671a18105445",
+        "run.json": "3306a4bd3963f880cb5ced59fe84cb46480604b554a82649ffbe05cc20c75b75",
+        "truth.npz": "92e92d139ba48feaf06569b34db715a2fc9c58870b6aeb5a6dbc76f3628945af",
+        "truth_original_coordinates.npz": "9fca1f6c6e33992fe0a0bb22a0599a87ac6aa677385e5b6873808e7e12fd3eec"
+      }
+    },
+    {
+      "directory": "artifacts/stage7/sensitivity-v2/level_wide/representative-7101",
+      "status": "interrupted_geometry_comparison",
+      "time_utc": "2026-10-21T21:42:14.341592+00:00",
+      "reason": "Stalled rank-two warmup; preserve partial attempt while verifying exact conditional coordinates.",
+      "decision": "docs/decisions/STAGE7_COUNT_COORDINATES_20261021.md",
+      "counts_as_completed_schedule": false,
+      "replacement_required": true,
+      "artifacts": {
+        "attempt_0.json": "9c18f4a55c217f6bea443fae8447c3ea9904415854ec483ab9157a21db3eb511",
+        "data.npz": "2f16c14da6f108731a36c429e2d532a6c4f7ab343a4e989a3cda9c5473faef19",
+        "early_failure_0.json": "c1191fc3ad7f10a8cf84e4a62391cda3a4a1b9c76e59bc1b8f38ce5321c6a85f",
+        "failed_state_0.npz": "2952cc8d9742fda386e0de3d5efb6d749a83b00803f6732f7ab5c5508be09dcf",
+        "gradient_timing.json": "afa72a08df959d101921d39c9448d251cdf46b7411bb4da5838fc0f17b043b21",
+        "interruption.json": "df525b1a67c19abadd72ae440d5a295bb4325cb77007b95dd7959c3066c09af5",
+        "run.json": "9d2f2d6dd367a40d5bb66e8026577a90f63682397ad18d4db2769c4755798433",
+        "truth.npz": "92e92d139ba48feaf06569b34db715a2fc9c58870b6aeb5a6dbc76f3628945af",
+        "truth_original_coordinates.npz": "9fca1f6c6e33992fe0a0bb22a0599a87ac6aa677385e5b6873808e7e12fd3eec"
+      }
+    },
+    {
+      "directory": "artifacts/stage7/sensitivity-v2/level_wide/fallback_zero-7101",
+      "status": "interrupted_geometry_comparison",
+      "time_utc": "2026-10-21T21:42:14.399011+00:00",
+      "reason": "Stalled rank-two warmup; preserve partial attempt while verifying exact conditional coordinates.",
+      "decision": "docs/decisions/STAGE7_COUNT_COORDINATES_20261021.md",
+      "counts_as_completed_schedule": false,
+      "replacement_required": true,
+      "artifacts": {
+        "attempt_0.json": "4b6a8eabef9f5dfba37e1fec33eb8476a4b3d8eb3fa2230bc1a1d74f23e94e25",
+        "data.npz": "c6d23bdf858acc4fe9141915fa9d6bbb3314c60843c8e18e1f070bdb26d438cc",
+        "early_failure_0.json": "0a27289d364c258f8bd4e64b73b566cffd74d3db6e61aabb633dc9cfd84a2236",
+        "failed_state_0.npz": "ce979de2632118c1c17cae7efd6fbf20ce28fa162d0f5105b94cecef4a0203eb",
+        "interruption.json": "aa62b0f85ede182651bccb0f76438a1d11c4176a89b034df2b51e1835b4d7a4c",
+        "run.json": "bac7e5ec1d08cb279b9af6c016b066c20211bb5452973f1a7d0b46e64be0019f",
+        "truth.npz": "dac3654db20054410876005868f2f268d33d9d7901bc4a2949a8f4039fd5aafb",
+        "truth_original_coordinates.npz": "b48cdc70e3dff4635810daf06d6b1910d3e03c43d9db27b1745919cdc1186b2a"
+      }
+    }
+  ],
+  "held_out_scoring_enabled": false
+}
