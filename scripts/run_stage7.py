@@ -121,6 +121,8 @@ def main():
         files.append(root/'docs/decisions/STAGE7_SEVERITY_COORDINATES_20261021.md')
     if args.conditional_counts:
         files.append(root/'docs/decisions/STAGE7_COUNT_COORDINATES_20261021.md')
+        if not args.dense_mass:
+            files.append(root/'docs/decisions/STAGE7_WHITENED_METRIC_20261022.md')
     write_json(folder / 'run.json', {
         'source_control': git_revision(root), 'options': options, 'effort_fit': effort,
         'pid': os.getpid(), 'source_sha256': {
@@ -212,6 +214,14 @@ def main():
                     record[key] = record.get(key, 0.) + sum(
                         float(stat[clock]) for stat in draw.stats
                     )
+                if (draw.draw_idx + 1) % 50 == 0:
+                    write_json(folder/'heartbeat.json', {
+                        'retry': retry, 'chain': int(draw.chain),
+                        'draw_index': int(draw.draw_idx), 'phase': phase,
+                        'sample_call_elapsed_seconds': elapsed,
+                        'chain_wall_markers': timing,
+                        'interpretation': 'Progress only; not diagnostic admission.',
+                    })
                 if (draw.draw_idx + 1) % 500 == 0:
                     print(args.scenario, args.seed, retry, draw.chain, draw.draw_idx + 1,
                           flush=True)
