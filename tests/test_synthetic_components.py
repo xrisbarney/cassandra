@@ -177,11 +177,13 @@ def test_reporting_and_threat_sum_not_separately_identified_by_counts():
     assert np.array_equal(generate('effort_oracle', 7101)[0]['N'], data['N'])
 
 
-def test_regime_model_native_numba_gradient_and_independent_emission_enumeration():
+@pytest.mark.parametrize('coordinates', ['innovations', 'centered'])
+def test_regime_model_native_numba_gradient_and_independent_emission_enumeration(coordinates):
     data, truth, options = generate('regimes', 7101)
     for name in data:
         data[name] = data[name][:4]
     options['months'] = 4
+    options['factor_parameterization'] = coordinates
     model = build_model(data, options, truth)
     point = model.initial_point()
     native = model.compile_dlogp()(point)
@@ -194,7 +196,7 @@ def test_regime_model_native_numba_gradient_and_independent_emission_enumeration
                           on_unused_input='ignore')
     e, p = fn(point)
     exact, _ = enumerate_hmm(e, np.log(p))
-    assert np.allclose(model.compile_logp(vars=model.potentials)(point), exact)
+    assert np.allclose(model.compile_logp(vars=[model['observations']])(point), exact)
 
 
 def test_centered_factor_prior_matches_stationary_gaussian_covariance():
