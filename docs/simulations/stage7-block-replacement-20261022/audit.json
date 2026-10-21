@@ -1,0 +1,64 @@
+{
+  "runs": [
+    {
+      "directory": "artifacts/stage7/recovery-v6/representative-7101",
+      "status": "interrupted_numerical_implementation_comparison",
+      "time_utc": "2026-10-21T22:34:56.190259+00:00",
+      "reason": "Superseded by independently verified cached block solver; full replacement schedules required.",
+      "decision": "docs/decisions/STAGE7_COUNT_COORDINATES_20261021.md",
+      "counts_as_completed_schedule": false,
+      "replacement_required": true,
+      "artifacts": {
+        "attempt_0.json": "f45c90b857e448d0820bfced43488ec2a535c81e88e34d7bd5dca53db8f758f2",
+        "attempt_1.json": "ea73f9f465fc8bd6908cd06681481b8ef2b123efb7057e7eb995db2851ecd7a7",
+        "data.npz": "2f16c14da6f108731a36c429e2d532a6c4f7ab343a4e989a3cda9c5473faef19",
+        "early_failure_0.json": "2b2ddc5375c95f65c2cec158b212bc39f5e37ee6d88f9578a5820b55e206bb3d",
+        "early_failure_1.json": "2b482c51e9113baa34e90a1a054a192824855b2db376b306070128133efefa27",
+        "failed_state_0.npz": "c85b2016b743eaad40008e4a071d3a4e20698e7cb3d0d56c7869d49874590397",
+        "failed_state_1.npz": "a3ec48e273a22a6472bb1127e2aa9226555169d0b92f4dac16d60dbf899c04b9",
+        "gradient_timing.json": "34954d4e14611b46ed0e0c82464954f72ea46233e3cde0b64383df672cf15324",
+        "interruption.json": "9ee5a5a98962c027cfb36cc64abaa7d22ae3f6dfa1d80713daf3650562adaed3",
+        "run.json": "7429540137ebfca2a659882660e41c038691f71c20f8a7c2ad34f7d37517f3a7",
+        "truth.npz": "92e92d139ba48feaf06569b34db715a2fc9c58870b6aeb5a6dbc76f3628945af",
+        "truth_original_coordinates.npz": "9fca1f6c6e33992fe0a0bb22a0599a87ac6aa677385e5b6873808e7e12fd3eec"
+      }
+    },
+    {
+      "directory": "artifacts/stage7/count-conditional-v2/primary/representative-7101",
+      "status": "interrupted_numerical_implementation_comparison",
+      "time_utc": "2026-10-21T22:34:56.326896+00:00",
+      "reason": "Superseded by independently verified cached block solver; full replacement schedules required.",
+      "decision": "docs/decisions/STAGE7_COUNT_COORDINATES_20261021.md",
+      "counts_as_completed_schedule": false,
+      "replacement_required": true,
+      "artifacts": {
+        "data.npz": "2f16c14da6f108731a36c429e2d532a6c4f7ab343a4e989a3cda9c5473faef19",
+        "gradient_timing.json": "7cce1ff5c890965fcfa942f0c41c0143166a47eb481d78f21811619920e50a99",
+        "interruption.json": "0d0ceb10ed28c3a57dad8f02ac1a5348d77226505b18ea82f580fedc28f12a73",
+        "run.json": "b1280f8f26957dafff51a676c0a19abeb7223c40b5bdf65fb4cd44bc0acd1e21",
+        "truth.npz": "92e92d139ba48feaf06569b34db715a2fc9c58870b6aeb5a6dbc76f3628945af",
+        "truth_original_coordinates.npz": "9fca1f6c6e33992fe0a0bb22a0599a87ac6aa677385e5b6873808e7e12fd3eec"
+      }
+    },
+    {
+      "directory": "artifacts/stage7/count-conditional-v2/primary/effort_proxy-7101",
+      "status": "interrupted_numerical_implementation_comparison",
+      "time_utc": "2026-10-21T22:34:56.378516+00:00",
+      "reason": "Superseded by independently verified cached block solver; full replacement schedules required.",
+      "decision": "docs/decisions/STAGE7_COUNT_COORDINATES_20261021.md",
+      "counts_as_completed_schedule": false,
+      "replacement_required": true,
+      "artifacts": {
+        "attempt_0.json": "6fbacf4dfa07a43c641f25d8fd48290b3dccf279db74556fc98d0c97ccb117ad",
+        "data.npz": "764d2e6d26f0541bd1cab1c4c01a6c872c25be8aeee724faeabda6403f035b2c",
+        "diagnostics_0.csv": "03ba0fde160a96f25c0220c24b747938450e898762dcd1c84f7a56f032a430ea",
+        "interruption.json": "363a12c49ea30bd5e51cf8276a4491973fb88d95fe8bbc37276a9a56b4a01a4d",
+        "posterior_0.nc": "3504888c6b97243e375261e110997b99957394bee36b3c9c2b1ca40e22cc23b5",
+        "run.json": "bd8aed9daca86a66c6ad1c017ce3395aed0f3900640c0a38720887ff6ed9d877",
+        "truth.npz": "7100a323810afc6fc49ec9be3d76f10023a2ebf536b3569c40ae4336b067f96a",
+        "truth_original_coordinates.npz": "f76de2bd2974630b626d37b5c619e0f9a13ec583a15b62e80cea9fc3b7ea156f"
+      }
+    }
+  ],
+  "held_out_scoring_enabled": false
+}
