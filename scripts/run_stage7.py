@@ -49,12 +49,14 @@ def main():
     parser.add_argument('--seed', type=int, choices=[7101, 7102, 7103], required=True)
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--center-factors', action='store_true')
+    parser.add_argument('--dense-mass', action='store_true')
     args = parser.parse_args()
     root = Path(__file__).resolve().parents[1]
     folder = args.output.resolve()
     folder.mkdir(parents=True, exist_ok=False)
     data, truth, options = generate(args.scenario, args.seed)
     options['factor_parameterization'] = 'centered' if args.center_factors else 'innovations'
+    options['mass_matrix'] = 'dense' if args.dense_mass else 'diagonal'
     effort = None
     if args.scenario == 'effort_proxy':
         data['effort'], effort = fitted_effort(data['N'], data['mask_N'].all(axis=1))
@@ -112,10 +114,21 @@ def main():
         with model, warnings.catch_warnings(record=True) as caught:
             warnings.simplefilter('always')
             start = time.perf_counter()
-            step = pm.NUTS(target_accept=accept, max_treedepth=depth,
-                           compile_kwargs={'mode': 'NUMBA'})
-            compile_seconds = time.perf_counter() - start
             initial = model.initial_point()
+            potential_args = {}
+            if args.dense_mass:
+                from pymc.blocking import DictToArrayBijection
+                from pymc.step_methods.hmc.quadpotential import QuadPotentialFullAdapt
+
+                initial_vector = DictToArrayBijection.map(initial).data
+                dimension = len(initial_vector)
+                potential_args['potential'] = QuadPotentialFullAdapt(
+                    dimension, initial_vector, np.eye(dimension), initial_weight=10,
+                    adaptation_window=max(101, 2 * dimension), update_window=10,
+                )
+            step = pm.NUTS(target_accept=accept, max_treedepth=depth,
+                           compile_kwargs={'mode': 'NUMBA'}, **potential_args)
+            compile_seconds = time.perf_counter() - start
             rng = np.random.default_rng(args.seed + retry * 100)
             initvals = [{k: v + rng.normal(0, .1, size=v.shape) for k, v in initial.items()}
                         for _ in range(4)]
@@ -147,7 +160,9 @@ def main():
             or m.startswith("Numba will use object mode to run AdvancedIncSubtensor's")
             or 'np.dot() is faster on contiguous arrays' in m
         )]
-        unresolved = [m for m in messages if m not in performance]
+        configuration_warnings = [m for m in messages if
+                                  m == 'QuadPotentialFullAdapt is an experimental feature']
+        unresolved = [m for m in messages if m not in performance + configuration_warnings]
         accepted = diagnostics['accepted'] and not unresolved
         table.to_csv(folder / f'diagnostics_{retry}.csv')
         start = time.perf_counter()
@@ -163,6 +178,7 @@ def main():
             'diagnostic_seconds': diagnostic_seconds, 'serialization_seconds': serialization,
             'peak_working_set_bytes': peak_memory_bytes(),
             'warnings': messages, 'performance_warnings': performance,
+            'sampler_configuration_warnings': configuration_warnings,
             'unresolved_warnings': unresolved,
         }
         write_json(folder / f'attempt_{retry}.json', attempt)

@@ -21,6 +21,7 @@ def main():
     parser.add_argument('--workers', type=int, choices=[1, 2, 3], default=2)
     parser.add_argument('--exclude', nargs='*', default=[])
     parser.add_argument('--center-factors', action='store_true')
+    parser.add_argument('--dense-mass', action='store_true')
     args = parser.parse_args()
     args.root.mkdir(parents=True, exist_ok=True)
     jobs = [(name, seed) for name in SCENARIOS for seed in (7101, 7102, 7103)
@@ -45,6 +46,8 @@ def main():
             ]
             if args.center_factors:
                 command.append('--center-factors')
+            if args.dense_mass:
+                command.append('--dense-mass')
             process = subprocess.run(command, stdout=stream, stderr=subprocess.STDOUT)
         record = json.loads((folder / 'result.json').read_text()) if (
             folder / 'result.json'
