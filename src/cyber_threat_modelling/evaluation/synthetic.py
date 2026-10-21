@@ -42,6 +42,10 @@ def generate(scenario, seed):
     kernel = scenario.startswith("kernel")
     n = t + 12
     m = np.log(np.geomspace(100, 1, k))
+    if scenario in ('factors_sparse', 'representative'):
+        # A genuinely rare last category: approximately ten publications in a
+        # 96-month window, rather than merely a smaller but regularly nonzero series.
+        m[-1] = np.log(0.1)
     if k == 1:
         m = np.array([np.log(0.8 if scenario == "dispersion_sparse" else 40)])
     phi = np.array([0.65, 0.25])[:rank]

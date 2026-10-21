@@ -52,6 +52,9 @@ use one category. A representative count-factor timing fixture uses ten
 categories, two factors and 108 months. Record the exact switches and generating
 parameters with each dataset. Synthetic category order is declared in the
 fixture, with dense anchors first; it does not reorder the real panel.
+For the shared-factor sparse and representative fixtures, the final category's
+reference mean is 0.1 per month (other fixtures use their recorded levels).
+This setting was made explicit before either recovery fixture was fitted.
 
 Auxiliary-channel component checks use known synthetic exposure and calibration
 coefficients. They do not establish that real EPSS/KEV/SEC channels are eligible
