@@ -21,7 +21,9 @@ def main():
     parser.add_argument('--root', type=Path, required=True)
     parser.add_argument('--workers', type=int, choices=[1, 2, 3], default=2)
     parser.add_argument('--exclude', nargs='*', default=[])
-    parser.add_argument('--center-factors', action='store_true')
+    coordinates = parser.add_mutually_exclusive_group()
+    coordinates.add_argument('--center-factors', action='store_true')
+    coordinates.add_argument('--anchor-factors', action='store_true')
     parser.add_argument('--dense-mass', action='store_true')
     args = parser.parse_args()
     args.root.mkdir(parents=True, exist_ok=True)
@@ -37,7 +39,8 @@ def main():
             record = json.loads(result.read_text())
             if record['options'].get('prior_id') != PRIOR_ID:
                 raise ValueError(f'Existing run has a different prior: {folder}')
-            requested = 'centered' if args.center_factors else 'innovations'
+            requested = ('anchored' if args.anchor_factors else
+                         'centered' if args.center_factors else 'innovations')
             if record['options'].get('factor_parameterization', 'innovations') != requested:
                 raise ValueError(f'Existing run has different factor coordinates: {folder}')
             metric = 'dense' if args.dense_mass else 'diagonal'
@@ -55,6 +58,8 @@ def main():
             ]
             if args.center_factors:
                 command.append('--center-factors')
+            if args.anchor_factors:
+                command.append('--anchor-factors')
             if args.dense_mass:
                 command.append('--dense-mass')
             process = subprocess.run(command, stdout=stream, stderr=subprocess.STDOUT)

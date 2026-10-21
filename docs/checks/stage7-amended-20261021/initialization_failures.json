@@ -1,0 +1,44 @@
+{
+  "cases": [
+    {
+      "case": "latent_ar-7101",
+      "status": "execution_failure_before_sampling",
+      "reason": "Scalar tau initialization supplied for a vector RV; corrected to np.full(k,.3).",
+      "directory": "artifacts/stage7/preflight-errors-v4/latent_ar-7101",
+      "files": {
+        "data.npz": "dceedb013ea71a2080ab3ff69442aaadaf7d1aa8169d041aa863d0899ab1dc83",
+        "run.json": "2ccedf84640a4542ba2dac25d76f833197ed5b34acbb173600f6a7efdd30ecb0",
+        "truth.npz": "082223d815834114c88546d9e078cdad8aab59afa797ffdfcfd0a53ad982378e",
+        "truth_original_coordinates.npz": "ba9834c201c1f45cbbb3a8d5dfb3cd89583c82adc97865d62e55706194dbc699"
+      },
+      "log_sha256": "aa7e45defbaa92ae583675751f833d0cd342e7a8e0efe6b27a306ab1f9596761"
+    },
+    {
+      "case": "latent_ar-7102",
+      "status": "execution_failure_before_sampling",
+      "reason": "Scalar tau initialization supplied for a vector RV; corrected to np.full(k,.3).",
+      "directory": "artifacts/stage7/preflight-errors-v4/latent_ar-7102",
+      "files": {
+        "data.npz": "8c49665f3ab610dd03a3162c054e4d833a63209410c481842b04a4e9289a0548",
+        "run.json": "d7e2fe2ffab99bab75f75fb8582ae44ba2f55f2f60d25d43131881c7ca0cb809",
+        "truth.npz": "77987a315e847bb990044e7274b46711604cadf815ceec1f861d5e805aa6a19f",
+        "truth_original_coordinates.npz": "a52c54b497fbc709353252f8143842e0fb72b9362812c3a81394a7f522cf9345"
+      },
+      "log_sha256": "aa7e45defbaa92ae583675751f833d0cd342e7a8e0efe6b27a306ab1f9596761"
+    },
+    {
+      "case": "latent_ar-7103",
+      "status": "execution_failure_before_sampling",
+      "reason": "Scalar tau initialization supplied for a vector RV; corrected to np.full(k,.3).",
+      "directory": "artifacts/stage7/preflight-errors-v4/latent_ar-7103",
+      "files": {
+        "data.npz": "1544101b43302b3c3194f58ce2147e00a18be30718b55d637fea96844d334f21",
+        "run.json": "34c6324c545fb7d221407851a20bc4ca31629b6403e67aba3e9164b69385ef48",
+        "truth.npz": "890ba704f568c01f90aa66123280888fe71c89f2c5beb36f9d06d24e3afbca64",
+        "truth_original_coordinates.npz": "7224fa23969fb038fe90ba944c2166535e063c3b87a50e8936801b525651f9a6"
+      },
+      "log_sha256": "aa7e45defbaa92ae583675751f833d0cd342e7a8e0efe6b27a306ab1f9596761"
+    }
+  ],
+  "probability_law_changed": false
+}

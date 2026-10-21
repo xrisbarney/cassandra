@@ -1,4 +1,6 @@
+import json
 import runpy
+import shutil
 from pathlib import Path
 
 import numpy as np
@@ -8,7 +10,11 @@ from scipy.special import logit
 from scipy.stats import multivariate_normal, truncnorm
 
 from cyber_threat_modelling.evaluation.synthetic import SCENARIOS, generate
-from cyber_threat_modelling.models.stage7_priors import PRIOR_ID, stationary_truth
+from cyber_threat_modelling.models.stage7_priors import (
+    PRIOR_ID,
+    stationary_truth,
+    verify_activation,
+)
 from cyber_threat_modelling.models.synthetic_state_space import build_model
 
 
@@ -118,3 +124,49 @@ def test_amended_residual_initialization_has_category_shape(scenario):
     assert all(np.isfinite(value).all() for value in point.values())
     if scenario == 'latent_ar':
         assert np.isfinite(model.compile_dlogp(mode='NUMBA')(point)).all()
+
+
+def test_activation_checks_frozen_documents_not_only_manifest(tmp_path):
+    root = Path(__file__).resolve().parents[1]
+    records = ['docs/amendments/STATE_SPACE_PRIORS_ACTIVATION_20261021.json',
+               'docs/amendments/STATE_SPACE_PRIORS_20261021.json', 'docs/STAGE2_FREEZE.json']
+    paths = set(records)
+    for record in records:
+        paths.update(entry['path'] for entry in json.loads((root/record).read_text())['files'])
+    for relative in paths:
+        target = tmp_path/relative
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(root/relative, target)
+    assert verify_activation(tmp_path)['prior_id'] == PRIOR_ID
+    (tmp_path/'docs/SPECIFICATION.md').write_text('altered specification')
+    with pytest.raises(ValueError, match='frozen design document'):
+        verify_activation(tmp_path)
+
+
+@pytest.mark.parametrize('scenario', ['factors_sparse', 'latent_ar'])
+def test_amplitude_coordinate_density_and_gradient(scenario):
+    data, truth, options = generate(scenario, 7101)
+    for name in data:
+        data[name] = data[name][:4]
+    options.update(months=4, prior_id=PRIOR_ID, factor_parameterization='anchored')
+    model = build_model(data, options, stationary_truth(truth, options))
+    point = model.initial_point()
+    values = np.array([[.2], [-.3], [.1], [.7], [.5]])
+    covariance = .3**2 * .4**np.abs(np.arange(5)[:, None]-np.arange(5))
+    if scenario == 'factors_sparse':
+        point['f_scaled_states'] = values
+        potential = 'f_state_prior'
+        # Exact inverse-coordinate density, including all T+1 Jacobian factors.
+        unit_covariance = covariance/.3**2
+        original = multivariate_normal.logpdf(values[:, 0]/.3, np.zeros(5), unit_covariance)
+        transformed = multivariate_normal.logpdf(values[:, 0], np.zeros(5), covariance)
+        assert np.allclose(transformed, original-5*np.log(.3))
+    else:
+        point['u_states'] = values
+        potential = 'u_state_prior'
+    expected = multivariate_normal.logpdf(values[:, 0], np.zeros(5), covariance)
+    actual = model.compile_logp(vars=[model[potential]])(point)
+    assert np.allclose(actual, expected, atol=1e-10)
+    native = model.compile_dlogp()(point)
+    assert np.isfinite(native).all()
+    assert np.allclose(model.compile_dlogp(mode='NUMBA')(point), native, atol=1e-8)

@@ -1,0 +1,142 @@
+{
+  "cases": [
+    {
+      "artifact_path": "artifacts/stage7/amended-model-prior-v2/pilot.npz",
+      "artifact_sha256": "19d07261d9c1d9e94b5dce55d6fce03783419f086ae08dcdd3e5e2e2cb84ced2",
+      "case": "pilot",
+      "count_quantiles": {
+        "0": 0.0,
+        "0.01": 0.0,
+        "0.5": 1.0,
+        "0.99": 3296.0100000000093,
+        "1": 654428863.0
+      },
+      "draws": 1000,
+      "effort": 0,
+      "failures": [],
+      "initial_factor_variance": [
+        0.9820900116147889,
+        1.1151234199842037
+      ],
+      "log_rate_above_20": 1,
+      "log_rate_quantiles": {
+        "0": -17.917063058637996,
+        "0.01": -8.161287381467504,
+        "0.5": 0.03043376898564293,
+        "0.99": 8.101012875724617,
+        "1": 20.471286112376664
+      },
+      "options": {
+        "categories": 10,
+        "conditional_level": false,
+        "factor_parameterization": "innovations",
+        "factors": 2,
+        "kernel": false,
+        "known_auxiliary_coefficients": false,
+        "months": 108,
+        "prior_id": "stationary_bounded_v1",
+        "regimes": 1,
+        "residual": "none",
+        "scenario": "representative",
+        "seed": 7101,
+        "severity_factors": 0
+      },
+      "regimes": "initial uniform, subsequent sampled transition rows",
+      "standardized_innovation_mean": [
+        -0.0032021975467965715,
+        -0.001179126556731508
+      ],
+      "standardized_innovation_variance": [
+        1.0018014352472608,
+        0.9997095570814364
+      ],
+      "warnings": [
+        "The effect of Potentials on other parameters is ignored during prior predictive sampling. This is likely to lead to invalid or biased predictive samples."
+      ]
+    },
+    {
+      "artifact_path": "artifacts/stage7/amended-model-prior-v2/full.npz",
+      "artifact_sha256": "87b41c3f4829aa9a7bb04b59d0b21b0c1b3d9ad31cab9e1acdb99a25be2980e7",
+      "case": "full",
+      "count_quantiles": {
+        "0": 0.0,
+        "0.01": 0.0,
+        "0.5": 2.0,
+        "0.99": 10570.020000000019,
+        "1": 229322866.0
+      },
+      "draws": 1000,
+      "effort": 0,
+      "failures": [],
+      "initial_factor_variance": [
+        0.9207176623024116,
+        0.9978115565733048
+      ],
+      "log_rate_above_20": 0,
+      "log_rate_quantiles": {
+        "0": -17.24940266311912,
+        "0.01": -7.8872694159183006,
+        "0.5": 0.8018203441764236,
+        "0.99": 9.312268189884382,
+        "1": 19.39811538713572
+      },
+      "options": {
+        "categories": 10,
+        "conditional_level": false,
+        "factor_parameterization": "innovations",
+        "factors": 2,
+        "kernel": true,
+        "known_auxiliary_coefficients": false,
+        "months": 108,
+        "prior_id": "stationary_bounded_v1",
+        "regimes": 3,
+        "residual": "iid",
+        "scenario": "representative",
+        "seed": 7101,
+        "severity_factors": 0
+      },
+      "regimes": "initial uniform, subsequent sampled transition rows",
+      "standardized_innovation_mean": [
+        0.002349586125630702,
+        -0.0007513756636660896
+      ],
+      "standardized_innovation_variance": [
+        0.9978783534539846,
+        1.000703360161648
+      ],
+      "warnings": [
+        "The effect of Potentials on other parameters is ignored during prior predictive sampling. This is likely to lead to invalid or biased predictive samples."
+      ]
+    }
+  ],
+  "interpretation": "Prior simulation only; not posterior recovery or SBC. Potential likelihoods are intentionally ignored.",
+  "model_sha256": "d323fd69ff010bc50972dab1649517b76d6d6900fb4738d53415de17d7dd3901",
+  "prior_activation": {
+    "activated_on": "2026-10-21",
+    "authority": "User: continue stage 7. patch issues as you find them",
+    "files": [
+      {
+        "path": "docs/amendments/STATE_SPACE_PRIORS_ACTIVATION_20261021.md",
+        "sha256": "9eede7b5586825cfbbcf24fc80926e6ac3a7f003bc54c079de28408538bc79c5"
+      },
+      {
+        "path": "docs/amendments/STATE_SPACE_PRIORS_20261021.json",
+        "sha256": "048d7cc179b6d01471c502477aadae8d9d95e22f71c4c2c8c785d52cbe9318bf"
+      }
+    ],
+    "held_out_scoring_enabled": false,
+    "parent_freeze_sha256": "7597b76276b837f8db9bc2baff63cb035e14cdfa8656885c782795d38cb598e7",
+    "path": "docs/amendments/STATE_SPACE_PRIORS_ACTIVATION_20261021.json",
+    "prior_id": "stationary_bounded_v1",
+    "proposal_record": "docs/amendments/STATE_SPACE_PRIORS_20261021.json",
+    "sha256": "8aeecc526dee9dfd86c7c51037f7d35117cdefbaaa682cff70fe92e4c5895e39",
+    "status": "active"
+  },
+  "real_data_read": false,
+  "source_revision": {
+    "dirty": false,
+    "revision": "761db0789c3b4a12fc5ef6df0f770d13a2d474ca",
+    "status": "available"
+  },
+  "source_sha256": "f230c828f764b8f850646418cc0b3e819f4700d2c220b9cc47b599d14b2582a7"
+}

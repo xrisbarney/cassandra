@@ -1,4 +1,4 @@
-"""Stage 7 research fixtures using frozen component laws, not a real-data adapter.
+"""Stage 7 research fixtures using recorded component laws, not a real-data adapter.
 
 Array convention is month x category. Nuisance values conditioned on in a fixture
 are explicit in its options. The production Stage 8 interface remains separate.
@@ -30,7 +30,20 @@ def loading_matrix(prefix, categories, rank, revised=False):
 
 def factors(prefix, categories, rank, months, parameterization='innovations', revised=False):
     phi = pm.Uniform(prefix + "_phi", -1, 1, shape=rank, initval=np.full(rank, 0.4))
-    if parameterization == 'centered':
+    matrix = None
+    if parameterization == 'anchored':
+        if not revised:
+            raise ValueError('Amplitude coordinates require the recorded revised prior.')
+        matrix = loading_matrix(prefix, categories, rank, revised)
+        amplitude = pt.diag(matrix[:rank])
+        scaled = pm.Flat(prefix + '_scaled_states', shape=(months + 1, rank),
+                         initval=np.zeros((months + 1, rank)))
+        initial = pm.logp(pm.Normal.dist(0, amplitude), scaled[0]).sum()
+        transitions = pm.logp(pm.Normal.dist(phi*scaled[:-1],
+                                              amplitude*pt.sqrt(1-phi**2)), scaled[1:]).sum()
+        pm.Potential(prefix + '_state_prior', initial + transitions)
+        states = pm.Deterministic(prefix + '_states', scaled / amplitude)
+    elif parameterization == 'centered':
         # The Flat base measure plus this normalized AR density is exactly the
         # same stationary Gaussian prior. Its density remains outside the HMM.
         states = pm.Flat(prefix + '_states', shape=(months + 1, rank),
@@ -47,7 +60,8 @@ def factors(prefix, categories, rank, months, parameterization='innovations', re
                                   transformed * pt.sqrt(1 - phi**2) if revised else transformed)
     else:
         raise ValueError('Unknown factor coordinates.')
-    matrix = loading_matrix(prefix, categories, rank, revised)
+    if matrix is None:
+        matrix = loading_matrix(prefix, categories, rank, revised)
     contribution = pm.Deterministic(prefix + "_contribution", states[1:] @ matrix.T)
     return contribution
 
@@ -90,10 +104,19 @@ def build_model(data, options, conditional=None):
                 u = pm.Normal("u_raw", 0, 1, shape=(t, k)) * tau
             else:
                 phi_u = pm.Uniform("phi_u", -1, 1, shape=k, initval=np.full(k, 0.4))
-                innovations = pm.Normal("u_innovations", 0, 1, shape=(k, t + 1))
-                u = ar1_transform(innovations, phi_u).T[1:] * tau
-                if revised:
-                    u = u * pt.sqrt(1 - phi_u**2)
+                if options.get('factor_parameterization') == 'anchored' and revised:
+                    states_u = pm.Flat('u_states', shape=(t+1, k), initval=np.zeros((t+1, k)))
+                    pm.Potential('u_state_prior',
+                                 pm.logp(pm.Normal.dist(0, tau), states_u[0]).sum()
+                                 + pm.logp(pm.Normal.dist(phi_u*states_u[:-1],
+                                                         tau*pt.sqrt(1-phi_u**2)),
+                                           states_u[1:]).sum())
+                    u = states_u[1:]
+                else:
+                    innovations = pm.Normal("u_innovations", 0, 1, shape=(k, t + 1))
+                    u = ar1_transform(innovations, phi_u).T[1:] * tau
+                    if revised:
+                        u = u * pt.sqrt(1 - phi_u**2)
             base = base + pm.Deterministic("u", u)
         if options["kernel"]:
             width = pm.Truncated("width", pm.LogNormal.dist(np.log(12), 0.5), lower=0, upper=18)

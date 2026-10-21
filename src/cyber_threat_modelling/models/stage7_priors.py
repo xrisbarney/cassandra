@@ -16,6 +16,10 @@ def verify_activation(root):
     digest = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()  # noqa: E731
     if digest(root / 'docs/STAGE2_FREEZE.json') != record['parent_freeze_sha256']:
         raise ValueError('The parent freeze changed.')
+    parent = json.loads((root / 'docs/STAGE2_FREEZE.json').read_text())
+    for entry in parent['files']:
+        if digest(root / entry['path']) != entry['sha256']:
+            raise ValueError('A frozen design document changed.')
     # Verify the sealed draft, including all of its source/audit dependencies.
     for entry in record['files']:
         if digest(root / entry['path']) != entry['sha256']:

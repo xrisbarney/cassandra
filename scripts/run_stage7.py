@@ -67,7 +67,9 @@ def main():
     parser.add_argument('--scenario', choices=SCENARIOS, required=True)
     parser.add_argument('--seed', type=int, choices=[7101, 7102, 7103], required=True)
     parser.add_argument('--output', type=Path, required=True)
-    parser.add_argument('--center-factors', action='store_true')
+    coordinates = parser.add_mutually_exclusive_group()
+    coordinates.add_argument('--center-factors', action='store_true')
+    coordinates.add_argument('--anchor-factors', action='store_true')
     parser.add_argument('--dense-mass', action='store_true')
     args = parser.parse_args()
     root = Path(__file__).resolve().parents[1]
@@ -78,7 +80,8 @@ def main():
     np.savez_compressed(folder / 'truth_original_coordinates.npz', **truth)
     truth = stationary_truth(truth, options)
     options['prior_id'] = PRIOR_ID
-    options['factor_parameterization'] = 'centered' if args.center_factors else 'innovations'
+    options['factor_parameterization'] = ('anchored' if args.anchor_factors else
+                                          'centered' if args.center_factors else 'innovations')
     options['mass_matrix'] = 'dense' if args.dense_mass else 'diagonal'
     effort = None
     if args.scenario == 'effort_proxy':
@@ -87,6 +90,8 @@ def main():
     np.savez_compressed(folder / 'truth.npz', **truth)
     files = list((root / 'src').rglob('*.py')) + [Path(__file__), root / 'uv.lock',
              root / 'docs/STAGE7_DESIGN.md', root / 'docs/STAGE2_FREEZE.json']
+    if args.anchor_factors:
+        files.append(root/'docs/decisions/STAGE7_AMPLITUDE_COORDINATES_20261021.md')
     write_json(folder / 'run.json', {
         'source_control': git_revision(root), 'options': options, 'effort_fit': effort,
         'pid': os.getpid(), 'source_sha256': {
