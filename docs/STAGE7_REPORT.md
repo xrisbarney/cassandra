@@ -1,5 +1,19 @@
 # Stage 7 synthetic validation record
 
+Current status, 2026-10-21: **v2 campaign running; not complete**. The
+[second amendment](amendments/STATE_SPACE_LEVELS_20261021.md) now governs new
+fits. Its primary prior passed all declared pilot plausibility gates; both
+wider sensitivity candidates failed the tail gate and remain stress comparisons.
+The [prior audit](checks/stage7-levels-20261021/audit.json) uses only the initial
+2010--2018 count panel; posterior fixtures use synthetic data only. The new
+campaign contains 43 primary and 12 sensitivity cases. All 161 tests passed
+before the runtime-only native-thread policy change. The first sparse-factor
+fits have passed; full recovery and component decisions await the campaign.
+The record below is historical evidence and will be replaced by the completed
+audit, not reinterpreted as v2 validation.
+
+## Historical campaigns
+
 Status: revised-prior validation resumed, 2026-10-21; Stage 7 incomplete. The
 [recorded design](STAGE7_DESIGN.md) fixes seeds, component checks, scenarios,
 budgets and interpretation before fitting. Forty generated datasets

@@ -183,22 +183,32 @@ without trend. `configs/stage6_arima_finalists.json` binds that particular local
 screening record by hash. A new screening run requires its own verified record
 path and hash in the finalist configuration.
 
-Stage 7 uses generated data only. The [design](docs/STAGE7_DESIGN.md),
+Stage 7 posterior fixtures use generated data only. The current prior-plausibility
+audit separately reads January 2010--December 2018 counts, never held-out counts.
+The [design](docs/STAGE7_DESIGN.md),
 [execution record](docs/STAGE7_REPORT.md), and
 [prior-tail finding](docs/STAGE7_PRIOR_FINDING.md) distinguish numerical component
 checks, fixed-truth recovery, and remaining model-validation gates. The user
 stopped the old-prior campaign on 2026-10-21. The subsequent
 [activation record](docs/amendments/STATE_SPACE_PRIORS_ACTIVATION_20261021.md)
-applies the sealed prior amendment to resumed synthetic validation under
-`stationary_bounded_v1`. Revised runs use new directories; old results remain
-historical evidence. To reproduce the prior-only audit with a new output path:
+records the first stationary-amplitude revision. The
+[second amendment](docs/amendments/STATE_SPACE_LEVELS_20261021.md) now governs
+`anchored_levels_v2`: anchored known-topic levels, a separate fallback level,
+declared predictive gates and both directions of sensitivity. The primary prior
+passed its [recorded checks](docs/checks/stage7-levels-20261021/audit.json).
+Revised runs use new directories; old results remain historical evidence.
+To reproduce the v2 prior audit with a new output path:
 
-    .\.venv\Scripts\python.exe scripts/check_stage7_prior_proposal.py --proposal docs/amendments/STATE_SPACE_PRIORS_20261021.proposal.json --output artifacts/stage7/new-proposal-prior-audit.json
+    .\.venv\Scripts\python.exe scripts/check_stage7_level_prior.py --output artifacts/stage7/new-level-prior-audit
 
 Revised posterior runs verify and record the activation hashes:
 
     . .\scripts\Use-Compiler.ps1
-    .\.venv\Scripts\python.exe scripts/run_stage7.py --scenario factors_sparse --seed 7101 --center-factors --dense-mass --output artifacts/stage7/new-amended-factor-case
+    .\.venv\Scripts\python.exe scripts/run_stage7.py --scenario factors_sparse --seed 7101 --anchor-factors --dense-mass --output artifacts/stage7/new-amended-factor-case
+
+`scripts/stage7_batch.py` executes the 43 primary cases. The separately labelled
+12-case sensitivity campaign is `scripts/stage7_sensitivity.py --root <fresh-path>`.
+New fit processes record and limit native numerical pools to one thread.
 
 The historical campaign's control cases used a diagonal metric, as recorded in
 the geometry decision. `scripts/summarize_stage7.py --controls-from` preserves
