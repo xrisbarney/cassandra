@@ -1,6 +1,7 @@
 import json
 import runpy
 import sys
+import warnings
 from contextlib import nullcontext
 from pathlib import Path
 from types import SimpleNamespace
@@ -27,6 +28,7 @@ def test_failed_retained_draw_saves_checkpoint_and_never_becomes_a_posterior(
     monkeypatch.setattr(pytensor.config, 'cxx', 'compiler-detection-only-in-this-mocked-test')
 
     def sample(**kwargs):
+        warnings.warn('fixture numerical warning', RuntimeWarning, stacklevel=1)
         # Warmup violations must be ignored. The retained event is irreversible.
         for tuning, index in [(True, 0), (False, kwargs['tune'])]:
             stats = {'diverging': reason == 'divergence',
@@ -51,6 +53,11 @@ def test_failed_retained_draw_saves_checkpoint_and_never_becomes_a_posterior(
         assert attempt['early_failure']['draw_index'] == attempt['warmup']
         assert attempt['diagnostics']['max_rhat'] is None
         assert (output/f'failed_state_{retry}.npz').exists()
+        assert 'fixture numerical warning' in attempt['unresolved_warnings']
+        context = next(w for w in attempt['warning_contexts']
+                       if w['message'] == 'fixture numerical warning')
+        assert context['phase'] == 'warmup' and context['chain'] == 0
+        assert context['draw_index'] == 0 and context['stack']
     assert not list(output.glob('posterior_*.nc'))
     assert not (output/'future.npz').exists()
     assert not (output/'recovery.json').exists()

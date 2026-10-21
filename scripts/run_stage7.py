@@ -178,6 +178,25 @@ def main():
         timing, failure = {}, {}
         with model, warnings.catch_warnings(record=True) as caught:
             warnings.simplefilter('always')
+            warning_contexts = []
+            warning_phase = {'phase': 'setup', 'chain': None, 'draw_index': None}
+
+            def capture_warning(message, category, filename, lineno, file=None, line=None):
+                # Preserve the ordinary warning gate while locating numerical
+                # warnings in setup, warmup or retained sampling for diagnosis.
+                import traceback
+
+                caught.append(warnings.WarningMessage(message, category, filename, lineno,
+                                                       file, line))
+                warning_contexts.append({
+                    'message': str(message), 'filename': filename, 'lineno': lineno,
+                    'category': category.__name__, **warning_phase,
+                    'stack': [{'filename': frame.filename, 'lineno': frame.lineno,
+                               'function': frame.name}
+                              for frame in traceback.extract_stack(limit=12)[:-1]],
+                })
+
+            warnings.showwarning = capture_warning
             start = time.perf_counter()
             initial = model.initial_point()
             potential_args = {}
@@ -225,6 +244,13 @@ def main():
                 if (draw.draw_idx + 1) % 500 == 0:
                     print(args.scenario, args.seed, retry, draw.chain, draw.draw_idx + 1,
                           flush=True)
+                next_index = int(draw.draw_idx) + 1
+                next_chain = int(draw.chain)
+                if next_index == warmup + draws:
+                    next_index, next_chain = 0, next_chain + 1
+                next_phase = ('post_sampling' if next_chain >= 4 else
+                              'warmup' if next_index < warmup else 'retained')
+                warning_phase.update(chain=next_chain, draw_index=next_index, phase=next_phase)
                 reason = retained_failure(draw.stats, draw.tuning, depth)
                 if reason:
                     failure.update(reason, chain=int(draw.chain), draw_index=int(draw.draw_idx),
@@ -235,6 +261,7 @@ def main():
                     raise IrrecoverableSamplingGate(failure['reason'])
 
             try:
+                warning_phase.update(phase='warmup', chain=0, draw_index=0)
                 idata = pm.sample(draws=draws, tune=warmup, chains=4, cores=1, step=step,
                                   random_seed=args.seed + retry, initvals=initvals,
                                   callback=callback, progressbar=False)
@@ -284,6 +311,7 @@ def main():
             'warning_locations': [{'message': str(w.message), 'filename': w.filename,
                                    'lineno': w.lineno, 'category': w.category.__name__}
                                   for w in caught],
+            'warning_contexts': warning_contexts,
             'sampler_configuration_warnings': configuration_warnings,
             'unresolved_warnings': unresolved,
             'early_failure': failure or None,
