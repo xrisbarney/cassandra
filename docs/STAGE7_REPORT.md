@@ -22,6 +22,15 @@ The factor and kernel forecast tests compare Monte Carlo means with independent
 analytic lognormal-mixture calculations. Finite kernel-truncation and
 known-parameter count-calibration outputs are in
 [the numerical audit](checks/stage7-numerics-20261021/numerics.json).
+Across 72 widths from 0.25 to 18 and integer lags 0 to 120, the largest observed
+kernel-covariance discrepancy is about 0.0002384 (width 18, lag 34). This is a
+finite-grid result, not an all-width error bound. The known-parameter count
+experiment compares interval coverage with exact discrete coverage, which need
+not equal the nominal level when counts have large atoms.
+
+The full suite passed 137 tests; two additional runner tests then verified early
+rejection and checkpoint handling. Ruff and the lock check passed. The original
+five-file protocol freeze and the panel-manifest hash still match.
 
 Hierarchical Gaussian group means are integrated out exactly: the category-level
 prior covariance is `s^2 I + hyper_sd^2 11'`. An independent quadrature check
@@ -38,6 +47,17 @@ comparisons; they are not additional independent simulated datasets.
 Known missing-BLAS, noncontiguous-dot and object-mode indexing warnings are
 recorded as performance messages after native/compiled value and gradient
 checks. Numerical warnings and all frozen convergence thresholds remain gates.
+The [fail-fast execution decision](decisions/STAGE7_FAIL_FAST_20261021.md) stops
+later attempts once a retained divergence/depth event makes admission impossible.
+Partial failed attempts are explicit and provide no recovery evidence. Accepted
+fits still require their entire four-chain budget. Earlier running processes
+retain their original complete-attempt behavior.
+
+Before its fits began, the deliberately zero-inflated fixture's reference mean
+was corrected to include its 30% independent zero inflation. It retains the
+unselected NB-component intensity as a separate generating target. Consequently,
+observable-mean recovery and underlying-intensity recovery answer different
+questions in that misspecified scenario; the generated observations were unchanged.
 
 ## Findings already established
 
