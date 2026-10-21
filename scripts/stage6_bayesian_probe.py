@@ -9,16 +9,26 @@ from cyber_threat_modelling.data.store import write_json
 from cyber_threat_modelling.evaluation.backtest import count_matrix, training_prefix
 from cyber_threat_modelling.models.bayesian_controls import fit_predict_bayesian
 from cyber_threat_modelling.models.count_baselines import FitFailure
-from cyber_threat_modelling.provenance import verify_independent_control_amendment
+from cyber_threat_modelling.provenance import (
+    verify_independent_control_amendment,
+    verify_observation_control_amendment,
+)
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("method", choices=["independent_nb_ar1", "pooled_nb"])
+    parser.add_argument(
+        "method", choices=["independent_nb_ar1", "independent_nb_glar", "pooled_nb"]
+    )
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     args.output.mkdir(parents=True, exist_ok=False)
     root = Path(__file__).resolve().parents[1]
+    if args.method == "independent_nb_glar":
+        write_json(
+            args.output / "model_amendment.json",
+            verify_observation_control_amendment(root, required=True),
+        )
     if args.method == "independent_nb_ar1":
         write_json(
             args.output / "prior_amendment.json",

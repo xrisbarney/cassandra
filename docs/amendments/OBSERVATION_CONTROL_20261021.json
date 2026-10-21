@@ -1,0 +1,20 @@
+{
+  "amendment_id": "2026-10-21-observation-driven-control",
+  "status": "active",
+  "decision_authority": "Implementation decision under the user instruction to resolve the independent Bayesian control using best practices or literature",
+  "decided_on": "2026-10-21",
+  "methods": [
+    "independent_nb_glar"
+  ],
+  "rule": "conditional_loglinear_nb_ar1_v1",
+  "replaces_primary_control": "independent_nb_ar1",
+  "parent_freeze_sha256": "7597b76276b837f8db9bc2baff63cb035e14cdfa8656885c782795d38cb598e7",
+  "files": [
+    {
+      "path": "docs/amendments/OBSERVATION_CONTROL_20261021.md",
+      "sha256": "f98e3a61c19118e8e83d4ef12c3ad53a46223fb08aa3eece75dc4d0634d53a23"
+    }
+  ],
+  "independent_development_scored_at_activation": false,
+  "held_out_scored_at_activation": false
+}

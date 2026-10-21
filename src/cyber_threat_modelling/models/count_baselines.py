@@ -34,6 +34,7 @@ def validate_method(spec):
         {"method": "historical_mean"},
         {"method": "seasonal_naive"},
         {"method": "independent_nb_ar1"},
+        {"method": "independent_nb_glar"},
         {"method": "pooled_nb"},
     ):
         return

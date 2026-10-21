@@ -117,12 +117,37 @@ def verify_independent_control_amendment(root: Path, required=False):
     return {"path": relative, "sha256": file_hash(path), "record": record}
 
 
+def verify_observation_control_amendment(root: Path, required=False):
+    from .models.control_priors import OBSERVATION_METHOD, OBSERVATION_RULE
+
+    relative = "docs/amendments/OBSERVATION_CONTROL_20261021.json"
+    path = root / relative
+    if not path.is_file():
+        if required:
+            raise ConfigurationError("The observation-driven control amendment is required.")
+        return None
+    record = json.loads(path.read_text(encoding="utf-8"))
+    if (
+        record["status"] != "active"
+        or record["rule"] != OBSERVATION_RULE
+        or record["methods"] != [OBSERVATION_METHOD]
+        or record["parent_freeze_sha256"] != file_hash(root / "docs/STAGE2_FREEZE.json")
+        or not record["files"]
+    ):
+        raise ConfigurationError("Invalid observation-driven amendment or parent freeze.")
+    for item in record["files"]:
+        if file_hash(project_file(root, item["path"])) != item["sha256"]:
+            raise ConfigurationError("A frozen amendment file changed.")
+    return {"path": relative, "sha256": file_hash(path), "record": record}
+
+
 def prepare_run(root: Path, config: ExperimentConfig, output: Path, data_manifest=None) -> Path:
     """Write a new preparation record. Never overwrite a prior run directory."""
     root = root.resolve()
     freeze = verify_freeze(root, config)
     amendment = verify_zero_series_amendment(root)
     independent_amendment = verify_independent_control_amendment(root)
+    observation_amendment = verify_observation_control_amendment(root)
     data_record = None
     if data_manifest:
         from .data.audit import verify_data_manifest
@@ -150,7 +175,9 @@ def prepare_run(root: Path, config: ExperimentConfig, output: Path, data_manifes
         "configuration": config.settings,
         "configuration_sha256": config.sha256,
         "protocol": freeze,
-        "design_amendments": [a for a in (amendment, independent_amendment) if a],
+        "design_amendments": [
+            a for a in (amendment, independent_amendment, observation_amendment) if a
+        ],
         "seed": config.settings["seed"],
         "python": sys.version,
         "platform": platform.platform(),

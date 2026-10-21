@@ -9,6 +9,10 @@ def predictive_checks(
     posterior, method, counts, initial_counts, origin, draws=1000, independent_prior_scale=None
 ):
     """Report discrepancy distributions, including zeros; these are not fit-selection scores."""
+    if method == "independent_nb_glar":
+        from ..models.observation_nb import predictive_checks as check_observation_model
+
+        return check_observation_model(posterior, counts, initial_counts, origin, draws)
     y = np.asarray(counts, dtype=int)
     t, k = y.shape
     rng = np.random.default_rng(stream_seed(20261020, method, origin, "predictive_checks"))

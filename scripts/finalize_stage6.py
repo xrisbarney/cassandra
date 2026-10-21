@@ -22,7 +22,7 @@ def main():
         (root / "artifacts/backtests/stage6-20261020", ["historical_mean", "seasonal_naive"]),
         (root / "artifacts/backtests/stage6-pooled-20261021", ["pooled_nb"]),
         (arima, [selection["selected_method"]]),
-        (root / args.independent_run, ["independent_nb_ar1"]),
+        (root / args.independent_run, ["independent_nb_glar"]),
     ]
     summaries, diagnoses, runtime, records = [], [], [], []
     for folder, methods in runs:

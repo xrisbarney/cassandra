@@ -15,7 +15,9 @@ from cyber_threat_modelling.models.bayesian_controls import build_model, diagnos
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("method", choices=["pooled_nb", "independent_nb_ar1"])
+    parser.add_argument(
+        "method", choices=["pooled_nb", "independent_nb_ar1", "independent_nb_glar"]
+    )
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--center-prefix", type=int)
     parser.add_argument("--low-rank", action="store_true")
@@ -81,7 +83,9 @@ def main():
     table.to_csv(args.output / "diagnostics.csv")
     result = {
         "method": args.method,
-        "prior": "stationary_scale_halfnormal_v1"
+        "prior": "conditional_loglinear_nb_ar1_v1"
+        if args.method == "independent_nb_glar"
+        else "stationary_scale_halfnormal_v1"
         if args.amended_prior
         else "original_innovation_scale",
         "retry_number": args.retry,

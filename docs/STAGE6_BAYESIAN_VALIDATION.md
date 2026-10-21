@@ -1,14 +1,40 @@
 # Stage 6 Bayesian control validation
 
-The pooled control keeps its frozen law. The independent control uses the dated
-[stationary-scale amendment](amendments/INDEPENDENT_CONTROL_20261021.md), which
-changes its scale prior following prior-predictive checking. This is distinct
-from the exact computational transformations below. The original Stage 2 freeze
-and failed exploratory fits remain preserved. Held-out scoring remains locked.
+The pooled control keeps its frozen law. The primary independent control is now
+the [conditional NB autoregression](amendments/OBSERVATION_CONTROL_20261021.md),
+identifier `independent_nb_glar`. It replaces the unsuccessful latent AR(1)
+control; this is a model change, not a claim that the latent control converged.
+The original Stage 2 freeze and failed exploratory fits remain preserved.
+Held-out scoring remains locked.
 
-## Independent control: active specification
+## Primary independent control
 
-The amended model retains the NB2 observation law, AR(1) log-rate deviations,
+The conditional law is `log(mu[t])=(1-phi)*m+phi*log(1+N[t-1])` with NB2 counts.
+Priors retain `m~Normal(log(initial_mean+0.5),2)`, `phi~Uniform(-1,1)` and
+`log(psi)~Normal(0,1)`. Condition on January 2010 and use subsequent counts in
+the likelihood. The reference-level parameter m is not an unconditional mean.
+The amendment gives the complete specification and distinguishes its priors
+from the model-family support in the literature.
+
+Every category retains an independent posterior, including the all-zero category.
+Future paths recursively use simulated counts and fixed posterior parameter tuples.
+The forecast PMF is the mixture of conditional NB masses over parameters and
+preceding simulated counts. It is not a moment-matched NB approximation.
+Tests compare the likelihood with SciPy, native/NUMBA gradients, joint versus
+separate-category density, and two-step forecast probabilities with an explicit
+sum over the preceding count. They also check replay, independent category
+draws, and the informative all-zero likelihood without a point-mass exception.
+
+The initial PyMC four-chain fit passed at the first budget: maximum R-hat
+1.00432, minimum bulk/tail ESS 1471.83/1043.10, BFMI 0.9105, no divergences
+or depth saturations. Prior/posterior replications recursively generate the
+training period conditional on its first count. These are posterior and
+implementation checks, not forecast performance evidence.
+
+## Superseded latent independent control
+
+The earlier [stationary-scale amendment](amendments/INDEPENDENT_CONTROL_20261021.md)
+retains the NB2 observation law, AR(1) log-rate deviations,
 initial-window mean anchor, and `phi~Uniform(-1,1)`. It puts
 `s~HalfNormal(0.75)` on the stationary log-rate SD and derives
 `tau=s*sqrt(1-phi²)`. Its initial state is `u0~Normal(0,s)`.

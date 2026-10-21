@@ -34,7 +34,7 @@ def main():
     wide, _ = count_matrix(pd.read_parquet(root / manifest["panel_file"]))
     checks, log_mass_checks = [], []
     for method in sorted({r["method"] for r in manifest["index"]}):
-        if method not in ("pooled_nb", "independent_nb_ar1"):
+        if method not in ("pooled_nb", "independent_nb_ar1", "independent_nb_glar"):
             raise ValueError("Use a run containing Bayesian controls only.")
         records = sorted(
             [r for r in manifest["index"] if r["method"] == method], key=lambda r: r["origin"]
@@ -64,7 +64,9 @@ def main():
                 idata = az.from_netcdf(folder / f"posterior_attempt_{fit['retry_number']}.nc")
 
                 def generate(n, stream):
-                    return posterior_forecast(idata.posterior, method, months, n, stream)
+                    return posterior_forecast(
+                        idata.posterior, method, months, n, stream, fit.get("last_counts")
+                    )
 
             forecasts = {n: generate(n, seed) for n in (1000, 3000, 6000)}
             if not np.array_equal(forecasts[3000].paths, issued.paths):

@@ -1,5 +1,16 @@
 # Design amendments
 
+## 2026-10-21: primary independent control replacement
+
+The [conditional observation-driven NB amendment](amendments/OBSERVATION_CONTROL_20261021.md)
+replaces the unsuccessful latent independent control as the Stage 6 primary
+control, under the user's instruction to resolve it using the literature.
+Its distinct ID is `independent_nb_glar`. The stationary-scale revision below
+remains a recorded diagnostic variant; it did not pass every required initial
+category. Its partial rolling run was aborted before scoring. The replacement
+keeps the four-chain budgets, convergence gates, held-out period and eight named
+comparators unchanged. Its companion JSON freezes the new specification.
+
 ## 2026-10-21: independent-control stationary-scale prior
 
 Under the user's instruction to resolve the independent Bayesian control using

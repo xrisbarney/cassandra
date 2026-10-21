@@ -19,6 +19,7 @@ from ..provenance import (
     prepare_run,
     verify_freeze,
     verify_independent_control_amendment,
+    verify_observation_control_amendment,
     verify_zero_series_amendment,
 )
 from .scores import SCORING_VERSION, score_aggregate, score_cell
@@ -128,7 +129,7 @@ def _forecast_origin(task):
     }
     started = time.perf_counter()
     try:
-        if name in ("independent_nb_ar1", "pooled_nb"):
+        if name in ("independent_nb_ar1", "independent_nb_glar", "pooled_nb"):
             from ..models.bayesian_controls import fit_predict_bayesian
 
             forecast, fit = fit_predict_bayesian(
@@ -174,6 +175,8 @@ def forecast_development(root, settings, panel_manifest, output, workers=1):
         amendments.append(verify_zero_series_amendment(root, required=True))
     if any(spec["method"] == "independent_nb_ar1" for spec in settings["methods"]):
         amendments.append(verify_independent_control_amendment(root, required=True))
+    if any(spec["method"] == "independent_nb_glar" for spec in settings["methods"]):
+        amendments.append(verify_observation_control_amendment(root, required=True))
     config = load_config(root / "configs/pilot.toml")
     verify_freeze(root, config)
     verify_panels(root, panel_manifest)

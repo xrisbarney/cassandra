@@ -24,6 +24,11 @@ def build_model(train, initial_counts, method):
     import pymc as pm
     import pytensor.tensor as pt
 
+    if method == "independent_nb_glar":
+        from .observation_nb import build_model as build_observation_model
+
+        return build_observation_model(train, initial_counts)
+
     y = integer_counts(train)
     initial = integer_counts(initial_counts)
     if y.ndim != 2 or initial.ndim != 2 or initial.shape[1] != y.shape[1]:
@@ -111,8 +116,12 @@ def diagnostic_report(idata, depth):
     return report, summary
 
 
-def posterior_forecast(posterior, method, months, draws, seed):
+def posterior_forecast(posterior, method, months, draws, seed, last_counts=None):
     """Preserve common coefficient draws for the pooled model and whole latent paths."""
+    if method == "independent_nb_glar":
+        from .observation_nb import forecast
+
+        return forecast(posterior, last_counts, draws, seed)
     post = posterior.stack(sample=("chain", "draw"))
     n = post.sizes["sample"]
     k = post.sizes["category"]
@@ -258,12 +267,18 @@ def fit_predict_bayesian(train, initial_counts, spec, draws, origin, folder, see
             checks = predictive_checks(idata.posterior, name, train, initial_counts, origin)
             write_json(folder / "predictive_checks.json", checks)
             future = posterior_forecast(
-                idata.posterior, name, len(train), draws, stream_seed(seed, name, origin, "future")
+                idata.posterior,
+                name,
+                len(train),
+                draws,
+                stream_seed(seed, name, origin, "future"),
+                last_counts=train[-1],
             )
             return future, {
                 "fit_status": "accepted",
                 "retry_number": retry,
                 "attempts": attempts,
+                "last_counts": np.asarray(train[-1], dtype=int).tolist(),
                 "parameter_uncertainty": "posterior draws",
                 "cross_category_dependence": "shared coefficients"
                 if name == "pooled_nb"
