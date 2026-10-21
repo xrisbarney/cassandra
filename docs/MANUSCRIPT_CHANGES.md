@@ -179,3 +179,24 @@ This changes the sampling coordinates, not the probability law. Independent
 precision, complete density-ratio and gradient checks passed, including missing
 marks and censored endpoints. Report posterior diagnostic outcomes separately;
 passing these identities alone does not establish successful inference.
+
+### Count coordinates and numerical implementation (2026-10-22)
+
+The [conditional count coordinates](decisions/STAGE7_COUNT_COORDINATES_20261021.md)
+likewise use a working Gaussian approximation solely to choose an invertible
+transformation. Counts retain their exact negative-binomial likelihood,
+including observed zeros; missing cells supply no proxy information. The
+normalized state density and parameter-dependent Jacobian remain in the target.
+For the validated one-regime submodel without iid noise or kernel, block
+Cholesky and triangular solves evaluate the same transformation as the dense
+reference. The cached implementation supplies exact first derivatives. It is
+not a Gaussian replacement model or an approximate posterior method.
+
+Document the independent dense-algebra, finite-difference and fused sampler
+log-density/gradient tests. The fused interface tests caught a scalar-versus-
+Tensor return error missed by separate numerical tests; the failed launches
+are preserved as execution errors. Keep these distinct from diagnostic failures.
+The [metric comparison](decisions/STAGE7_WHITENED_METRIC_20261022.md) changes only
+mass adaptation after whitening and must be reported with its actual outcomes.
+Timing evidence separates compilation, warmup and retained sampling, records
+compiler optimization and concurrency, and is not a real-data rolling-fit budget.
