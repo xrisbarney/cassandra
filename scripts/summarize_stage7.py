@@ -17,9 +17,13 @@ def main():
     parser.add_argument('--runs', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--controls-from', type=Path)
+    parser.add_argument('--include', nargs='*', choices=SCENARIOS)
+    parser.add_argument('--seeds', nargs='+', type=int, choices=[7101, 7102, 7103],
+                        default=[7101, 7102, 7103])
     args = parser.parse_args()
-    expected = [(name, seed) for name in SCENARIOS for seed in (7101, 7102, 7103)
-                if name != 'representative' or seed == 7101]
+    expected = [(name, seed) for name in SCENARIOS for seed in args.seeds
+                if (name != 'representative' or seed == 7101)
+                and (not args.include or name in args.include)]
     diagnostics, recoveries, parameters, audit = [], [], [], []
     for name, seed in expected:
         source = args.controls_from if args.controls_from and name in (
