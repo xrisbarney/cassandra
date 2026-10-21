@@ -86,10 +86,12 @@ def generate(scenario, seed):
         # Unmodelled selection/zero inflation, deliberately outside the fitted NB law.
         counts[rng.random(counts.shape) < 0.3] = 0
     mask_n = np.ones((t, k), dtype=bool)
+    if severity:
+        mask_n[24:28] = False
     offset = np.zeros(t)
     if scenario == "effort_oracle":
         offset = true_effort[:t].copy()
-    data = {"N": counts[:t], "mask_N": mask_n, "effort": offset}
+    data = {"N": np.where(mask_n, counts[:t], np.nan), "mask_N": mask_n, "effort": offset}
     truth = {
         "m": m, "phi": phi, "loading": loading, "f": f[:t + 1],
         "tau": tau, "phi_u": phi_u, "u": u[:t], "psi": psi, "a": a,

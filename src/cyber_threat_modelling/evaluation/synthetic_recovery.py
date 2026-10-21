@@ -75,7 +75,9 @@ def summarize(posterior, data, truth, options, seed):
         'eta_operational': interval_metrics(eta, target_eta),
         'eta_generating_interpretation': interval_metrics(eta, truth['eta']),
         'expected_observed_counts': interval_metrics(mu, truth['mu']),
-        'training_posterior_predictive': interval_metrics(predictive, data['N']),
+        'training_posterior_predictive': interval_metrics(
+            predictive[:, data['mask_N']], data['N'][data['mask_N']]
+        ),
         'parameters': {}, 'regimes': regime_report,
     }
     mapping = {'m': 'm', 'psi': 'psi', 'tau': 'tau', 'phi_u': 'phi_u', 'f_phi': 'phi',

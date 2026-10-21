@@ -153,12 +153,14 @@ def test_masked_invalid_values_never_enter_likelihood_or_gradient():
         if key != 'M':
             data[key] = value[:16]
     options['months'] = 16
+    data['mask_N'][3:5] = False
+    data['N'][3:5] = np.nan
     model = build_model(data, options, truth)
     point = model.initial_point()
     val = model.compile_logp()(point)
     grad = model.compile_dlogp()(point)
     assert np.isfinite(val) and np.isfinite(grad).all()
-    for name in ['B', 'E', 'V', 'D']:
+    for name in ['N', 'B', 'E', 'V', 'D']:
         data[name][~data['mask_' + name]] = -np.inf
     altered = build_model(data, options, truth)
     assert np.allclose(altered.compile_logp()(point), val)

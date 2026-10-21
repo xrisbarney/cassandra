@@ -47,7 +47,11 @@ def build_model(data, options, conditional=None):
         if options["conditional_level"]:
             m = pt.as_tensor_variable(np.asarray(conditional["m"]))
         else:
-            m = hierarchical_level("m", k, 0, 3, 2, np.log(data["N"].mean(axis=0) + 0.5))
+            observed_sum = np.where(data['mask_N'], data['N'], 0).sum(axis=0)
+            observed_count = data['mask_N'].sum(axis=0)
+            initial_rate = np.divide(observed_sum, observed_count,
+                                     out=np.zeros(k), where=observed_count > 0)
+            m = hierarchical_level("m", k, 0, 3, 2, np.log(initial_rate + 0.5))
         psi = pm.LogNormal("psi", np.log(10), 1, shape=k, initval=np.full(k, 10))
         base = pt.broadcast_to(m, (t, k))
         if rank:
