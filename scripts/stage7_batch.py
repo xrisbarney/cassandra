@@ -34,6 +34,12 @@ def main():
             if not result.exists():
                 return {'scenario': name, 'seed': seed, 'status': 'partial_run_preserved'}
             record = json.loads(result.read_text())
+            requested = 'centered' if args.center_factors else 'innovations'
+            if record['options'].get('factor_parameterization', 'innovations') != requested:
+                raise ValueError(f'Existing run has different factor coordinates: {folder}')
+            metric = 'dense' if args.dense_mass else 'diagonal'
+            if record['options'].get('mass_matrix', 'diagonal') != metric:
+                raise ValueError(f'Existing run has a different mass matrix: {folder}')
             for relative, digest in record['artifacts'].items():
                 if file_hash(folder / relative) != digest:
                     raise ValueError(f'Changed artifact: {folder / relative}')

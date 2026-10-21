@@ -16,12 +16,16 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--runs', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--controls-from', type=Path)
     args = parser.parse_args()
     expected = [(name, seed) for name in SCENARIOS for seed in (7101, 7102, 7103)
                 if name != 'representative' or seed == 7101]
     diagnostics, recoveries, parameters, audit = [], [], [], []
     for name, seed in expected:
-        folder = args.runs / f'{name}-{seed}'
+        source = args.controls_from if args.controls_from and name in (
+            'independent', 'latent_ar'
+        ) else args.runs
+        folder = source / f'{name}-{seed}'
         path = folder / 'result.json'
         record = json.loads(path.read_text())
         for relative, digest in record['artifacts'].items():
@@ -30,6 +34,7 @@ def main():
         run = json.loads((folder / 'run.json').read_text())
         audit.append({'scenario': name, 'seed': seed, 'status': record['status'],
                       'directory': folder.as_posix(), 'result_sha256': file_hash(path),
+                      'options': record['options'],
                       'source_control': run['source_control'],
                       'data_sha256': run['data_sha256'], 'truth_sha256': run['truth_sha256']})
         for attempt in record['attempts']:
