@@ -15,6 +15,34 @@ from cyber_threat_modelling.models.components import fitted_effort
 from cyber_threat_modelling.provenance import file_hash, git_revision
 
 
+def peak_memory_bytes():
+    """Process peak working set on Windows; unavailable platforms are explicit."""
+    if os.name != 'nt':
+        return None
+    import ctypes
+    from ctypes import wintypes
+
+    class Counters(ctypes.Structure):
+        _fields_ = [('cb', wintypes.DWORD), ('PageFaultCount', wintypes.DWORD)] + [
+            (name, ctypes.c_size_t) for name in (
+                'PeakWorkingSetSize', 'WorkingSetSize', 'QuotaPeakPagedPoolUsage',
+                'QuotaPagedPoolUsage', 'QuotaPeakNonPagedPoolUsage', 'QuotaNonPagedPoolUsage',
+                'PagefileUsage', 'PeakPagefileUsage',
+            )
+        ]
+
+    kernel, psapi = ctypes.windll.kernel32, ctypes.windll.psapi
+    kernel.GetCurrentProcess.restype = wintypes.HANDLE
+    psapi.GetProcessMemoryInfo.argtypes = [wintypes.HANDLE, ctypes.POINTER(Counters),
+                                         wintypes.DWORD]
+    counters = Counters()
+    counters.cb = ctypes.sizeof(counters)
+    if not psapi.GetProcessMemoryInfo(kernel.GetCurrentProcess(), ctypes.byref(counters),
+                                     counters.cb):
+        raise OSError('Could not obtain process peak memory.')
+    return int(counters.PeakWorkingSetSize)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--scenario', choices=SCENARIOS, required=True)
@@ -52,6 +80,29 @@ def main():
     start = time.perf_counter()
     model = build_model(data, options, truth)
     graph_seconds = time.perf_counter() - start
+    if args.scenario == 'representative':
+        start = time.perf_counter()
+        gradient = model.compile_dlogp(mode='NUMBA')
+        compile_seconds = time.perf_counter() - start
+        point = model.initial_point()
+        start = time.perf_counter()
+        evaluated = gradient(point)
+        first_call = time.perf_counter() - start
+        if not np.isfinite(evaluated).all():
+            raise ValueError('Representative gradient is nonfinite.')
+        repeats = []
+        for _ in range(30):
+            start = time.perf_counter()
+            gradient(point)
+            repeats.append(time.perf_counter() - start)
+        write_json(folder / 'gradient_timing.json', {
+            'graph_seconds': graph_seconds, 'function_compile_seconds': compile_seconds,
+            'first_call_including_deferred_jit_seconds': first_call,
+            'median_repeated_call_seconds': float(np.median(repeats)),
+            'peak_working_set_bytes': peak_memory_bytes(),
+            'cache_scope': 'First call in this process, not an empty on-disk cache experiment.',
+            'fit_follows_this_preflight': True,
+        })
     budgets = [(1000, 1000, .95, 12), (2000, 1000, .99, 15), (2000, 2000, .99, 15)]
     attempts = []
     for retry, (warmup, draws, accept, depth) in enumerate(budgets):
@@ -108,6 +159,7 @@ def main():
             'graph_seconds': graph_seconds, 'step_compile_seconds': compile_seconds,
             'sample_call_seconds': sample_seconds, 'chain_wall_markers': timing,
             'diagnostic_seconds': diagnostic_seconds, 'serialization_seconds': serialization,
+            'peak_working_set_bytes': peak_memory_bytes(),
             'warnings': messages, 'performance_warnings': performance,
             'unresolved_warnings': unresolved,
         }
