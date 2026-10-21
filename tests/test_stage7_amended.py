@@ -61,8 +61,8 @@ def test_amended_compiled_gradients_and_stationary_density(scenario):
         full_logp = model.compile_logp()
         derivative = model.compile_dlogp(vars=[model['a_scale']])
         left, right = dict(point), dict(point)
-        left['a_scale_log__'] -= 1e-5
-        right['a_scale_log__'] += 1e-5
+        left['a_scale_log__'] = point['a_scale_log__'] - 1e-5
+        right['a_scale_log__'] = point['a_scale_log__'] + 1e-5
         finite_difference = (full_logp(right)-full_logp(left))/2e-5
         assert np.allclose(derivative(point), finite_difference, rtol=1e-5, atol=1e-5)
 
@@ -102,3 +102,19 @@ def test_amended_covariance_matches_original_generating_process():
                     truth['width'][None] if options['kernel'] else None,
                     truth['tau'][None], truth['phi_u'][None], options['residual'], lag, flag))
             assert np.allclose(*results, atol=1e-12)
+
+
+@pytest.mark.parametrize('scenario', ['latent_ar', 'dispersion_dense', 'representative'])
+def test_amended_residual_initialization_has_category_shape(scenario):
+    data, truth, options = generate(scenario, 7101)
+    for name in data:
+        data[name] = data[name][:4]
+    options.update(months=4, prior_id=PRIOR_ID)
+    if scenario == 'representative':
+        options.update(residual='iid', kernel=True, regimes=3)
+    model = build_model(data, options, stationary_truth(truth, options))
+    point = model.initial_point()
+    assert point['tau_interval__'].shape == (options['categories'],)
+    assert all(np.isfinite(value).all() for value in point.values())
+    if scenario == 'latent_ar':
+        assert np.isfinite(model.compile_dlogp(mode='NUMBA')(point)).all()

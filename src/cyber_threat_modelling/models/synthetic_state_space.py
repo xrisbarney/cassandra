@@ -82,7 +82,8 @@ def build_model(data, options, conditional=None):
             base = base + factors("f", k, rank, t,
                                   options.get('factor_parameterization', 'innovations'), revised)
         if options["residual"] != "none":
-            tau = (pm.TruncatedNormal('tau', 0, 1, lower=0, upper=1, shape=k, initval=.3)
+            tau = (pm.TruncatedNormal('tau', 0, 1, lower=0, upper=1, shape=k,
+                                      initval=np.full(k, .3))
                    if revised else
                    pm.Deterministic("tau", 0.01 + pm.HalfNormal("tau_excess", 1, shape=k)))
             if options["residual"] == "iid":
