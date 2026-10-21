@@ -98,3 +98,12 @@ they are not exhausted statistical fits or convergence failures.
 This extends the algebra in the
 [severity decision](STAGE7_SEVERITY_COORDINATES_20261021.md); its Gaussian proxy
 is an implementation choice whose usefulness must be established by the fits.
+
+First effort-proxy outcome, recorded before reading its recovery scores:
+`count-block-v3/primary/effort_proxy-7101` passed the first four-chain budget
+with R-hat 1.00874, minimum bulk/tail ESS 792/640, minimum BFMI 0.94095,
+zero retained divergences/depth saturations, and no unresolved warnings.
+Apply the same conditional count coordinates, cached block solver and dense
+metric to seeds 7102 and 7103. The original three failed amplitude-coordinate
+schedules remain part of the record. This does not select a new prior or
+claim that the effort proxy identifies physical threat activity.
