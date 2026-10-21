@@ -54,6 +54,7 @@ def main():
                         {
                             "method": method,
                             "origin": record["origin"],
+                            "category": attempt.get("category"),
                             "retry_number": attempt["retry_number"],
                             **attempt["diagnostics"],
                         }
@@ -62,6 +63,7 @@ def main():
                         {
                             "method": method,
                             "origin": record["origin"],
+                            "category": attempt.get("category"),
                             "retry_number": attempt["retry_number"],
                             **{
                                 key: value

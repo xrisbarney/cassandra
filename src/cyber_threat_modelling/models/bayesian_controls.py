@@ -30,6 +30,7 @@ def build_model(train, initial_counts, method):
         raise ValueError("Incompatible training and initial-prior anchor arrays.")
     t, k = y.shape
     if method == "independent_nb_ar1":
+        from .control_priors import INDEPENDENT_STATIONARY_SCALE_SD
         from .independent_geometry import build_conditioned_model
 
         # Frozen Stage 5 row order: category 8 is the strongly informed persistent
@@ -38,7 +39,12 @@ def build_model(train, initial_counts, method):
         centered = (
             np.array([7], dtype=int) if k > 7 and initial[:, 7].sum() else np.array([], dtype=int)
         )
-        return build_conditioned_model(y, initial, center_states=centered)
+        return build_conditioned_model(
+            y,
+            initial,
+            center_states=centered,
+            stationary_scale_sd=INDEPENDENT_STATIONARY_SCALE_SD,
+        )
     with pm.Model(coords={"category": np.arange(k), "month": np.arange(t)}) as model:
         log_psi = pm.Normal("log_psi", 0, 1, dims="category")
         psi = pm.Deterministic("psi", pt.exp(log_psi), dims="category")
@@ -148,6 +154,10 @@ def fit_predict_bayesian(train, initial_counts, spec, draws, origin, folder, see
     if not pytensor.config.cxx:
         raise ValueError("Activate the verified compiler before Bayesian fitting.")
     name = spec["method"]
+    if name == "independent_nb_ar1":
+        from .independent_controls import fit_independent_categories
+
+        return fit_independent_categories(train, initial_counts, draws, origin, folder, seed)
     started = time.perf_counter()
     model = build_model(train, initial_counts, name)
     construction = time.perf_counter() - started

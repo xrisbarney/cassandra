@@ -1,0 +1,20 @@
+{
+  "amendment_id": "2026-10-21-independent-control",
+  "status": "active",
+  "decision_authority": "Implementation decision under the user instruction to finish Stage 6 and resolve the independent Bayesian control using best practices or literature",
+  "decided_on": "2026-10-21",
+  "methods": [
+    "independent_nb_ar1"
+  ],
+  "rule": "stationary_scale_halfnormal_v1",
+  "stationary_scale_sd": 0.75,
+  "parent_freeze_sha256": "7597b76276b837f8db9bc2baff63cb035e14cdfa8656885c782795d38cb598e7",
+  "files": [
+    {
+      "path": "docs/amendments/INDEPENDENT_CONTROL_20261021.md",
+      "sha256": "ef7c70ac940c8218d09c806242f0a97d008d510015ce31eb44eb3c7fd93de9fc"
+    }
+  ],
+  "independent_development_scored_at_activation": false,
+  "held_out_scored_at_activation": false
+}

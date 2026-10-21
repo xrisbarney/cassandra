@@ -92,11 +92,37 @@ def verify_zero_series_amendment(root: Path, required=False):
     return {"path": relative, "sha256": file_hash(path), "record": record}
 
 
+def verify_independent_control_amendment(root: Path, required=False):
+    from .models.control_priors import INDEPENDENT_PRIOR_RULE, INDEPENDENT_STATIONARY_SCALE_SD
+
+    relative = "docs/amendments/INDEPENDENT_CONTROL_20261021.json"
+    path = root / relative
+    if not path.is_file():
+        if required:
+            raise ConfigurationError("The independent-control prior amendment is required.")
+        return None
+    record = json.loads(path.read_text(encoding="utf-8"))
+    if (
+        record["status"] != "active"
+        or record["rule"] != INDEPENDENT_PRIOR_RULE
+        or record["stationary_scale_sd"] != INDEPENDENT_STATIONARY_SCALE_SD
+        or record["methods"] != ["independent_nb_ar1"]
+        or record["parent_freeze_sha256"] != file_hash(root / "docs/STAGE2_FREEZE.json")
+        or not record["files"]
+    ):
+        raise ConfigurationError("Invalid independent-control amendment or parent freeze.")
+    for item in record["files"]:
+        if file_hash(project_file(root, item["path"])) != item["sha256"]:
+            raise ConfigurationError("A frozen amendment file changed.")
+    return {"path": relative, "sha256": file_hash(path), "record": record}
+
+
 def prepare_run(root: Path, config: ExperimentConfig, output: Path, data_manifest=None) -> Path:
     """Write a new preparation record. Never overwrite a prior run directory."""
     root = root.resolve()
     freeze = verify_freeze(root, config)
     amendment = verify_zero_series_amendment(root)
+    independent_amendment = verify_independent_control_amendment(root)
     data_record = None
     if data_manifest:
         from .data.audit import verify_data_manifest
@@ -124,7 +150,7 @@ def prepare_run(root: Path, config: ExperimentConfig, output: Path, data_manifes
         "configuration": config.settings,
         "configuration_sha256": config.sha256,
         "protocol": freeze,
-        "design_amendments": [amendment] if amendment else [],
+        "design_amendments": [a for a in (amendment, independent_amendment) if a],
         "seed": config.settings["seed"],
         "python": sys.version,
         "platform": platform.platform(),

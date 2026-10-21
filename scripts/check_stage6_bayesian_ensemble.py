@@ -14,6 +14,7 @@ from cyber_threat_modelling.evaluation.scores import crps
 from cyber_threat_modelling.forecasting.count_laws import CountForecast
 from cyber_threat_modelling.models.bayesian_controls import posterior_forecast
 from cyber_threat_modelling.models.count_baselines import stream_seed
+from cyber_threat_modelling.models.independent_controls import forecast_from_files
 from cyber_threat_modelling.provenance import file_hash
 
 
@@ -51,20 +52,24 @@ def main():
         for origin, (record, horizons) in selected.items():
             folder = args.run / record["directory"]
             fit = json.loads((folder / "fit.json").read_text())
-            idata = az.from_netcdf(folder / f"posterior_attempt_{fit['retry_number']}.nc")
             months = len(wide.loc[:origin])
             seed = stream_seed(record["seed"], method, origin, "future")
             issued = CountForecast.load(folder / "forecast.npz")
-            forecasts = {
-                n: posterior_forecast(idata.posterior, method, months, n, seed)
-                for n in (1000, 3000, 6000)
-            }
+            if fit.get("posterior_layout") == "separate_categories":
+                idata = None
+
+                def generate(n, stream):
+                    return forecast_from_files(folder, fit, months, n, stream)
+            else:
+                idata = az.from_netcdf(folder / f"posterior_attempt_{fit['retry_number']}.nc")
+
+                def generate(n, stream):
+                    return posterior_forecast(idata.posterior, method, months, n, stream)
+
+            forecasts = {n: generate(n, seed) for n in (1000, 3000, 6000)}
             if not np.array_equal(forecasts[3000].paths, issued.paths):
                 raise ValueError("Saved 3000-path stream does not reproduce.")
-            repeat = posterior_forecast(
-                idata.posterior,
-                method,
-                months,
+            repeat = generate(
                 6000,
                 stream_seed(record["seed"], method, origin, "future_mc_repeat"),
             )
@@ -86,7 +91,8 @@ def main():
                             "difference": repeated_log_mass - original_log_mass,
                         }
                     )
-            idata.close()
+            if idata is not None:
+                idata.close()
         for horizon, sizes in values.items():
             means = {str(n): float(np.mean(v)) for n, v in sizes.items()}
             tolerance = 0.01 * max(1, means["6000"])

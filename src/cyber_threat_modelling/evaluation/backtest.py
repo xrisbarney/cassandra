@@ -14,7 +14,13 @@ from ..features.build import verify_panels
 from ..forecasting.count_laws import CountForecast, integer_counts
 from ..models.count_baselines import FitFailure, fit_predict, method_id, stream_seed
 from ..models.ordering import loading_order
-from ..provenance import file_hash, prepare_run, verify_freeze, verify_zero_series_amendment
+from ..provenance import (
+    file_hash,
+    prepare_run,
+    verify_freeze,
+    verify_independent_control_amendment,
+    verify_zero_series_amendment,
+)
 from .scores import SCORING_VERSION, score_aggregate, score_cell
 
 
@@ -163,9 +169,11 @@ def forecast_development(root, settings, panel_manifest, output, workers=1):
         raise ValueError("Use one to four independent origin workers.")
     names = validate_settings(settings)
     verify_finalists(root, settings)
-    amendment = None
+    amendments = []
     if any(spec["method"] == "arima" for spec in settings["methods"]):
-        amendment = verify_zero_series_amendment(root, required=True)
+        amendments.append(verify_zero_series_amendment(root, required=True))
+    if any(spec["method"] == "independent_nb_ar1" for spec in settings["methods"]):
+        amendments.append(verify_independent_control_amendment(root, required=True))
     config = load_config(root / "configs/pilot.toml")
     verify_freeze(root, config)
     verify_panels(root, panel_manifest)
@@ -178,7 +186,13 @@ def forecast_development(root, settings, panel_manifest, output, workers=1):
     initial = counts[:108]
     permutation, inverse = loading_order(initial, categories)
     prepare_run(root, config, output)
-    amendment_sha256 = amendment["sha256"] if amendment else None
+    amendment_sha256 = (
+        amendments[0]["sha256"]
+        if len(amendments) == 1
+        else hashlib.sha256(canonical_json(amendments)).hexdigest()
+        if amendments
+        else None
+    )
     effective_settings = {"settings": settings, "amendment_sha256": amendment_sha256}
     configuration_hash = hashlib.sha256(canonical_json(effective_settings)).hexdigest()
     write_json(output / "backtest_settings.json", settings)
@@ -232,6 +246,7 @@ def forecast_development(root, settings, panel_manifest, output, workers=1):
         "panel_file": panel_relative,
         "configuration_sha256": configuration_hash,
         "design_amendment_sha256": amendment_sha256,
+        "design_amendments": amendments,
         "category_ids": categories,
         "model_category_order": np.asarray(categories)[permutation].tolist(),
         "inverse_model_permutation": inverse.tolist(),

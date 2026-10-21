@@ -5,7 +5,9 @@ import numpy as np
 from ..models.count_baselines import stream_seed
 
 
-def predictive_checks(posterior, method, counts, initial_counts, origin, draws=1000):
+def predictive_checks(
+    posterior, method, counts, initial_counts, origin, draws=1000, independent_prior_scale=None
+):
     """Report discrepancy distributions, including zeros; these are not fit-selection scores."""
     y = np.asarray(counts, dtype=int)
     t, k = y.shape
@@ -31,9 +33,14 @@ def predictive_checks(posterior, method, counts, initial_counts, origin, draws=1
             * post.unit_state.transpose("sample", "month", "category").values[indices]
         )
         m = rng.normal(np.log(np.mean(initial_counts, axis=0) + 0.5), 2, (draws, k))
-        tau = abs(rng.normal(0, 0.3, (draws, k)))
+        scale = abs(rng.normal(0, independent_prior_scale or 0.3, (draws, k)))
         phi = rng.uniform(-1, 1, (draws, k))
-        u = tau * rng.normal(size=(draws, k)) / np.sqrt(1 - phi**2)
+        if independent_prior_scale is None:
+            tau = scale
+            u = tau * rng.normal(size=(draws, k)) / np.sqrt(1 - phi**2)
+        else:
+            tau = scale * np.sqrt(1 - phi**2)
+            u = scale * rng.normal(size=(draws, k))
         prior_eta = np.empty((draws, t, k))
         for month in range(t):
             if month:
@@ -45,6 +52,7 @@ def predictive_checks(posterior, method, counts, initial_counts, origin, draws=1
         "method": method,
         "interpretation": "in-sample predictive checks, not out-of-sample calibration",
         "categories": [],
+        "independent_stationary_scale_prior_sd": independent_prior_scale,
     }
     prior_psi = np.exp(rng.normal(size=(draws, k)))
     with np.errstate(over="raise", under="raise"):

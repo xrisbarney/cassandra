@@ -9,6 +9,7 @@ from cyber_threat_modelling.data.store import write_json
 from cyber_threat_modelling.evaluation.backtest import count_matrix, training_prefix
 from cyber_threat_modelling.models.bayesian_controls import fit_predict_bayesian
 from cyber_threat_modelling.models.count_baselines import FitFailure
+from cyber_threat_modelling.provenance import verify_independent_control_amendment
 
 
 def main():
@@ -18,6 +19,11 @@ def main():
     args = parser.parse_args()
     args.output.mkdir(parents=True, exist_ok=False)
     root = Path(__file__).resolve().parents[1]
+    if args.method == "independent_nb_ar1":
+        write_json(
+            args.output / "prior_amendment.json",
+            verify_independent_control_amendment(root, required=True),
+        )
     wide, counts = count_matrix(
         pd.read_parquet(root / "data/processed/stage5-20261020/topic_month.parquet")
     )

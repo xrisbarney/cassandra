@@ -14,7 +14,9 @@ def initial_conditioning(tau, phi):
     return marginal_variance, 4 / marginal_variance, 4 * stationary_variance / marginal_variance
 
 
-def build_conditioned_model(train, initial_counts, *, center_states=False):
+def build_conditioned_model(
+    train, initial_counts, *, center_states=False, mutable=False, stationary_scale_sd=None
+):
     import pymc as pm
     import pytensor.tensor as pt
 
@@ -23,7 +25,7 @@ def build_conditioned_model(train, initial_counts, *, center_states=False):
     y = integer_counts(train)
     initial = integer_counts(initial_counts)
     t, k = y.shape
-    m0 = np.log(initial.mean(axis=0) + 0.5)
+    m0_value = np.log(initial.mean(axis=0) + 0.5)
     centered = (
         np.arange(k)
         if center_states is True
@@ -41,11 +43,24 @@ def build_conditioned_model(train, initial_counts, *, center_states=False):
         return pt.concatenate([value[j : j + 1] for j in indices], axis=0)
 
     with pm.Model(coords={"category": np.arange(k), "month": np.arange(t)}) as model:
+        m0 = pm.Data("prior_mean", m0_value) if mutable else m0_value
+        observations = (
+            pm.Data("training_counts", y.T, dims=("category", "month")) if mutable else y.T
+        )
         log_psi = pm.Normal("log_psi", 0, 1, dims="category")
         psi = pm.Deterministic("psi", pt.exp(log_psi), dims="category")
-        tau = pm.HalfNormal("tau", 0.3, dims="category")
         phi = pm.Uniform("phi", -1, 1, dims="category")
-        variance, weight, conditional_variance = initial_conditioning(tau, phi)
+        if stationary_scale_sd is None:
+            tau = pm.HalfNormal("tau", 0.3, dims="category")
+            variance, weight, conditional_variance = initial_conditioning(tau, phi)
+        else:
+            stationary_scale = pm.HalfNormal(
+                "stationary_scale", stationary_scale_sd, dims="category"
+            )
+            tau = pm.Deterministic("tau", stationary_scale * pt.sqrt(1 - phi**2), dims="category")
+            variance = 4 + stationary_scale**2
+            weight = 4 / variance
+            conditional_variance = 4 * stationary_scale**2 / variance
         initial_eta = pm.Normal("initial_eta", m0, pt.sqrt(variance), dims="category")
         m_residual = pm.Normal("m_residual", 0, 1, dims="category")
         m = pm.Deterministic(
@@ -58,7 +73,7 @@ def build_conditioned_model(train, initial_counts, *, center_states=False):
             future_eta = pm.Flat(
                 "future_eta",
                 shape=(n_centered, t - 1),
-                initval=np.broadcast_to(m0[centered, None], (n_centered, t - 1)).copy(),
+                initval=np.broadcast_to(m0_value[centered, None], (n_centered, t - 1)).copy(),
             )
             center_m = rows(m, centered)[:, None]
             center_phi = rows(phi, centered)[:, None]
@@ -93,7 +108,7 @@ def build_conditioned_model(train, initial_counts, *, center_states=False):
             "counts",
             mu=pt.exp(m[:, None] + u),
             alpha=psi[:, None],
-            observed=y.T,
+            observed=observations,
             dims=("category", "month"),
         )
     return model

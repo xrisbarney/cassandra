@@ -1,5 +1,17 @@
 # Design amendments
 
+## 2026-10-21: independent-control stationary-scale prior
+
+Under the user's instruction to resolve the independent Bayesian control using
+best practices or the literature, the scale prior is moved to the stationary
+log-rate SD. This is a substantive model change following a prior-predictive
+failure, separate from the exact computational reparameterizations. It is
+recorded before any independent-control development scoring or held-out scoring.
+See the [decision and mathematical rationale](amendments/INDEPENDENT_CONTROL_20261021.md)
+and [supplemental freeze](amendments/INDEPENDENT_CONTROL_20261021.json).
+The original Stage 2 freeze, other controls and all diagnostic thresholds remain
+unchanged. The prior scale is an explicit design choice, not a published result.
+
 ## 2026-10-21: all-zero ARIMA/ETS boundary convention
 
 User-approved substantive supplement to design v1.0.1, activated before ARIMA
