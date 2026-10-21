@@ -52,11 +52,128 @@ def _dot(left, right):
 
 
 @njit(cache=True, error_model='numpy')
+def _forward_small(diagonal, off, natural, whitened):
+    """Scalar triangular algebra avoids per-month tiny-array allocation."""
+    length, rank = natural.shape
+    lower = np.zeros_like(diagonal)
+    below = np.zeros_like(diagonal)
+    right = np.empty_like(natural)
+    states = np.empty_like(natural)
+    jacobian = 0.
+    for t in range(length):
+        if t:
+            for i in range(rank):
+                below[t, i, 0] = off[i, 0]/lower[t-1, 0, 0]
+                if rank == 2:
+                    below[t, i, 1] = (off[i, 1]-lower[t-1, 1, 0]*below[t, i, 0]) / (
+                        lower[t-1, 1, 1])
+        d00 = diagonal[t, 0, 0]
+        for j in range(rank):
+            d00 -= below[t, 0, j]**2
+        lower[t, 0, 0] = np.sqrt(d00)
+        if rank == 2:
+            d10, d11 = diagonal[t, 1, 0], diagonal[t, 1, 1]
+            for j in range(rank):
+                d10 -= below[t, 1, j]*below[t, 0, j]
+                d11 -= below[t, 1, j]**2
+            lower[t, 1, 0] = d10/lower[t, 0, 0]
+            lower[t, 1, 1] = np.sqrt(d11-lower[t, 1, 0]**2)
+        for i in range(rank):
+            rhs = natural[t, i]
+            if t:
+                for j in range(rank):
+                    rhs -= below[t, i, j]*right[t-1, j]
+            if i:
+                rhs -= lower[t, 1, 0]*right[t, 0]
+            right[t, i] = rhs/lower[t, i, i]
+            jacobian -= np.log(lower[t, i, i])
+    for t in range(length-1, -1, -1):
+        for i in range(rank-1, -1, -1):
+            rhs = right[t, i]+whitened[t, i]
+            if t < length-1:
+                for j in range(rank):
+                    rhs -= below[t+1, j, i]*states[t+1, j]
+            if rank == 2 and i == 0:
+                rhs -= lower[t, 1, 0]*states[t, 1]
+            states[t, i] = rhs/lower[t, i, i]
+    return states, jacobian, lower, below, right
+
+
+@njit(cache=True, error_model='numpy')
+def _reverse_small(diagonal, off, natural, whitened, grad_states, grad_jacobian):
+    """Reverse the same scalar operations; retain the lower-triangle convention."""
+    states, _, lower, below, right = _forward_small(diagonal, off, natural, whitened)
+    length, rank = natural.shape
+    adj_states = grad_states.copy()
+    adj_lower, adj_below = np.zeros_like(lower), np.zeros_like(below)
+    adj_right, adj_white = np.zeros_like(natural), np.zeros_like(whitened)
+    adj_diagonal, adj_off = np.zeros_like(diagonal), np.zeros_like(off)
+    adj_natural = np.zeros_like(natural)
+    rhs, symmetric, contribution = np.empty(rank), np.zeros((rank, rank)), np.empty_like(off)
+    for t in range(length):
+        rhs[0] = adj_states[t, 0]/lower[t, 0, 0]
+        if rank == 2:
+            rhs[1] = (adj_states[t, 1]-lower[t, 1, 0]*rhs[0])/lower[t, 1, 1]
+        for i in range(rank):
+            adj_right[t, i] += rhs[i]
+            adj_white[t, i] += rhs[i]
+            for j in range(i+1):
+                adj_lower[t, i, j] -= states[t, i]*rhs[j]
+            adj_lower[t, i, i] -= grad_jacobian/lower[t, i, i]
+            if t < length-1:
+                for j in range(rank):
+                    adj_below[t+1, i, j] -= states[t+1, i]*rhs[j]
+                    adj_states[t+1, i] -= below[t+1, i, j]*rhs[j]
+    for t in range(length-1, -1, -1):
+        rhs[rank-1] = adj_right[t, rank-1]/lower[t, rank-1, rank-1]
+        if rank == 2:
+            rhs[0] = (adj_right[t, 0]-lower[t, 1, 0]*rhs[1])/lower[t, 0, 0]
+        for i in range(rank):
+            adj_natural[t, i] += rhs[i]
+            for j in range(i+1):
+                adj_lower[t, i, j] -= rhs[i]*right[t, j]
+            if t:
+                for j in range(rank):
+                    adj_below[t, i, j] -= rhs[i]*right[t-1, j]
+                    adj_right[t-1, j] -= below[t, i, j]*rhs[i]
+        # a=sqrt(D00), b=D10/a, c=sqrt(D11-b*b).
+        # Reverse these identities directly rather than allocating matrix solves.
+        adj_a = adj_lower[t, 0, 0]
+        if rank == 2:
+            symmetric[1, 1] = adj_lower[t, 1, 1]/(2*lower[t, 1, 1])
+            adj_b = adj_lower[t, 1, 0]-2*lower[t, 1, 0]*symmetric[1, 1]
+            adj_diagonal[t, 1, 0] = adj_b/lower[t, 0, 0]
+            adj_a -= adj_b*lower[t, 1, 0]/lower[t, 0, 0]
+            symmetric[0, 1] = symmetric[1, 0] = adj_diagonal[t, 1, 0]/2
+            adj_diagonal[t, 1, 1] = symmetric[1, 1]
+        symmetric[0, 0] = adj_diagonal[t, 0, 0] = adj_a/(2*lower[t, 0, 0])
+        if t:
+            for i in range(rank):
+                for j in range(rank):
+                    for k in range(rank):
+                        adj_below[t, i, j] -= 2*symmetric[i, k]*below[t, k, j]
+            for i in range(rank):
+                contribution[i, rank-1] = adj_below[t, i, rank-1]/lower[t-1, rank-1, rank-1]
+                if rank == 2:
+                    contribution[i, 0] = (adj_below[t, i, 0]
+                                          - lower[t-1, 1, 0]*contribution[i, 1]) / lower[t-1, 0, 0]
+                for j in range(rank):
+                    adj_off[i, j] += contribution[i, j]
+            for i in range(rank):
+                for j in range(i+1):
+                    for k in range(rank):
+                        adj_lower[t-1, i, j] -= contribution[k, i]*below[t, k, j]
+    return adj_diagonal, adj_off, adj_natural, adj_white
+
+
+@njit(cache=True, error_model='numpy')
 def forward(diagonal, off, natural, whitened):
     length, rank = natural.shape
     if (length < 1 or rank < 1 or diagonal.shape != (length, rank, rank)
             or off.shape != (rank, rank) or whitened.shape != natural.shape):
         raise ValueError('Incompatible block Gaussian dimensions.')
+    if rank <= 2:
+        return _forward_small(diagonal, off, natural, whitened)
     lower = np.empty_like(diagonal)
     below = np.zeros_like(diagonal)
     right = np.empty_like(natural)
@@ -94,6 +211,12 @@ def _chol_reverse(lower, adjoint):
 
 @njit(cache=True, error_model='numpy')
 def reverse(diagonal, off, natural, whitened, grad_states, grad_jacobian):
+    length, rank = natural.shape
+    if (length < 1 or rank < 1 or diagonal.shape != (length, rank, rank)
+            or off.shape != (rank, rank) or whitened.shape != natural.shape):
+        raise ValueError('Incompatible block Gaussian dimensions.')
+    if natural.shape[1] <= 2:
+        return _reverse_small(diagonal, off, natural, whitened, grad_states, grad_jacobian)
     states, _, lower, below, right = forward(diagonal, off, natural, whitened)
     length, rank = natural.shape
     adj_states = grad_states.copy()

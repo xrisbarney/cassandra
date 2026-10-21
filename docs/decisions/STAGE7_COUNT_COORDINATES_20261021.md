@@ -107,3 +107,24 @@ Apply the same conditional count coordinates, cached block solver and dense
 metric to seeds 7102 and 7103. The original three failed amplitude-coordinate
 schedules remain part of the record. This does not select a new prior or
 claim that the effort proxy identifies physical threat activity.
+
+Allocation profile, 2026-10-22: at 109 states and rank two, the original cached
+forward and reverse kernels took median 0.000530 and 0.002207 seconds in a
+100-call microbenchmark under concurrent load. The reverse includes another
+forward evaluation. Specialize the one- and two-factor triangular algebra into
+scalar operations and preallocated arrays, retaining the general solver for
+higher rank. This removes per-month tiny-matrix allocations; it does not alter
+the precision, working likelihood, normalization or Jacobian. Repeat dense
+reference, finite-difference, near-unit/strided and complete fused target checks
+before using the optimization as validated evidence. Report a fresh full-gradient
+timing, since primitive speed alone is not a sampler speedup estimate. Existing
+processes retain their already loaded implementation and provenance.
+
+The specialized implementation passed all six focused checks (882.11 seconds):
+the four independent block/reference/gradient/near-unit tests and the complete
+fused count and censored-severity targets. The two dense-oracle variants are
+also included in the separate full-suite run. In the same 100-call primitive
+microbenchmark, forward/reverse medians became 0.0000327/0.0000852 seconds.
+These measurements were made under concurrent load and do not isolate a sampler
+speedup. Use the verified scalar implementation for subsequent block fits;
+existing partial attempts remain identifiable by their source hashes.
