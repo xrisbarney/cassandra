@@ -35,11 +35,27 @@ def checked_run(folder, candidate, scenario, seed, activation):
         if file_hash(folder/filename) != run[key]:
             raise ValueError(f'Changed generating record: {folder/filename}')
     admitted = [attempt for attempt in result['attempts'] if attempt['accepted']]
+    budgets = [(1000, 1000, .95, 12), (2000, 1000, .99, 15), (2000, 2000, .99, 15)]
+    for index, attempt in enumerate(result['attempts']):
+        if index >= len(budgets) or attempt['retry'] != index:
+            raise ValueError(f'Unexpected retry schedule: {folder}')
+        observed = tuple(attempt[key] for key in
+                         ['warmup', 'draws', 'target_accept', 'max_treedepth'])
+        if observed != budgets[index] or attempt['chains'] != 4:
+            raise ValueError(f'Changed sampling budget: {folder}')
     if result['status'] == 'accepted':
         if len(admitted) != 1 or not admitted[0]['diagnostics']['accepted']:
             raise ValueError(f'Inconsistent admission: {folder}')
         if admitted[0]['unresolved_warnings']:
             raise ValueError(f'Unresolved admitted warning: {folder}')
+        if admitted[0] is not result['attempts'][-1]:
+            raise ValueError(f'Continued after admission: {folder}')
+        import xarray as xr
+
+        retry = admitted[0]['retry']
+        with xr.open_dataset(folder/f'posterior_{retry}.nc', group='posterior') as posterior:
+            if posterior.sizes['chain'] != 4 or posterior.sizes['draw'] != budgets[retry][1]:
+                raise ValueError(f'Incomplete accepted posterior: {folder}')
     elif result['status'] == 'failed_diagnostic_gate':
         if admitted or len(result['attempts']) != 3 or (folder/'recovery.json').exists():
             raise ValueError(f'Incomplete or mislabelled failed case: {folder}')
@@ -52,8 +68,18 @@ def checked_run(folder, candidate, scenario, seed, activation):
         'data_sha256': run['data_sha256'], 'truth_sha256': run['truth_sha256'],
         'original_truth_sha256': run['truth_original_coordinates_sha256'],
         'source_control': run['source_control'],
+        'options': options,
         'compute_thread_policy': run.get('compute_thread_policy', 'original library defaults'),
     }
+
+
+def routed_folder(routing, campaign, key, default, root):
+    """Use only an explicit, project-contained route; never select by outcome."""
+    chosen = Path(routing.get(campaign, {}).get(key, default))
+    resolved = chosen.resolve()
+    if not resolved.is_relative_to(root.resolve()):
+        raise ValueError(f'Route escapes the project: {chosen}')
+    return chosen
 
 
 def main():
@@ -63,15 +89,27 @@ def main():
     parser.add_argument('--severity-repair', type=Path,
                         default=Path('artifacts/stage7/severity-conditional-v2'))
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--routing', type=Path,
+                        help='Explicit replacement routes and preserved earlier attempts.')
     args = parser.parse_args()
+    routing = json.loads(args.routing.read_text()) if args.routing else {}
+    primary_keys = {f'{name}/{seed}' for name in SCENARIOS for seed in [7101, 7102, 7103]
+                    if name != 'representative' or seed == 7101}
+    sensitivity_keys = {f'{candidate}/{name}/7101' for candidate in CANDIDATES
+                        if candidate != 'primary'
+                        for name in ['factors_sparse', 'representative', 'fallback_zero']}
+    for campaign, expected in [('primary', primary_keys), ('sensitivity', sensitivity_keys)]:
+        if set(routing.get(campaign, {})) - expected:
+            raise ValueError(f'Unknown {campaign} routing keys.')
     activation = verify_activation(Path.cwd(), CURRENT_PRIOR_ID)
     records, primary = [], {}
     for scenario in SCENARIOS:
         for seed in [7101, 7102, 7103]:
             if scenario == 'representative' and seed != 7101:
                 continue
-            record = checked_run(args.primary/f'{scenario}-{seed}', 'primary', scenario,
-                                 seed, activation)
+            folder = routed_folder(routing, 'primary', f'{scenario}/{seed}',
+                                   args.primary/f'{scenario}-{seed}', Path.cwd())
+            record = checked_run(folder, 'primary', scenario, seed, activation)
             record['campaign'] = 'primary'
             records.append(record)
             primary[scenario, seed] = record
@@ -79,8 +117,9 @@ def main():
         if candidate == 'primary':
             continue
         for scenario in ['factors_sparse', 'representative', 'fallback_zero']:
-            record = checked_run(args.sensitivity/candidate/f'{scenario}-7101', candidate,
-                                 scenario, 7101, activation)
+            folder = routed_folder(routing, 'sensitivity', f'{candidate}/{scenario}/7101',
+                                   args.sensitivity/candidate/f'{scenario}-7101', Path.cwd())
+            record = checked_run(folder, candidate, scenario, 7101, activation)
             record['campaign'] = 'sensitivity'
             records.append(record)
     # The predeclared repair continues beyond seed 7101 only if that fit passes.
@@ -99,6 +138,27 @@ def main():
         for key in ['data_sha256', 'truth_sha256', 'original_truth_sha256']:
             if record[key] != reference[key]:
                 raise ValueError(f'Datasets differ across repeated fits: {record["directory"]}')
+    earlier = []
+    for item in routing.get('earlier_attempts', []):
+        folder = routed_folder({}, '', '', item['directory'], Path.cwd())
+        run = json.loads((folder/'run.json').read_text())
+        reference = primary[run['options']['scenario'], run['options']['seed']]
+        for key, filename in [('data_sha256', 'data.npz'), ('truth_sha256', 'truth.npz'),
+                              ('original_truth_sha256', 'truth_original_coordinates.npz')]:
+            if file_hash(folder/filename) != reference[key]:
+                raise ValueError(f'Changed data in earlier attempt: {folder}')
+        for relative, digest in item['artifacts'].items():
+            path = (folder/relative).resolve()
+            if not path.is_relative_to(folder.resolve()) or file_hash(path) != digest:
+                raise ValueError(f'Changed earlier attempt artifact: {path}')
+        if (folder/'result.json').exists():
+            old = checked_run(folder, run['options']['prior_candidate'],
+                              run['options']['scenario'], run['options']['seed'], activation)
+            if item['status'] != old['status']:
+                raise ValueError(f'Wrong earlier attempt status: {folder}')
+        elif item['status'] not in ['interrupted', 'execution_failed']:
+            raise ValueError(f'Unfinished attempt needs explicit status: {folder}')
+        earlier.append(item)
     args.output.mkdir(parents=True, exist_ok=False)
     write_json(args.output/'audit.json', {
         'prior_id': CURRENT_PRIOR_ID, 'activation': activation,
@@ -106,6 +166,8 @@ def main():
         'counts': {name: dict(Counter(r['status'] for r in records if r['campaign'] == name))
                    for name in ['primary', 'sensitivity', 'severity_coordinates']},
         'runs': records, 'held_out_scoring_enabled': False,
+        'routing_sha256': file_hash(args.routing) if args.routing else None,
+        'earlier_attempts': earlier,
         'interpretation': 'Completion includes explicit diagnostic failures. Sensitivity and '
                           'coordinate refits are not independent generated datasets.',
         'source_sha256': file_hash(Path(__file__)),

@@ -17,10 +17,13 @@ def main():
     parser.add_argument('--runs', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--controls-from', type=Path)
+    parser.add_argument('--routing', type=Path)
+    parser.add_argument('--candidate', default='primary')
     parser.add_argument('--include', nargs='*', choices=SCENARIOS)
     parser.add_argument('--seeds', nargs='+', type=int, choices=[7101, 7102, 7103],
                         default=[7101, 7102, 7103])
     args = parser.parse_args()
+    routing = json.loads(args.routing.read_text()) if args.routing else {}
     expected = [(name, seed) for name in SCENARIOS for seed in args.seeds
                 if (name != 'representative' or seed == 7101)
                 and (not args.include or name in args.include)]
@@ -30,8 +33,17 @@ def main():
             'independent', 'latent_ar'
         ) else args.runs
         folder = source / f'{name}-{seed}'
+        route_group = 'primary' if args.candidate == 'primary' else 'sensitivity'
+        route_key = (f'{name}/{seed}' if args.candidate == 'primary'
+                     else f'{args.candidate}/{name}/{seed}')
+        folder = Path(routing.get(route_group, {}).get(route_key, folder))
+        if not folder.resolve().is_relative_to(Path.cwd().resolve()):
+            raise ValueError(f'Run directory escapes project: {folder}')
         path = folder / 'result.json'
         record = json.loads(path.read_text())
+        if (record['options']['prior_candidate'] != args.candidate
+                or record['options']['scenario'] != name or record['options']['seed'] != seed):
+            raise ValueError(f'Run does not match requested case: {folder}')
         for relative, digest in record['artifacts'].items():
             if file_hash(folder / relative) != digest:
                 raise ValueError(f'Changed artifact: {folder / relative}')
@@ -90,6 +102,7 @@ def main():
         'runs': audit, 'expected_datasets': len(expected),
         'accepted': sum(r['status'] == 'accepted' for r in audit),
         'held_out_scoring_enabled': False, 'real_data_read': False,
+        'routing_sha256': file_hash(args.routing) if args.routing else None,
         'interpretation': 'Fixed-truth stress/recovery cases; not SBC or real-data validation.',
         'artifacts': {p.name: file_hash(p) for p in args.output.iterdir() if p.is_file()},
     })
