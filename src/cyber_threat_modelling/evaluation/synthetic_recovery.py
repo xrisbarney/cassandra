@@ -5,6 +5,7 @@ from scipy.special import expit
 from scipy.stats import nbinom
 
 from ..inference.hmm import recover
+from ..models.stage7_priors import amended
 
 
 def posterior_array(posterior, name):
@@ -125,6 +126,7 @@ def summarize(posterior, data, truth, options, seed):
 
 
 def future_counts(posterior, data, truth, options, indices, z, rng):
+    revised = amended(options)
     size, k = len(indices), options['categories']
     get = lambda name: posterior_array(posterior, name)[indices]  # noqa: E731
     m = np.broadcast_to(truth['m'], (size, k)) if options['conditional_level'] else get('m')
@@ -153,10 +155,13 @@ def future_counts(posterior, data, truth, options, indices, z, rng):
     for h in range(12):
         eta = m.copy()
         if rank:
-            state = phi * state + rng.normal(size=state.shape)
+            state = phi * state + rng.normal(size=state.shape) * (
+                np.sqrt(1 - phi**2) if revised else 1)
             eta += np.einsum('skr,sr->sk', loading, state)
         if options['residual'] != 'none':
             noise = tau * rng.normal(size=(size, k))
+            if revised and options['residual'] == 'ar':
+                noise *= np.sqrt(1 - phi_u**2)
             u = phi_u * u + noise if options['residual'] == 'ar' else noise
             eta += u
         if options['kernel']:

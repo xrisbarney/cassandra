@@ -1,5 +1,14 @@
 # Design amendments
 
+## 2026-10-21: activation for revised Stage 7 validation
+
+The user instructed continuation of Stage 7 with issues patched as found.
+The [activation record](amendments/STATE_SPACE_PRIORS_ACTIVATION_20261021.md)
+activates the sealed prior proposal as `stationary_bounded_v1` for synthetic
+fits, forecasts and recovery. Its companion JSON binds the specification;
+new runs verify and record it. Old priors/results and the original freeze stay
+unchanged. Real-data fitting and held-out scoring remain disabled.
+
 ## 2026-10-21: proposed state-space prior revision (not active)
 
 At the user's request, unfinished old-prior Stage 7 jobs were stopped and their

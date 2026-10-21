@@ -11,7 +11,7 @@ from pathlib import Path
 import arviz as az
 import numpy as np
 import pandas as pd
-from scipy.stats import lognorm
+from scipy.stats import lognorm, truncnorm
 
 from cyber_threat_modelling.data.store import write_json
 from cyber_threat_modelling.evaluation.synthetic_recovery import (
@@ -19,13 +19,15 @@ from cyber_threat_modelling.evaluation.synthetic_recovery import (
     posterior_array,
     reconstructed_loading,
 )
+from cyber_threat_modelling.models.stage7_priors import amended
 from cyber_threat_modelling.provenance import file_hash
 
 
-def covariance(loading, phi, a, width, tau, phi_u, residual, lag):
+def covariance(loading, phi, a, width, tau, phi_u, residual, lag, revised=False):
     """Stationary log-state covariance conditional on the regime and effort."""
     size, k, _ = loading.shape
-    result = np.einsum('skr,sr,slr->skl', loading, phi**lag / (1-phi**2), loading)
+    factor_var = phi**lag if revised else phi**lag / (1-phi**2)
+    result = np.einsum('skr,sr,slr->skl', loading, factor_var, loading)
     if a is not None:
         from scipy.special import expit
 
@@ -34,7 +36,7 @@ def covariance(loading, phi, a, width, tau, phi_u, residual, lag):
         cov_g = np.sum(weights[:, :61-lag] * weights[:, lag:], axis=1)
         result += a[:, :, None] * a[:, None, :] * cov_g[:, None, None]
     if residual == 'ar':
-        diagonal = tau**2 * phi_u**lag / (1-phi_u**2)
+        diagonal = tau**2 * phi_u**lag / (1 if revised else 1-phi_u**2)
     elif residual == 'iid' and lag == 0:
         diagonal = tau**2
     else:
@@ -66,6 +68,7 @@ def main():
         if case['status'] != 'accepted':
             continue
         options = case['options']
+        revised = amended(options)
         prefix = {'scenario': case['scenario'], 'seed': case['seed']}
         post = az.from_netcdf(folder/f"posterior_{result['attempts'][-1]['retry']}.nc").posterior
         with np.load(folder/'truth.npz') as loaded:
@@ -81,18 +84,23 @@ def main():
         tau = get('tau') if options['residual'] != 'none' else np.zeros((samples, k))
         phi_u = get('phi_u') if options['residual'] == 'ar' else np.zeros((samples, k))
         for lag in (0, 1, 6, 12):
-            draws = covariance(loading, phi, a, width, tau, phi_u, options['residual'], lag)
+            draws = covariance(loading, phi, a, width, tau, phi_u, options['residual'], lag,
+                               revised)
             target = covariance(
                 truth['loading'][None], truth['phi'][None],
                 truth['a'][None] if options['kernel'] else None,
                 truth['width'][None] if options['kernel'] else None,
-                truth['tau'][None], truth['phi_u'][None], options['residual'], lag,
+                truth['tau'][None], truth['phi_u'][None], options['residual'], lag, revised,
             )[0]
             covariances.append({**prefix, 'lag': lag, **interval_metrics(draws, target),
                                 'truth_frobenius_norm': float(np.linalg.norm(target))})
         priors = {'m': np.sqrt(13), 'n': np.sqrt(2), 'f_phi': np.sqrt(1/3),
                   'h_phi': np.sqrt(1/3), 'phi_u': np.sqrt(1/3),
                   'tau': np.sqrt(1-2/np.pi), 'width': width_prior_sd}
+        if revised:
+            priors.update(m=np.sqrt(9 + truncnorm.moment(2, 0, 1.5, scale=2)),
+                          n=np.sqrt(1 + truncnorm.moment(2, 0, 2)),
+                          tau=np.sqrt(truncnorm.var(0, 1)))
         for name, sd in priors.items():
             if name in post:
                 values = get(name).reshape(samples, -1)
@@ -105,6 +113,16 @@ def main():
                                  'prior_sd': 1., 'posterior_sd': actual, 'sd_ratio': actual})
         recovery = json.loads((folder/'recovery.json').read_text())
         extra = {**prefix}
+        if revised:
+            bounds = {'m_sd': 3, 'n_sd': 2, 'tau': 1, 'a': 1}
+            for prefix_name, factor_rank in [('f', rank), ('h', options['severity_factors'])]:
+                if factor_rank:
+                    bounds[prefix_name+'_diag'] = 2/np.sqrt(factor_rank)
+                    bounds[prefix_name+'_free'] = 2/np.sqrt(factor_rank)
+            extra['upper_support_edge_probability'] = {
+                name: np.mean(np.abs(get(name)) > .95*bound, axis=0).tolist()
+                for name, bound in bounds.items() if name in post
+            }
         for key in ('tau_logpsi_correlation', 'regimes'):
             if recovery.get(key) is not None:
                 extra[key] = recovery[key]
@@ -112,6 +130,11 @@ def main():
             # The first loading is positive but squaring removes its sign;
             # hence its prior norm is a half-Normal scale times a chi norm.
             norm_prior = abs(rng.normal(0, .5, 200000)) * np.sqrt(rng.chisquare(k, 200000))
+            if revised:
+                scale = abs(rng.normal(0, .5, (200000, 1)))
+                values = truncnorm.rvs(-1/scale, 1/scale, scale=scale,
+                                       size=(200000, k), random_state=rng)
+                norm_prior = np.linalg.norm(values, axis=1)
             norm = get('a_norm')
             extra['kernel'] = {
                 'prior_norm_mean': float(norm_prior.mean()),
@@ -132,7 +155,7 @@ def main():
         'analysis_source_sha256': file_hash(Path(__file__)),
         'interpretation': 'Descriptive accepted-fit summaries; no new admission thresholds.',
         'covariance_target': 'Stationary log-state covariance conditional on regime and effort.',
-        'contraction': 'Posterior SD divided by the frozen marginal prior SD.',
+        'contraction': 'Posterior SD divided by the matching recorded marginal prior SD.',
         'artifacts': {p.name: file_hash(p) for p in args.output.iterdir() if p.is_file()},
     })
 

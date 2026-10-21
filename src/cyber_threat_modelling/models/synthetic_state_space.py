@@ -11,47 +11,60 @@ import pytensor.tensor as pt
 from ..inference.hmm import hmm_logp
 from .ar1_transform import ar1_transform
 from .components import add_masked, symbolic_mark_logp
+from .stage7_priors import amended
 
 
-def loading_matrix(prefix, categories, rank):
-    diag = pm.HalfNormal(prefix + "_diag", 1, shape=rank, initval=np.full(rank, 0.3))
+def loading_matrix(prefix, categories, rank, revised=False):
+    sd, bound = 1 / np.sqrt(rank), 2 / np.sqrt(rank)
+    diag = (pm.TruncatedNormal(prefix + '_diag', 0, sd, lower=0, upper=bound,
+                              shape=rank, initval=np.full(rank, .3)) if revised else
+            pm.HalfNormal(prefix + "_diag", 1, shape=rank, initval=np.full(rank, 0.3)))
     rows, cols = np.where(np.tril(np.ones((categories, rank)), -1))
-    free = pm.Normal(prefix + "_free", 0, 1, shape=len(rows), initval=np.zeros(len(rows)))
+    free = (pm.TruncatedNormal(prefix + '_free', 0, sd, lower=-bound, upper=bound,
+                              shape=len(rows), initval=np.zeros(len(rows))) if revised else
+            pm.Normal(prefix + "_free", 0, 1, shape=len(rows), initval=np.zeros(len(rows))))
     matrix = pt.zeros((categories, rank))
     matrix = pt.set_subtensor(matrix[np.arange(rank), np.arange(rank)], diag)
     return pt.set_subtensor(matrix[rows, cols], free)
 
 
-def factors(prefix, categories, rank, months, parameterization='innovations'):
+def factors(prefix, categories, rank, months, parameterization='innovations', revised=False):
     phi = pm.Uniform(prefix + "_phi", -1, 1, shape=rank, initval=np.full(rank, 0.4))
     if parameterization == 'centered':
         # The Flat base measure plus this normalized AR density is exactly the
         # same stationary Gaussian prior. Its density remains outside the HMM.
         states = pm.Flat(prefix + '_states', shape=(months + 1, rank),
                          initval=np.zeros((months + 1, rank)))
-        initial = pm.logp(pm.Normal.dist(0, 1 / pt.sqrt(1 - phi**2)), states[0]).sum()
-        transitions = pm.logp(pm.Normal.dist(phi * states[:-1], 1), states[1:]).sum()
+        initial_sd = 1 if revised else 1 / pt.sqrt(1 - phi**2)
+        innovation_sd = pt.sqrt(1 - phi**2) if revised else 1
+        initial = pm.logp(pm.Normal.dist(0, initial_sd), states[0]).sum()
+        transitions = pm.logp(pm.Normal.dist(phi * states[:-1], innovation_sd), states[1:]).sum()
         pm.Potential(prefix + '_state_prior', initial + transitions)
     elif parameterization == 'innovations':
         innovations = pm.Normal(prefix + "_innovations", 0, 1, shape=(rank, months + 1))
-        states = pm.Deterministic(prefix + "_states", ar1_transform(innovations, phi).T)
+        transformed = ar1_transform(innovations, phi).T
+        states = pm.Deterministic(prefix + "_states",
+                                  transformed * pt.sqrt(1 - phi**2) if revised else transformed)
     else:
         raise ValueError('Unknown factor coordinates.')
-    matrix = loading_matrix(prefix, categories, rank)
+    matrix = loading_matrix(prefix, categories, rank, revised)
     contribution = pm.Deterministic(prefix + "_contribution", states[1:] @ matrix.T)
     return contribution
 
 
-def hierarchical_level(prefix, categories, center, hyper_sd, scale_sd, init):
+def hierarchical_level(prefix, categories, center, hyper_sd, scale_sd, init, revised=False):
     # Integrate the Gaussian group mean exactly. The marginal covariance is
     # s^2 I + hyper_sd^2 11'; this preserves the frozen hierarchical prior while
     # avoiding a likelihood ridge between a group mean and standardized levels.
-    sd = pm.HalfNormal(prefix + "_sd", scale_sd, initval=1)
+    sd = (pm.TruncatedNormal(prefix + '_sd', 0, scale_sd, lower=0,
+                             upper=3 if prefix == 'm' else 2, initval=1) if revised else
+          pm.HalfNormal(prefix + "_sd", scale_sd, initval=1))
     covariance = sd**2 * np.eye(categories) + hyper_sd**2 * np.ones((categories, categories))
     return pm.MvNormal(prefix, mu=np.full(categories, center), cov=covariance, initval=init)
 
 
 def build_model(data, options, conditional=None):
+    revised = amended(options)
     t, k = data["N"].shape
     r, rank = options["regimes"], options["factors"]
     with pm.Model() as model:
@@ -62,20 +75,24 @@ def build_model(data, options, conditional=None):
             observed_count = data['mask_N'].sum(axis=0)
             initial_rate = np.divide(observed_sum, observed_count,
                                      out=np.zeros(k), where=observed_count > 0)
-            m = hierarchical_level("m", k, 0, 3, 2, np.log(initial_rate + 0.5))
+            m = hierarchical_level("m", k, 0, 3, 2, np.log(initial_rate + 0.5), revised)
         psi = pm.LogNormal("psi", np.log(10), 1, shape=k, initval=np.full(k, 10))
         base = pt.broadcast_to(m, (t, k))
         if rank:
             base = base + factors("f", k, rank, t,
-                                  options.get('factor_parameterization', 'innovations'))
+                                  options.get('factor_parameterization', 'innovations'), revised)
         if options["residual"] != "none":
-            tau = pm.Deterministic("tau", 0.01 + pm.HalfNormal("tau_excess", 1, shape=k))
+            tau = (pm.TruncatedNormal('tau', 0, 1, lower=0, upper=1, shape=k, initval=.3)
+                   if revised else
+                   pm.Deterministic("tau", 0.01 + pm.HalfNormal("tau_excess", 1, shape=k)))
             if options["residual"] == "iid":
                 u = pm.Normal("u_raw", 0, 1, shape=(t, k)) * tau
             else:
                 phi_u = pm.Uniform("phi_u", -1, 1, shape=k, initval=np.full(k, 0.4))
                 innovations = pm.Normal("u_innovations", 0, 1, shape=(k, t + 1))
                 u = ar1_transform(innovations, phi_u).T[1:] * tau
+                if revised:
+                    u = u * pt.sqrt(1 - phi_u**2)
             base = base + pm.Deterministic("u", u)
         if options["kernel"]:
             width = pm.Truncated("width", pm.LogNormal.dist(np.log(12), 0.5), lower=0, upper=18)
@@ -85,9 +102,15 @@ def build_model(data, options, conditional=None):
             indices = np.arange(t)[:, None] + 60 - np.arange(61)[None, :]
             g = pm.Deterministic("g", pt.sum(xi[indices] * weights, axis=1))
             scale = pm.HalfNormal("a_scale", 0.5)
-            first = pm.HalfNormal("a_first_raw", 1)
-            remaining = pm.Normal("a_remaining_raw", 0, 1, shape=k - 1)
-            a = pm.Deterministic("a", scale * pt.concatenate([first[None], remaining]))
+            if revised:
+                first = pm.TruncatedNormal('a_first', 0, scale, lower=0, upper=1, initval=.2)
+                remaining = pm.TruncatedNormal('a_remaining', 0, scale, lower=-1, upper=1,
+                                                shape=k-1, initval=np.zeros(k-1))
+                a = pm.Deterministic('a', pt.concatenate([first[None], remaining]))
+            else:
+                first = pm.HalfNormal("a_first_raw", 1)
+                remaining = pm.Normal("a_remaining_raw", 0, 1, shape=k - 1)
+                a = pm.Deterministic("a", scale * pt.concatenate([first[None], remaining]))
             pm.Deterministic("a_norm", pt.sqrt(pt.sum(a**2)))
             base = base + g[:, None] * a
         if r > 1:
@@ -107,9 +130,9 @@ def build_model(data, options, conditional=None):
         )
         emissions = add_masked(emissions, nterm, months)
         if options["severity_factors"]:
-            n = hierarchical_level("n", k, 1, 1, 1, np.ones(k))
+            n = hierarchical_level("n", k, 1, 1, 1, np.ones(k), revised)
             loc = n + factors("h", k, options["severity_factors"], t,
-                              options.get('factor_parameterization', 'innovations'))
+                              options.get('factor_parameterization', 'innovations'), revised)
             kappa = pm.HalfNormal("kappa", 0.5, shape=k, initval=np.full(k, 0.3))
             # This fixture has R=1; joint severity/regime validation belongs to Stage 8.
             loc = pm.Deterministic("severity_location", loc)

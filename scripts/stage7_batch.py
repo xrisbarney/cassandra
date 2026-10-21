@@ -12,6 +12,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
 from cyber_threat_modelling.evaluation.synthetic import SCENARIOS
+from cyber_threat_modelling.models.stage7_priors import PRIOR_ID
 from cyber_threat_modelling.provenance import file_hash
 
 
@@ -34,6 +35,8 @@ def main():
             if not result.exists():
                 return {'scenario': name, 'seed': seed, 'status': 'partial_run_preserved'}
             record = json.loads(result.read_text())
+            if record['options'].get('prior_id') != PRIOR_ID:
+                raise ValueError(f'Existing run has a different prior: {folder}')
             requested = 'centered' if args.center_factors else 'innovations'
             if record['options'].get('factor_parameterization', 'innovations') != requested:
                 raise ValueError(f'Existing run has different factor coordinates: {folder}')

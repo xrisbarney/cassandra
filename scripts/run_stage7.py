@@ -12,6 +12,11 @@ import numpy as np
 from cyber_threat_modelling.data.store import write_json
 from cyber_threat_modelling.evaluation.synthetic import SCENARIOS, generate
 from cyber_threat_modelling.models.components import fitted_effort
+from cyber_threat_modelling.models.stage7_priors import (
+    PRIOR_ID,
+    stationary_truth,
+    verify_activation,
+)
 from cyber_threat_modelling.provenance import file_hash, git_revision
 
 
@@ -66,9 +71,13 @@ def main():
     parser.add_argument('--dense-mass', action='store_true')
     args = parser.parse_args()
     root = Path(__file__).resolve().parents[1]
+    activation = verify_activation(root)
     folder = args.output.resolve()
     folder.mkdir(parents=True, exist_ok=False)
     data, truth, options = generate(args.scenario, args.seed)
+    np.savez_compressed(folder / 'truth_original_coordinates.npz', **truth)
+    truth = stationary_truth(truth, options)
+    options['prior_id'] = PRIOR_ID
     options['factor_parameterization'] = 'centered' if args.center_factors else 'innovations'
     options['mass_matrix'] = 'dense' if args.dense_mass else 'diagonal'
     effort = None
@@ -85,6 +94,8 @@ def main():
         }, 'data_sha256': file_hash(folder / 'data.npz'),
         'truth_sha256': file_hash(folder / 'truth.npz'), 'real_data_read': False,
         'held_out_scoring_enabled': False,
+        'prior_amendment': activation,
+        'truth_original_coordinates_sha256': file_hash(folder/'truth_original_coordinates.npz'),
     })
     import pymc as pm
     import pytensor

@@ -187,12 +187,18 @@ Stage 7 uses generated data only. The [design](docs/STAGE7_DESIGN.md),
 [execution record](docs/STAGE7_REPORT.md), and
 [prior-tail finding](docs/STAGE7_PRIOR_FINDING.md) distinguish numerical component
 checks, fixed-truth recovery, and remaining model-validation gates. The user
-stopped the old-prior campaign on 2026-10-21. Do not restart it as the next
-validation step. The [prior amendment draft](docs/amendments/STATE_SPACE_PRIORS_20261021.md)
-has separate mathematical and prior-only checks; it is not active in the
-inference code. To reproduce its prior-only audit with a new output path:
+stopped the old-prior campaign on 2026-10-21. The subsequent
+[activation record](docs/amendments/STATE_SPACE_PRIORS_ACTIVATION_20261021.md)
+applies the sealed prior amendment to resumed synthetic validation under
+`stationary_bounded_v1`. Revised runs use new directories; old results remain
+historical evidence. To reproduce the prior-only audit with a new output path:
 
     .\.venv\Scripts\python.exe scripts/check_stage7_prior_proposal.py --proposal docs/amendments/STATE_SPACE_PRIORS_20261021.proposal.json --output artifacts/stage7/new-proposal-prior-audit.json
+
+Revised posterior runs verify and record the activation hashes:
+
+    . .\scripts\Use-Compiler.ps1
+    .\.venv\Scripts\python.exe scripts/run_stage7.py --scenario factors_sparse --seed 7101 --center-factors --dense-mass --output artifacts/stage7/new-amended-factor-case
 
 The historical campaign's control cases used a diagonal metric, as recorded in
 the geometry decision. `scripts/summarize_stage7.py --controls-from` preserves

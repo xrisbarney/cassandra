@@ -1,0 +1,19 @@
+{
+  "status": "active",
+  "prior_id": "stationary_bounded_v1",
+  "activated_on": "2026-10-21",
+  "authority": "User: continue stage 7. patch issues as you find them",
+  "parent_freeze_sha256": "7597b76276b837f8db9bc2baff63cb035e14cdfa8656885c782795d38cb598e7",
+  "proposal_record": "docs/amendments/STATE_SPACE_PRIORS_20261021.json",
+  "files": [
+    {
+      "path": "docs/amendments/STATE_SPACE_PRIORS_ACTIVATION_20261021.md",
+      "sha256": "9eede7b5586825cfbbcf24fc80926e6ac3a7f003bc54c079de28408538bc79c5"
+    },
+    {
+      "path": "docs/amendments/STATE_SPACE_PRIORS_20261021.json",
+      "sha256": "048d7cc179b6d01471c502477aadae8d9d95e22f71c4c2c8c785d52cbe9318bf"
+    }
+  ],
+  "held_out_scoring_enabled": false
+}

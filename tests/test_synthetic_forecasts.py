@@ -1,11 +1,13 @@
 import arviz as az
 import numpy as np
+import pytest
 
 from cyber_threat_modelling.evaluation.synthetic_recovery import future_counts
 from cyber_threat_modelling.models.components import kernel_weights
 
 
-def test_factor_forecast_means_against_analytic_lognormal_nb_mixture():
+@pytest.mark.parametrize('revised', [False, True])
+def test_factor_forecast_means_against_analytic_lognormal_nb_mixture(revised):
     draws, k, phi, load, state = 60000, 2, .7, .4, .8
     posterior = az.from_dict(posterior={
         'm': np.full((1, 1, k), np.log(10)), 'psi': np.full((1, 1, k), 8.),
@@ -14,10 +16,12 @@ def test_factor_forecast_means_against_analytic_lognormal_nb_mixture():
     }).posterior
     options = {'categories': k, 'factors': 1, 'conditional_level': False,
                'residual': 'none', 'kernel': False, 'regimes': 1}
+    if revised:
+        options['prior_id'] = 'stationary_bounded_v1'
     paths = future_counts(posterior, {'effort': np.zeros(5)}, {}, options,
                           np.zeros(draws, int), np.zeros(draws, int), np.random.default_rng(710))
     for h in (1, 3, 6, 12):
-        variance = sum(phi**(2*j) for j in range(h))
+        variance = 1-phi**(2*h) if revised else sum(phi**(2*j) for j in range(h))
         mean_state = phi**h * state
         expected = np.exp(np.log(10) + np.array([load, -load])*mean_state
                           + .5*load**2*variance)
@@ -46,4 +50,21 @@ def test_kernel_forecast_carries_sampled_history_and_appends_only_new_innovation
         conditional_variance = np.sum(w[:h]**2)
         expected = np.exp(np.log(10) + loading*conditional_mean
                           + .5*loading**2*conditional_variance)
+        assert np.allclose(paths[:, h-1, 0].mean(), expected, rtol=.015)
+
+
+def test_amended_ar_forecast_uses_stationary_sd_not_innovation_sd():
+    draws, phi, scale, state = 60000, .55, .4, .8
+    posterior = az.from_dict(posterior={
+        'm': np.full((1, 1, 1), np.log(10)), 'psi': np.full((1, 1, 1), 8.),
+        'phi_u': np.full((1, 1, 1), phi), 'tau': np.full((1, 1, 1), scale),
+        'u': np.full((1, 1, 2, 1), state),
+    }).posterior
+    options = {'categories': 1, 'factors': 0, 'conditional_level': False,
+               'residual': 'ar', 'kernel': False, 'regimes': 1,
+               'prior_id': 'stationary_bounded_v1'}
+    paths = future_counts(posterior, {'effort': np.zeros(5)}, {}, options,
+                          np.zeros(draws, int), np.zeros(draws, int), np.random.default_rng(711))
+    for h in (1, 3, 6, 12):
+        expected = np.exp(np.log(10) + phi**h*state + .5*scale**2*(1-phi**(2*h)))
         assert np.allclose(paths[:, h-1, 0].mean(), expected, rtol=.015)

@@ -1,6 +1,6 @@
 # Stage 7 synthetic validation record
 
-Status: old-prior campaign stopped by user, 2026-10-21; Stage 7 incomplete. The
+Status: revised-prior validation resumed, 2026-10-21; Stage 7 incomplete. The
 [recorded design](STAGE7_DESIGN.md) fixes seeds, component checks, scenarios,
 budgets and interpretation before fitting. Forty generated datasets
 were planned; none uses a real-data panel or held-out outcomes. The
@@ -8,8 +8,11 @@ were planned; none uses a real-data panel or held-out outcomes. The
 13 completed cases (6 accepted, 7 failed diagnostic gates), 5 user-stopped
 cases and 22 not started. Completed files were hash-verified, and partial
 directories were preserved. No old-prior sampling jobs remain. The
-[proposed prior amendment](amendments/STATE_SPACE_PRIORS_20261021.md) is prepared
-with an analytic argument and prior-only simulations; it is not active.
+[prior amendment](amendments/STATE_SPACE_PRIORS_20261021.md) is now
+[activated](amendments/STATE_SPACE_PRIORS_ACTIVATION_20261021.md) for a separate
+synthetic campaign. Its original sealed draft remains unchanged. The fitting,
+forecast, covariance and truth-coordinate code now use the stationary-amplitude
+law together. New directories preserve both original and translated truth.
 
 ## Implementation and verification
 
@@ -82,9 +85,8 @@ diagnostic outcome. Accepted fits are conditional old-prior evidence, not
 validation of the proposed revision. No old-prior recovery claim resolves
 the prior-tail finding.
 
-The draft prior revision changes the model, so its fit, forecast, covariance
-and truth-coordinate implementations must be updated together after activation.
-Fresh diagnostic/recovery runs are still required. The optional iid-noise
+The prior revision changes the model. Fresh diagnostic/recovery runs are
+required and are recorded separately. The optional iid-noise
 identification and kernel identification gates remain unresolved.
 
 ## Limits and next gates
