@@ -117,7 +117,7 @@ def generate(scenario, seed):
             mask = rng.random(values[:t].shape) > 0.25
             mask[:12] = False
             if name in ("B", "E"):
-                mask &= counts[:t] > 0
+                mask &= (counts[:t] > 0) & mask_n
             data[name] = np.where(mask, values[:t], np.nan)
             data[f"mask_{name}"] = mask
         data["M"] = exposure

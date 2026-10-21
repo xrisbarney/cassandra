@@ -148,6 +148,8 @@ def test_collapsed_hierarchical_level_matches_integrated_original_prior():
 
 def test_masked_invalid_values_never_enter_likelihood_or_gradient():
     data, truth, options = generate("severity_missing", 7101)
+    assert not (data['mask_B'] & ~data['mask_N']).any()
+    assert not (data['mask_E'] & ~data['mask_N']).any()
     # Small computational fixture while preserving all channel types.
     for key, value in list(data.items()):
         if key != 'M':
