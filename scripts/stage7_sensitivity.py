@@ -12,6 +12,7 @@ from cyber_threat_modelling.models.stage7_priors import CANDIDATES
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--root', type=Path, required=True)
+    parser.add_argument('--workers', type=int, choices=[1, 2, 3], default=1)
     args = parser.parse_args()
     args.root.mkdir(parents=True, exist_ok=True)
     for candidate in CANDIDATES:
@@ -19,7 +20,8 @@ def main():
             continue
         result = subprocess.run([
             sys.executable, '-u', 'scripts/stage7_batch.py', '--root', str(args.root/candidate),
-            '--workers', '3', '--anchor-factors', '--dense-mass', '--prior-candidate', candidate,
+            '--workers', str(args.workers), '--anchor-factors', '--dense-mass',
+            '--prior-candidate', candidate,
             '--include', 'factors_sparse', 'representative', 'fallback_zero', '--seeds', '7101',
         ], check=False)
         print(json.dumps({'candidate': candidate, 'coordinator_exit': result.returncode}),
