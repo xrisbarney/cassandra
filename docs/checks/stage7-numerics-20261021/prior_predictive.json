@@ -1,0 +1,116 @@
+{
+  "categories": 4,
+  "count_simulation_failures": [
+    {
+      "category": 3,
+      "draw": 771,
+      "log_rate": 98.04367932758049,
+      "reason": "ValueError"
+    },
+    {
+      "category": 0,
+      "draw": 1655,
+      "log_rate": 42.72876789523423,
+      "reason": "ValueError"
+    },
+    {
+      "category": 0,
+      "draw": 1672,
+      "log_rate": 53.89997060838588,
+      "reason": "ValueError"
+    },
+    {
+      "category": 3,
+      "draw": 1672,
+      "log_rate": 86.4062002749797,
+      "reason": "ValueError"
+    },
+    {
+      "category": 0,
+      "draw": 5502,
+      "log_rate": 74.49146336331869,
+      "reason": "ValueError"
+    },
+    {
+      "category": 3,
+      "draw": 5987,
+      "log_rate": 93.0774605908403,
+      "reason": "ValueError"
+    },
+    {
+      "category": 0,
+      "draw": 9341,
+      "log_rate": 56.00859690171493,
+      "reason": "ValueError"
+    },
+    {
+      "category": 1,
+      "draw": 9619,
+      "log_rate": 43.6722653187329,
+      "reason": "ValueError"
+    },
+    {
+      "category": 1,
+      "draw": 12000,
+      "log_rate": 76.14093935915385,
+      "reason": "ValueError"
+    },
+    {
+      "category": 2,
+      "draw": 12000,
+      "log_rate": 78.0455199434306,
+      "reason": "ValueError"
+    },
+    {
+      "category": 0,
+      "draw": 13162,
+      "log_rate": 46.96624167439009,
+      "reason": "ValueError"
+    },
+    {
+      "category": 2,
+      "draw": 13162,
+      "log_rate": 42.95705863739523,
+      "reason": "ValueError"
+    },
+    {
+      "category": 3,
+      "draw": 14069,
+      "log_rate": 142.10731918100214,
+      "reason": "ValueError"
+    },
+    {
+      "category": 2,
+      "draw": 14410,
+      "log_rate": 43.069090258411165,
+      "reason": "ValueError"
+    },
+    {
+      "category": 0,
+      "draw": 17146,
+      "log_rate": 44.86452211509766,
+      "reason": "ValueError"
+    },
+    {
+      "category": 1,
+      "draw": 17957,
+      "log_rate": 55.37615175389513,
+      "reason": "ValueError"
+    }
+  ],
+  "draws": 20000,
+  "factors": 1,
+  "interpretation": "Finite stress sample, not a bound or calibrated prediction.",
+  "largest_successful_count": 533601161580297472,
+  "log_rate_above_20": 64,
+  "log_rate_quantiles": {
+    "0": -79.20428252350166,
+    "0.01": -9.986914194729165,
+    "0.5": -0.04111407267368358,
+    "0.99": 9.926247148548196,
+    "1": 142.10731918100214
+  },
+  "prior": "Frozen stationary factor prior, counts only, no iid residual, e=0.",
+  "seed": 7100,
+  "source_sha256": "d8c1f105ed70963239a1b73fe0cfa8726d5ad69cd2520b234f8bbf2904678e78"
+}
