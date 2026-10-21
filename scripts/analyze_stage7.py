@@ -123,6 +123,19 @@ def main():
                                  'prior_sd': 1., 'posterior_sd': actual, 'sd_ratio': actual})
         recovery = json.loads((folder/'recovery.json').read_text())
         extra = {**prefix}
+        if options['scenario'].startswith('effort'):
+            # The same generated N admits two physical decompositions. This
+            # descriptive comparison was required by the nonidentification
+            # design; no additional fit or synthetic observations are needed.
+            eta = get('eta_by_regime')[:, :, 0]
+            extra['paired_effort_interpretations'] = {
+                'reporting_shift_eta': interval_metrics(eta, truth['eta']),
+                'threat_shift_eta': interval_metrics(
+                    eta, truth['eta']+truth['true_effort'][:, None]),
+                'interpretation': 'Identical count likelihood under a reporting shift '
+                                  'or equal log-intensity shift; these are alternative '
+                                  'physical truths, not independent datasets.',
+            }
         if revised:
             bounds = {'m_sd': 3, 'n_sd': 2, 'tau': 1, 'a': 1}
             if settings:
