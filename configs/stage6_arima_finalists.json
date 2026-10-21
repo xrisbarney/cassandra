@@ -1,6 +1,6 @@
 {
   "split": "development",
-  "draws": 3000,
+  "draws": 6000,
   "purpose": "arima_finalist_selection",
   "methods": [
     {
@@ -25,5 +25,9 @@
   "screening_record": {
     "path": "artifacts/backtests/stage6-arima-screen-20261021/selection.json",
     "sha256": "6a3134c87beeb136927abd0588c06cc33f4c90dbf88da434edc4d414a286dc64"
+  },
+  "budget_record": {
+    "path": "docs/decisions/ENSEMBLE_BUDGET_20261021.json",
+    "sha256": "e8266c7776c06bbdb6ee6dda770a8b1a5812ba3a6afb90eca235b460305b6f77"
   }
 }

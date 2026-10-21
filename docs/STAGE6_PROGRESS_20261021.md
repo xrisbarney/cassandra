@@ -1,5 +1,9 @@
 # Stage 6 continuation and review disposition
 
+This report predates the completed ARIMA selection and independent-control
+replacement. See the [current Stage 6 record](STAGE6_COMPLETION.md). Statements
+below describe the earlier implementation and verification state.
+
 **Subsequent update, 2026-10-21:** the user accepted the zero-series convention.
 The [active amendment](amendments/ZERO_SERIES_20261021.md) and its separate freeze
 now govern new ARIMA/ETS runs. Pending-decision and screening-lock statements

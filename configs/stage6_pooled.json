@@ -1,6 +1,14 @@
 {
   "split": "development",
-  "draws": 3000,
-  "methods": [{"method": "pooled_nb"}],
-  "purpose": "initial_controls_not_model_selection"
+  "draws": 6000,
+  "methods": [
+    {
+      "method": "pooled_nb"
+    }
+  ],
+  "purpose": "initial_controls_not_model_selection",
+  "budget_record": {
+    "path": "docs/decisions/ENSEMBLE_BUDGET_20261021.json",
+    "sha256": "e8266c7776c06bbdb6ee6dda770a8b1a5812ba3a6afb90eca235b460305b6f77"
+  }
 }

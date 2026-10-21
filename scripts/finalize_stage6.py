@@ -16,11 +16,14 @@ def main():
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     root = Path(__file__).resolve().parents[1]
-    arima = root / "artifacts/backtests/stage6-arima-finalists-20261021"
+    arima = root / "artifacts/backtests/stage6-arima-6000-20261021"
     selection = json.loads((arima / "selection.json").read_text())
     runs = [
-        (root / "artifacts/backtests/stage6-20261020", ["historical_mean", "seasonal_naive"]),
-        (root / "artifacts/backtests/stage6-pooled-20261021", ["pooled_nb"]),
+        (
+            root / "artifacts/backtests/stage6-fixed-6000-20261021",
+            ["historical_mean", "seasonal_naive"],
+        ),
+        (root / "artifacts/backtests/stage6-pooled-6000-20261021", ["pooled_nb"]),
         (arima, [selection["selected_method"]]),
         (root / args.independent_run, ["independent_nb_glar"]),
     ]
@@ -28,6 +31,8 @@ def main():
     for folder, methods in runs:
         manifest_path = folder / "forecast_manifest.json"
         manifest = json.loads(manifest_path.read_text())
+        if manifest["settings"]["draws"] != 6000:
+            raise ValueError("All reported controls must use the common 6000-path budget.")
         verify_artifacts(folder, manifest)
         score_manifest_path = folder / "scores/score_manifest.json"
         score_manifest = json.loads(score_manifest_path.read_text())
@@ -56,6 +61,7 @@ def main():
                             "origin": record["origin"],
                             "category": attempt.get("category"),
                             "retry_number": attempt["retry_number"],
+                            "fit_status": attempt.get("fit_status"),
                             **attempt["diagnostics"],
                         }
                     )
@@ -95,6 +101,10 @@ def main():
     )
     record = {
         "status": "stage6_initial_controls_complete",
+        "assembler": {
+            "path": Path(__file__).resolve().relative_to(root).as_posix(),
+            "sha256": file_hash(Path(__file__)),
+        },
         "runs": records,
         "arima_selection": selection,
         "held_out_scoring_enabled": False,

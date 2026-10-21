@@ -1,5 +1,9 @@
 # Stage 6: first development benchmark
 
+Historical snapshot of the first run. Statements below concern its recorded
+source revision. See the [current Stage 6 record](STAGE6_COMPLETION.md) for
+subsequent amendments, posterior validation and completed computations.
+
 Status: **in progress**. The rolling-origin engine, count-law scoring and initial
 fixed controls are implemented. This is not completion of the comparator suite,
 ARIMA grid selection, Bayesian posterior validation or proposed-model selection.

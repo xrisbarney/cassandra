@@ -15,7 +15,8 @@ evaluation_end = "2025-12"
 [forecast]
 path_months = 12
 reported_horizons = [1, 3, 6, 12]
-draws = 3000
+# Predeclared common-budget escalation; see docs/decisions/ENSEMBLE_BUDGET_20261021.json.
+draws = 6000
 
 [model]
 topics = 10

@@ -1,6 +1,14 @@
 {
   "split": "development",
-  "draws": 3000,
+  "draws": 6000,
   "purpose": "initial_controls_not_model_selection",
-  "methods": [{"method": "independent_nb_glar"}]
+  "methods": [
+    {
+      "method": "independent_nb_glar"
+    }
+  ],
+  "budget_record": {
+    "path": "docs/decisions/ENSEMBLE_BUDGET_20261021.json",
+    "sha256": "e8266c7776c06bbdb6ee6dda770a8b1a5812ba3a6afb90eca235b460305b6f77"
+  }
 }

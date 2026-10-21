@@ -140,14 +140,28 @@ Stage 6 now provides separate development forecast and scoring commands:
     .\.venv\Scripts\python.exe -m cyber_threat_modelling score-development artifacts/backtests/new-development-run
     .\.venv\Scripts\python.exe scripts/check_stage6_ensemble.py --run artifacts/backtests/new-development-run --output artifacts/backtests/new-development-run/ensemble_check.json
 
-The initial run contains historical mean, seasonal naive, and a diagnostic
-ARIMA(0,1,0) candidate. This is not the frozen ARIMA grid selection. Commands
-refuse held-out execution and refuse to overwrite runs or scores. Bayesian
-control adapters are implemented with diagnostic gates; their posterior
-validation and rolling fits remain outstanding. See the
+Commands refuse held-out execution and refuse to overwrite runs or scores.
+The current [Stage 6 record](docs/STAGE6_COMPLETION.md) tracks the five initial
+controls, posterior validation, ARIMA selection and development results. The
+original [first benchmark report](docs/STAGE6_BACKTEST.md) is historical. See the
 [category and KEV carry-forward decisions](docs/STAGE6_8_CARRY_FORWARD.md).
-The [Stage 6 report](docs/STAGE6_BACKTEST.md) contains the initial development
-tables, failed-fit register and remaining validation gates.
+`configs/stage6.json` reproduces that first fixed-control run with diagnostic
+ARIMA(0,1,0); it is not the selected ARIMA specification.
+
+The [independent-control amendment](docs/amendments/OBSERVATION_CONTROL_20261021.md)
+replaces the unsuccessful latent control with a Bayesian conditional NB
+autoregression (`independent_nb_glar`). Its priors, conditional likelihood and
+recursive forecasts are explicit; its original convergence thresholds remain.
+The [validation record](docs/STAGE6_BAYESIAN_VALIDATION.md) preserves both the
+failed latent attempts and the successful replacement's initial checks.
+`configs/stage6_bayesian.json` and `configs/stage6_independent.json` retain the
+superseded latent control for diagnostics. Use `configs/stage6_observation_nb.json`
+for the primary independent control and `configs/stage6_pooled.json` for the pooled one.
+
+    . .\scripts\Use-Compiler.ps1
+    .\.venv\Scripts\ctm.exe forecast-development configs/stage6_observation_nb.json --panel-manifest docs/panels/stage5-20261020/panel_manifest.json --output artifacts/backtests/new-independent-run --workers 4
+    .\.venv\Scripts\python.exe scripts/check_stage6_bayesian_ensemble.py --run artifacts/backtests/new-independent-run --output artifacts/backtests/new-independent-run/ensemble_check.json
+    .\.venv\Scripts\ctm.exe score-development artifacts/backtests/new-independent-run
 
 The [2026-10-21 amendment](docs/amendments/ZERO_SERIES_20261021.md) is active for
 new ARIMA/ETS runs. It retains all categories and uses an explicit zero point
@@ -157,8 +171,11 @@ The frozen ARIMA screen can now be run with a fresh output directory:
 
     .\.venv\Scripts\python.exe scripts/stage6_arima_screen.py --workers 2 --output artifacts/backtests/new-arima-screen
 
-It evaluates all 65 candidates at the 20 quarterly development origins. Its
-two valid finalists still require the frozen 60-origin monthly comparison.
+It evaluates all 65 candidates at the 20 quarterly development origins. The
+recorded run and the two-finalist 60-origin comparison selected ARIMA(2,1,1)
+without trend. `configs/stage6_arima_finalists.json` binds that particular local
+screening record by hash. A new screening run requires its own verified record
+path and hash in the finalist configuration.
 
 Use locked commands to prevent unnoticed dependency resolution changes; see
 [uv locking and syncing](https://docs.astral.sh/uv/concepts/projects/sync/).

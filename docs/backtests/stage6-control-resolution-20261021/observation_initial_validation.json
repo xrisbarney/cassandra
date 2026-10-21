@@ -1,0 +1,269 @@
+{
+  "status": "initial_window_validation_only",
+  "pymc_attempt": {
+    "backend": "PyMC NUTS with PyTensor NUMBA log-density/gradient",
+    "chain_wall_markers": {
+      "0": {
+        "first_draw_seconds": 13.029702000087127,
+        "first_retained_draw_seconds": 20.523456200025976
+      },
+      "1": {
+        "first_draw_seconds": 25.561943400185555,
+        "first_retained_draw_seconds": 32.841357400175184
+      },
+      "2": {
+        "first_draw_seconds": 38.34603110002354,
+        "first_retained_draw_seconds": 45.43002480012365
+      },
+      "3": {
+        "first_draw_seconds": 50.44914190005511,
+        "first_retained_draw_seconds": 61.064465700183064
+      }
+    },
+    "chains": 4,
+    "cores": 1,
+    "diagnostics": {
+      "accepted": true,
+      "all_diagnostics_finite": true,
+      "divergences": 0,
+      "max_rhat": 1.0043155218747206,
+      "min_bfmi": 0.9105120372427216,
+      "min_bulk_ess": 1471.8287329212587,
+      "min_tail_ess": 1043.0958669500253,
+      "tree_depth_saturations": 0
+    },
+    "draws": 1000,
+    "environment_warnings": [
+      "PyTensor could not link to a BLAS installation. Operations that might benefit from BLAS will be severely degraded.\nThis usually happens when PyTensor is installed via pip. We recommend it be installed via conda/mamba/pixi instead.\nAlternatively, you can use an experimental backend such as Numba or JAX that perform their own BLAS optimizations, by setting `pytensor.config.mode == 'NUMBA'` or passing `mode='NUMBA'` when compiling a PyTensor function.\nFor more options and details see https://pytensor.readthedocs.io/en/latest/troubleshooting.html#how-do-i-configure-test-my-blas-library"
+    ],
+    "fit_status": "accepted",
+    "graph_seconds": 0.04666549991816282,
+    "initialization": "distinct seeded 0.1-SD jitter in unconstrained coordinates",
+    "max_treedepth": 12,
+    "posterior_serialization_seconds": 0.3938038998749107,
+    "retry_number": 0,
+    "sample_call_including_startup_and_warmup_seconds": 69.96921570017003,
+    "step_construction_compile_seconds": 3.682362899882719,
+    "target_accept": 0.95,
+    "unresolved_warnings": [],
+    "warmup": 1000,
+    "warnings": [
+      "PyTensor could not link to a BLAS installation. Operations that might benefit from BLAS will be severely degraded.\nThis usually happens when PyTensor is installed via pip. We recommend it be installed via conda/mamba/pixi instead.\nAlternatively, you can use an experimental backend such as Numba or JAX that perform their own BLAS optimizations, by setting `pytensor.config.mode == 'NUMBA'` or passing `mode='NUMBA'` when compiling a PyTensor function.\nFor more options and details see https://pytensor.readthedocs.io/en/latest/troubleshooting.html#how-do-i-configure-test-my-blas-library"
+    ]
+  },
+  "compiled_attempt": {
+    "backend": "nutpie 0.15.2, numba",
+    "compile_seconds": 26.210640500066802,
+    "diagnostics": {
+      "accepted": true,
+      "all_diagnostics_finite": true,
+      "divergences": 0,
+      "max_rhat": 1.0034528272019716,
+      "min_bfmi": 0.9007071968733524,
+      "min_bulk_ess": 1526.7755128614303,
+      "min_tail_ess": 1026.0939878702295,
+      "tree_depth_saturations": 0
+    },
+    "draws": 1000,
+    "exploratory_only": true,
+    "mass_adaptation": "gradient diagonal",
+    "max_treedepth": 12,
+    "method": "independent_nb_glar",
+    "prior": "conditional_loglinear_nb_ar1_v1",
+    "retry_number": 0,
+    "sample_seconds": 33.09601609990932,
+    "target_accept": 0.95,
+    "warmup": 1000
+  },
+  "backend_mean_comparison": [
+    {
+      "parameter": "m[0]",
+      "pymc_mean": 4.306205239372289,
+      "compiled_mean": 4.310728318607011,
+      "difference_over_combined_mcse": -1.0182223304761098
+    },
+    {
+      "parameter": "m[1]",
+      "pymc_mean": 5.147397067824871,
+      "compiled_mean": 5.158168717626609,
+      "difference_over_combined_mcse": -1.6550540165659553
+    },
+    {
+      "parameter": "m[2]",
+      "pymc_mean": 4.39233951601166,
+      "compiled_mean": 4.365682651389079,
+      "difference_over_combined_mcse": 0.8397697044048043
+    },
+    {
+      "parameter": "m[3]",
+      "pymc_mean": 3.8412035631223254,
+      "compiled_mean": 3.8429740881578573,
+      "difference_over_combined_mcse": -0.6449002614471747
+    },
+    {
+      "parameter": "m[4]",
+      "pymc_mean": 3.622602575065046,
+      "compiled_mean": 3.6218860874402723,
+      "difference_over_combined_mcse": 0.18452299056000163
+    },
+    {
+      "parameter": "m[5]",
+      "pymc_mean": 4.587898691495389,
+      "compiled_mean": 4.585080454784136,
+      "difference_over_combined_mcse": 0.45016071170362104
+    },
+    {
+      "parameter": "m[6]",
+      "pymc_mean": 3.1885011384861763,
+      "compiled_mean": 3.132672908248201,
+      "difference_over_combined_mcse": 1.5908959213203802
+    },
+    {
+      "parameter": "m[7]",
+      "pymc_mean": 5.696635978034972,
+      "compiled_mean": 5.712162827798244,
+      "difference_over_combined_mcse": -0.5316694885268614
+    },
+    {
+      "parameter": "m[8]",
+      "pymc_mean": 3.722770842922255,
+      "compiled_mean": 3.7191288568995784,
+      "difference_over_combined_mcse": 1.9825499844594374
+    },
+    {
+      "parameter": "m[9]",
+      "pymc_mean": -3.9570577172193806,
+      "compiled_mean": -3.917587671809494,
+      "difference_over_combined_mcse": -1.5336707857123835
+    },
+    {
+      "parameter": "phi[0]",
+      "pymc_mean": 0.6466933683517915,
+      "compiled_mean": 0.6453570599255595,
+      "difference_over_combined_mcse": 0.605515897435819
+    },
+    {
+      "parameter": "phi[1]",
+      "pymc_mean": 0.7025139522586892,
+      "compiled_mean": 0.7056596341152012,
+      "difference_over_combined_mcse": -1.4728672193011907
+    },
+    {
+      "parameter": "phi[2]",
+      "pymc_mean": 0.7464462448608806,
+      "compiled_mean": 0.7460118463508154,
+      "difference_over_combined_mcse": 0.13353226306132934
+    },
+    {
+      "parameter": "phi[3]",
+      "pymc_mean": -0.07389020589485248,
+      "compiled_mean": -0.07402138864184112,
+      "difference_over_combined_mcse": 0.04342206964645197
+    },
+    {
+      "parameter": "phi[4]",
+      "pymc_mean": 0.3125114645230865,
+      "compiled_mean": 0.3100895639653556,
+      "difference_over_combined_mcse": 0.9357777669519366
+    },
+    {
+      "parameter": "phi[5]",
+      "pymc_mean": 0.6978774341938521,
+      "compiled_mean": 0.695252216179168,
+      "difference_over_combined_mcse": 1.4811249025779265
+    },
+    {
+      "parameter": "phi[6]",
+      "pymc_mean": 0.9804633929110054,
+      "compiled_mean": 0.979796621977175,
+      "difference_over_combined_mcse": 1.7918424188347815
+    },
+    {
+      "parameter": "phi[7]",
+      "pymc_mean": 0.9190069358386849,
+      "compiled_mean": 0.9208882848218916,
+      "difference_over_combined_mcse": -1.6081231682201338
+    },
+    {
+      "parameter": "phi[8]",
+      "pymc_mean": 0.03588108259971981,
+      "compiled_mean": 0.03401367488671076,
+      "difference_over_combined_mcse": 0.8704083697237235
+    },
+    {
+      "parameter": "phi[9]",
+      "pymc_mean": -0.609631331017125,
+      "compiled_mean": -0.6075375767467864,
+      "difference_over_combined_mcse": -0.3270036923693306
+    },
+    {
+      "parameter": "psi[0]",
+      "pymc_mean": 7.43108312360128,
+      "compiled_mean": 7.424967624439941,
+      "difference_over_combined_mcse": 0.2889184803513389
+    },
+    {
+      "parameter": "psi[1]",
+      "pymc_mean": 7.13169700358284,
+      "compiled_mean": 7.113093426874466,
+      "difference_over_combined_mcse": 1.0191047612172575
+    },
+    {
+      "parameter": "psi[2]",
+      "pymc_mean": 1.4737903207398984,
+      "compiled_mean": 1.47300198606605,
+      "difference_over_combined_mcse": 0.22295551090998927
+    },
+    {
+      "parameter": "psi[3]",
+      "pymc_mean": 1.0675027277348614,
+      "compiled_mean": 1.0675843784473058,
+      "difference_over_combined_mcse": -0.03313382294898236
+    },
+    {
+      "parameter": "psi[4]",
+      "pymc_mean": 1.5247436192734778,
+      "compiled_mean": 1.5218798213758766,
+      "difference_over_combined_mcse": 0.7983889278059743
+    },
+    {
+      "parameter": "psi[5]",
+      "pymc_mean": 4.922658851366977,
+      "compiled_mean": 4.920786929791124,
+      "difference_over_combined_mcse": 0.1452449462721657
+    },
+    {
+      "parameter": "psi[6]",
+      "pymc_mean": 0.40118109839363425,
+      "compiled_mean": 0.398258658595426,
+      "difference_over_combined_mcse": 2.041267570119223
+    },
+    {
+      "parameter": "psi[7]",
+      "pymc_mean": 9.333604617726111,
+      "compiled_mean": 9.301992224373857,
+      "difference_over_combined_mcse": 1.2127770399622104
+    },
+    {
+      "parameter": "psi[8]",
+      "pymc_mean": 2.0753389838004432,
+      "compiled_mean": 2.076181098231108,
+      "difference_over_combined_mcse": -0.1651321674237476
+    },
+    {
+      "parameter": "psi[9]",
+      "pymc_mean": 1.6465230053450388,
+      "compiled_mean": 1.6831348725888033,
+      "difference_over_combined_mcse": -0.6987032161021008
+    }
+  ],
+  "mean_comparison_interpretation": "Descriptive independent-chain Monte Carlo check, not an additional invented convergence cutoff.",
+  "source_artifacts": {
+    "artifacts/stage6-completion/probe-observation-nb-initial/result.json": "15c0341d2b8084ed91b085747e76cae446af1d5474a84ffe1741f97abe9cca01",
+    "artifacts/stage6-completion/probe-observation-nb-initial/posterior_attempt_0.nc": "d6539026353ce756dcea16bb56301b4a32947a3f29801d79c349eeb9561fdaef",
+    "artifacts/stage6-completion/probe-observation-nb-initial/predictive_checks.json": "def6ffc067a30f268c6b35b8516b216fcaaceb7c463b9af6d03ff297144a0189",
+    "artifacts/stage6-completion/probe-observation-nb-compiled/result.json": "edc7737b5c9cb3180f11ac6cd6d2feafc8310876573970b0af68a269e1271df5",
+    "artifacts/stage6-completion/probe-observation-nb-compiled/posterior.nc": "b7fa3d9c37c079220460b0f950bf79f75889ae8543ab75a92171eaf8b80a2148"
+  },
+  "held_out_scored": false
+}

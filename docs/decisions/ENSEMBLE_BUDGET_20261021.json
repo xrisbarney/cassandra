@@ -1,0 +1,18 @@
+{
+  "decision": "Apply the existing BASELINE_SPECIFICATIONS section 1 common-budget fallback; no model or NUTS budget changes",
+  "decided_on": "2026-10-21",
+  "reporting_draws": 6000,
+  "check_draws": 12000,
+  "parent_freeze_sha256": "7597b76276b837f8db9bc2baff63cb035e14cdfa8656885c782795d38cb598e7",
+  "evidence": {
+    "path": "docs/decisions/ENSEMBLE_CHECK_3000_20261021.json",
+    "sha256": "70ad03693baba76b349917ee9ca65232ba9f50041dd66c44f38467067999ceda"
+  },
+  "failed_horizons": [
+    1,
+    6
+  ],
+  "scope": "All reported Stage 6 controls, including both monthly ARIMA finalists. Preserve the original quarterly screening and all 3000-path artifacts. Recheck monthly finalist ranking at 6000.",
+  "held_out_scored": false,
+  "originating_evidence_path": "artifacts/backtests/stage6-observation-nb-20261021/ensemble_check.json"
+}

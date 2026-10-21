@@ -2,7 +2,8 @@
 
 Each entry names the location in `main.tex`, what it currently says, what the
 specification (`SPECIFICATION.md`) proposes, and the edit needed once the
-corresponding implementation and evidence exist. No model has been implemented.
+corresponding implementation and evidence exist. The numbered table records the
+Stage 1 design review; later implementation evidence is appended below.
 Factual and mathematical review updated on 2026-10-20. Entries are ordered by section.
 "Pending evidence" entries are claims the specification cannot support until
 the named stage produces results.
@@ -90,3 +91,24 @@ accurately without claiming the period has never been examined in earlier work.
   does not depend on the count-linked intensity. The choice remains open.
 
 These requirements are also recorded in [the carry-forward note](STAGE6_8_CARRY_FORWARD.md).
+
+## Stage 6 control implementation (2026-10-21)
+
+- Distinguish the five initial controls from the eight named comparison systems.
+  The active independent control is a conditional Bayesian log-linear NB
+  autoregression (`independent_nb_glar`), not the unsuccessful latent AR(1) model.
+  Cite its [dated amendment and sources](amendments/OBSERVATION_CONTROL_20261021.md).
+  State the conditional likelihood, first-count initialization, empirical
+  initial-window prior anchor and recursive predictive law. Its numerical priors
+  are project choices. The failed latent fits remain computational evidence.
+- Describe the approved all-zero ARIMA/ETS point-mass convention explicitly.
+  Keep all categories and disclose the fallback category's effect on averages.
+  Do not imply that ETS has been implemented merely because its boundary rule exists.
+- Report Stage 6 scores as development results. ARIMA is selected on development
+  CRPS; this does not establish held-out superiority. MAE uses predictive medians
+  and RMSE uses predictive means. Count log scores evaluate issued PMFs; no
+  winsorization or moment-matched density is substituted for a forecast law.
+- Keep control-posterior validation distinct from proposed-model recovery,
+  matched factor/regime ablations, held-out calibration and economic validation.
+  The [Stage 6 record](STAGE6_COMPLETION.md) identifies completed evidence and
+  remaining stages; all old failed-evaluation numerical claims still require replacement.

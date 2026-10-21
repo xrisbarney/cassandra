@@ -30,6 +30,10 @@ def main():
     if manifest["settings"]["split"] != "development":
         raise ValueError("Development only.")
     verify_artifacts(args.run, manifest)
+    issued_size = manifest["settings"]["draws"]
+    if issued_size not in (3000, 6000):
+        raise ValueError("Unsupported reporting ensemble size.")
+    sizes = (1000, 3000, 6000) if issued_size == 3000 else (6000, 12000)
     root = Path(__file__).resolve().parents[1]
     wide, _ = count_matrix(pd.read_parquet(root / manifest["panel_file"]))
     checks, log_mass_checks = [], []
@@ -48,7 +52,7 @@ def main():
                 raise ValueError("Six complete eligible origins required at every horizon.")
             for record in eligible:
                 selected.setdefault(record["origin"], (record, []))[1].append(horizon)
-        values = {h: {n: [] for n in (1000, 3000, 6000)} for h in (1, 3, 6, 12)}
+        values = {h: {n: [] for n in sizes} for h in (1, 3, 6, 12)}
         for origin, (record, horizons) in selected.items():
             folder = args.run / record["directory"]
             fit = json.loads((folder / "fit.json").read_text())
@@ -68,9 +72,9 @@ def main():
                         idata.posterior, method, months, n, stream, fit.get("last_counts")
                     )
 
-            forecasts = {n: generate(n, seed) for n in (1000, 3000, 6000)}
-            if not np.array_equal(forecasts[3000].paths, issued.paths):
-                raise ValueError("Saved 3000-path stream does not reproduce.")
+            forecasts = {n: generate(n, seed) for n in sizes}
+            if not np.array_equal(forecasts[issued_size].paths, issued.paths):
+                raise ValueError("Saved reporting stream does not reproduce.")
             repeat = generate(
                 6000,
                 stream_seed(record["seed"], method, origin, "future_mc_repeat"),
@@ -95,9 +99,9 @@ def main():
                     )
             if idata is not None:
                 idata.close()
-        for horizon, sizes in values.items():
-            means = {str(n): float(np.mean(v)) for n, v in sizes.items()}
-            tolerance = 0.01 * max(1, means["6000"])
+        for horizon, sample_sizes in values.items():
+            means = {str(n): float(np.mean(v)) for n, v in sample_sizes.items()}
+            tolerance = 0.01 * max(1, means[str(sizes[-1])])
             checks.append(
                 {
                     "method": method,
@@ -105,7 +109,7 @@ def main():
                     "mean_crps": means,
                     "tolerance": tolerance,
                     "passed": all(
-                        abs(means[str(n)] - means["6000"]) <= tolerance for n in (1000, 3000)
+                        abs(means[str(n)] - means[str(sizes[-1])]) <= tolerance for n in sizes[:-1]
                     ),
                 }
             )

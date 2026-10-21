@@ -31,6 +31,8 @@ def development_origins():
 
 def validate_settings(settings):
     keys = {"split", "draws", "methods", "purpose"}
+    if settings.get("draws") == 6000:
+        keys.add("budget_record")
     if settings.get("purpose") == "arima_finalist_selection":
         keys.add("screening_record")
     require_keys(settings, keys, "backtest")
@@ -38,13 +40,13 @@ def validate_settings(settings):
         raise ValueError(
             "Held-out execution is locked pending development selection and validation."
         )
-    if settings["draws"] != 3000 or settings["purpose"] not in (
+    if settings["draws"] not in (3000, 6000) or settings["purpose"] not in (
         "initial_controls_not_model_selection",
         "arima_finalist_selection",
     ):
-        raise ValueError(
-            "Initial controls require 3000 paths and the documented diagnostic purpose."
-        )
+        raise ValueError("Initial controls require the frozen path budget and documented purpose.")
+    if settings["draws"] == 6000:
+        require_keys(settings["budget_record"], {"path", "sha256"}, "budget_record")
     if not isinstance(settings["methods"], list) or not settings["methods"]:
         raise ValueError("Specify at least one frozen baseline.")
     names = [method_id(spec) for spec in settings["methods"]]
@@ -169,6 +171,10 @@ def forecast_development(root, settings, panel_manifest, output, workers=1):
     if type(workers) is not int or not 1 <= workers <= 4:
         raise ValueError("Use one to four independent origin workers.")
     names = validate_settings(settings)
+    if settings["draws"] == 6000:
+        from .reissue import verify_budget_record
+
+        verify_budget_record(root, settings["budget_record"])
     verify_finalists(root, settings)
     amendments = []
     if any(spec["method"] == "arima" for spec in settings["methods"]):
@@ -178,6 +184,12 @@ def forecast_development(root, settings, panel_manifest, output, workers=1):
     if any(spec["method"] == "independent_nb_glar" for spec in settings["methods"]):
         amendments.append(verify_observation_control_amendment(root, required=True))
     config = load_config(root / "configs/pilot.toml")
+    config = type(config)(
+        {
+            **config.settings,
+            "forecast": {**config.settings["forecast"], "draws": settings["draws"]},
+        }
+    )
     verify_freeze(root, config)
     verify_panels(root, panel_manifest)
     panel_record = json.loads(panel_manifest.read_text(encoding="utf-8"))
@@ -337,6 +349,10 @@ def score_development(root, folder):
     manifest_path = folder / "forecast_manifest.json"
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     names = validate_settings(manifest["settings"])
+    if manifest["settings"]["draws"] == 6000:
+        from .reissue import verify_budget_record
+
+        verify_budget_record(root, manifest["settings"]["budget_record"])
     panel_manifest = artifact_path(root, manifest["panel_manifest"])
     if file_hash(panel_manifest) != manifest["panel_manifest_sha256"]:
         raise ValueError("The forecast's panel manifest changed.")

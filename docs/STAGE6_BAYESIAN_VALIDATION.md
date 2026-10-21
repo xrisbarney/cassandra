@@ -15,8 +15,14 @@ Priors retain `m~Normal(log(initial_mean+0.5),2)`, `phi~Uniform(-1,1)` and
 the likelihood. The reference-level parameter m is not an unconditional mean.
 The amendment gives the complete specification and distinguishes its priors
 from the model-family support in the literature.
+The initial-window mean is a frozen empirical prior anchor, as in the original
+control; its estimation uncertainty is not an additional posterior component.
+It is never recomputed from development or held-out outcomes.
 
 Every category retains an independent posterior, including the all-zero category.
+This is an independent forecasting control, not an ablation that changes only
+the proposed model's factors or regimes; those effects require later matched
+ablations. The named BSTS-U and Bakdash state-space comparisons remain required.
 Future paths recursively use simulated counts and fixed posterior parameter tuples.
 The forecast PMF is the mixture of conditional NB masses over parameters and
 preceding simulated counts. It is not a moment-matched NB approximation.
@@ -30,6 +36,15 @@ The initial PyMC four-chain fit passed at the first budget: maximum R-hat
 or depth saturations. Prior/posterior replications recursively generate the
 training period conditional on its first count. These are posterior and
 implementation checks, not forecast performance evidence.
+An independent nutpie fit also passed at the first budget (maximum R-hat
+1.00345, minimum bulk/tail ESS 1526.78/1026.09, BFMI 0.9007, no divergences or
+depth saturations). The largest difference between sampler means for m, phi
+and psi was 2.04 combined MC standard errors. This is a descriptive agreement
+check, not a new admission threshold. Production retains PyMC NUTS with the
+NUMBA density/gradient backend. The
+[initial validation record](backtests/stage6-control-resolution-20261021/observation_initial_validation.json)
+and [recursive predictive checks](backtests/stage6-control-resolution-20261021/observation_initial_predictive_checks.json)
+preserve the evidence and source artifact hashes.
 
 ## Superseded latent independent control
 
