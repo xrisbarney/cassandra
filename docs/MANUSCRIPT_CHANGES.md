@@ -168,3 +168,14 @@ Report reference-effort and longitudinal prior checks separately from stress
 envelopes, posterior convergence and recovery. Include both tightened and
 widened sensitivity laws, and disclose the fallback's remaining dependence
 through shared dynamics. Keep all count categories in primary scoring.
+
+### Severity sampling coordinates
+
+The [conditional severity coordinates](decisions/STAGE7_SEVERITY_COORDINATES_20261021.md)
+use a Gaussian working conditional to transform the latent states. The model
+still evaluates the censored mark likelihood and the normalized stationary
+state prior, including the parameter-dependent transformation Jacobian.
+This changes the sampling coordinates, not the probability law. Independent
+precision, complete density-ratio and gradient checks passed, including missing
+marks and censored endpoints. Report posterior diagnostic outcomes separately;
+passing these identities alone does not establish successful inference.
