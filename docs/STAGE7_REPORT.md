@@ -28,7 +28,12 @@ prior covariance is `s^2 I + hyper_sd^2 11'`. An independent quadrature check
 confirms equality with the original hierarchical prior. This improves geometry
 without changing that prior. Two earlier uncompleted engineering runs retain
 their source/data records and explicit abort records under `artifacts/stage7/`;
-they are not recovery evidence. The campaign uses `artifacts/stage7/recovery-v1`.
+they are not recovery evidence. The final campaign uses
+`artifacts/stage7/recovery-v3`, retaining the six independent/latent-AR controls
+from `recovery-v1`. The [geometry decision](decisions/STAGE7_GEOMETRY_20261021.md)
+records the centered factor coordinates and dense metric selected from
+computational diagnostics. Earlier factor attempts remain available as geometry
+comparisons; they are not additional independent simulated datasets.
 
 Known missing-BLAS, noncontiguous-dot and object-mode indexing warnings are
 recorded as performance messages after native/compiled value and gradient

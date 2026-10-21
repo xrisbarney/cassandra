@@ -183,5 +183,21 @@ without trend. `configs/stage6_arima_finalists.json` binds that particular local
 screening record by hash. A new screening run requires its own verified record
 path and hash in the finalist configuration.
 
+Stage 7 uses generated data only. The [design](docs/STAGE7_DESIGN.md),
+[execution record](docs/STAGE7_REPORT.md), and
+[prior-tail finding](docs/STAGE7_PRIOR_FINDING.md) distinguish numerical component
+checks, fixed-truth recovery, and remaining model-validation gates. These commands
+run a new case and then assemble a completed campaign; existing output directories
+are preserved rather than overwritten:
+
+    . .\scripts\Use-Compiler.ps1
+    .\.venv\Scripts\python.exe scripts/run_stage7.py --scenario factors_sparse --seed 7101 --center-factors --dense-mass --output artifacts/stage7/new-factor-case
+    .\.venv\Scripts\python.exe scripts/stage7_batch.py --root artifacts/stage7/new-campaign --workers 2 --center-factors --dense-mass
+
+The historical campaign's control cases used a diagonal metric, as recorded in
+the geometry decision. `scripts/summarize_stage7.py --controls-from` preserves
+that distinction in its audit. `scripts/analyze_stage7.py` and
+`scripts/plot_stage7.py` describe admitted posteriors; failed fits remain failures.
+
 Use locked commands to prevent unnoticed dependency resolution changes; see
 [uv locking and syncing](https://docs.astral.sh/uv/concepts/projects/sync/).

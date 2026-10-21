@@ -111,7 +111,7 @@ def build_model(data, options, conditional=None):
             loc = n + factors("h", k, options["severity_factors"], t,
                               options.get('factor_parameterization', 'innovations'))
             kappa = pm.HalfNormal("kappa", 0.5, shape=k, initval=np.full(k, 0.3))
-            # This fixture has R=1. Severity-regime shifts get separate component tests.
+            # This fixture has R=1; joint severity/regime validation belongs to Stage 8.
             loc = pm.Deterministic("severity_location", loc)
             months, cats = np.where(data["mask_B"])
             term = symbolic_mark_logp(
