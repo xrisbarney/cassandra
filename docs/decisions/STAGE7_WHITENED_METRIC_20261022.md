@@ -30,3 +30,15 @@ stopped after a successful alternative is an interrupted engineering attempt,
 not a completed failed schedule. The replacement must itself be a complete
 four-chain admitted fit or a fully exhausted schedule. The comparison adds
 no independent generated dataset and reads no real-data evaluation outcomes.
+
+Numerical optimization follow-up: the verified scalar block implementation
+removes the tiny-array allocation bottleneck. Repeat the diagonal representative
+trial in a new directory under the full same schedule. Its preflight measures
+the complete model gradient. If that is at least twice as fast as the previous
+0.00252-second preflight under this concurrent workload, supersede the two
+unfinished allocation-heavy representative trials and preserve their partial
+records. This is a computational replacement; neither interrupted trial is
+called a fully failed schedule. If the replacement is not admitted, the dense
+metric still requires its own complete schedule with the verified faster
+implementation before the metric comparison can be closed. No posterior
+recovery score is consulted for this computational decision.
