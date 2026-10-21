@@ -1,5 +1,10 @@
 # Stage 1: Record of changes required in the manuscript
 
+The dated Stage 7 addendum below supersedes the original Stage 1 recommendations
+about factor innovation covariance, loading priors and the residual noise floor.
+The historical Stage 2 specification remains sealed; implementation amendments
+are recorded separately.
+
 Each entry names the location in `main.tex`, what it currently says, what the
 specification (`SPECIFICATION.md`) proposes, and the edit needed once the
 corresponding implementation and evidence exist. The numbered table records the
@@ -112,3 +117,38 @@ These requirements are also recorded in [the carry-forward note](STAGE6_8_CARRY_
   matched factor/regime ablations, held-out calibration and economic validation.
   The [Stage 6 record](STAGE6_COMPLETION.md) identifies completed evidence and
   remaining stages; all old failed-evaluation numerical claims still require replacement.
+
+## Stage 7 prior and coordinate changes (2026-10-21)
+
+These changes are active for synthetic validation under
+[the activation record](amendments/STATE_SPACE_PRIORS_ACTIVATION_20261021.md).
+They do not establish successful recovery or authorize held-out fitting.
+
+- Supersede edit 5's identity innovation covariance with
+  `Q = diag(1 - phi_j**2)` and stationary initial factors `N(0,I)`.
+  Each factor has unit stationary variance; loadings measure stationary
+  amplitude. Apply the same convention to severity factors and forecasts.
+  This is a change of prior law relative to Stage 2, not merely coordinates.
+- At `main.tex:552`, the figure node near line 357, and the figure caption
+  at line 518, replace the old scale/loading descriptions with the actual
+  normalized truncated laws in the amendment. Free loading entries have
+  scale `1/sqrt(r)` and bounds `+/-2/sqrt(r)`; leading diagonal entries are
+  positive. Optional iid count SD has a HalfNormal(1) prior truncated to
+  `(0,1)`, with no artificial 0.01 floor. Supersede the retained-floor bullet
+  in the historical list above. Do not claim these restrictions encode no
+  beliefs, or that a noise floor makes Markov transitions stochastic.
+- Distinguish these substantive restrictions from the equivalent sampling
+  coordinates in [the geometry decision](decisions/STAGE7_AMPLITUDE_COORDINATES_20261021.md).
+  Scaling factor states by their anchor loading, with the full transition
+  normalizers/Jacobian, preserves the amended probability law.
+- Finite prior moments do not establish plausible predictive spread,
+  posterior convergence, recovery, or calibrated forecasts. Report those
+  checks separately, including failures and sensitivity results.
+- The proposed training-only level anchor, narrower level hierarchy, and
+  independent fallback-category level are under review. They are not the
+  laws of the already running `stationary_bounded_v1` fits. A subsequent
+  amendment must specify the exact anchor, eligible categories, reference
+  effort convention, and treatment of synthetic fixtures before new fits.
+- Version G's bounded KEV elasticity is a separate substantive restriction.
+  Count-only validation does not validate that slope law or resolve the
+  unmatched-KEV cohort issue.
