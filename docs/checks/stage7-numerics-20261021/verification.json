@@ -1,0 +1,19 @@
+{
+  "date": "2026-10-21",
+  "source_revision": "b335aa6fa6b5a13e785e876c3c00733c7ea03ceb",
+  "pytest": {
+    "passed": 136,
+    "warnings": 1,
+    "warning": "PyTensor native BLAS unavailable; NUMBA backend used for sampling",
+    "seconds": 403.92,
+    "log_path": "artifacts/stage7-final-full-tests.log",
+    "log_sha256": "479f20289aabb62c14db3d431f0acfdae18714b5bd86f360fbccfbafbe57daea"
+  },
+  "ruff": "passed",
+  "uv_lock_check": "passed",
+  "configuration_validation": "passed",
+  "freeze_sha256": "7597b76276b837f8db9bc2baff63cb035e14cdfa8656885c782795d38cb598e7",
+  "frozen_files_verified": 5,
+  "panel_manifest_sha256": "0448a3eb7f6d4a17d3808b98ad7a315105ed2cc72974cf7828afb4c3d5515840",
+  "held_out_scoring_enabled": false
+}
