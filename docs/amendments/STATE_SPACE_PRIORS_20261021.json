@@ -1,0 +1,42 @@
+{
+  "amendment_id": "2026-10-21-state-space-priors-draft1",
+  "status": "proposed_not_active",
+  "prepared_on": "2026-10-21",
+  "parent_freeze_sha256": "7597b76276b837f8db9bc2baff63cb035e14cdfa8656885c782795d38cb598e7",
+  "authority": "User requested prior amendment first and stopping unfinished old-prior runs",
+  "activation_record": null,
+  "files": [
+    {
+      "path": "docs/amendments/STATE_SPACE_PRIORS_20261021.md",
+      "sha256": "f48c652297e31e84ed5cd0afeb228e0822a11dc6391c82220a25123a59775831"
+    },
+    {
+      "path": "docs/amendments/STATE_SPACE_PRIORS_20261021.proposal.json",
+      "sha256": "d4c710dc9a7d7a51aa2bfa6b9a595cd02003ee2ae41a988e8d900e79b2206d72"
+    },
+    {
+      "path": "scripts/check_stage7_prior_proposal.py",
+      "sha256": "2def7397f441273041c143ef3c3b21a720456d19f4f7559f9265d9984df914f1"
+    },
+    {
+      "path": "docs/checks/stage7-prior-proposal-20261021/audit-final.json",
+      "sha256": "1fcc56efa07e129aad09d2d2636eee58fb869b6e7ce3b86dc0369fdcaf4c2e65"
+    },
+    {
+      "path": "docs/checks/stage7-prior-proposal-20261021/verification.json",
+      "sha256": "6e93e12e04c217a308c73fb23a6c0c88227934edb9a0259f0573d561fdf8925e"
+    },
+    {
+      "path": "docs/checks/stage7-prior-proposal-20261021/README.md",
+      "sha256": "37d5a837a3ee7c7b49e8f32b947c08e49942a3af0cd19b82b75c44b89d8449b2"
+    },
+    {
+      "path": "docs/simulations/stage7-20261021-interrupted/audit.json",
+      "sha256": "100e8c4909f2616ed4d79d905df1791daccc41d37a0dea26f9a1b7ad9ad060c5"
+    },
+    {
+      "path": "docs/simulations/stage7-20261021-interrupted/process_stop.json",
+      "sha256": "3210df1ad570df53c1c879e1404484096104393d5a91e4f8e050fe39cccc0791"
+    }
+  ]
+}

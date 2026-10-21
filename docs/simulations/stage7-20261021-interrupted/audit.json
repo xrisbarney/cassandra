@@ -1,0 +1,302 @@
+{
+  "timestamp_utc": "2026-10-21T19:10:41.3161024Z",
+  "expected_datasets": 40,
+  "counts": {
+    "accepted": 6,
+    "failed_diagnostic_gate": 7,
+    "user_directed_stop": 5,
+    "not_started": 22
+  },
+  "runs": [
+    {
+      "scenario": "independent",
+      "seed": 7101,
+      "directory": "artifacts/stage7/recovery-v1/independent-7101",
+      "status": "accepted",
+      "result_sha256": "7ab74d1a795cdf8a4e8ed69a9c1004302c4a1caa3b744a1f2f95e6bc5f5e1507",
+      "attempts": 1
+    },
+    {
+      "scenario": "independent",
+      "seed": 7102,
+      "directory": "artifacts/stage7/recovery-v1/independent-7102",
+      "status": "accepted",
+      "result_sha256": "19f060646ddc0f115cc286d838a901dd9ba6ed5a0b47ed3457379e218eaabcc0",
+      "attempts": 1
+    },
+    {
+      "scenario": "independent",
+      "seed": 7103,
+      "directory": "artifacts/stage7/recovery-v1/independent-7103",
+      "status": "accepted",
+      "result_sha256": "c23a6b924bc614dbae7d3400acad9c01f6ce11cb12a2284e27ab1606cb270ace",
+      "attempts": 1
+    },
+    {
+      "scenario": "latent_ar",
+      "seed": 7101,
+      "directory": "artifacts/stage7/recovery-v1/latent_ar-7101",
+      "status": "failed_diagnostic_gate",
+      "result_sha256": "f232b09a7d538d5db08de355b055fabd443abfef629f16afebc36cb03b6a50d9",
+      "attempts": 3
+    },
+    {
+      "scenario": "latent_ar",
+      "seed": 7102,
+      "directory": "artifacts/stage7/recovery-v1/latent_ar-7102",
+      "status": "failed_diagnostic_gate",
+      "result_sha256": "d490b33edeb716e53a3824426a147de411e329a954acbedd9ff90eb3997d506b",
+      "attempts": 3
+    },
+    {
+      "scenario": "latent_ar",
+      "seed": 7103,
+      "directory": "artifacts/stage7/recovery-v1/latent_ar-7103",
+      "status": "failed_diagnostic_gate",
+      "result_sha256": "2dc7f2b35949aad00e4f9ef75704cfcad19084503c86e088dbece61681801c45",
+      "attempts": 3
+    },
+    {
+      "scenario": "factors_sparse",
+      "seed": 7101,
+      "directory": "artifacts/stage7/recovery-v3/factors_sparse-7101",
+      "status": "accepted",
+      "result_sha256": "217b9532916adc27c29111e989ac8c25201a7dcb1963b73b0f9906e1302da323",
+      "attempts": 1
+    },
+    {
+      "scenario": "factors_sparse",
+      "seed": 7102,
+      "directory": "artifacts/stage7/recovery-v3/factors_sparse-7102",
+      "status": "failed_diagnostic_gate",
+      "result_sha256": "6a5ec564a41c7c43686bc3ff9050699441888beff7de61804cb51e961d5cfa52",
+      "attempts": 3
+    },
+    {
+      "scenario": "factors_sparse",
+      "seed": 7103,
+      "directory": "artifacts/stage7/recovery-v3/factors_sparse-7103",
+      "status": "accepted",
+      "result_sha256": "104ee222b6079338a1c8bab82139690d5b6511c31f5ee3ea4eb2bfad872f4ccc",
+      "attempts": 1
+    },
+    {
+      "scenario": "severity_missing",
+      "seed": 7101,
+      "directory": "artifacts/stage7/recovery-v3/severity_missing-7101",
+      "status": "failed_diagnostic_gate",
+      "result_sha256": "74b3bdb0ff3816fa6e83b386127dcdb78d13ec414a7c520aa59c7756b14eea5a",
+      "attempts": 3
+    },
+    {
+      "scenario": "severity_missing",
+      "seed": 7102,
+      "directory": "artifacts/stage7/recovery-v3/severity_missing-7102",
+      "status": "user_directed_stop",
+      "completed_attempt_records": [
+        "attempt_0.json"
+      ],
+      "interruption_sha256": "65578291867a56e39fbced844d41e475f5572315cf3fd7f24bcc1dc0c3924a22"
+    },
+    {
+      "scenario": "severity_missing",
+      "seed": 7103,
+      "directory": "artifacts/stage7/recovery-v3/severity_missing-7103",
+      "status": "user_directed_stop",
+      "completed_attempt_records": [
+        "attempt_0.json",
+        "attempt_1.json"
+      ],
+      "interruption_sha256": "5b41cb206a2acd39556c920ad2a4551d28e716cefba4750f3234beb8a60ca07a"
+    },
+    {
+      "scenario": "regimes",
+      "seed": 7101,
+      "directory": "artifacts/stage7/recovery-v3/regimes-7101",
+      "status": "accepted",
+      "result_sha256": "b6dcb9ba1562e26eb37df60aa50212ddf8fe383071fd2e18a268ed206bfde9dc",
+      "attempts": 2
+    },
+    {
+      "scenario": "regimes",
+      "seed": 7102,
+      "directory": "artifacts/stage7/recovery-v3/regimes-7102",
+      "status": "user_directed_stop",
+      "completed_attempt_records": [],
+      "interruption_sha256": "da61b0d0b9a94d3918f6aaeee56e0fce2530d63eedb17c3793a8e8d26f26d141"
+    },
+    {
+      "scenario": "regimes",
+      "seed": 7103,
+      "directory": "artifacts/stage7/recovery-v3/regimes-7103",
+      "status": "not_started"
+    },
+    {
+      "scenario": "effort_proxy",
+      "seed": 7101,
+      "directory": "artifacts/stage7/recovery-v3/effort_proxy-7101",
+      "status": "not_started"
+    },
+    {
+      "scenario": "effort_proxy",
+      "seed": 7102,
+      "directory": "artifacts/stage7/recovery-v3/effort_proxy-7102",
+      "status": "not_started"
+    },
+    {
+      "scenario": "effort_proxy",
+      "seed": 7103,
+      "directory": "artifacts/stage7/recovery-v3/effort_proxy-7103",
+      "status": "not_started"
+    },
+    {
+      "scenario": "effort_oracle",
+      "seed": 7101,
+      "directory": "artifacts/stage7/recovery-v3/effort_oracle-7101",
+      "status": "not_started"
+    },
+    {
+      "scenario": "effort_oracle",
+      "seed": 7102,
+      "directory": "artifacts/stage7/recovery-v3/effort_oracle-7102",
+      "status": "not_started"
+    },
+    {
+      "scenario": "effort_oracle",
+      "seed": 7103,
+      "directory": "artifacts/stage7/recovery-v3/effort_oracle-7103",
+      "status": "not_started"
+    },
+    {
+      "scenario": "effort_none",
+      "seed": 7101,
+      "directory": "artifacts/stage7/recovery-v3/effort_none-7101",
+      "status": "not_started"
+    },
+    {
+      "scenario": "effort_none",
+      "seed": 7102,
+      "directory": "artifacts/stage7/recovery-v3/effort_none-7102",
+      "status": "not_started"
+    },
+    {
+      "scenario": "effort_none",
+      "seed": 7103,
+      "directory": "artifacts/stage7/recovery-v3/effort_none-7103",
+      "status": "not_started"
+    },
+    {
+      "scenario": "kernel_present",
+      "seed": 7101,
+      "directory": "artifacts/stage7/recovery-v3/kernel_present-7101",
+      "status": "not_started"
+    },
+    {
+      "scenario": "kernel_present",
+      "seed": 7102,
+      "directory": "artifacts/stage7/recovery-v3/kernel_present-7102",
+      "status": "not_started"
+    },
+    {
+      "scenario": "kernel_present",
+      "seed": 7103,
+      "directory": "artifacts/stage7/recovery-v3/kernel_present-7103",
+      "status": "not_started"
+    },
+    {
+      "scenario": "kernel_absent",
+      "seed": 7101,
+      "directory": "artifacts/stage7/recovery-v3/kernel_absent-7101",
+      "status": "not_started"
+    },
+    {
+      "scenario": "kernel_absent",
+      "seed": 7102,
+      "directory": "artifacts/stage7/recovery-v3/kernel_absent-7102",
+      "status": "not_started"
+    },
+    {
+      "scenario": "kernel_absent",
+      "seed": 7103,
+      "directory": "artifacts/stage7/recovery-v3/kernel_absent-7103",
+      "status": "not_started"
+    },
+    {
+      "scenario": "dispersion_dense",
+      "seed": 7101,
+      "directory": "artifacts/stage7/recovery-v3/dispersion_dense-7101",
+      "status": "failed_diagnostic_gate",
+      "result_sha256": "92b1ff0660e4390eaa2131abbc00b80bb0a16811aedda10b1f6672f7a3cd9fbb",
+      "attempts": 3
+    },
+    {
+      "scenario": "dispersion_dense",
+      "seed": 7102,
+      "directory": "artifacts/stage7/recovery-v3/dispersion_dense-7102",
+      "status": "failed_diagnostic_gate",
+      "result_sha256": "4bd8cd96f7b0b57752e24baf07eeda8228fd096a6b758aa9ce6c6a9725d74458",
+      "attempts": 3
+    },
+    {
+      "scenario": "dispersion_dense",
+      "seed": 7103,
+      "directory": "artifacts/stage7/recovery-v3/dispersion_dense-7103",
+      "status": "user_directed_stop",
+      "completed_attempt_records": [
+        "attempt_0.json"
+      ],
+      "interruption_sha256": "f3025a1171e58f0b9b8b8cd51c2a6c8080ed21b4a1dd226ab3f0e6a58213ce4d"
+    },
+    {
+      "scenario": "dispersion_sparse",
+      "seed": 7101,
+      "directory": "artifacts/stage7/recovery-v3/dispersion_sparse-7101",
+      "status": "not_started"
+    },
+    {
+      "scenario": "dispersion_sparse",
+      "seed": 7102,
+      "directory": "artifacts/stage7/recovery-v3/dispersion_sparse-7102",
+      "status": "not_started"
+    },
+    {
+      "scenario": "dispersion_sparse",
+      "seed": 7103,
+      "directory": "artifacts/stage7/recovery-v3/dispersion_sparse-7103",
+      "status": "not_started"
+    },
+    {
+      "scenario": "misspecified",
+      "seed": 7101,
+      "directory": "artifacts/stage7/recovery-v3/misspecified-7101",
+      "status": "not_started"
+    },
+    {
+      "scenario": "misspecified",
+      "seed": 7102,
+      "directory": "artifacts/stage7/recovery-v3/misspecified-7102",
+      "status": "not_started"
+    },
+    {
+      "scenario": "misspecified",
+      "seed": 7103,
+      "directory": "artifacts/stage7/recovery-v3/misspecified-7103",
+      "status": "not_started"
+    },
+    {
+      "scenario": "representative",
+      "seed": 7101,
+      "directory": "artifacts/stage7/recovery-v3/representative-7101",
+      "status": "user_directed_stop",
+      "completed_attempt_records": [
+        "attempt_0.json",
+        "attempt_1.json"
+      ],
+      "interruption_sha256": "a1e099a38bc4f2f61bda260c4c71e3f1a38ee9e6b993d19829637589b07af7bf"
+    }
+  ],
+  "process_stop_sha256": "3210df1ad570df53c1c879e1404484096104393d5a91e4f8e050fe39cccc0791",
+  "real_data_read": false,
+  "held_out_scoring_enabled": false,
+  "interpretation": "Incomplete old-prior campaign, stopped by user. No amended-prior fits."
+}

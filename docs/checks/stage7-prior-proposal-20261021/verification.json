@@ -1,0 +1,19 @@
+{
+  "date": "2026-10-21",
+  "status": "proposal_only_not_activated",
+  "source_revision_before_edits": "d53a73f133fed1a6bfd84ea6dc5d89f684bcd6b4",
+  "ruff": "passed",
+  "lock_check": "passed",
+  "calendar_validation": "passed",
+  "prior_audit_reproduction": "byte-identical in a separate process",
+  "prior_audit_sha256": "1fcc56efa07e129aad09d2d2636eee58fb869b6e7ce3b86dc0369fdcaf4c2e65",
+  "frozen_files_verified": 5,
+  "parent_freeze_sha256": "7597b76276b837f8db9bc2baff63cb035e14cdfa8656885c782795d38cb598e7",
+  "panel_manifest_sha256": "0448a3eb7f6d4a17d3808b98ad7a315105ed2cc72974cf7828afb4c3d5515840",
+  "production_code_changed": false,
+  "revised_posterior_fits_started": false,
+  "old_prior_sampling_processes_remaining": 0,
+  "completed_and_interrupted_artifact_hashes_verified": true,
+  "held_out_scoring_enabled": false,
+  "tests": "Prior-only audit and quadrature checks rerun; production suite unchanged from 137 + 2 checks in the Stage 7 report."
+}

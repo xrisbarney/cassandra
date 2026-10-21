@@ -1,9 +1,15 @@
 # Stage 7 synthetic validation record
 
-Status: execution in progress, 2026-10-21. The
+Status: old-prior campaign stopped by user, 2026-10-21; Stage 7 incomplete. The
 [recorded design](STAGE7_DESIGN.md) fixes seeds, component checks, scenarios,
-budgets and interpretation before fitting. Forty generated datasets are
-scheduled; none uses a real-data panel or held-out outcomes.
+budgets and interpretation before fitting. Forty generated datasets
+were planned; none uses a real-data panel or held-out outcomes. The
+[interruption audit](simulations/stage7-20261021-interrupted/audit.json) records
+13 completed cases (6 accepted, 7 failed diagnostic gates), 5 user-stopped
+cases and 22 not started. Completed files were hash-verified, and partial
+directories were preserved. No old-prior sampling jobs remain. The
+[proposed prior amendment](amendments/STATE_SPACE_PRIORS_20261021.md) is prepared
+with an analytic argument and prior-only simulations; it is not active.
 
 ## Implementation and verification
 
@@ -37,7 +43,7 @@ prior covariance is `s^2 I + hyper_sd^2 11'`. An independent quadrature check
 confirms equality with the original hierarchical prior. This improves geometry
 without changing that prior. Two earlier uncompleted engineering runs retain
 their source/data records and explicit abort records under `artifacts/stage7/`;
-they are not recovery evidence. The final campaign uses
+they are not recovery evidence. The interrupted campaign used
 `artifacts/stage7/recovery-v3`, retaining the six independent/latent-AR controls
 from `recovery-v1`. The [geometry decision](decisions/STAGE7_GEOMETRY_20261021.md)
 records the centered factor coordinates and dense metric selected from
@@ -50,8 +56,8 @@ checks. Numerical warnings and all frozen convergence thresholds remain gates.
 The [fail-fast execution decision](decisions/STAGE7_FAIL_FAST_20261021.md) stops
 later attempts once a retained divergence/depth event makes admission impossible.
 Partial failed attempts are explicit and provide no recovery evidence. Accepted
-fits still require their entire four-chain budget. Earlier running processes
-retain their original complete-attempt behavior.
+fits still require their entire four-chain budget. Processes started before
+that decision retained their original complete-attempt behavior until stopped.
 
 Before its fits began, the deliberately zero-inflated fixture's reference mean
 was corrected to include its 30% independent zero inflation. It retains the
@@ -67,10 +73,19 @@ rate-scale first moment under the frozen level and factor priors. The original
 priors remain unchanged in this campaign. A documented prior amendment and
 revalidation are required before real-data proposed-model fitting.
 
-The completed independent-count fixtures passed their first four-chain budgets.
-Latent AR fixtures have required all retry budgets; unsuccessful fits are kept
-and will not contribute recovery claims. Remaining scenario results will be
-reported with accepted/attempted denominators after all scheduled runs finish.
+The three independent-count fixtures passed their first four-chain budgets.
+Two of three sparse-factor cases and one completed regime case passed. The
+three latent-AR cases, remaining sparse-factor case, one severity/missingness
+case and two dispersion cases failed their diagnostic gates. The other cases
+were interrupted or unstarted; their status must not be classified as a
+diagnostic outcome. Accepted fits are conditional old-prior evidence, not
+validation of the proposed revision. No old-prior recovery claim resolves
+the prior-tail finding.
+
+The draft prior revision changes the model, so its fit, forecast, covariance
+and truth-coordinate implementations must be updated together after activation.
+Fresh diagnostic/recovery runs are still required. The optional iid-noise
+identification and kernel identification gates remain unresolved.
 
 ## Limits and next gates
 

@@ -1,0 +1,86 @@
+{
+  "timestamp_utc": "2026-10-21T19:10:41.3161024Z",
+  "reason": "User requested prior amendment first and stop unfinished old-prior runs",
+  "processes": [
+    {
+      "ProcessId": 23824,
+      "ParentProcessId": 8384,
+      "CommandLine": "\"C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Scripts\\python.exe\" -u scripts/stage7_batch.py --root artifacts/stage7/recovery-v3 --workers 2 --center-factors --dense-mass --exclude independent latent_ar"
+    },
+    {
+      "ProcessId": 3116,
+      "ParentProcessId": 23824,
+      "CommandLine": "\"C:\\Users\\Chris\\AppData\\Local\\Programs\\Python\\Python312\\python.exe\" -u scripts/stage7_batch.py --root artifacts/stage7/recovery-v3 --workers 2 --center-factors --dense-mass --exclude independent latent_ar"
+    },
+    {
+      "ProcessId": 20572,
+      "ParentProcessId": 3056,
+      "CommandLine": "\"C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Scripts\\python.exe\" -u scripts/run_stage7.py --scenario representative --seed 7101 --output artifacts/stage7/recovery-v3/representative-7101 --center-factors --dense-mass"
+    },
+    {
+      "ProcessId": 7724,
+      "ParentProcessId": 20572,
+      "CommandLine": "\"C:\\Users\\Chris\\AppData\\Local\\Programs\\Python\\Python312\\python.exe\" -u scripts/run_stage7.py --scenario representative --seed 7101 --output artifacts/stage7/recovery-v3/representative-7101 --center-factors --dense-mass"
+    },
+    {
+      "ProcessId": 16876,
+      "ParentProcessId": 26468,
+      "CommandLine": "\"C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Scripts\\python.exe\" -u scripts/stage7_batch.py --root artifacts/stage7/recovery-v3 --workers 1 --center-factors --dense-mass --exclude independent latent_ar factors_sparse severity_missing regimes effort_proxy effort_oracle effort_none kernel_present kernel_absent representative"
+    },
+    {
+      "ProcessId": 15792,
+      "ParentProcessId": 16876,
+      "CommandLine": "\"C:\\Users\\Chris\\AppData\\Local\\Programs\\Python\\Python312\\python.exe\" -u scripts/stage7_batch.py --root artifacts/stage7/recovery-v3 --workers 1 --center-factors --dense-mass --exclude independent latent_ar factors_sparse severity_missing regimes effort_proxy effort_oracle effort_none kernel_present kernel_absent representative"
+    },
+    {
+      "ProcessId": 18896,
+      "ParentProcessId": 3116,
+      "CommandLine": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Scripts\\python.exe -u scripts/run_stage7.py --scenario severity_missing --seed 7102 --output artifacts\\stage7\\recovery-v3\\severity_missing-7102 --center-factors --dense-mass"
+    },
+    {
+      "ProcessId": 11256,
+      "ParentProcessId": 18896,
+      "CommandLine": "\"C:\\Users\\Chris\\AppData\\Local\\Programs\\Python\\Python312\\python.exe\" -u scripts/run_stage7.py --scenario severity_missing --seed 7102 --output artifacts\\stage7\\recovery-v3\\severity_missing-7102 --center-factors --dense-mass"
+    },
+    {
+      "ProcessId": 28316,
+      "ParentProcessId": 28224,
+      "CommandLine": "\"C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Scripts\\python.exe\" -u scripts/stage7_batch.py --root artifacts/stage7/recovery-v3 --workers 1 --center-factors --dense-mass --exclude independent latent_ar factors_sparse severity_missing kernel_present kernel_absent dispersion_dense dispersion_sparse misspecified representative"
+    },
+    {
+      "ProcessId": 15068,
+      "ParentProcessId": 28316,
+      "CommandLine": "\"C:\\Users\\Chris\\AppData\\Local\\Programs\\Python\\Python312\\python.exe\" -u scripts/stage7_batch.py --root artifacts/stage7/recovery-v3 --workers 1 --center-factors --dense-mass --exclude independent latent_ar factors_sparse severity_missing kernel_present kernel_absent dispersion_dense dispersion_sparse misspecified representative"
+    },
+    {
+      "ProcessId": 3080,
+      "ParentProcessId": 3116,
+      "CommandLine": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Scripts\\python.exe -u scripts/run_stage7.py --scenario severity_missing --seed 7103 --output artifacts\\stage7\\recovery-v3\\severity_missing-7103 --center-factors --dense-mass"
+    },
+    {
+      "ProcessId": 13912,
+      "ParentProcessId": 3080,
+      "CommandLine": "\"C:\\Users\\Chris\\AppData\\Local\\Programs\\Python\\Python312\\python.exe\" -u scripts/run_stage7.py --scenario severity_missing --seed 7103 --output artifacts\\stage7\\recovery-v3\\severity_missing-7103 --center-factors --dense-mass"
+    },
+    {
+      "ProcessId": 8412,
+      "ParentProcessId": 15792,
+      "CommandLine": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Scripts\\python.exe -u scripts/run_stage7.py --scenario dispersion_dense --seed 7103 --output artifacts\\stage7\\recovery-v3\\dispersion_dense-7103 --center-factors --dense-mass"
+    },
+    {
+      "ProcessId": 28264,
+      "ParentProcessId": 8412,
+      "CommandLine": "\"C:\\Users\\Chris\\AppData\\Local\\Programs\\Python\\Python312\\python.exe\" -u scripts/run_stage7.py --scenario dispersion_dense --seed 7103 --output artifacts\\stage7\\recovery-v3\\dispersion_dense-7103 --center-factors --dense-mass"
+    },
+    {
+      "ProcessId": 28428,
+      "ParentProcessId": 15068,
+      "CommandLine": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Scripts\\python.exe -u scripts/run_stage7.py --scenario regimes --seed 7102 --output artifacts\\stage7\\recovery-v3\\regimes-7102 --center-factors --dense-mass"
+    },
+    {
+      "ProcessId": 11408,
+      "ParentProcessId": 28428,
+      "CommandLine": "\"C:\\Users\\Chris\\AppData\\Local\\Programs\\Python\\Python312\\python.exe\" -u scripts/run_stage7.py --scenario regimes --seed 7102 --output artifacts\\stage7\\recovery-v3\\regimes-7102 --center-factors --dense-mass"
+    }
+  ]
+}

@@ -4,6 +4,11 @@ This finding concerns the proposed state-space model's frozen priors, not the
 Stage 6 independent control that was replaced by amendment. The prior audit
 does not alter either model or any historical score.
 
+Update, 2026-10-21: the user stopped unfinished old-prior jobs and requested
+the [prior amendment draft](amendments/STATE_SPACE_PRIORS_20261021.md) first.
+The draft is checked separately and is not yet active. This original finding
+and its frozen-prior audit remain unchanged as evidence.
+
 The finite [stress audit](checks/stage7-numerics-20261021/prior_predictive.json)
 drew 20,000 parameter/state samples for four categories at a stationary month,
 using one factor, no iid residual and no effort offset. Among 80,000 category

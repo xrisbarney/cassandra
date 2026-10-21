@@ -1,5 +1,16 @@
 # Design amendments
 
+## 2026-10-21: proposed state-space prior revision (not active)
+
+At the user's request, unfinished old-prior Stage 7 jobs were stopped and their
+artifacts preserved. The [draft prior amendment](amendments/STATE_SPACE_PRIORS_20261021.md)
+addresses stationary factor amplitude, hierarchical scales, optional residuals,
+kernel loadings and the version-G KEV slope. Its analytic moment proof and
+prior-only simulation audit are ready for review. This is a proposal, not an
+activated model or a completed Stage 7 validation. The original Stage 2 freeze,
+Stage 6 controls/results and inference code remain unchanged. Revised posterior
+fits have not started.
+
 ## 2026-10-21: primary independent control replacement
 
 The [conditional observation-driven NB amendment](amendments/OBSERVATION_CONTROL_20261021.md)
