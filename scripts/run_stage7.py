@@ -13,7 +13,9 @@ from cyber_threat_modelling.data.store import write_json
 from cyber_threat_modelling.evaluation.synthetic import SCENARIOS, generate
 from cyber_threat_modelling.models.components import fitted_effort
 from cyber_threat_modelling.models.stage7_priors import (
-    PRIOR_ID,
+    CANDIDATES,
+    CURRENT_PRIOR_ID,
+    level_settings,
     stationary_truth,
     verify_activation,
 )
@@ -71,21 +73,32 @@ def main():
     coordinates.add_argument('--center-factors', action='store_true')
     coordinates.add_argument('--anchor-factors', action='store_true')
     parser.add_argument('--dense-mass', action='store_true')
+    parser.add_argument('--prior-candidate', choices=CANDIDATES, default='primary')
     args = parser.parse_args()
     root = Path(__file__).resolve().parents[1]
-    activation = verify_activation(root)
+    activation = verify_activation(root, CURRENT_PRIOR_ID)
+    audit_path = root/'docs/checks/stage7-levels-20261021/audit.json'
+    prior_audit = json.loads(audit_path.read_text())
+    if not prior_audit.get('complete') or not prior_audit.get('primary_passed'):
+        raise ValueError('The primary prior-predictive gate has not passed.')
+    if prior_audit['prior_activation']['sha256'] != activation['sha256']:
+        raise ValueError('Prior audit belongs to a different activation.')
+    # The candidate grid is predeclared; wide cases may fail plausibility and
+    # still run as explicitly labelled sensitivity stress comparisons.
     folder = args.output.resolve()
     folder.mkdir(parents=True, exist_ok=False)
     data, truth, options = generate(args.scenario, args.seed)
     np.savez_compressed(folder / 'truth_original_coordinates.npz', **truth)
     truth = stationary_truth(truth, options)
-    options['prior_id'] = PRIOR_ID
+    options['prior_id'] = CURRENT_PRIOR_ID
+    options['prior_candidate'] = args.prior_candidate
     options['factor_parameterization'] = ('anchored' if args.anchor_factors else
                                           'centered' if args.center_factors else 'innovations')
     options['mass_matrix'] = 'dense' if args.dense_mass else 'diagonal'
     effort = None
     if args.scenario == 'effort_proxy':
         data['effort'], effort = fitted_effort(data['N'], data['mask_N'].all(axis=1))
+    options['level_settings'] = level_settings(data, options)
     np.savez_compressed(folder / 'data.npz', **data)
     np.savez_compressed(folder / 'truth.npz', **truth)
     files = list((root / 'src').rglob('*.py')) + [Path(__file__), root / 'uv.lock',
@@ -100,6 +113,7 @@ def main():
         'truth_sha256': file_hash(folder / 'truth.npz'), 'real_data_read': False,
         'held_out_scoring_enabled': False,
         'prior_amendment': activation,
+        'prior_predictive_audit_sha256': file_hash(audit_path),
         'truth_original_coordinates_sha256': file_hash(folder/'truth_original_coordinates.npz'),
     })
     import pymc as pm

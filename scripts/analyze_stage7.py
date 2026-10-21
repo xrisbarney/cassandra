@@ -19,7 +19,7 @@ from cyber_threat_modelling.evaluation.synthetic_recovery import (
     posterior_array,
     reconstructed_loading,
 )
-from cyber_threat_modelling.models.stage7_priors import amended
+from cyber_threat_modelling.models.stage7_priors import CURRENT_PRIOR_ID, amended
 from cyber_threat_modelling.provenance import file_hash
 
 
@@ -101,13 +101,23 @@ def main():
             priors.update(m=np.sqrt(9 + truncnorm.moment(2, 0, 1.5, scale=2)),
                           n=np.sqrt(1 + truncnorm.moment(2, 0, 2)),
                           tau=np.sqrt(truncnorm.var(0, 1)))
+        settings = (options.get('level_settings')
+                    if options.get('prior_id') == CURRENT_PRIOR_ID else None)
+        multiplier = settings['amplitude_multiplier'] if settings else 1.
+        if settings:
+            scale, bound = settings['scale_sd'], settings['scale_upper']
+            priors['m'] = np.sqrt(settings['hyper_sd']**2
+                                   + truncnorm.moment(2, 0, bound/scale, scale=scale))
+            priors['tau'] *= multiplier
         for name, sd in priors.items():
             if name in post:
                 values = get(name).reshape(samples, -1)
                 for j, actual in enumerate(values.std(axis=0)):
+                    marginal_sd = 1. if (settings and name == 'm'
+                                          and j == settings['fallback_index']) else sd
                     contractions.append({**prefix, 'parameter': name, 'index': j,
-                                         'prior_sd': sd, 'posterior_sd': actual,
-                                         'sd_ratio': actual/sd})
+                                         'prior_sd': marginal_sd, 'posterior_sd': actual,
+                                         'sd_ratio': actual/marginal_sd})
         for j, actual in enumerate(np.log(get('psi')).std(axis=0)):
             contractions.append({**prefix, 'parameter': 'log_psi', 'index': j,
                                  'prior_sd': 1., 'posterior_sd': actual, 'sd_ratio': actual})
@@ -115,10 +125,12 @@ def main():
         extra = {**prefix}
         if revised:
             bounds = {'m_sd': 3, 'n_sd': 2, 'tau': 1, 'a': 1}
+            if settings:
+                bounds.update(m_sd=settings['scale_upper'], tau=multiplier, a=multiplier)
             for prefix_name, factor_rank in [('f', rank), ('h', options['severity_factors'])]:
                 if factor_rank:
-                    bounds[prefix_name+'_diag'] = 2/np.sqrt(factor_rank)
-                    bounds[prefix_name+'_free'] = 2/np.sqrt(factor_rank)
+                    bounds[prefix_name+'_diag'] = 2*multiplier/np.sqrt(factor_rank)
+                    bounds[prefix_name+'_free'] = 2*multiplier/np.sqrt(factor_rank)
             extra['upper_support_edge_probability'] = {
                 name: np.mean(np.abs(get(name)) > .95*bound, axis=0).tolist()
                 for name, bound in bounds.items() if name in post
@@ -131,8 +143,8 @@ def main():
             # hence its prior norm is a half-Normal scale times a chi norm.
             norm_prior = abs(rng.normal(0, .5, 200000)) * np.sqrt(rng.chisquare(k, 200000))
             if revised:
-                scale = abs(rng.normal(0, .5, (200000, 1)))
-                values = truncnorm.rvs(-1/scale, 1/scale, scale=scale,
+                scale = abs(rng.normal(0, .5*multiplier, (200000, 1)))
+                values = truncnorm.rvs(-multiplier/scale, multiplier/scale, scale=scale,
                                        size=(200000, k), random_state=rng)
                 norm_prior = np.linalg.norm(values, axis=1)
             norm = get('a_norm')

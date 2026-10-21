@@ -12,7 +12,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
 from cyber_threat_modelling.evaluation.synthetic import SCENARIOS
-from cyber_threat_modelling.models.stage7_priors import PRIOR_ID
+from cyber_threat_modelling.models.stage7_priors import CANDIDATES, CURRENT_PRIOR_ID
 from cyber_threat_modelling.provenance import file_hash
 
 
@@ -21,14 +21,19 @@ def main():
     parser.add_argument('--root', type=Path, required=True)
     parser.add_argument('--workers', type=int, choices=[1, 2, 3], default=2)
     parser.add_argument('--exclude', nargs='*', default=[])
+    parser.add_argument('--include', nargs='*', choices=SCENARIOS)
+    parser.add_argument('--seeds', nargs='+', type=int, choices=[7101, 7102, 7103],
+                        default=[7101, 7102, 7103])
+    parser.add_argument('--prior-candidate', choices=CANDIDATES, default='primary')
     coordinates = parser.add_mutually_exclusive_group()
     coordinates.add_argument('--center-factors', action='store_true')
     coordinates.add_argument('--anchor-factors', action='store_true')
     parser.add_argument('--dense-mass', action='store_true')
     args = parser.parse_args()
     args.root.mkdir(parents=True, exist_ok=True)
-    jobs = [(name, seed) for name in SCENARIOS for seed in (7101, 7102, 7103)
-            if name not in args.exclude and (name != 'representative' or seed == 7101)]
+    jobs = [(name, seed) for name in SCENARIOS for seed in args.seeds
+            if name not in args.exclude and (not args.include or name in args.include)
+            and (name != 'representative' or seed == 7101)]
 
     def execute(name, seed):
         folder = args.root / f'{name}-{seed}'
@@ -37,8 +42,10 @@ def main():
             if not result.exists():
                 return {'scenario': name, 'seed': seed, 'status': 'partial_run_preserved'}
             record = json.loads(result.read_text())
-            if record['options'].get('prior_id') != PRIOR_ID:
+            if record['options'].get('prior_id') != CURRENT_PRIOR_ID:
                 raise ValueError(f'Existing run has a different prior: {folder}')
+            if record['options'].get('prior_candidate') != args.prior_candidate:
+                raise ValueError(f'Existing run has a different prior candidate: {folder}')
             requested = ('anchored' if args.anchor_factors else
                          'centered' if args.center_factors else 'innovations')
             if record['options'].get('factor_parameterization', 'innovations') != requested:
@@ -55,6 +62,7 @@ def main():
             command = [
                 sys.executable, '-u', 'scripts/run_stage7.py', '--scenario', name,
                 '--seed', str(seed), '--output', str(folder),
+                '--prior-candidate', args.prior_candidate,
             ]
             if args.center_factors:
                 command.append('--center-factors')

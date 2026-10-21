@@ -1,0 +1,17 @@
+{
+  "status": "active",
+  "prior_id": "anchored_levels_v2",
+  "authority": "User: okay, treat all and proceed; take stage 7 to the end",
+  "parent_freeze_sha256": "7597b76276b837f8db9bc2baff63cb035e14cdfa8656885c782795d38cb598e7",
+  "files": [
+    {
+      "path": "docs/amendments/STATE_SPACE_LEVELS_20261021.md",
+      "sha256": "7b3c340989576750de28504503af52e86db317e4df7f372914ea2d4e70c99d16"
+    },
+    {
+      "path": "docs/amendments/STATE_SPACE_PRIORS_ACTIVATION_20261021.json",
+      "sha256": "8aeecc526dee9dfd86c7c51037f7d35117cdefbaaa682cff70fe92e4c5895e39"
+    }
+  ],
+  "held_out_scoring_enabled": false
+}

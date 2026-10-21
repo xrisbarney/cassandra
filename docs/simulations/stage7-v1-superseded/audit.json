@@ -1,0 +1,159 @@
+{
+  "reason": "User accepted anchored-level revision; preserve v1 completed and unfinished runs",
+  "runs": [
+    {
+      "directory": "artifacts/stage7/recovery-v4/factors_sparse-7101",
+      "status": "stopped_for_level_amendment",
+      "files": {
+        "attempt_0.json": "f5fd41fe7e7693ffbdb2ec5cb2ac510d108328f9ba9197edc5c60f6488c75d7c",
+        "attempt_1.json": "6c64f9995eb8e0699487d3f6da932ff8c07783760bee98b1121086fd2b7619e9",
+        "data.npz": "53a7f3bd8c4eba71e76b1cd015bad5980be48a402dd59e517574727f8e7cbd33",
+        "diagnostics_0.csv": "e1885783d522cf01c95718dc72a5805be22caf639f4628f1c0a110592d31bae9",
+        "diagnostics_1.csv": "fcbf98997cf02ac8db8a7442207cd579feff0f92c0da909f5669221356f86c9e",
+        "posterior_0.nc": "5fd3072eb6da20a7ec0441b6983fe1e8d3b79e680fdbbec407a544ba48eda2c8",
+        "posterior_1.nc": "13294fc62887060be4acb4fea182889b9f5a400056b775743714ed7dd2d7a609",
+        "run.json": "2ac6c0a22b372fc4aa0e9bc3652c5024c7e13bfdb4aa2dbaa56ee482318b7649",
+        "truth.npz": "ce354834e88c98c08f34175e057f1c4792ce84bfebba7d7231cd5fd670de9c43",
+        "truth_original_coordinates.npz": "7c03723bfb675719d75df36145a322ddb0ed0c6b67745bddf321b6681700e95e"
+      }
+    },
+    {
+      "directory": "artifacts/stage7/recovery-v4/factors_sparse-7102",
+      "status": "stopped_for_level_amendment",
+      "files": {
+        "attempt_0.json": "4b6b001d89a455b743af3b80399de246d806c453731cdc66933e8f30615eba05",
+        "attempt_1.json": "b2b924eb219be1596a6d60fc619230b34cae321093a5905fe59e31d4636ba257",
+        "data.npz": "b05b466fb78f7234afc26ac11254b82ccf020ecb4392155e5383c6e5e864ff66",
+        "diagnostics_0.csv": "5a5757b5452bdf3ec80ae4863bb0274094a2ca988c92046df5affed7ffda299e",
+        "diagnostics_1.csv": "e0b01cbfe1e1d20065f3de49c7d345bc2b5b8353b090c88d5317c61af10bcbeb",
+        "posterior_0.nc": "9678db9afed26add57bc0e783d2c173b5109352d9b0d93b4fce379cd1f1feaf1",
+        "posterior_1.nc": "e44f520d86ba2b585647a50c87aafdfe9f29a828dfdff76bb29e485dff6c0cf3",
+        "run.json": "6216025ec1ba49fbcbb08837cf6c2fbe5e4062f561de32cb899dfb59b9f0b1ce",
+        "truth.npz": "550aef99f435b80ff0bcaff3fe9b267888bab9a98290d517f19b2668081eb329",
+        "truth_original_coordinates.npz": "fdf1726ad738f31dc87cb075d92dca3eaed0d691b60648e10934466d16db6923"
+      }
+    },
+    {
+      "directory": "artifacts/stage7/recovery-v4/independent-7101",
+      "status": "accepted",
+      "files": {
+        "attempt_0.json": "7f947ecb72e657e66ab66b5c552b4dc4ac7790d7c5c7d59cefaf5364a4750b43",
+        "data.npz": "6a642082fa2b5588d6d577cb73bba72c1e094b445232cc9f3ba235d75c95e288",
+        "diagnostics_0.csv": "bed9ff0cffb7a4f76a90f9858fe6acc47aafcbdcdf2b6c7eaa6e3ee3114fc326",
+        "future.npz": "da61cef0eae0467945c3c6fc0371f4aeafec0d6eb0d6012b9f3f70025387956c",
+        "posterior_0.nc": "a9aef88621dfad04fb687476fd3f2889ae0b4da9bbf8386f6448f3fe707b7fe0",
+        "recovery.json": "76f32122ee9d6a0a2b4ebcd2d3bc980d2e2b5108cffa47e7d6a3af51be380b86",
+        "result.json": "ff091614c63c376fe1ae07cb9854666d3afe702a25a521ac2c3c54cb06e0b94d",
+        "run.json": "3d8a3eb975237d54e72f63ce616aea96fc7996668d8d11b30d102038f2b20e6c",
+        "truth.npz": "058c127f872643e0b83d00a9b42cf3147293d42abb8577a1462dbe6075542f91",
+        "truth_original_coordinates.npz": "058c127f872643e0b83d00a9b42cf3147293d42abb8577a1462dbe6075542f91"
+      }
+    },
+    {
+      "directory": "artifacts/stage7/recovery-v4/independent-7102",
+      "status": "accepted",
+      "files": {
+        "attempt_0.json": "c5fbb47971422d8b51083870072e8cd12a5a8ab2a3024f77d96d5425bbfab056",
+        "data.npz": "85059e6dec89897108928de65a5b1e481def4edcec969e5f13c0b51ee7b268a4",
+        "diagnostics_0.csv": "badb7f94bacce3300070e4c929b089565490e965300e052a05c45155a253ebf2",
+        "future.npz": "ef51eed8a6a0e817e3aa94f78dc2f0ec8b9c6a067b5c40247a327fd09b9ec544",
+        "posterior_0.nc": "952d9039bd02d360dccfd75e63a1e080ee58c0706e7a5c118c816a5288813384",
+        "recovery.json": "1634a3c099b2c79ce9f071bf54afb92715452ab9f51d059f02d6b633038380c7",
+        "result.json": "b67ba020d4b61b2b08ea35120351a7016b4479f1be5fa04811d2e92db879217f",
+        "run.json": "2eacab6932e023a583ad6ba6b5841c506ccb32da17b35783cf7ceb08729ccb3b",
+        "truth.npz": "6cd5410688fad24c5fc7ec2825306724f39c5c7921387a057cbee61b024c2eab",
+        "truth_original_coordinates.npz": "6cd5410688fad24c5fc7ec2825306724f39c5c7921387a057cbee61b024c2eab"
+      }
+    },
+    {
+      "directory": "artifacts/stage7/recovery-v4/independent-7103",
+      "status": "accepted",
+      "files": {
+        "attempt_0.json": "931f92ee889f00577e96fda8d27cd44f17c918a41f22ae4e1ba78c0ef6570090",
+        "data.npz": "c9f2ebd7eddd652035fd5823bacd5154593875c4d21e66164e5dbf99e3e7ed84",
+        "diagnostics_0.csv": "31a9d071ca140d8431a1590cc6b3f88521d94ec73b1cfabb79b79a860fd8090b",
+        "future.npz": "1095779cb246b383d82ad49812ef9b290c35e340df5d127525d32976a18d89cd",
+        "posterior_0.nc": "62750d378852eecddc119e04e8a3ff506cbc051043cd4f5440c3afcadd6426a3",
+        "recovery.json": "7576bab4d377deeb65217e6ebd1803683c6e769fa0d92eb11ccf76b6a3af39b3",
+        "result.json": "2199e5e2eeb1b5c03d73793119cb12c8e377d9d85e6e20ff63d4830b8cfb123d",
+        "run.json": "9df724c469f37ed9046ffbd500235d7f6bbb454506e268832bc7c1667a049d60",
+        "truth.npz": "03ed14222904acd33a48afbe3fc908da5a96160474120850d2b2f34c90eb1f6a",
+        "truth_original_coordinates.npz": "03ed14222904acd33a48afbe3fc908da5a96160474120850d2b2f34c90eb1f6a"
+      }
+    },
+    {
+      "directory": "artifacts/stage7/recovery-v4/latent_ar-7101",
+      "status": "failed_diagnostic_gate",
+      "files": {
+        "attempt_0.json": "3bb53373e68ac6071c59d60e7eeac442eb9f155ea6d72419dc1382a0d89ab394",
+        "attempt_1.json": "0f984a6dee8f3a4e7908da93d31a804535d46dc34197ba76293d9059c6653690",
+        "attempt_2.json": "730f3fe296be768a7380eabf6a1e6ecaa70f570c0f4c91004a90757bc17aeff6",
+        "data.npz": "dceedb013ea71a2080ab3ff69442aaadaf7d1aa8169d041aa863d0899ab1dc83",
+        "diagnostics_0.csv": "c215c43be6228f5d73bccc1ed0b2d0f61cdc0c8aaf848ed62cf11e134b0929e3",
+        "diagnostics_1.csv": "e1106be72bfe5b8eec163399a88f09720ddf1dfe9a3669fcccc7f592e59de973",
+        "diagnostics_2.csv": "a01713ee2221b8f56a852ba0da3e730bcf278de5c702d4e5c6fc6939ee8d8d86",
+        "posterior_0.nc": "771b5eeab383efc7b8583e57bc8454a42be1084227eb870272082c7536711252",
+        "posterior_1.nc": "9fc2c5c3ea99559c28cda4211baafb93cfce37599a30f501e1d596757c347695",
+        "posterior_2.nc": "a3133a2d363a85e0b871ec4475f37703b84d80682e42263d26357b52c21b5bfe",
+        "result.json": "6e87a1c0fe6c4f4aa78b8b30037907a59f20384440e9ea34d6ecf14f1ab94a68",
+        "run.json": "5bd20b29dbf26852afa26503f51165b5e73df3a1ed6a5e4767a6e1a06e7fbdb0",
+        "truth.npz": "082223d815834114c88546d9e078cdad8aab59afa797ffdfcfd0a53ad982378e",
+        "truth_original_coordinates.npz": "ba9834c201c1f45cbbb3a8d5dfb3cd89583c82adc97865d62e55706194dbc699"
+      }
+    },
+    {
+      "directory": "artifacts/stage7/recovery-v4/latent_ar-7102",
+      "status": "stopped_for_level_amendment",
+      "files": {
+        "attempt_0.json": "8962f08068a492bab3410d401c978000859889918c9d42c979a7128e70e3207f",
+        "attempt_1.json": "5f517b948ce794195759fe031cf245a39a1d17aacada9d871141f413e51dfbca",
+        "data.npz": "8c49665f3ab610dd03a3162c054e4d833a63209410c481842b04a4e9289a0548",
+        "diagnostics_1.csv": "78f9b4350ba547461ad22a8114d512e24371f5de459ffa02a6696edbe1246412",
+        "early_failure_0.json": "bbccb53aa32e8b6f9e8bd6319c4ac38cff91b7734b2c9ec7be6caa943802000b",
+        "failed_state_0.npz": "f7bf61c73e694b93b54ba3c880f207f9e5e31fd4ad67faf6091137fc3ba3a95f",
+        "posterior_1.nc": "a62a5eb92d6302c52e3450736d4df653cb29f3f4cee518c30651b0c818608452",
+        "run.json": "4d446da61e4aaf7dfb2f467033f50d4de09326a74ae71396b1ac7a03f12bb8a1",
+        "truth.npz": "77987a315e847bb990044e7274b46711604cadf815ceec1f861d5e805aa6a19f",
+        "truth_original_coordinates.npz": "a52c54b497fbc709353252f8143842e0fb72b9362812c3a81394a7f522cf9345"
+      }
+    },
+    {
+      "directory": "artifacts/stage7/recovery-v5/factors_sparse-7101",
+      "status": "accepted",
+      "files": {
+        "attempt_0.json": "3d1fa0c8b654b97d2c646fdc6e27eb204343d34e4f11ec562104d9699c22d406",
+        "data.npz": "53a7f3bd8c4eba71e76b1cd015bad5980be48a402dd59e517574727f8e7cbd33",
+        "diagnostics_0.csv": "7fb38a44a5a94b7596116127530f3f7ad1e7ac651f10e9abd1b1bbdf44f989e7",
+        "future.npz": "8c62d9918823598b0fb1fbe15729850136d7cbb9eac991fdc6d826374daa567a",
+        "posterior_0.nc": "487e5fea190709ef62e1c5e9238f032451df104259118447d6d6ed70056fe779",
+        "recovery.json": "5acc1c60c6eb5821dd7a803938fdbc1dc4556ec4351dad27ecd16d8300d166bd",
+        "result.json": "cde1a1f9452a903c10f029aa2b51f66e35c8c461d34f269a875fb712c8fa59d2",
+        "run.json": "43508a6af383f78f2f941f7559d948b241ad828ce6cc870308bf45a7be92870f",
+        "truth.npz": "ce354834e88c98c08f34175e057f1c4792ce84bfebba7d7231cd5fd670de9c43",
+        "truth_original_coordinates.npz": "7c03723bfb675719d75df36145a322ddb0ed0c6b67745bddf321b6681700e95e"
+      }
+    },
+    {
+      "directory": "artifacts/stage7/recovery-v5/latent_ar-7101",
+      "status": "accepted",
+      "files": {
+        "attempt_0.json": "87164f5fef88ef82639eceb6efe94319a8b457c9b65f65cedca35439a526345a",
+        "data.npz": "dceedb013ea71a2080ab3ff69442aaadaf7d1aa8169d041aa863d0899ab1dc83",
+        "diagnostics_0.csv": "31b00af4dc3b21c0862afc156f09964ee4295cb3b1e7730045996e7a69b6247c",
+        "future.npz": "96849c128d50cb6ad875ce29ce4772f52100316291ce17b76168acc33d06ecb8",
+        "posterior_0.nc": "44ca506cb855122d3fa05ffdcc743ad44e434b891fc507df8c1470153bafd0b0",
+        "recovery.json": "66e4d35bbb7fba28faa51c97f572427d197cf40ecc89212b488b43969f7cce27",
+        "result.json": "50df38454e119a394d4734a2ca412712bd132436335952f99216060f1a591e65",
+        "run.json": "880465890d71e8369c95dfe3232ab5bb7d50b5badd239738fcfcbca93e86919a",
+        "truth.npz": "082223d815834114c88546d9e078cdad8aab59afa797ffdfcfd0a53ad982378e",
+        "truth_original_coordinates.npz": "ba9834c201c1f45cbbb3a8d5dfb3cd89583c82adc97865d62e55706194dbc699"
+      }
+    }
+  ],
+  "counts": {
+    "stopped_for_level_amendment": 3,
+    "accepted": 5,
+    "failed_diagnostic_gate": 1
+  },
+  "held_out_scoring_enabled": false
+}

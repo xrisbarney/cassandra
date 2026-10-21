@@ -1,5 +1,15 @@
 # Design amendments
 
+## 2026-10-21: anchored levels and separate fallback (v2)
+
+The [second prior amendment](amendments/STATE_SPACE_LEVELS_20261021.md) records
+training-only level anchoring, a separate fallback level, predeclared predictive
+spread gates, both directions of sensitivity, and 43 primary synthetic cases.
+Its [activation hash record](amendments/STATE_SPACE_LEVELS_20261021.json) preserves
+the first amendment and Stage 2 freeze. Existing v1 results remain evidence
+about that law; unfinished v1 jobs were stopped following the user's direction
+to apply the review. They are not v2 posterior validation.
+
 ## 2026-10-21: activation for revised Stage 7 validation
 
 The user instructed continuation of Stage 7 with issues patched as found.

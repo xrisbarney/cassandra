@@ -8,7 +8,7 @@ from ..models.components import kernel_weights
 SCENARIOS = (
     "independent", "latent_ar", "factors_sparse", "severity_missing", "regimes",
     "effort_proxy", "effort_oracle", "effort_none", "kernel_present", "kernel_absent",
-    "dispersion_dense", "dispersion_sparse", "misspecified", "representative",
+    "dispersion_dense", "dispersion_sparse", "misspecified", "representative", "fallback_zero",
 )
 
 
@@ -26,7 +26,7 @@ def generate(scenario, seed):
         raise ValueError("Unknown synthetic scenario.")
     # The effort variants deliberately use exactly the same observations.
     rng = np.random.default_rng(seed)
-    k, t, rank = (10, 108, 2) if scenario == "representative" else (4, 96, 1)
+    k, t, rank = (10, 108, 2) if scenario in ("representative", "fallback_zero") else (4, 96, 1)
     if scenario.startswith("kernel"):
         t = 144
     residual = "none"
@@ -46,6 +46,8 @@ def generate(scenario, seed):
         # A genuinely rare last category: approximately ten publications in a
         # 96-month window, rather than merely a smaller but regularly nonzero series.
         m[-1] = np.log(0.1)
+    if scenario == 'fallback_zero':
+        m[-1] = np.log(.0001)
     if k == 1:
         m = np.array([np.log(0.8 if scenario == "dispersion_sparse" else 40)])
     phi = np.array([0.65, 0.25])[:rank]
@@ -140,4 +142,6 @@ def generate(scenario, seed):
         "conditional_level": scenario.startswith("dispersion"),
         "known_auxiliary_coefficients": severity,
     }
+    if scenario == 'fallback_zero':
+        options['fallback_index'] = k-1
     return data, truth, options

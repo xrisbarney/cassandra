@@ -11,11 +11,11 @@ import pytensor.tensor as pt
 from ..inference.hmm import hmm_logp
 from .ar1_transform import ar1_transform
 from .components import add_masked, symbolic_mark_logp
-from .stage7_priors import amended
+from .stage7_priors import CURRENT_PRIOR_ID, amended, level_settings
 
 
-def loading_matrix(prefix, categories, rank, revised=False):
-    sd, bound = 1 / np.sqrt(rank), 2 / np.sqrt(rank)
+def loading_matrix(prefix, categories, rank, revised=False, amplitude=1.):
+    sd, bound = amplitude / np.sqrt(rank), 2 * amplitude / np.sqrt(rank)
     diag = (pm.TruncatedNormal(prefix + '_diag', 0, sd, lower=0, upper=bound,
                               shape=rank, initval=np.full(rank, .3)) if revised else
             pm.HalfNormal(prefix + "_diag", 1, shape=rank, initval=np.full(rank, 0.3)))
@@ -28,13 +28,14 @@ def loading_matrix(prefix, categories, rank, revised=False):
     return pt.set_subtensor(matrix[rows, cols], free)
 
 
-def factors(prefix, categories, rank, months, parameterization='innovations', revised=False):
+def factors(prefix, categories, rank, months, parameterization='innovations', revised=False,
+            multiplier=1.):
     phi = pm.Uniform(prefix + "_phi", -1, 1, shape=rank, initval=np.full(rank, 0.4))
     matrix = None
     if parameterization == 'anchored':
         if not revised:
             raise ValueError('Amplitude coordinates require the recorded revised prior.')
-        matrix = loading_matrix(prefix, categories, rank, revised)
+        matrix = loading_matrix(prefix, categories, rank, revised, multiplier)
         amplitude = pt.diag(matrix[:rank])
         scaled = pm.Flat(prefix + '_scaled_states', shape=(months + 1, rank),
                          initval=np.zeros((months + 1, rank)))
@@ -61,7 +62,7 @@ def factors(prefix, categories, rank, months, parameterization='innovations', re
     else:
         raise ValueError('Unknown factor coordinates.')
     if matrix is None:
-        matrix = loading_matrix(prefix, categories, rank, revised)
+        matrix = loading_matrix(prefix, categories, rank, revised, multiplier)
     contribution = pm.Deterministic(prefix + "_contribution", states[1:] @ matrix.T)
     return contribution
 
@@ -79,6 +80,9 @@ def hierarchical_level(prefix, categories, center, hyper_sd, scale_sd, init, rev
 
 def build_model(data, options, conditional=None):
     revised = amended(options)
+    settings = (level_settings(data, options)
+                if options.get('prior_id') == CURRENT_PRIOR_ID else None)
+    multiplier = settings['amplitude_multiplier'] if settings else 1.
     t, k = data["N"].shape
     r, rank = options["regimes"], options["factors"]
     with pm.Model() as model:
@@ -89,14 +93,30 @@ def build_model(data, options, conditional=None):
             observed_count = data['mask_N'].sum(axis=0)
             initial_rate = np.divide(observed_sum, observed_count,
                                      out=np.zeros(k), where=observed_count > 0)
-            m = hierarchical_level("m", k, 0, 3, 2, np.log(initial_rate + 0.5), revised)
+            if settings:
+                known = settings['known_indices']
+                sd = pm.TruncatedNormal('m_sd', 0, settings['scale_sd'], lower=0,
+                                         upper=settings['scale_upper'], initval=.7)
+                size = len(known)
+                cov = sd**2*np.eye(size) + settings['hyper_sd']**2*np.ones((size, size))
+                levels = pm.MvNormal('m_known', mu=np.full(size, settings['anchor']),
+                                     cov=cov, initval=np.log(initial_rate[known]+.5))
+                m = pt.set_subtensor(pt.zeros(k)[known], levels)
+                if settings['fallback_index'] is not None:
+                    fallback = pm.Normal('m_fallback', settings['fallback_anchor'], 1,
+                                          initval=settings['fallback_anchor'])
+                    m = pt.set_subtensor(m[settings['fallback_index']], fallback)
+                m = pm.Deterministic('m', m)
+            else:
+                m = hierarchical_level("m", k, 0, 3, 2, np.log(initial_rate + 0.5), revised)
         psi = pm.LogNormal("psi", np.log(10), 1, shape=k, initval=np.full(k, 10))
         base = pt.broadcast_to(m, (t, k))
         if rank:
             base = base + factors("f", k, rank, t,
-                                  options.get('factor_parameterization', 'innovations'), revised)
+                                  options.get('factor_parameterization', 'innovations'), revised,
+                                  multiplier)
         if options["residual"] != "none":
-            tau = (pm.TruncatedNormal('tau', 0, 1, lower=0, upper=1, shape=k,
+            tau = (pm.TruncatedNormal('tau', 0, multiplier, lower=0, upper=multiplier, shape=k,
                                       initval=np.full(k, .3))
                    if revised else
                    pm.Deterministic("tau", 0.01 + pm.HalfNormal("tau_excess", 1, shape=k)))
@@ -125,10 +145,12 @@ def build_model(data, options, conditional=None):
             xi = pm.Normal("xi", 0, 1, shape=t + 60)
             indices = np.arange(t)[:, None] + 60 - np.arange(61)[None, :]
             g = pm.Deterministic("g", pt.sum(xi[indices] * weights, axis=1))
-            scale = pm.HalfNormal("a_scale", 0.5)
+            scale = pm.HalfNormal("a_scale", 0.5*multiplier)
             if revised:
-                first = pm.TruncatedNormal('a_first', 0, scale, lower=0, upper=1, initval=.2)
-                remaining = pm.TruncatedNormal('a_remaining', 0, scale, lower=-1, upper=1,
+                first = pm.TruncatedNormal('a_first', 0, scale, lower=0,
+                                            upper=multiplier, initval=.2)
+                remaining = pm.TruncatedNormal('a_remaining', 0, scale,
+                                                lower=-multiplier, upper=multiplier,
                                                 shape=k-1, initval=np.zeros(k-1))
                 a = pm.Deterministic('a', pt.concatenate([first[None], remaining]))
             else:
@@ -156,7 +178,8 @@ def build_model(data, options, conditional=None):
         if options["severity_factors"]:
             n = hierarchical_level("n", k, 1, 1, 1, np.ones(k), revised)
             loc = n + factors("h", k, options["severity_factors"], t,
-                              options.get('factor_parameterization', 'innovations'), revised)
+                              options.get('factor_parameterization', 'innovations'), revised,
+                              multiplier)
             kappa = pm.HalfNormal("kappa", 0.5, shape=k, initval=np.full(k, 0.3))
             # This fixture has R=1; joint severity/regime validation belongs to Stage 8.
             loc = pm.Deterministic("severity_location", loc)

@@ -152,3 +152,19 @@ They do not establish successful recovery or authorize held-out fitting.
 - Version G's bounded KEV elasticity is a separate substantive restriction.
   Count-only validation does not validate that slope law or resolve the
   unmatched-KEV cohort issue.
+
+### Second Stage 7 amendment: levels and fallback
+
+The [anchored-level amendment](amendments/STATE_SPACE_LEVELS_20261021.md)
+supersedes the pending-review status above for synthetic validation. State
+`m_bar ~ N(c,1)`, `s_m ~ HalfNormal(1)` truncated to `(0,2)`, and the independent
+fallback level `N(log(mean_initial_fallback+0.5),1)`. For the real-panel design,
+the known-only initial-window anchor is 4.301907835285142. This is data-informed
+regularization; it is not an externally elicited prior or an exact conversion
+from an observed mean to a reference-effort latent median. Synthetic experiments
+compute their own anchors without real counts or future observations.
+
+Report reference-effort and longitudinal prior checks separately from stress
+envelopes, posterior convergence and recovery. Include both tightened and
+widened sensitivity laws, and disclose the fallback's remaining dependence
+through shared dynamics. Keep all count categories in primary scoring.
