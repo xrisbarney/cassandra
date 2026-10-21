@@ -81,6 +81,15 @@ trend was selected at the common 6,000-path budget with one-month CRPS
 with trend. Both finalists passed the forecast-ensemble check at all four horizons.
 The selection is development selection, not a held-out superiority claim.
 
+The declared all-zero boundary was used for category 10 at **60 of 60 origins**
+for the selected ARIMA(2,1,1), and at 60 of 60 for the other monthly finalist.
+Quarterly screening records **1,298 boundary uses** across accepted candidate-origin
+fits (63 candidates with 20 completed origins and two with 19). The two failed
+candidate-origin fits have no completed fit record and are not added to that
+count. Reissuing forecasts at 6,000 paths reuses those fits; it does not count as
+another boundary application.
+
+
 ## Development results and audit
 
 The original 3,000-path check exceeded the frozen 1% CRPS tolerance at horizons
@@ -117,6 +126,25 @@ One-month development scores, all ten categories and all 60 eligible origins
 | Pooled Bayesian NB | 65.58 | 5.227 | 98.36 | 144.02 | 0.410 | 0.933 |
 | ARIMA(2,1,1), no trend | 27.28 | 5.018 | 35.27 | 59.08 | 0.645 | 0.872 |
 | Independent Bayesian NB autoregression | 36.03 | 4.805 | 48.67 | 78.71 | 0.665 | 0.960 |
+
+Category 10 contributes exactly zero CRPS and negative log mass for the selected
+ARIMA on all **222 eligible origin-horizon cells** (60+58+55+49), because its
+observed targets are all zero. Other controls assign small positive uncertainty
+to that category. The all-category average therefore reflects both performance
+on the nine active categories and this difference in boundary treatment. It
+remains the protocol's primary score; the active-stratum comparison below
+excludes the fallback category and isolates performance on the nonempty series.
+The zero-series result is not evidence of successful prediction of threat activity.
+
+One-month development scores on the nine active categories (540 cells):
+
+| Control | CRPS | Negative log mass |
+|---|---:|---:|
+| Historical mean | 116.57 | 78.420 |
+| Seasonal naive | 45.00 | 5.903 |
+| Pooled Bayesian NB | 72.82 | 5.803 |
+| ARIMA(2,1,1), no trend | 30.31 | 5.576 |
+| Independent Bayesian NB autoregression | 40.04 | 5.338 |
 
 CRPS by horizon, using the available-origin window at each horizon:
 
