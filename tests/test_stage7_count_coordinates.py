@@ -59,6 +59,12 @@ def test_conditional_count_target_and_gradients_with_zeros_and_missingness(solve
     compiled = new_model.compile_dlogp(mode='NUMBA')(new)
     assert np.isfinite(native).all()
     assert np.allclose(compiled, native, rtol=1e-7, atol=1e-7)
+    # The sampler fuses the log density and gradient; testing the gradient
+    # alone does not exercise the scalar Jacobian output in that fused graph.
+    combined = new_model.compile_fn([new_model.logp(), new_model.dlogp()],
+                                    inputs=new_model.value_vars, mode='NUMBA')(new)
+    assert np.allclose(combined[0], new_model.compile_logp()(new), atol=1e-8)
+    assert np.allclose(combined[1], native, rtol=1e-7, atol=1e-7)
     function = new_model.compile_logp()
     offset = 0
     for variable in new_model.value_vars:

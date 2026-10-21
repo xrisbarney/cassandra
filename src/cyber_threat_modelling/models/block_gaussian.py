@@ -135,7 +135,8 @@ def reverse(diagonal, off, natural, whitened, grad_states, grad_jacobian):
 @njit(cache=True, error_model='numpy')
 def transform(diagonal, off, natural, whitened):
     states, jacobian, _, _, _ = forward(diagonal, off, natural, whitened)
-    return states, jacobian
+    # Tensor scalar outputs must remain 0-D arrays inside fused NUMBA graphs.
+    return states, np.asarray(jacobian)
 
 
 class BlockGaussianReverse(Op):

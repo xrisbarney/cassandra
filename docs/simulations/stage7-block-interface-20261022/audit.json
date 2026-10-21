@@ -1,0 +1,42 @@
+{
+  "runs": [
+    {
+      "directory": "artifacts/stage7/count-block-v2/primary/representative-7101",
+      "status": "execution_failed_before_sampling",
+      "time_utc": "2026-10-21T22:43:03.971827+00:00",
+      "reason": "Numba fused Tensor scalar interface: native float returned instead of a zero-dimensional array.",
+      "counts_as_completed_schedule": false,
+      "no_retained_posterior": true,
+      "replacement_required": true,
+      "log": "artifacts/stage7-count-block-representative.log",
+      "log_sha256": "12f3c11edd812d0b3ca1d4503a9929251d8789f77d6de366feb791ef3fccfb2f",
+      "artifacts": {
+        "data.npz": "2f16c14da6f108731a36c429e2d532a6c4f7ab343a4e989a3cda9c5473faef19",
+        "execution_failure.json": "6e6ba86a5ac19acd9e91984e4d817a953a81e6be2c70544da9b81cbcfa6e0075",
+        "gradient_timing.json": "dee6ef8752b6fe227d5a7227a67817c98e775bb731233088d87541135041e5a5",
+        "run.json": "31d55d813292c1efb599f49e864026b2f5fc80b2259e06c59f5af19fb0b36c13",
+        "truth.npz": "92e92d139ba48feaf06569b34db715a2fc9c58870b6aeb5a6dbc76f3628945af",
+        "truth_original_coordinates.npz": "9fca1f6c6e33992fe0a0bb22a0599a87ac6aa677385e5b6873808e7e12fd3eec"
+      }
+    },
+    {
+      "directory": "artifacts/stage7/count-block-v2/primary/effort_proxy-7101",
+      "status": "execution_failed_before_sampling",
+      "time_utc": "2026-10-21T22:43:04.038666+00:00",
+      "reason": "Numba fused Tensor scalar interface: native float returned instead of a zero-dimensional array.",
+      "counts_as_completed_schedule": false,
+      "no_retained_posterior": true,
+      "replacement_required": true,
+      "log": "artifacts/stage7-count-block-effort.log",
+      "log_sha256": "61b09defbe0fde055d6dc753531efa1b25816755b718e5ba6ca1240db2cbf6a8",
+      "artifacts": {
+        "data.npz": "764d2e6d26f0541bd1cab1c4c01a6c872c25be8aeee724faeabda6403f035b2c",
+        "execution_failure.json": "36ea90a5a4bf7c1ddec6c1eda85ef9e9266d492e4c1b0b1e017b472cae75a1b9",
+        "run.json": "455b37668f9647fcdd515caab2bb29932715fd57bc07992950ef4c4306b2bcbd",
+        "truth.npz": "7100a323810afc6fc49ec9be3d76f10023a2ebf536b3569c40ae4336b067f96a",
+        "truth_original_coordinates.npz": "f76de2bd2974630b626d37b5c619e0f9a13ec583a15b62e80cea9fc3b7ea156f"
+      }
+    }
+  ],
+  "held_out_scoring_enabled": false
+}

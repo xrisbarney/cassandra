@@ -87,6 +87,14 @@ exhausted schedule or successful recovery experiment. The nearly completed
 severity attempt continues; the verified block solver can replace its dense
 linear algebra on subsequent seeds without changing its transformation.
 
+Integration correction: the first cached-block launches failed before sampling
+when the fused NUTS log-density/gradient graph received a native scalar Jacobian
+from an Op declared to return a Tensor scalar. Return a zero-dimensional array
+instead. Numerical value/Jacobian and separate-gradient tests did not exercise
+that fused interface, so add combined log-density/gradient checks for both
+count and censored-severity models. Retain the two execution failures separately;
+they are not exhausted statistical fits or convergence failures.
+
 This extends the algebra in the
 [severity decision](STAGE7_SEVERITY_COORDINATES_20261021.md); its Gaussian proxy
 is an implementation choice whose usefulness must be established by the fits.
