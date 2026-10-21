@@ -45,6 +45,48 @@ every replacement sensitivity case receives its full declared schedule in a new
 directory. Completion requires an explicit accounting of both interrupted and
 replacement runs; interruption alone cannot close a required case.
 
+Numerical optimization, declared before block-solver fits: the dense rank-two
+preflight measured about 0.0253 seconds per gradient, versus 0.000716 seconds
+in amplitude coordinates under the current concurrent workload. Its precision
+is block tridiagonal. Implement block Cholesky followed by forward/backward
+triangular solves, using the same time ordering and log determinant. This is
+the same transformation with linear rather than cubic work in the number of
+months at fixed rank. Verify states, Jacobian and derivatives against dense
+SciPy algebra for one and two factors, and repeat the complete count-target
+test. Keep the dense solver available as an oracle and label each run's solver.
+Existing dense-solver attempts are preserved; no timing-based diagnostic waiver
+or change to the mathematical target is authorized.
+
+Compiler follow-up, 2026-10-22: stack inspections with py-spy 0.4.1 located
+the first block test in PyTensor rewrites and then LLVM optimization. Preserve
+the unfinished default-level-3 test log/stack and repeat the entire block-test
+set with `NUMBA_OPT=1`. This
+[documented Numba setting](https://numba.readthedocs.io/en/stable/reference/envvars.html#envvar-NUMBA_OPT)
+trades compiler optimization effort against execution cost. Keep native/NUMBA
+value and gradient agreement as a prerequisite; record the compiler level in
+each subsequent fit. Do not enable fast-math or suppress numerical warnings.
+
+The symbolic Scan implementation remains available as a reference, but its
+compilation was still too expensive under level 1. The production candidate
+therefore implements the same forward block factorization and reverse
+derivative as cached deterministic Numba kernels, wrapped in a PyTensor Op,
+following the existing AR/HMM components. Reverse the backward solve, then
+the forward solve and each local Cholesky operation. This supplies exact first
+derivatives, not finite-difference derivatives to NUTS. Keep the independent
+dense/finite-difference tests as the admission check for this implementation.
+The interrupted symbolic test attempts are retained and are not passing tests.
+
+Verification outcome: the cached primitive passed dense state/Jacobian,
+independent finite-difference reverse-derivative, native/NUMBA and complete
+count-target tests. Additional tests at persistence 0.9998 (and -0.995 in the
+second factor), including Fortran-strided inputs, passed. The unfinished
+amplitude-coordinate representative fit and the two dense conditional count
+engineering fits are now superseded by fresh cached-block fits under the full
+same schedules. Retain their partial attempts and hashes; none is labelled an
+exhausted schedule or successful recovery experiment. The nearly completed
+severity attempt continues; the verified block solver can replace its dense
+linear algebra on subsequent seeds without changing its transformation.
+
 This extends the algebra in the
 [severity decision](STAGE7_SEVERITY_COORDINATES_20261021.md); its Gaussian proxy
 is an implementation choice whose usefulness must be established by the fits.

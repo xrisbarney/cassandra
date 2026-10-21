@@ -1,4 +1,5 @@
 import numpy as np
+import pytest
 from scipy.linalg import cholesky, solve_triangular
 from scipy.special import logit
 
@@ -7,7 +8,8 @@ from cyber_threat_modelling.models.stage7_priors import CURRENT_PRIOR_ID
 from cyber_threat_modelling.models.synthetic_state_space import build_model
 
 
-def test_conditional_count_target_and_gradients_with_zeros_and_missingness():
+@pytest.mark.parametrize('solver', ['dense', 'block'])
+def test_conditional_count_target_and_gradients_with_zeros_and_missingness(solver):
     data, truth, options = generate('representative', 7101)
     data = {key: value[:4] if key != 'M' else value for key, value in data.items()}
     data['N'][0, -1] = 0
@@ -15,7 +17,8 @@ def test_conditional_count_target_and_gradients_with_zeros_and_missingness():
     data['effort'] = np.array([-.2, 0, .1, .3])
     options.update(months=4, prior_id=CURRENT_PRIOR_ID, factor_parameterization='anchored')
     old_model = build_model(data, options, truth)
-    new_model = build_model(data, dict(options, count_parameterization='conditional'), truth)
+    new_model = build_model(data, dict(options, count_parameterization='conditional',
+                                      gaussian_solver=solver), truth)
     old, new = old_model.initial_point(), new_model.initial_point()
     phi, dispersion = np.array([.3, .7]), np.linspace(4, 12, 10)
     bound = np.sqrt(2)

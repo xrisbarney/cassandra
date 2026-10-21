@@ -29,6 +29,8 @@ def main():
     coordinates.add_argument('--center-factors', action='store_true')
     coordinates.add_argument('--anchor-factors', action='store_true')
     parser.add_argument('--dense-mass', action='store_true')
+    parser.add_argument('--conditional-counts', action='store_true')
+    parser.add_argument('--block-coordinates', action='store_true')
     args = parser.parse_args()
     args.root.mkdir(parents=True, exist_ok=True)
     jobs = [(name, seed) for name in SCENARIOS for seed in args.seeds
@@ -53,6 +55,12 @@ def main():
             metric = 'dense' if args.dense_mass else 'diagonal'
             if record['options'].get('mass_matrix', 'diagonal') != metric:
                 raise ValueError(f'Existing run has a different mass matrix: {folder}')
+            if record['options'].get('count_parameterization') != (
+                    'conditional' if args.conditional_counts else None):
+                raise ValueError(f'Existing run has different count coordinates: {folder}')
+            solver = 'block' if args.block_coordinates else 'dense'
+            if record['options'].get('gaussian_solver', 'dense') != solver:
+                raise ValueError(f'Existing run has a different Gaussian solver: {folder}')
             for relative, digest in record['artifacts'].items():
                 if file_hash(folder / relative) != digest:
                     raise ValueError(f'Changed artifact: {folder / relative}')
@@ -70,6 +78,10 @@ def main():
                 command.append('--anchor-factors')
             if args.dense_mass:
                 command.append('--dense-mass')
+            if args.conditional_counts:
+                command.append('--conditional-counts')
+            if args.block_coordinates:
+                command.append('--block-coordinates')
             process = subprocess.run(command, stdout=stream, stderr=subprocess.STDOUT)
         record = json.loads((folder / 'result.json').read_text()) if (
             folder / 'result.json'

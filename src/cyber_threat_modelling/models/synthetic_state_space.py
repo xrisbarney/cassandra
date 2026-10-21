@@ -120,7 +120,8 @@ def build_model(data, options, conditional=None):
             phi_f = pm.Uniform('f_phi', -1, 1, shape=rank, initval=np.full(rank, .4))
             matrix_f = loading_matrix('f', k, rank, revised, multiplier)
             base = base + count_states(t, rank, phi_f, matrix_f, m, psi,
-                                       data['N'], data['mask_N'], data['effort'])
+                                       data['N'], data['mask_N'], data['effort'],
+                                       options.get('gaussian_solver', 'dense'))
         elif rank:
             base = base + factors("f", k, rank, t,
                                   options.get('factor_parameterization', 'innovations'), revised,
@@ -197,7 +198,8 @@ def build_model(data, options, conditional=None):
                 phi_h = pm.Uniform('h_phi', -1, 1, shape=h_rank, initval=np.full(h_rank, .4))
                 matrix_h = loading_matrix('h', k, h_rank, revised, multiplier)
                 loc = n + severity_states(t, h_rank, phi_h, matrix_h, n, kappa,
-                                           data['B'], data['mask_B'])
+                                           data['B'], data['mask_B'],
+                                           options.get('gaussian_solver', 'dense'))
             else:
                 loc = n + factors("h", k, options["severity_factors"], t,
                                   options.get('factor_parameterization', 'innovations'), revised,

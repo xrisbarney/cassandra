@@ -77,6 +77,7 @@ def main():
     parser.add_argument('--prior-candidate', choices=CANDIDATES, default='primary')
     parser.add_argument('--conditional-severity', action='store_true')
     parser.add_argument('--conditional-counts', action='store_true')
+    parser.add_argument('--block-coordinates', action='store_true')
     args = parser.parse_args()
     if args.conditional_severity and args.scenario != 'severity_missing':
         parser.error('Conditional severity coordinates apply only to the severity fixture.')
@@ -101,6 +102,8 @@ def main():
         options['severity_parameterization'] = 'conditional'
     if args.conditional_counts:
         options['count_parameterization'] = 'conditional'
+    if args.block_coordinates:
+        options['gaussian_solver'] = 'block'
     options['factor_parameterization'] = ('anchored' if args.anchor_factors else
                                           'centered' if args.center_factors else 'innovations')
     options['mass_matrix'] = 'dense' if args.dense_mass else 'diagonal'
@@ -128,6 +131,7 @@ def main():
         'prior_amendment': activation,
         'prior_predictive_audit_sha256': file_hash(audit_path),
         'compute_threadpools': threadpool_info(),
+        'numba_optimization_env': os.environ.get('NUMBA_OPT', '3 (library default)'),
         'compute_thread_policy': 'One native numerical thread per sequential-chain fit process.',
         'truth_original_coordinates_sha256': file_hash(folder/'truth_original_coordinates.npz'),
     })
