@@ -85,3 +85,13 @@ def test_histogram_trajectory_bootstrap_matches_explicit_resampling():
         values = counts[rng.integers(3, size=3)]
         direct.append([np.median(values), np.quantile(values, .999), np.mean(values == 0)])
     assert np.allclose(list(result.values()), np.quantile(direct, [.025, .975], axis=0).T)
+
+
+def test_gate_escalates_borderline_intervals_on_either_side_of_threshold():
+    root = Path(__file__).resolve().parents[1]
+    gate = runpy.run_path(str(root/'scripts/check_stage7_level_prior.py'))['gate']
+    intervals = {'median': [60, 70], 'q999': [47000, 63000], 'p_zero': [.01, .02]}
+    for q in [49000, 55000]:
+        assert gate({'median': 65, 'q999': q, 'p_zero': .015}, intervals, []) == 'unresolved'
+    intervals['q999'] = [60000, 100000]
+    assert gate({'median': 65, 'q999': 70000, 'p_zero': .015}, intervals, []) == 'fail'

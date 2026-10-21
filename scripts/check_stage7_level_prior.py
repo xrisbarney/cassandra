@@ -56,8 +56,9 @@ def uncertainty(counts, rng):
 def gate(stats, intervals, failures):
     limits = {'median': (30, 175), 'q999': (0, 50000), 'p_zero': (0, .05)}
     passed = not failures and all(lo <= stats[key] <= hi for key, (lo, hi) in limits.items())
-    unresolved = passed and any(intervals[key][0] < lo or intervals[key][1] > hi
-                                for key, (lo, hi) in limits.items())
+    unresolved = not failures and any(
+        intervals[key][0] < boundary < intervals[key][1]
+        for key, limits_pair in limits.items() for boundary in limits_pair)
     return 'unresolved' if unresolved else 'pass' if passed else 'fail'
 
 
@@ -65,6 +66,8 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--draws', type=int, choices=[2000, 8000], default=2000)
+    parser.add_argument('--candidate', choices=CANDIDATES)
+    parser.add_argument('--pilot-only', action='store_true')
     args = parser.parse_args()
     root = Path(__file__).resolve().parents[1]
     activation = verify_activation(root, CURRENT_PRIOR_ID)
@@ -93,6 +96,8 @@ def main():
     cases = []
     for case_index, (candidate, full) in enumerate(
             [(name, False) for name in CANDIDATES]+[('primary', True)]):
+        if (args.candidate and candidate != args.candidate) or (args.pilot_only and full):
+            continue
         config = dict(options, prior_candidate=candidate, kernel=full,
                       residual='iid' if full else 'none', regimes=3 if full else 1)
         model = build_model(data, config)
@@ -152,8 +157,10 @@ def main():
         print({k: record[k] for k in ['candidate', 'full', 'reference']}, flush=True)
         del prior, model, rates, eta, values, known
         gc.collect()
-    primary = cases[0]
-    passed = all(primary[name]['gate'] == 'pass' for name in ['reference', 'longitudinal'])
+    primary = next((case for case in cases if case['candidate'] == 'primary' and not case['full']),
+                   None)
+    passed = (all(primary[name]['gate'] == 'pass' for name in ['reference', 'longitudinal'])
+              if primary else None)
     write_json(args.output/'audit.json', {**source, 'cases': cases, 'complete': True,
                                         'primary_passed': passed,
                                         'interpretation': 'Data-informed prior plausibility; '

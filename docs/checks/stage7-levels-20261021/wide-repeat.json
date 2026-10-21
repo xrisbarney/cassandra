@@ -1,0 +1,185 @@
+{
+  "cases": [
+    {
+      "candidate": "dynamics_wide",
+      "draws": 8000,
+      "full": false,
+      "longitudinal": {
+        "bootstrap_95": null,
+        "failures": [],
+        "fallback": {
+          "maximum": 204842,
+          "median": 0.0,
+          "p_zero": 0.5538449074074074,
+          "q999": 426.0
+        },
+        "gate": "pass",
+        "known": {
+          "maximum": 54271220,
+          "median": 64.0,
+          "p_zero": 0.024790895061728394,
+          "q999": 99162.00600000098
+        }
+      },
+      "prior_artifact_sha256": "47744611e9b3778e026dcb78ce67cdc40eae04e10e13e8d1d763f96777aea245",
+      "reference": {
+        "bootstrap_95": {
+          "median": [
+            66.0,
+            69.0
+          ],
+          "p_zero": [
+            0.01725786394032922,
+            0.01871714570473251
+          ],
+          "q999": [
+            47678.22610000018,
+            54118.675
+          ]
+        },
+        "failures": [],
+        "fallback": {
+          "maximum": 24584,
+          "median": 0.0,
+          "p_zero": 0.5573842592592593,
+          "q999": 200.0
+        },
+        "gate": "unresolved",
+        "known": {
+          "maximum": 33224676,
+          "median": 68.0,
+          "p_zero": 0.017962705761316873,
+          "q999": 50854.001000000164
+        }
+      },
+      "regime_occupancy": [
+        1.0
+      ],
+      "settings": {
+        "amplitude_multiplier": 1.5,
+        "anchor": 4.301907835285142,
+        "candidate": "dynamics_wide",
+        "fallback_anchor": -0.6931471805599453,
+        "fallback_index": 9,
+        "hyper_sd": 1.0,
+        "known_indices": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "scale_sd": 1.0,
+        "scale_upper": 2.0,
+        "training_months": 108
+      },
+      "warnings": [
+        "The effect of Potentials on other parameters is ignored during prior predictive sampling. This is likely to lead to invalid or biased predictive samples."
+      ]
+    }
+  ],
+  "complete": true,
+  "effort_fit": {
+    "converged": true,
+    "filtered_level_mean": 6.341546718301736,
+    "filtered_level_sd": 0.46820261291137855,
+    "parameters": [
+      0.05236003458031743,
+      0.010302032094056354,
+      2.469114004565365e-11
+    ],
+    "warnings": []
+  },
+  "held_out_scoring_enabled": false,
+  "initial_category_means": [
+    67.99074074074075,
+    148.5462962962963,
+    33.175925925925924,
+    47.47222222222222,
+    32.56481481481482,
+    86.26851851851852,
+    30.675925925925927,
+    173.00925925925927,
+    40.361111111111114,
+    0.0
+  ],
+  "interpretation": "Data-informed prior plausibility; not posterior recovery or SBC.",
+  "primary_passed": null,
+  "prior_activation": {
+    "authority": "User: okay, treat all and proceed; take stage 7 to the end",
+    "files": [
+      {
+        "path": "docs/amendments/STATE_SPACE_LEVELS_20261021.md",
+        "sha256": "7b3c340989576750de28504503af52e86db317e4df7f372914ea2d4e70c99d16"
+      },
+      {
+        "path": "docs/amendments/STATE_SPACE_PRIORS_ACTIVATION_20261021.json",
+        "sha256": "8aeecc526dee9dfd86c7c51037f7d35117cdefbaaa682cff70fe92e4c5895e39"
+      }
+    ],
+    "held_out_scoring_enabled": false,
+    "parent_freeze_sha256": "7597b76276b837f8db9bc2baff63cb035e14cdfa8656885c782795d38cb598e7",
+    "path": "docs/amendments/STATE_SPACE_LEVELS_20261021.json",
+    "prior_id": "anchored_levels_v2",
+    "sha256": "9aeaa185fdfffd4cca9589236a9154fccac5a85a1d9c28c47e4ff6915f39b7ec",
+    "status": "active"
+  },
+  "real_data_read": "2010-01 through 2018-12 counts only",
+  "source_control": {
+    "dirty": true,
+    "revision": "00040ca891b7d66513251c4e28e02fa8464f34c8",
+    "status": "available"
+  },
+  "source_sha256": {
+    "scripts/check_stage7_level_prior.py": "07db560fcdbdb5f8ec91cd7310c498a343c7b8148de6162c7ca7b527b72ef223",
+    "src/cyber_threat_modelling/__init__.py": "a365c84764dda6c2a1d2f23a60b695fad2bc1f1f96ca753160b48fa86812f510",
+    "src/cyber_threat_modelling/__main__.py": "307299fda7b77d22c64cb51430ec75e5f59d78e9c948786afb3b2544fe45e4b7",
+    "src/cyber_threat_modelling/cli.py": "6f48feb5ed5570f522955c067d4d986ce375e23bf071e807018fd8c67a7f9f75",
+    "src/cyber_threat_modelling/config.py": "6acd3a1575636a59d802b16a7f44bf882f932b7b8c969a1c48d2dede93f1dd06",
+    "src/cyber_threat_modelling/data/__init__.py": "72edef16e28ab678d0ffcd0bb74758685c228fc831c7fe60183c85d8104470e6",
+    "src/cyber_threat_modelling/data/audit.py": "32003ff51046fa5649d0a0dbd9b81de48a25fca0419711a5dab23857aeb32a89",
+    "src/cyber_threat_modelling/data/economics.py": "7d227c5a03c3d9e178501a1c4928871c21fbe9f1cd0a20cd898e613eeff04003",
+    "src/cyber_threat_modelling/data/history.py": "30e1a5bad35c8d9a87f088ceea0421164c93e6412734d0f0e8a6094453bf586f",
+    "src/cyber_threat_modelling/data/nvd.py": "241f92b018873dd62c183ea1e35bc2055f43e3812002d575edfc3b9dc0eaf034",
+    "src/cyber_threat_modelling/data/sec.py": "9adb45f889a7283c169c6469f5d2e2fdb11cdcfece6a3686344f3f083004658c",
+    "src/cyber_threat_modelling/data/signals.py": "ec59a8a24cbe8274ddcf0be1f186412b48d943faca2871e841ea0579076cb375",
+    "src/cyber_threat_modelling/data/store.py": "2df8fc5608ca0e24ac35c12241d716459d4f1e756487cc359b3d632ad2a3f7ce",
+    "src/cyber_threat_modelling/economics/__init__.py": "c73b4ff032284d1260b13324ffc69789c59a4eab138331f55afb69f3d2d5b232",
+    "src/cyber_threat_modelling/evaluation/__init__.py": "32b970481d63a50f9433ca70e0125c40bfa4f4f2dfb809c20d06354e2f8a97d4",
+    "src/cyber_threat_modelling/evaluation/backtest.py": "19fbb714f9ab51a32817432036fa9bf16eb8f3f125cc959c2c54fec240c5d370",
+    "src/cyber_threat_modelling/evaluation/control_checks.py": "d733a2105c9c56b3cc3f0db53b149067126efa5b37816fb0e2ce96fad4d6e223",
+    "src/cyber_threat_modelling/evaluation/reissue.py": "91e2a6ae40a515b1dc293e4a3761c29ca7b92d8485f0eddf140d700d035d4f1c",
+    "src/cyber_threat_modelling/evaluation/scores.py": "d68d1e1e25462dc5f7ff2948abb7ddc3b80f6dfaeca251f33e4f3e2f9cf4c824",
+    "src/cyber_threat_modelling/evaluation/synthetic.py": "a43f4183345762257e92b38f393676651ce9bdd36d127930977088f1a608bf51",
+    "src/cyber_threat_modelling/evaluation/synthetic_recovery.py": "dfb87e3683c9e3fd1543bf5a24e0900c764d9a89c39d819ee21ab0a8f7f9a818",
+    "src/cyber_threat_modelling/features/__init__.py": "72f05635dcf6149500afbc9ba3369318ff95b172d15b9b267579804a9a6ec6f0",
+    "src/cyber_threat_modelling/features/build.py": "b8ff24238a346f2fcb2016ce35a6981601536e506ce26cd6ddca025726993e71",
+    "src/cyber_threat_modelling/features/incidents.py": "6013dbee9f67c674781a51f2648210484a2d8410a508ee50b38d0ffcabf9a708",
+    "src/cyber_threat_modelling/features/panels.py": "43b4c55b6f69ba8ea0d937529893f9d9465cdd8c6928db323917968b1d350e4d",
+    "src/cyber_threat_modelling/features/topics.py": "0bec3b7748dbab2501208bdfd5ac64056424593a6efca74f6ba0a1322f647c99",
+    "src/cyber_threat_modelling/forecasting/__init__.py": "7ad7fbc5f27e43fc0fa3cf66fe582e2766e355c00cbcfdb04be456835cde1997",
+    "src/cyber_threat_modelling/forecasting/count_laws.py": "5bdefbf807eb4163cbdea02bca03fc013044a41664fc35552800538da5212d97",
+    "src/cyber_threat_modelling/inference/__init__.py": "976866d35c206c6ef8514821ee7ada0f6ad43e694919056c182d3960a1265b7d",
+    "src/cyber_threat_modelling/inference/hmm.py": "0e9c459bd3982ecd86c1f43887b5322c03de7973409ade22b9f7d691ff04b6b1",
+    "src/cyber_threat_modelling/models/__init__.py": "15a3242e7279d76725844a5491ee8391e4c15f024c5330277a0dae4e61ad495a",
+    "src/cyber_threat_modelling/models/ar1_transform.py": "5b6c601f0f94efd542411dd154ee41e5143ea8eeb30ed5276fff8c4d3727d53b",
+    "src/cyber_threat_modelling/models/bayesian_controls.py": "19c4bdaae4e5c5bd74537e757a1deb6e7f1b12c4f644fcc8e44ac621b1a75717",
+    "src/cyber_threat_modelling/models/boundaries.py": "eb736f0645d0abc91d908943ff6f499df1ae32b75c7cb9ae6891542b95bb84b6",
+    "src/cyber_threat_modelling/models/components.py": "039507ed3f80c10313285cf0fdc68818a0b25b2f28d23fd207af86e0ea9782ff",
+    "src/cyber_threat_modelling/models/control_priors.py": "1fdb2b76fff3dbb3480c6145206a5c124bc719d889c327bc827ae3ee738039e5",
+    "src/cyber_threat_modelling/models/count_baselines.py": "377431a8a70fdc84ef285b7a33ff63d40a067f7926c628779a4ed29d41338a1e",
+    "src/cyber_threat_modelling/models/independent_controls.py": "68727fab54c8bdcace227142fb80d20575f440156f36410bafc59392c3ff6e63",
+    "src/cyber_threat_modelling/models/independent_geometry.py": "6c9efbb84e36ed3a6c74e2e548245e256d78305c3ad62dfc7807d6080f108b27",
+    "src/cyber_threat_modelling/models/observation_nb.py": "d799afd5ca58178c0581962fa2ad96ed80b6498a8dcf0c8a5b64500306a5f664",
+    "src/cyber_threat_modelling/models/ordering.py": "8469f3e7ae2f4dab5df7c21b15a428518078a41bb9ee0c92812a38e5f78aea91",
+    "src/cyber_threat_modelling/models/stage7_priors.py": "89b8e2d4166c84c0f3742a799daf75f1bf77b2688c9616236e08b7427f7ef381",
+    "src/cyber_threat_modelling/models/synthetic_state_space.py": "966109ba17d09ea8c4c84f19c54c6e9b143cd033a23a79c8b98d621d5c2da283",
+    "src/cyber_threat_modelling/provenance.py": "b117a21e34d2ad287878ffc60d9ade061a8f3c4e0b73cd48ea6bcc5ee991402a",
+    "src/cyber_threat_modelling/reporting/__init__.py": "55a810f3a5eb1047b7a23f1fa80c565391f2ffc8b62143c5a65fab28cfd9fef6"
+  },
+  "training_prefix_sha256": "a120fbf0ef3406d3fb9fed5ced598589ee6a2381da23e557ff5fedb80011217e"
+}

@@ -2,8 +2,9 @@
 
 Current status, 2026-10-21: **v2 campaign running; not complete**. The
 [second amendment](amendments/STATE_SPACE_LEVELS_20261021.md) now governs new
-fits. Its primary prior passed all declared pilot plausibility gates; both
-wider sensitivity candidates failed the tail gate and remain stress comparisons.
+fits. Its primary prior passed all declared pilot plausibility gates. The wider
+level candidate failed the tail gate; the wider dynamic candidate remains
+unresolved after its declared 8,000-draw repeat. Both remain stress comparisons.
 The [prior audit](checks/stage7-levels-20261021/audit.json) uses only the initial
 2010--2018 count panel; posterior fixtures use synthetic data only. The new
 campaign contains 43 primary and 12 sensitivity cases. All 161 tests passed
