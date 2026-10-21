@@ -135,7 +135,7 @@ def main():
                 name: np.mean(np.abs(get(name)) > .95*bound, axis=0).tolist()
                 for name, bound in bounds.items() if name in post
             }
-        for key in ('tau_logpsi_correlation', 'regimes'):
+        for key in ('tau_logpsi_correlation', 'regimes', 'fallback_check'):
             if recovery.get(key) is not None:
                 extra[key] = recovery[key]
         if options['kernel']:

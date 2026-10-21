@@ -81,6 +81,18 @@ def summarize(posterior, data, truth, options, seed):
         ),
         'parameters': {}, 'regimes': regime_report,
     }
+    fallback = options.get('fallback_index')
+    if fallback is not None:
+        known = [j for j in range(k) if j != fallback]
+        result['fallback_check'] = {
+            'index': fallback, 'observed_total': int(np.nansum(data['N'][:, fallback])),
+            'observed_nonzero_months': int(np.sum(data['N'][:, fallback] > 0)),
+            'known_eta': interval_metrics(eta[:, :, known], target_eta[:, known]),
+            'fallback_eta': interval_metrics(eta[:, :, fallback], target_eta[:, fallback]),
+            'fallback_mean_counts': interval_metrics(mu[:, :, fallback], truth['mu'][:, fallback]),
+            'posterior_predictive_zero_fraction': float(np.mean(predictive[:, :, fallback] == 0)),
+            'interpretation': 'Zero counts constrain the rate; future rates remain positive.',
+        }
     mapping = {'m': 'm', 'psi': 'psi', 'tau': 'tau', 'phi_u': 'phi_u', 'f_phi': 'phi',
                'h_phi': 'phi_h', 'n': 'n', 'kappa': 'kappa', 'width': 'width', 'a': 'a'}
     for name, target in mapping.items():
