@@ -177,10 +177,22 @@ def build_model(data, options, conditional=None):
         emissions = add_masked(emissions, nterm, months)
         if options["severity_factors"]:
             n = hierarchical_level("n", k, 1, 1, 1, np.ones(k), revised)
-            loc = n + factors("h", k, options["severity_factors"], t,
-                              options.get('factor_parameterization', 'innovations'), revised,
-                              multiplier)
-            kappa = pm.HalfNormal("kappa", 0.5, shape=k, initval=np.full(k, 0.3))
+            if options.get('severity_parameterization') == 'conditional':
+                if not revised:
+                    raise ValueError('Conditional severity coordinates require stationary factors.')
+                from .gaussian_coordinates import severity_states
+
+                h_rank = options['severity_factors']
+                kappa = pm.HalfNormal('kappa', .5, shape=k, initval=np.full(k, .3))
+                phi_h = pm.Uniform('h_phi', -1, 1, shape=h_rank, initval=np.full(h_rank, .4))
+                matrix_h = loading_matrix('h', k, h_rank, revised, multiplier)
+                loc = n + severity_states(t, h_rank, phi_h, matrix_h, n, kappa,
+                                           data['B'], data['mask_B'])
+            else:
+                loc = n + factors("h", k, options["severity_factors"], t,
+                                  options.get('factor_parameterization', 'innovations'), revised,
+                                  multiplier)
+                kappa = pm.HalfNormal("kappa", 0.5, shape=k, initval=np.full(k, 0.3))
             # This fixture has R=1; joint severity/regime validation belongs to Stage 8.
             loc = pm.Deterministic("severity_location", loc)
             months, cats = np.where(data["mask_B"])

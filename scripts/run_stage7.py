@@ -75,7 +75,10 @@ def main():
     coordinates.add_argument('--anchor-factors', action='store_true')
     parser.add_argument('--dense-mass', action='store_true')
     parser.add_argument('--prior-candidate', choices=CANDIDATES, default='primary')
+    parser.add_argument('--conditional-severity', action='store_true')
     args = parser.parse_args()
+    if args.conditional_severity and args.scenario != 'severity_missing':
+        parser.error('Conditional severity coordinates apply only to the severity fixture.')
     root = Path(__file__).resolve().parents[1]
     activation = verify_activation(root, CURRENT_PRIOR_ID)
     audit_path = root/'docs/checks/stage7-levels-20261021/audit.json'
@@ -93,6 +96,8 @@ def main():
     truth = stationary_truth(truth, options)
     options['prior_id'] = CURRENT_PRIOR_ID
     options['prior_candidate'] = args.prior_candidate
+    if args.conditional_severity:
+        options['severity_parameterization'] = 'conditional'
     options['factor_parameterization'] = ('anchored' if args.anchor_factors else
                                           'centered' if args.center_factors else 'innovations')
     options['mass_matrix'] = 'dense' if args.dense_mass else 'diagonal'
@@ -106,6 +111,8 @@ def main():
              root / 'docs/STAGE7_DESIGN.md', root / 'docs/STAGE2_FREEZE.json']
     if args.anchor_factors:
         files.append(root/'docs/decisions/STAGE7_AMPLITUDE_COORDINATES_20261021.md')
+    if args.conditional_severity:
+        files.append(root/'docs/decisions/STAGE7_SEVERITY_COORDINATES_20261021.md')
     write_json(folder / 'run.json', {
         'source_control': git_revision(root), 'options': options, 'effort_fit': effort,
         'pid': os.getpid(), 'source_sha256': {
