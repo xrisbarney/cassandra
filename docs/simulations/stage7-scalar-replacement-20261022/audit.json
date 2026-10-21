@@ -1,0 +1,37 @@
+{
+  "gradient_preflight_sha256": "d1b538bfcb569d09dadc8c0001e25b8b0b6702e9f838840f6ca5dbf94f4d02f8",
+  "interpretation": "Concurrent preflight comparison, not controlled end-to-end timing. Interrupted attempts are not completed failure schedules.",
+  "new_gradient_seconds": 0.0011074499998358078,
+  "old_gradient_seconds": 0.002521750000596512,
+  "replacement": "artifacts/stage7/count-scalar-v4/primary/representative-7101",
+  "runs": [
+    {
+      "artifacts": {
+        "attempt_0.json": "f0d7a11f8f82e09d21ceaf4e065268e9e8f677bc5ac560191548eecff6c42f3a",
+        "data.npz": "2f16c14da6f108731a36c429e2d532a6c4f7ab343a4e989a3cda9c5473faef19",
+        "early_failure_0.json": "474569f08f6f5b67014d1671f7a944340254308fc82d075cbeaf38cd8769e584",
+        "failed_state_0.npz": "1c55cd5a3c6bc5da48eea17875406857a1829922c129ed97d430c17cc02a04c5",
+        "gradient_timing.json": "2fec5ba1210d6af7a60a57bf839a2ac55f101bc90d90871692805d3e922ad4be",
+        "interruption.json": "7d35d5e4236030ea9bab5d174f6e84206ab8292e8ad6e24caa473be48707d56a",
+        "run.json": "1d80bbe8c0e73d70e52a4d6fcb670db9589e1fc14bb7aecb790b6e02fdc7582d",
+        "truth.npz": "92e92d139ba48feaf06569b34db715a2fc9c58870b6aeb5a6dbc76f3628945af",
+        "truth_original_coordinates.npz": "9fca1f6c6e33992fe0a0bb22a0599a87ac6aa677385e5b6873808e7e12fd3eec"
+      },
+      "directory": "artifacts/stage7/count-block-v3/primary/representative-7101",
+      "status": "interrupted"
+    },
+    {
+      "artifacts": {
+        "data.npz": "2f16c14da6f108731a36c429e2d532a6c4f7ab343a4e989a3cda9c5473faef19",
+        "gradient_timing.json": "d7b96a9bc9288318763a0ec653909f2b9de462976dd23e5d93c05311de693762",
+        "heartbeat.json": "25719bde40a8c2336acd6496409ff99b017269662ebb0e2ff50ec2ef8d6c3fd5",
+        "interruption.json": "7d35d5e4236030ea9bab5d174f6e84206ab8292e8ad6e24caa473be48707d56a",
+        "run.json": "40d2c5b52e8b6e1ea9a07c7ffb5a94992d267e4b3a93fc11bdaec54dfad60aa6",
+        "truth.npz": "92e92d139ba48feaf06569b34db715a2fc9c58870b6aeb5a6dbc76f3628945af",
+        "truth_original_coordinates.npz": "9fca1f6c6e33992fe0a0bb22a0599a87ac6aa677385e5b6873808e7e12fd3eec"
+      },
+      "directory": "artifacts/stage7/count-block-diagonal-v1/primary/representative-7101",
+      "status": "interrupted"
+    }
+  ]
+}
