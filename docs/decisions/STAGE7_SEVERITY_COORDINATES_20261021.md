@@ -36,3 +36,17 @@ replications. Keep the intensity coordinates and all frozen gates unchanged.
 The [Stan reparameterization discussion](https://mc-stan.org/docs/stan-users-guide/efficiency-tuning.html)
 motivates matching coordinates to data informativeness; the explicit transform
 and its density identity above are this implementation's derivation.
+
+Outcome, 2026-10-22: seed 7101 passed its final declared budget, with four
+chains of 2,000 retained draws, R-hat 1.00396, minimum bulk/tail ESS 2,118/2,477,
+minimum BFMI 0.61191, and no retained divergences, depth saturations or
+unresolved warnings. The earlier two complete budgets met numerical diagnostic
+thresholds but emitted unresolved dot warnings and remain unaccepted.
+
+Run seeds 7102 and 7103 with the verified scalar block solver for this same
+conditional transformation; keep count coordinates anchored and the metric
+dense. The original loop had automatically launched dense seed 7102 when seed
+7101 completed. Its initialization is preserved in the
+[reroute audit](../simulations/stage7-severity-solver-reroute-20261022/audit.json),
+and a fresh directory receives the complete replacement schedule. This is a
+linear-algebra optimization, not a change of statistical model or diagnostic gate.

@@ -1,0 +1,14 @@
+{
+  "artifacts": {
+    "data.npz": "3e934be2636988b7000f2d166c3e684e788b349a7f36b847080ebd2932fde430",
+    "interruption.json": "cd65a002421b5e8044af4162ae031f0c8bfeab028515d1b6a3d74f93c9d276f4",
+    "run.json": "7dec78d6f417498bd462c4e5c7bfab6db9dee673cd70185c86df3b6596fb8a0a",
+    "truth.npz": "0b05a74f44aaa8b83363ef90e2e66dd6c77166bc6649e79b326d462ba934a9b8",
+    "truth_original_coordinates.npz": "6203371026c575a603ab441f6086f56c594c0d466f3569ded9dd39267c892185"
+  },
+  "counts_as_completed_schedule": false,
+  "directory": "artifacts/stage7/severity-conditional-v2/severity_missing-7102",
+  "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "reason": "Reroute subsequent severity seeds to the verified exact block solver after first-seed admission; preserve this automatically launched dense initialization. Full replacement schedule required.",
+  "status": "interrupted"
+}
