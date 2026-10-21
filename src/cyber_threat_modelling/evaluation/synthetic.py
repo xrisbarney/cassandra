@@ -100,6 +100,13 @@ def generate(scenario, seed):
         "true_effort": true_effort[:t], "future_counts": counts[t:],
         "future_eta": eta[t:], "future_mu": mu[t:],
     }
+    if scenario == 'misspecified':
+        # The NB-component intensity remains a separate generating target.
+        # Observed counts include the 30% independent selection/zero inflation.
+        truth['nb_component_mu'] = mu[:t]
+        truth['future_nb_component_mu'] = mu[t:]
+        truth['mu'] = 0.7 * mu[:t]
+        truth['future_mu'] = 0.7 * mu[t:]
     if severity:
         phi_h = np.array([0.45])
         h = stationary_factors(rng, phi_h, n)

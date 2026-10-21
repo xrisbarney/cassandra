@@ -177,6 +177,13 @@ def test_reporting_and_threat_sum_not_separately_identified_by_counts():
     assert np.array_equal(generate('effort_oracle', 7101)[0]['N'], data['N'])
 
 
+def test_misspecified_observed_mean_includes_zero_inflation():
+    _, truth, _ = generate('misspecified', 7101)
+    assert np.allclose(truth['mu'], 0.7 * np.exp(truth['eta']))
+    assert np.allclose(truth['future_mu'], 0.7 * np.exp(truth['future_eta']))
+    assert np.allclose(truth['nb_component_mu'], np.exp(truth['eta']))
+
+
 @pytest.mark.parametrize('coordinates', ['innovations', 'centered'])
 def test_regime_model_native_numba_gradient_and_independent_emission_enumeration(coordinates):
     data, truth, options = generate('regimes', 7101)
