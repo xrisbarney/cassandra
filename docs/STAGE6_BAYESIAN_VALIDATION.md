@@ -46,6 +46,18 @@ NUMBA density/gradient backend. The
 and [recursive predictive checks](backtests/stage6-control-resolution-20261021/observation_initial_predictive_checks.json)
 preserve the evidence and source artifact hashes.
 
+## Rolling development validation completed
+
+Both admitted Bayesian controls passed all 60 rolling development origins at
+the first four-chain budget. The independent control's worst R-hat was 1.00661,
+minimum bulk/tail ESS 811.16/404.28 and minimum BFMI 0.7636. The pooled control's
+corresponding values were 1.00645, 4262.36/2030.79 and 0.8433. Neither had
+divergences or tree-depth saturation. The
+[completion record](STAGE6_COMPLETION.md) links all 120 fit diagnostics, runtime
+components and development scores. Common 6,000-path reporting passed all
+6,000/12,000 ensemble checks. These checks validate the initial controls;
+proposed-model synthetic recovery and posterior validation remain later stages.
+
 ## Superseded latent independent control
 
 The earlier [stationary-scale amendment](amendments/INDEPENDENT_CONTROL_20261021.md)

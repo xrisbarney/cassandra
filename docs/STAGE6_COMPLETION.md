@@ -1,9 +1,11 @@
 # Stage 6 completion record
 
-Status: **execution in progress**. The independent control's rolling run and its
-ensemble/scoring checks must finish before this record can declare completion.
-The implementation and initial posterior validation are complete. January
-2024 through December 2025 remains unscored.
+Status, 2026-10-21: **Stage 6 complete for the five initial controls and
+rolling development benchmark specified in the plan**. All 60 origins per
+control, posterior gates, forecast-ensemble checks and development score tables
+are complete. Both final Bayesian scoring jobs finished before the computer
+restart; the resumed session verified their saved artifacts rather than refitting.
+January 2024 through December 2025 remains unscored.
 
 ## Scope and implementation
 
@@ -74,22 +76,110 @@ The rule also binds the future ETS adapter; ETS itself is not implemented here.
 All 65 ARIMA candidates were screened at the 20 quarterly development origins.
 Sixty-three completed all origins; two completed 19 and were ineligible.
 The two finalists were both refit at all 60 monthly origins. ARIMA(2,1,1) without
-trend was selected with one-month CRPS 27.26839, versus 27.48251 for ARIMA(3,1,1)
+trend was selected at the common 6,000-path budget with one-month CRPS
+27.28006, versus 27.47851 for ARIMA(3,1,1)
 with trend. Both finalists passed the forecast-ensemble check at all four horizons.
 The selection is development selection, not a held-out superiority claim.
 
 ## Development results and audit
 
-Pending completion of the independent control's full schedule, ensemble checks
-and scoring. Final tables will be assembled only from verified admitted artifacts.
+The original 3,000-path check exceeded the frozen 1% CRPS tolerance at horizons
+1 and 6 for the independent control. The
+[budget decision](decisions/ENSEMBLE_BUDGET_20261021.json) applies the existing
+fallback in BASELINE_SPECIFICATIONS: 6,000 reporting paths for every method,
+checked against 12,000 on the last six eligible origins at each horizon.
+Posterior samples, fitted parameters, NUTS budgets and convergence gates are
+unchanged. More predictive paths do not create additional posterior information.
+The original 3,000-path artifacts remain historical; both monthly ARIMA finalists
+are rescored at 6,000, retaining the original quarterly screening.
+
+Reissuing ARIMA uses its exact joint conditional Gaussian covariance, calculated
+from the fitted state-space matrices. It preserves temporal dependence and the
+analytic marginal forecast laws; its random-number realization differs from
+statsmodels' per-path simulator. Closed-form AR(1)/random-walk tests and an
+independent native-simulation comparison validate the covariance calculation.
+Bayesian and fixed-control source forecasts reproduce exactly before reissuing.
+
+All 24 method/horizon ensemble checks passed at 6,000 versus 12,000 paths,
+including both ARIMA finalists. The final five-control table includes only the
+selected ARIMA. The [completion audit](backtests/stage6-complete-20261021/completion.json)
+binds verified forecast, score and ensemble artifacts. The
+[complete score table](backtests/stage6-complete-20261021/summary.csv) contains
+200 rows across horizons, strata and evaluation windows; every row is complete.
+
+One-month development scores, all ten categories and all 60 eligible origins
+(600 cells; lower CRPS, negative log mass, MAE and RMSE are better):
+
+| Control | CRPS | Negative log mass | MAE | RMSE | 50% coverage | 90% coverage |
+|---|---:|---:|---:|---:|---:|---:|
+| Historical mean | 104.92 | 70.579 | 109.34 | 190.52 | 0.137 | 0.235 |
+| Seasonal naive | 40.50 | 5.330 | 53.54 | 88.88 | 0.652 | 0.883 |
+| Pooled Bayesian NB | 65.58 | 5.227 | 98.36 | 144.02 | 0.410 | 0.933 |
+| ARIMA(2,1,1), no trend | 27.28 | 5.018 | 35.27 | 59.08 | 0.645 | 0.872 |
+| Independent Bayesian NB autoregression | 36.03 | 4.805 | 48.67 | 78.71 | 0.665 | 0.960 |
+
+CRPS by horizon, using the available-origin window at each horizon:
+
+| Control | 1 month | 3 months | 6 months | 12 months |
+|---|---:|---:|---:|---:|
+| Historical mean | 104.92 | 108.27 | 112.18 | 117.57 |
+| Seasonal naive | 40.50 | 41.05 | 41.83 | 40.50 |
+| Pooled Bayesian NB | 65.58 | 67.44 | 69.53 | 71.86 |
+| ARIMA(2,1,1), no trend | 27.28 | 29.36 | 32.03 | 38.51 |
+| Independent Bayesian NB autoregression | 36.03 | 50.06 | 66.74 | 83.98 |
+
+These are development comparisons, not untouched-test results or significance
+claims. Selected ARIMA has the lowest development CRPS here; the independent
+Bayesian control has the lowest one-month negative log mass. Passing posterior
+diagnostics does not guarantee predictive calibration: the independent control
+covers 96% at the nominal 90% level at one month, but only 77.1% at twelve months.
+Different horizons have different eligible origins; the saved common-origin
+tables support comparisons using the same origin window.
+
+Log-mass Monte Carlo sensitivity is reported separately from the frozen CRPS
+admission gate. On the last six eligible origins at each horizon, the maximum
+absolute per-cell differences are:
+
+| Control | 6,000 versus 12,000 | Independent 6,000-path seed |
+|---|---:|---:|
+| Pooled Bayesian NB | 0.0081 | 0.0259 |
+| Independent Bayesian NB | 0.0546 | 0.1689 |
+
+These maxima are numerical sensitivity diagnostics, not new admission thresholds.
+The independent-seed evidence retains its original source hash.
+
+Both Bayesian controls passed all 60 four-chain fits at the first frozen budget.
+The [posterior diagnostic table](backtests/stage6-complete-20261021/posterior_diagnostics.csv)
+records all 120 fits; none has divergences or tree-depth saturation.
+
+| Control | Maximum R-hat | Minimum bulk ESS | Minimum tail ESS | Minimum BFMI |
+|---|---:|---:|---:|---:|
+| Independent Bayesian NB | 1.00661 | 811.16 | 404.28 | 0.7636 |
+| Pooled Bayesian NB | 1.00645 | 4262.36 | 2030.79 | 0.8433 |
+
+The [runtime table](backtests/stage6-complete-20261021/bayesian_runtime.csv)
+separates step construction/compilation from the sampling call. Median times
+were 4.15/176.36 seconds for the independent control and 3.76/184.95 seconds
+for the pooled control. The sampling call includes startup and warmup; these
+measurements were collected under concurrent load. They are not full-model
+Stage 9 cost estimates or isolated post-warmup sampling times.
 
 ## Verification and remaining stages
 
-The full source test run passed **109 tests**; Ruff and the dependency-lock check
-passed. The original Stage 2 freeze remains unchanged, with substantive decisions
-in separately hashed supplements. The model run records clean source commit
-`45bd87f815beb79d2c270130e2b255a4b73e080a`. Source audits are revised-history audits;
-these results concern monthly CVE-publication counts.
+The full implementation test run passed **113 tests**, with one documented
+missing-BLAS performance warning. Its saved log and source hashes were checked
+after restart; no source changes followed that test run. Ruff, the dependency-lock
+check and configuration validation passed again after restart. The
+[verification record](backtests/stage6-verification-20261021.json) binds the tested
+implementation and configuration. The original Stage 2 freeze remains unchanged;
+substantive decisions are separately hashed supplements.
+
+The independent rolling fits record clean source commit `45bd87f`; the pooled
+fits record `cd7752c`. All four final forecast-reissue runs record clean source
+commit `8095f2a`, and preserve the original fits and diagnostics. The final audit
+assembler verified forecast and score artifact hashes after restart. Source
+audits are revised-history audits; these results concern monthly CVE-publication
+counts and do not establish historical availability of every source field.
 
 The all-zero unknown category remains in the category-equal primary score and
 can compress differences. Active-category and aggregate results are also reported;

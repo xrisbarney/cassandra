@@ -1,0 +1,36 @@
+{
+  "tested_implementation_revision": "8095f2a78d2fef4f275294d5b50d4ead18f562e0",
+  "current_implementation_matches_recorded_sources": true,
+  "tests_passed": 113,
+  "test_log_sha256": "46209eb16aaef980de3e0a2dc392d206f77c8c18bf627f947c5cd04f4a82cdae",
+  "ruff_log_sha256": "af352a86840ad0af3d37ea0d9197f868363a6dac6b1c2ef5d2722f6b41d2d9af",
+  "lock_log_sha256": "d5d47a3177981134e285be46e1c9dc3b1fb4f22bfa58e47bfd5625de1c00ad6c",
+  "configuration_validation": {
+    "status": "valid",
+    "configuration_sha256": "ba6fcc8c86ed71907472a22d1550a7ea2d458e08c234b7bfcf508632c092d751",
+    "evaluation_origin_counts": {
+      "1": 24,
+      "3": 22,
+      "6": 19,
+      "12": 13
+    },
+    "development_origin_counts": {
+      "1": 60,
+      "3": 58,
+      "6": 55,
+      "12": 49
+    }
+  },
+  "original_freeze_sha256": "7597b76276b837f8db9bc2baff63cb035e14cdfa8656885c782795d38cb598e7",
+  "original_freeze_files_verified": true,
+  "amendments": [
+    "c4e73555e034bc9d9d540a2dcad2cd8ba0ce5b1e0744beda80750fa026c08bbd",
+    "dd8165d03c5293c05dd428acfb31c1b3dae76a7394b8a166a4aaa4454474ae7c",
+    "7aa42acd6e56bd91ec7c1d6588e6ede67ac0071150180ab036bee5257822ca69"
+  ],
+  "panel_manifest_sha256": "0448a3eb7f6d4a17d3808b98ad7a315105ed2cc72974cf7828afb4c3d5515840",
+  "held_out_scoring_enabled": false,
+  "reporting_budget_record_sha256": "e8266c7776c06bbdb6ee6dda770a8b1a5812ba3a6afb90eca235b460305b6f77",
+  "ruff": "passed",
+  "uv_lock": "current"
+}

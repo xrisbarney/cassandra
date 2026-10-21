@@ -1,0 +1,92 @@
+{
+  "status": "stage6_initial_controls_complete",
+  "assembler": {
+    "path": "scripts/finalize_stage6.py",
+    "sha256": "8d3efb75dabc4886ea9bdc63e952419418783fed65a88883982289586baef55b"
+  },
+  "runs": [
+    {
+      "run": "artifacts/backtests/stage6-fixed-6000-20261021",
+      "methods": [
+        "historical_mean",
+        "seasonal_naive"
+      ],
+      "forecast_manifest_sha256": "e6a6f1903a9c32364144a99a11bde8d7aa5bad9867aee412a204cba5a5f32bab",
+      "score_manifest_sha256": "e847028bfdd40c9e108ab6a8f96d8435995a9872da98022d6e26280d2d33fb99",
+      "ensemble_check_sha256": "0378a227979b0b9a99b58c13f031c5dbef71a92a08110004955f532e6a45d05c",
+      "run_provenance_sha256": "744660cf20ccdde04a5d31a4db4f1b2709fe1529cba4c9fc6a1b0ff838f0ea76"
+    },
+    {
+      "run": "artifacts/backtests/stage6-pooled-6000-20261021",
+      "methods": [
+        "pooled_nb"
+      ],
+      "forecast_manifest_sha256": "702b0289130a3328aa23e62b8cb9c516ac5265a60faedef3551b6a0ffd551a59",
+      "score_manifest_sha256": "ebaf22aa3ff0fe11add83601b07edac86ea36942b26589120fc67b8e4b4d0dc9",
+      "ensemble_check_sha256": "b3141f129de08923668f2cde32af85ba0a7c781c7b4dad3bb53e18f47fffd585",
+      "run_provenance_sha256": "0752a5ca88150faecd0a2a6cc62fc63e38eb5fc7eb7906d3c03e144ed1cd3e6b"
+    },
+    {
+      "run": "artifacts/backtests/stage6-arima-6000-20261021",
+      "methods": [
+        "arima_2_1_1_n"
+      ],
+      "forecast_manifest_sha256": "11c43b868a3d782fcaf2f5ffed6b82aa309935e868698f7beb185da1d7979ff6",
+      "score_manifest_sha256": "15f2b9a87349badf62f0f98ffa461f17cfae26c6c6688a198701a3724fbab7fb",
+      "ensemble_check_sha256": "043b64f2e17068adc7138997508bdb761fd1b6f3730e34fd1d86d6db4e1bd1c1",
+      "run_provenance_sha256": "fc2738b9b146c372d54f44e484bfe072c631e3a524dda38ac7f286110d562eb0"
+    },
+    {
+      "run": "artifacts/backtests/stage6-observation-6000-20261021",
+      "methods": [
+        "independent_nb_glar"
+      ],
+      "forecast_manifest_sha256": "c4a859d3455e8a86125fc97e171a95acaf0827f382745074670787f6334c1fc7",
+      "score_manifest_sha256": "a4ac195a968879df3c5e3d8f0e03a979b107887ab8a8b410fc9f8644650b88d4",
+      "ensemble_check_sha256": "1186b2b0ccf59600e913d588be05dbe4c9ebd6cb024db1829955d851bc9875bc",
+      "run_provenance_sha256": "6af0e0d0901dc07c42b63548d051579f093f6c9a839e5dbe315701838843f898"
+    }
+  ],
+  "arima_selection": {
+    "criterion": "All-category mean h=1 CRPS over 60 monthly development origins; parameter-count then grid-order ties",
+    "forecast_manifest_sha256": "11c43b868a3d782fcaf2f5ffed6b82aa309935e868698f7beb185da1d7979ff6",
+    "held_out_scoring_enabled": false,
+    "ranking": [
+      {
+        "crps": 27.280060278935185,
+        "grid_order": 47,
+        "method": "arima_2_1_1_n",
+        "parameter_count_per_series": 4
+      },
+      {
+        "crps": 27.478507079120373,
+        "grid_order": 63,
+        "method": "arima_3_1_1_t",
+        "parameter_count_per_series": 6
+      }
+    ],
+    "score_manifest_sha256": "15f2b9a87349badf62f0f98ffa461f17cfae26c6c6688a198701a3724fbab7fb",
+    "screening_record": {
+      "path": "artifacts/backtests/stage6-arima-screen-20261021/selection.json",
+      "sha256": "6a3134c87beeb136927abd0588c06cc33f4c90dbf88da434edc4d414a286dc64"
+    },
+    "selected_method": "arima_2_1_1_n",
+    "selected_specification": {
+      "method": "arima",
+      "order": [
+        2,
+        1,
+        1
+      ],
+      "trend": "n"
+    },
+    "status": "development_selection_complete"
+  },
+  "held_out_scoring_enabled": false,
+  "scope": "Initial five controls and development runner; full requested comparator suite and proposed-model selection remain later gates.",
+  "artifacts": {
+    "bayesian_runtime.csv": "be9b565ed0e4a6bfa2ce5afa3cb2b0a16aa7c15969ed5ccf609910358c5b07fe",
+    "posterior_diagnostics.csv": "080d6567050a9334f9605a591d61998aff8bf8e63ad960ef5e2b268386290c96",
+    "summary.csv": "43c5754351d693ab2c1eb90e3863dac2ade4af42228780aaccda1645f5d4035b"
+  }
+}

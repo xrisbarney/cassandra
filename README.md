@@ -141,8 +141,9 @@ Stage 6 now provides separate development forecast and scoring commands:
     .\.venv\Scripts\python.exe scripts/check_stage6_ensemble.py --run artifacts/backtests/new-development-run --output artifacts/backtests/new-development-run/ensemble_check.json
 
 Commands refuse held-out execution and refuse to overwrite runs or scores.
-The current [Stage 6 record](docs/STAGE6_COMPLETION.md) tracks the five initial
-controls, posterior validation, ARIMA selection and development results. The
+The [Stage 6 completion record](docs/STAGE6_COMPLETION.md) reports all five initial
+controls across 60 development origins, posterior validation, ARIMA selection
+and complete development results. The 2024-2025 holdout remains unscored. The
 original [first benchmark report](docs/STAGE6_BACKTEST.md) is historical. See the
 [category and KEV carry-forward decisions](docs/STAGE6_8_CARRY_FORWARD.md).
 `configs/stage6.json` reproduces that first fixed-control run with diagnostic
@@ -157,6 +158,11 @@ failed latent attempts and the successful replacement's initial checks.
 `configs/stage6_bayesian.json` and `configs/stage6_independent.json` retain the
 superseded latent control for diagnostics. Use `configs/stage6_observation_nb.json`
 for the primary independent control and `configs/stage6_pooled.json` for the pooled one.
+The common reporting budget is now 6,000 paths, following the protocol's existing
+fallback after the 3,000-path Monte Carlo check failed. The
+[budget decision](docs/decisions/ENSEMBLE_BUDGET_20261021.json) binds the evidence;
+checks compare 6,000 with 12,000. `scripts/reissue_stage6.py` reuses accepted fits
+at this budget, preserving the original runs and all posterior diagnostics.
 
     . .\scripts\Use-Compiler.ps1
     .\.venv\Scripts\ctm.exe forecast-development configs/stage6_observation_nb.json --panel-manifest docs/panels/stage5-20261020/panel_manifest.json --output artifacts/backtests/new-independent-run --workers 4
