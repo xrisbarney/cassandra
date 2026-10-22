@@ -12,15 +12,19 @@ from cyber_threat_modelling.data.store import write_json
 from cyber_threat_modelling.provenance import file_hash, git_revision
 
 
+def source_snapshot():
+    paths = [Path('uv.lock'), *Path('src').rglob('*.py'),
+             *Path('tests').rglob('*.py'), *Path('scripts').glob('*.py')]
+    return {p.as_posix(): file_hash(p) for p in paths}
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path, required=True)
     args = parser.parse_args()
     args.output.mkdir(parents=True, exist_ok=False)
     paths = sorted(Path('tests').glob('test_*.py'))
-    sources = [Path('uv.lock'), *Path('src').rglob('*.py'),
-               *Path('tests').rglob('*.py'), *Path('scripts').glob('*.py')]
-    source_hashes = {p.as_posix(): file_hash(p) for p in sources}
+    source_hashes = source_snapshot()
     start_revision = git_revision(Path.cwd())
     collect_log = args.output/'collection.log'
     with collect_log.open('xb') as stream:
@@ -49,18 +53,21 @@ def main():
         records.append(row)
         write_json(args.output/'progress.json', records)
         print(json.dumps(row), flush=True)
-    unchanged = source_hashes == {p.as_posix(): file_hash(p) for p in sources}
+    end_hashes = source_snapshot()
+    unchanged = source_hashes == end_hashes
     total = sum(r['passed'] for r in records)
     passed = all(r['exit_code'] == 0 for r in records) and total == expected
-    result = {'source_control_start': start_revision, 'source_control_end': git_revision(Path.cwd()),
+    result = {'source_control_start': start_revision,
+              'source_control_end': git_revision(Path.cwd()),
               'source_sha256': source_hashes, 'source_unchanged': unchanged,
+              'source_sha256_end': end_hashes,
               'expected_tests': expected, 'passed': total, 'files': len(records),
               'all_passed': passed and unchanged, 'records': records,
               'mode': 'Every collected test file in a fresh process; no deselection.',
               'collection_sha256': file_hash(collect_log)}
     write_json(args.output/'result.json', result)
     if not result['all_passed']:
-        raise RuntimeError('Tests failed, collection differs, or source changed during verification.')
+        raise RuntimeError('Tests failed, collection differs, or source changed during checks.')
 
 
 if __name__ == '__main__':
