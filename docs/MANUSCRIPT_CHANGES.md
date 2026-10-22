@@ -304,3 +304,23 @@ inside a failed joint fit. Neither density ordering nor the fallback prior
 alone is established as the failure cause. Any adopted one-factor pilot needs
 its own dimensional validation and dated amendment; no amendment has yet been
 activated and no Stage 8 or held-out fit has started.
+
+### Bounded convergence supplement outcome (2026-10-22)
+
+The [four-case supplement](STAGE7_SUPPLEMENT_REPORT.md) is complete with no
+numerically admitted posterior. Report its failures separately from the
+original 55 cases: retained divergences in the masked two-factor and matched
+one-factor fallback, inadequate tail ESS in the reduced representative, and
+inadequate R-hat/bulk ESS in the reduced fallback. All attempts used the
+predeclared single-attempt budget and unchanged diagnostic gates. Two complete
+posteriors were independently rechecked; the two partial attempts do not supply
+R-hat, ESS or recovery evidence. No one-factor pilot has been adopted.
+
+The reduced cases approximate two-factor generated observations; they do not
+redefine the generating truth. The matched case is a fixed-truth one-factor
+counterpart, not an independent SBC replication. Masking count observations
+does not validate the original all-zero target or decide unmatched-KEV treatment.
+Preserve the diagnostic plots as failed-chain evidence, without assigning
+posterior region weights or declaring a unique cause. The prior-predictive and
+software checks passed, but production-pilot posterior validation remains
+unresolved. No Stage 8 fit or held-out score is available.

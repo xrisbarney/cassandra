@@ -1,0 +1,11 @@
+{
+  "artifacts": {
+    "chains.pdf": "64706ba2d254ebc69f0ab9e8f2afe6ce1a82ca59cecbcb3d16af655300f21cff",
+    "chains.png": "f6772172c5d49c00c5d2334e935c0cb141220f66ab96983f15dee86d4b613286"
+  },
+  "case": "reduced_representative",
+  "interpretation": "Four-chain diagnostic plots preserve failed cases. Recovery bands are drawn only for numerical passes, not a final exploration decision. Reduced cases approximate a two-factor generating truth.",
+  "result_sha256": "4a8cdc93e21cb60f17b2e039c2f5416c062f3efab571069518803a5ca6c5e7c4",
+  "script_sha256": "58401440ec2c6f1a42d5357b794bb101c3d5a0262b71242670583b2226d2002e",
+  "status": "failed_diagnostic_gate"
+}

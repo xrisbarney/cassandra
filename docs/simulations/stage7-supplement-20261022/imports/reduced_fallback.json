@@ -1,0 +1,23 @@
+{
+  "artifact_hashes_verified": true,
+  "case": "reduced_fallback",
+  "complete_posterior_recomputed": true,
+  "diagnostics": {
+    "accepted": false,
+    "all_diagnostics_finite": true,
+    "divergences": 0,
+    "max_rhat": 1.0669017460585097,
+    "min_bfmi": 0.8609681167523342,
+    "min_bulk_ess": 94.53202057718376,
+    "min_tail_ess": 423.9346095627971,
+    "tree_depth_saturations": 0
+  },
+  "directory": "artifacts/stage7/supplement-v1/reduced_fallback",
+  "download": "artifacts/stage7/supplement-downloads/39830813971/reduced_fallback",
+  "github_run_id": "39830813971",
+  "github_sha": "e164dd753c00e3af79a76e37687be17063a8773d",
+  "held_out_scoring_enabled": false,
+  "result_sha256": "ea526b542a5662022c8636f284f8605755df3c83f3a9205891632a2d741e7f10",
+  "source_sha256": "6521c716b05d67c967b4c7d502f7291869209dd7210bb4beb8d7923d0836913a",
+  "status": "failed_diagnostic_gate"
+}

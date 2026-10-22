@@ -1,0 +1,23 @@
+{
+  "artifact_hashes_verified": true,
+  "case": "reduced_representative",
+  "complete_posterior_recomputed": true,
+  "diagnostics": {
+    "accepted": false,
+    "all_diagnostics_finite": true,
+    "divergences": 0,
+    "max_rhat": 1.0076301462748054,
+    "min_bfmi": 0.8841241684139076,
+    "min_bulk_ess": 824.3996357259072,
+    "min_tail_ess": 310.38557905136497,
+    "tree_depth_saturations": 0
+  },
+  "directory": "artifacts/stage7/supplement-v1/reduced_representative",
+  "download": "artifacts/stage7/supplement-downloads/39830813971/reduced_representative",
+  "github_run_id": "39830813971",
+  "github_sha": "e164dd753c00e3af79a76e37687be17063a8773d",
+  "held_out_scoring_enabled": false,
+  "result_sha256": "4a8cdc93e21cb60f17b2e039c2f5416c062f3efab571069518803a5ca6c5e7c4",
+  "source_sha256": "6521c716b05d67c967b4c7d502f7291869209dd7210bb4beb8d7923d0836913a",
+  "status": "failed_diagnostic_gate"
+}

@@ -1,0 +1,23 @@
+{
+  "artifact_hashes_verified": true,
+  "case": "masked_fallback",
+  "complete_posterior_recomputed": false,
+  "diagnostics": {
+    "accepted": false,
+    "all_diagnostics_finite": false,
+    "divergences": 1,
+    "max_rhat": null,
+    "min_bfmi": null,
+    "min_bulk_ess": null,
+    "min_tail_ess": null,
+    "tree_depth_saturations": 0
+  },
+  "directory": "artifacts/stage7/supplement-v1/masked_fallback",
+  "download": "artifacts/stage7/supplement-downloads/39830813971/masked_fallback",
+  "github_run_id": "39830813971",
+  "github_sha": "e164dd753c00e3af79a76e37687be17063a8773d",
+  "held_out_scoring_enabled": false,
+  "result_sha256": "b66cf0e4ad6bb2fc15b01b4b0eb60aa6763d8ad07b46c1bdddf87bbd46eb9c76",
+  "source_sha256": "6521c716b05d67c967b4c7d502f7291869209dd7210bb4beb8d7923d0836913a",
+  "status": "failed_diagnostic_gate"
+}

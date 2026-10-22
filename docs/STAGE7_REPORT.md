@@ -285,3 +285,11 @@ level itself mixes better than the second persistence and several known-category
 levels. Neither a weak-anchor cause nor a fallback-level-only cause has been
 established. The supplement retains these findings and cannot automatically
 admit Stage 8 through a one-factor label change.
+
+The [bounded supplement is now complete](STAGE7_SUPPLEMENT_REPORT.md): four
+single-attempt cases, zero numerical passes and zero recovery-eligible cases.
+Both the masked two-factor and matched one-factor fallback stop on retained
+divergences; the reduced representative fails tail ESS, and the reduced fallback
+fails R-hat and bulk ESS. No production-pilot amendment follows. The original
+campaign totals above remain unchanged. Stage 8 stays closed and this repair
+round has ended without additional retries.

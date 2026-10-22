@@ -1,0 +1,18 @@
+{
+  "additional_repair_round_authorized": false,
+  "attempts": 4,
+  "audit_sha256": "02035175c834cd484bc46e1781de3249685eb1b548a3f5f2908d26f89480a9e9",
+  "complete_posteriors_independently_recomputed": 2,
+  "early_retained_divergence_stops": 2,
+  "execution_sha256": "52c513c1624e448d86b82a44a9e92a3592e567ecbd8e79de23df8a0b0588c107",
+  "held_out_scoring_enabled": false,
+  "numerical_passes": 0,
+  "one_factor_pilot_adopted": false,
+  "original_55_case_campaign_unchanged": true,
+  "recovery_eligible": 0,
+  "report_sha256": "ec147006a66785903469e59f2ad64073220e546bff40a3f4d7ee037e7fc2ec92",
+  "retained_transitions_completed_including_failures": 24927,
+  "stage8_enabled": false,
+  "status": "bounded_round_complete_pilot_unvalidated",
+  "warmup_transitions_completed": 26000
+}
