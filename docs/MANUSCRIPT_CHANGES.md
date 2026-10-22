@@ -211,7 +211,7 @@ fits from preserved earlier attempts. Do not add duplicate verification of the
 same severity files to the number of fitted cases.
 
 Separate numerical correctness, convergence, fixed-truth recovery and predictive
-calibration. The 200 distinct passing software tests (190 full-run plus ten targeted gate
+calibration. The 202 distinct passing software tests (190 full-run plus twelve targeted gate
 tests) establish the first category only.
 Only complete, warning-free posteriors passing all prescribed gates contribute
 to recovery summaries. Failed or interrupted chains cannot substantiate a

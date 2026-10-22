@@ -47,6 +47,9 @@ def main():
             if not result.exists():
                 return {'scenario': name, 'seed': seed, 'status': 'partial_run_preserved'}
             record = json.loads(result.read_text())
+            if (record['options'].get('scenario') != name
+                    or record['options'].get('seed') != seed):
+                raise ValueError(f'Existing run has a different scenario or seed: {folder}')
             if record['options'].get('prior_id') != CURRENT_PRIOR_ID:
                 raise ValueError(f'Existing run has a different prior: {folder}')
             if record['options'].get('prior_candidate') != args.prior_candidate:

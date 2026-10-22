@@ -1,0 +1,12 @@
+{
+  "new_distinct_tests": 2,
+  "total_distinct_tests_passed": 202,
+  "command": ".venv/Scripts/python.exe -m pytest -q tests/test_stage7_batch_identity.py",
+  "exit_code": 0,
+  "pytest_stdout": "2 passed in 7.93s",
+  "source_sha256": {
+    "scripts/stage7_batch.py": "b1ee2445acb174806a2bbac5f9e9574cb6d5d219014784335168689e1a302802",
+    "tests/test_stage7_batch_identity.py": "9c68d7b60e6aee1f719f243ad4b0e0aaa1309eabc3f79bdf7ba8dc80f54f87af"
+  },
+  "scope": "Reject a resumed folder containing a different scenario or seed before reading its admission or launching a fit. No model-algebra change."
+}
