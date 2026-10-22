@@ -1,0 +1,15 @@
+{
+  "passed": true,
+  "distinct_new_tests": 6,
+  "command": ".venv/Scripts/python.exe -m pytest tests/test_stage7_hosted.py -q",
+  "exit_code": 0,
+  "observed_stdout": "......                                                                   [100%]\n6 passed in 3.57s\n",
+  "evidence": "Transcribed from tool execution result 006d53, not a second test run.",
+  "source_sha256": {
+    "scripts/ci_stage7.py": "c0011949958df2b4e8001a26ba2d8103acd5793fde7def75bbb995197fa59e42",
+    "tests/test_stage7_hosted.py": "10c70654e72962d12a3b68c90486a9f244c0ad0e0bdb0932fa72919d41888073",
+    "docs/decisions/STAGE7_HOSTED_PENDING_20261022.json": "d660e73c033e55f7114eba8db8107014878abc14d4ad24f432e627e3ca8f6603"
+  },
+  "numerical_model_changed": false,
+  "fitting_activated": false
+}
