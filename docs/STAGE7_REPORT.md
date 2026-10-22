@@ -15,6 +15,8 @@ the same observations for each seed. Repeated coordinate fits and sensitivity
 fits are not additional independent datasets. These are fixed-truth recovery
 experiments, **not simulation-based calibration**. Neither three seeds nor
 coverage over dependent category-month cells establishes general calibration.
+The historical "40 datasets" wording in the preserved design/amendment means
+40 scenario/seed cases; it does not override their explicit effort-data reuse.
 
 The small factor fixtures use four categories and 96 months; kernel fixtures
 use 144 months, dispersion fixtures one category and 192 months, and the
