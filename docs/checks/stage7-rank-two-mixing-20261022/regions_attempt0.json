@@ -1,0 +1,104 @@
+{
+  "directory": "artifacts/stage7/rank-two-joint-v1/primary/fallback_zero-7101",
+  "candidate": "primary",
+  "source_sha256": "366187dcdcf7dc97578b3d04542aa9788d4718a3363d32e1fa9daa8fd1df8507",
+  "marker_record_sha256": "b43db4c76a9d58dc1aa7c15121d124cdfac8c8656a4b5e947934d54eb2d79cec",
+  "run_sha256": "0e31f1ed61a582ddceebc3005c6fc4b5061fb5fc8022d349814012d159a97e00",
+  "data_sha256": "c6d23bdf858acc4fe9141915fa9d6bbb3314c60843c8e18e1f070bdb26d438cc",
+  "attempts": [
+    {
+      "retry": 0,
+      "attempt_sha256": "536b83c3c4483294b5de0707631ff587e85b5d366d7edd1c51bcdfc2e239d5ce",
+      "numerical_diagnostics": {
+        "accepted": false,
+        "all_diagnostics_finite": true,
+        "divergences": 0,
+        "max_rhat": 1.2483698274587833,
+        "min_bfmi": 0.8538771029787292,
+        "min_bulk_ess": 12.227400803730783,
+        "min_tail_ess": 32.12427940476765,
+        "tree_depth_saturations": 0
+      },
+      "attempt_accepted": false,
+      "regions": {
+        "lower_persistence": {
+          "visits_per_chain": [
+            28,
+            172,
+            346,
+            2
+          ],
+          "fraction_per_chain": [
+            0.028,
+            0.172,
+            0.346,
+            0.002
+          ],
+          "transitions_per_chain": [
+            10,
+            5,
+            4,
+            2
+          ],
+          "draws_per_chain": 1000,
+          "every_chain_visits": true,
+          "every_chain_enters_and_leaves": true,
+          "indicator_rhat": 1.1711112013700664,
+          "indicator_bulk_ess": 17.08612161456723
+        },
+        "high_positive_mean": {
+          "visits_per_chain": [
+            759,
+            766,
+            311,
+            937
+          ],
+          "fraction_per_chain": [
+            0.759,
+            0.766,
+            0.311,
+            0.937
+          ],
+          "transitions_per_chain": [
+            92,
+            69,
+            51,
+            78
+          ],
+          "draws_per_chain": 1000,
+          "every_chain_visits": true,
+          "every_chain_enters_and_leaves": true,
+          "indicator_rhat": 1.329400103619892,
+          "indicator_bulk_ess": 9.75374606700988
+        },
+        "high_negative_mean": {
+          "visits_per_chain": [
+            103,
+            3,
+            246,
+            3
+          ],
+          "fraction_per_chain": [
+            0.103,
+            0.003,
+            0.246,
+            0.003
+          ],
+          "transitions_per_chain": [
+            52,
+            6,
+            57,
+            6
+          ],
+          "draws_per_chain": 1000,
+          "every_chain_visits": true,
+          "every_chain_enters_and_leaves": true,
+          "indicator_rhat": 1.1613983042913467,
+          "indicator_bulk_ess": 18.08503765145818
+        }
+      },
+      "posterior_sha256": "d8b6d73dc96667a20b092c5640cb0bc8aae6705c2c7b47aedf1bcebb36e1af77"
+    }
+  ],
+  "interpretation": "Visits describe exploration, not posterior region weights. No admission or recovery eligibility is changed by this review. Sensitivity priors have different posterior targets; compare their regions descriptively."
+}
