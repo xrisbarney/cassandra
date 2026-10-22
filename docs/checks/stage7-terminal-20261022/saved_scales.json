@@ -1,0 +1,15 @@
+{
+  "cases": [
+    {
+      "case": "matched_one_factor_fallback",
+      "m_sd": 0.003346677464161872,
+      "state_sha256": "be1680dded52f26061ea9852974e29e55f6b8ac4afc6f117c05066f48bd702a8"
+    },
+    {
+      "case": "masked_fallback",
+      "m_sd": 1.309540279533559,
+      "state_sha256": "c0b2a81e1f105313ac21848a7f982269d9d5be639df538fb5df353b2447a8083"
+    }
+  ],
+  "interpretation": "Saved callback points, not admitted posterior estimates or complete trajectories. Scale transform is 2*expit(unconstrained coordinate)."
+}

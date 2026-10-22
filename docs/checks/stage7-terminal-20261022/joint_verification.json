@@ -1,0 +1,226 @@
+{
+  "checks": [
+    {
+      "density_error": 1.1296833690721542e-08,
+      "gradient_max_error": 4.416749810332021e-08,
+      "independent_derivatives": [
+        {
+          "analytic": 17.093909897564437,
+          "fd": 17.093909877985425,
+          "variable": "m_sd_interval__"
+        },
+        {
+          "analytic": -9.55568340122213,
+          "fd": -9.55568320932798,
+          "variable": "psi_log__"
+        },
+        {
+          "analytic": 9.958332235934984,
+          "fd": 9.958332202586462,
+          "variable": "f_phi_interval__"
+        },
+        {
+          "analytic": 30.522129240500455,
+          "fd": 30.522129236487668,
+          "variable": "f_diag_interval__"
+        },
+        {
+          "analytic": 402.4917875548234,
+          "fd": 402.491787258441,
+          "variable": "f_free_interval__"
+        },
+        {
+          "analytic": 0.5730318784886316,
+          "fd": 0.5730318662244827,
+          "variable": "joint_level_whitened"
+        },
+        {
+          "analytic": 2.543840524313801e-17,
+          "fd": 0.0,
+          "variable": "f_whitened_states"
+        }
+      ],
+      "model": "joint_free",
+      "point": "initial"
+    },
+    {
+      "density_error": 1.1292286217212677e-08,
+      "gradient_max_error": 6.551275255617384e-08,
+      "independent_derivatives": [
+        {
+          "analytic": 17.963251612556085,
+          "fd": 17.963251616492926,
+          "variable": "m_sd_interval__"
+        },
+        {
+          "analytic": -6.282051624270265,
+          "fd": -6.282051572270574,
+          "variable": "psi_log__"
+        },
+        {
+          "analytic": 9.290896133151172,
+          "fd": 9.290896127822634,
+          "variable": "f_phi_interval__"
+        },
+        {
+          "analytic": 27.867586535988952,
+          "fd": 27.867586550200937,
+          "variable": "f_diag_interval__"
+        },
+        {
+          "analytic": 409.24811359177113,
+          "fd": 409.24811332843086,
+          "variable": "f_free_interval__"
+        },
+        {
+          "analytic": 0.23934622616688697,
+          "fd": 0.23934621822263577,
+          "variable": "joint_level_whitened"
+        },
+        {
+          "analytic": 0.006146512201041411,
+          "fd": 0.006146524356154258,
+          "variable": "f_whitened_states"
+        }
+      ],
+      "model": "joint_free",
+      "point": "perturbed"
+    },
+    {
+      "density_error": 1.1305473890388384e-08,
+      "gradient_max_error": 2.351999626171164e-07,
+      "independent_derivatives": [
+        {
+          "analytic": 16.079545937820647,
+          "fd": 16.079545935099304,
+          "variable": "m_sd_interval__"
+        },
+        {
+          "analytic": -104.4669660648752,
+          "fd": -104.46696603594317,
+          "variable": "psi_log__"
+        },
+        {
+          "analytic": -3.4722532719063626,
+          "fd": -3.4722572308965023,
+          "variable": "f_phi_interval__"
+        },
+        {
+          "analytic": 5.785912239920813,
+          "fd": 5.785912185274355,
+          "variable": "f_diag_interval__"
+        },
+        {
+          "analytic": 22.85354712894383,
+          "fd": 22.853547125123438,
+          "variable": "f_free_interval__"
+        },
+        {
+          "analytic": 0.4199117816941079,
+          "fd": 0.41991181660705473,
+          "variable": "joint_level_whitened"
+        },
+        {
+          "analytic": 8.556789972063976e-16,
+          "fd": 0.0,
+          "variable": "f_whitened_states"
+        }
+      ],
+      "model": "joint_free",
+      "point": "near_unit"
+    },
+    {
+      "density_error": 1.1293650459265336e-08,
+      "gradient_max_error": 4.416756738123695e-08,
+      "independent_derivatives": [
+        {
+          "analytic": 17.03734410586324,
+          "fd": 17.037344082382333,
+          "variable": "m_sd_interval__"
+        },
+        {
+          "analytic": -11.851530426703109,
+          "fd": -11.851530211970383,
+          "variable": "psi_log__"
+        },
+        {
+          "analytic": 26.34749813167539,
+          "fd": 26.347498123868714,
+          "variable": "f_diag_interval__"
+        },
+        {
+          "analytic": 417.635175693496,
+          "fd": 417.63517533581756,
+          "variable": "f_free_interval__"
+        },
+        {
+          "analytic": 0.5205552989451439,
+          "fd": 0.5205552952247672,
+          "variable": "joint_level_whitened"
+        },
+        {
+          "analytic": 1.2655446818474745e-16,
+          "fd": 0.0,
+          "variable": "f_whitened_states"
+        }
+      ],
+      "model": "joint_fixed",
+      "point": "initial"
+    },
+    {
+      "density_error": 1.1296378943370655e-08,
+      "gradient_max_error": 6.551275255617384e-08,
+      "independent_derivatives": [
+        {
+          "analytic": 17.760792765615037,
+          "fd": 17.7607927525969,
+          "variable": "m_sd_interval__"
+        },
+        {
+          "analytic": -6.2720030878683,
+          "fd": -6.272003020058036,
+          "variable": "psi_log__"
+        },
+        {
+          "analytic": 21.81296348163969,
+          "fd": 21.812963473166743,
+          "variable": "f_diag_interval__"
+        },
+        {
+          "analytic": 379.36673267911954,
+          "fd": 379.3667324544003,
+          "variable": "f_free_interval__"
+        },
+        {
+          "analytic": -0.6776981060349476,
+          "fd": -0.6776980853828718,
+          "variable": "joint_level_whitened"
+        },
+        {
+          "analytic": 0.009927961158555942,
+          "fd": 0.009927953215083107,
+          "variable": "f_whitened_states"
+        }
+      ],
+      "model": "joint_fixed",
+      "point": "perturbed"
+    }
+  ],
+  "elapsed_seconds": 392.3057004000002,
+  "passed": true,
+  "performance_warnings": [
+    {
+      "category": "UserWarning",
+      "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\pytensor\\link\\c\\cmodule.py",
+      "lineno": 2986,
+      "message": "PyTensor could not link to a BLAS installation. Operations that might benefit from BLAS will be severely degraded.\nThis usually happens when PyTensor is installed via pip. We recommend it be installed via conda/mamba/pixi instead.\nAlternatively, you can use an experimental backend such as Numba or JAX that perform their own BLAS optimizations, by setting `pytensor.config.mode == 'NUMBA'` or passing `mode='NUMBA'` when compiling a PyTensor function.\nFor more options and details see https://pytensor.readthedocs.io/en/latest/troubleshooting.html#how-do-i-configure-test-my-blas-library"
+    }
+  ],
+  "sampling_performed": false,
+  "source_sha256": {
+    "stage7_terminal_model.py": "790f3a8ccccd46f10abf07b2e27022966c2ec0b093409a1140bbfe49ebf991fa",
+    "stage7_terminal_oracle.py": "cfb77e62f49e27c9b72bcc6470c472fb9badd763e9fd978c1b38f57377fbc216",
+    "verify_stage7_terminal.py": "d4390afcbd29113ae709e2e83e40042943f30cbb7b26ed32af1973999dba84c0"
+  },
+  "unresolved_warnings": []
+}

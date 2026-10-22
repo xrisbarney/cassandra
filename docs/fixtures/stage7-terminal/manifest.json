@@ -1,0 +1,31 @@
+{
+  "cases": [
+    {
+      "files_sha256": {
+        "docs/fixtures/stage7-terminal/7102/data.npz": "e80de98fe90989992bb5c30c53311b59f54b55628d6ee845e302f436a96b4407",
+        "docs/fixtures/stage7-terminal/7102/options.json": "4f4ea87e189b37688b6866457ef9b9970ac8e3a20049e9e35395177d197e65f5",
+        "docs/fixtures/stage7-terminal/7102/truth.npz": "998787fc7ba8d3b514f8838902395c1d4f86f9836eafa63ae40ffb959aad96c1"
+      },
+      "generators": {
+        "count_seed": 78201,
+        "future_state_seed": 78202
+      },
+      "seed": 7102
+    },
+    {
+      "files_sha256": {
+        "docs/fixtures/stage7-terminal/7103/data.npz": "50348176b8d7b9477acf76a438a552b89bf335dacdbab00c74928a555cda2fce",
+        "docs/fixtures/stage7-terminal/7103/options.json": "902ff3bc18329b8f6f48a58cf27172a3811e08dba6aaa8817a2c3b00bf003ea0",
+        "docs/fixtures/stage7-terminal/7103/truth.npz": "aaacec870369f199d5e9364c03bff495aabc89d5ffec5cc8b1143f1148759b1b"
+      },
+      "generators": {
+        "count_seed": 78301,
+        "future_state_seed": 78302
+      },
+      "seed": 7103
+    }
+  ],
+  "data_selection_permitted": false,
+  "seed7101_reconstruction_passed": true,
+  "source_sha256": "bdd263e16f45fd4c2f77f34f90ccaf4bf40d06c8f03baea458440ed08f98fecf"
+}

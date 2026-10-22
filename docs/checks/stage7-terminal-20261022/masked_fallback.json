@@ -1,0 +1,305 @@
+{
+  "case": "masked_fallback",
+  "elapsed_seconds": 110.68027910000819,
+  "limitation": "Callback points are not full divergent trajectories. Local agreement does not certify all integration paths or identify a unique mechanism.",
+  "passed": true,
+  "performance_warnings": [
+    {
+      "category": "UserWarning",
+      "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\pytensor\\link\\c\\cmodule.py",
+      "lineno": 2986,
+      "message": "PyTensor could not link to a BLAS installation. Operations that might benefit from BLAS will be severely degraded.\nThis usually happens when PyTensor is installed via pip. We recommend it be installed via conda/mamba/pixi instead.\nAlternatively, you can use an experimental backend such as Numba or JAX that perform their own BLAS optimizations, by setting `pytensor.config.mode == 'NUMBA'` or passing `mode='NUMBA'` when compiling a PyTensor function.\nFor more options and details see https://pytensor.readthedocs.io/en/latest/troubleshooting.html#how-do-i-configure-test-my-blas-library"
+    }
+  ],
+  "points": [
+    {
+      "compiled_logp": -3634.798892083077,
+      "constant_shift_prior_curvature": [
+        19.560515863783138,
+        2.309942892035204
+      ],
+      "dense_logp": -3634.798892054254,
+      "derivatives": [
+        {
+          "analytic": 0.1825410792785629,
+          "independent_fd": 0.1825410436140373,
+          "index": 0,
+          "variable": "m_sd_interval__"
+        },
+        {
+          "analytic": -2.023017862146505,
+          "independent_fd": -2.023017873398203,
+          "index": 0,
+          "variable": "psi_log__"
+        },
+        {
+          "analytic": -1.0689417693957188,
+          "independent_fd": -1.0689417877074447,
+          "index": 9,
+          "variable": "psi_log__"
+        },
+        {
+          "analytic": -3.5491352199870785,
+          "independent_fd": -3.549135271896375,
+          "index": 0,
+          "variable": "f_phi_interval__"
+        },
+        {
+          "analytic": -0.047292768168398516,
+          "independent_fd": -0.047293269744841375,
+          "index": 1,
+          "variable": "f_phi_interval__"
+        },
+        {
+          "analytic": -8.027790122199308,
+          "independent_fd": -8.027790136111435,
+          "index": 0,
+          "variable": "f_diag_interval__"
+        },
+        {
+          "analytic": -2.187598648084659,
+          "independent_fd": -2.1875986249142443,
+          "index": 1,
+          "variable": "f_diag_interval__"
+        },
+        {
+          "analytic": 1.763014267989598,
+          "independent_fd": 1.763014370226301,
+          "index": 0,
+          "variable": "f_free_interval__"
+        },
+        {
+          "analytic": -1.276158585756523,
+          "independent_fd": -1.2761585821863264,
+          "index": 16,
+          "variable": "f_free_interval__"
+        },
+        {
+          "analytic": -2.3539243003777197,
+          "independent_fd": -2.353924287490372,
+          "index": 0,
+          "variable": "joint_level_whitened"
+        },
+        {
+          "analytic": -1.746016360730426,
+          "independent_fd": -1.7460163462601483,
+          "index": 9,
+          "variable": "joint_level_whitened"
+        },
+        {
+          "analytic": -1.34333257826252,
+          "independent_fd": -1.3433325648293248,
+          "index": 0,
+          "variable": "f_whitened_states"
+        },
+        {
+          "analytic": 0.09009993725566053,
+          "independent_fd": 0.09009988843899917,
+          "index": 217,
+          "variable": "f_whitened_states"
+        }
+      ],
+      "native_logp": -3634.798892083083,
+      "phi": [
+        0.7201592693219019,
+        0.9994839502588926
+      ],
+      "point": "saved_callback_point"
+    },
+    {
+      "compiled_logp": -3634.802204688684,
+      "constant_shift_prior_curvature": [
+        19.560424696515113,
+        2.309912774191726
+      ],
+      "dense_logp": -3634.802204663467,
+      "derivatives": [
+        {
+          "analytic": 0.182436848202168,
+          "independent_fd": 0.18243683825858167,
+          "index": 0,
+          "variable": "m_sd_interval__"
+        },
+        {
+          "analytic": -2.0354038526969136,
+          "independent_fd": -2.035404259004281,
+          "index": 0,
+          "variable": "psi_log__"
+        },
+        {
+          "analytic": -1.0689546982842533,
+          "independent_fd": -1.06895470253221,
+          "index": 9,
+          "variable": "psi_log__"
+        },
+        {
+          "analytic": -3.5520219053195543,
+          "independent_fd": -3.552021871655597,
+          "index": 0,
+          "variable": "f_phi_interval__"
+        },
+        {
+          "analytic": -0.04694513078855802,
+          "independent_fd": -0.04694570634455885,
+          "index": 1,
+          "variable": "f_phi_interval__"
+        },
+        {
+          "analytic": -8.03573383046764,
+          "independent_fd": -8.03573375378619,
+          "index": 0,
+          "variable": "f_diag_interval__"
+        },
+        {
+          "analytic": -2.1876399868912313,
+          "independent_fd": -2.1876400296605425,
+          "index": 1,
+          "variable": "f_diag_interval__"
+        },
+        {
+          "analytic": 1.7735178744049729,
+          "independent_fd": 1.7735178744260336,
+          "index": 0,
+          "variable": "f_free_interval__"
+        },
+        {
+          "analytic": -1.2760687172679195,
+          "independent_fd": -1.2760687013724237,
+          "index": 16,
+          "variable": "f_free_interval__"
+        },
+        {
+          "analytic": -2.353986542496808,
+          "independent_fd": -2.3539865424027084,
+          "index": 0,
+          "variable": "joint_level_whitened"
+        },
+        {
+          "analytic": -1.7459779211906938,
+          "independent_fd": -1.7459779201089984,
+          "index": 9,
+          "variable": "joint_level_whitened"
+        },
+        {
+          "analytic": -1.343468149512985,
+          "independent_fd": -1.3434681477519916,
+          "index": 0,
+          "variable": "f_whitened_states"
+        },
+        {
+          "analytic": 0.09018686188110472,
+          "independent_fd": 0.09018688160722375,
+          "index": 217,
+          "variable": "f_whitened_states"
+        }
+      ],
+      "native_logp": -3634.8022046886817,
+      "phi": [
+        0.7201591832212777,
+        0.999483897777877
+      ],
+      "point": "perturbation_1"
+    },
+    {
+      "compiled_logp": -3634.7975686216837,
+      "constant_shift_prior_curvature": [
+        19.5556175427617,
+        2.3101064352812406
+      ],
+      "dense_logp": -3634.797568590652,
+      "derivatives": [
+        {
+          "analytic": 0.18251229221506138,
+          "independent_fd": 0.1825122581067262,
+          "index": 0,
+          "variable": "m_sd_interval__"
+        },
+        {
+          "analytic": -2.0280420292472554,
+          "independent_fd": -2.028042058555002,
+          "index": 0,
+          "variable": "psi_log__"
+        },
+        {
+          "analytic": -1.0690880355417134,
+          "independent_fd": -1.0690880344554898,
+          "index": 9,
+          "variable": "psi_log__"
+        },
+        {
+          "analytic": -3.555957311644491,
+          "independent_fd": -3.555957277967536,
+          "index": 0,
+          "variable": "f_phi_interval__"
+        },
+        {
+          "analytic": -0.04699102981270188,
+          "independent_fd": -0.046990749069664155,
+          "index": 1,
+          "variable": "f_phi_interval__"
+        },
+        {
+          "analytic": -8.02574809701389,
+          "independent_fd": -8.025747956708074,
+          "index": 0,
+          "variable": "f_diag_interval__"
+        },
+        {
+          "analytic": -2.18745602123011,
+          "independent_fd": -2.1874560161450063,
+          "index": 1,
+          "variable": "f_diag_interval__"
+        },
+        {
+          "analytic": 1.7734534810275056,
+          "independent_fd": 1.7734535731506182,
+          "index": 0,
+          "variable": "f_free_interval__"
+        },
+        {
+          "analytic": -1.2762289042361674,
+          "independent_fd": -1.276228908864141,
+          "index": 16,
+          "variable": "f_free_interval__"
+        },
+        {
+          "analytic": -2.3538343792654297,
+          "independent_fd": -2.3538343612017343,
+          "index": 0,
+          "variable": "joint_level_whitened"
+        },
+        {
+          "analytic": -1.746012247320739,
+          "independent_fd": -1.7460122535339904,
+          "index": 9,
+          "variable": "joint_level_whitened"
+        },
+        {
+          "analytic": -1.3432043153733852,
+          "independent_fd": -1.3432043260763749,
+          "index": 0,
+          "variable": "f_whitened_states"
+        },
+        {
+          "analytic": 0.090238781204121,
+          "independent_fd": 0.09023874554259236,
+          "index": 217,
+          "variable": "f_whitened_states"
+        }
+      ],
+      "native_logp": -3634.7975686216882,
+      "phi": [
+        0.7202268321655558,
+        0.9994838972550009
+      ],
+      "point": "perturbation_2"
+    }
+  ],
+  "sampling_performed": false,
+  "saved_state_sha256": "c0b2a81e1f105313ac21848a7f982269d9d5be639df538fb5df353b2447a8083",
+  "source_sha256": {
+    "audit_stage7_terminal_states.py": "787b02e8785ed13c7e22877ca1a0f8c2c868233f2927202d8274af0ba6badaa2",
+    "stage7_terminal_oracle.py": "cfb77e62f49e27c9b72bcc6470c472fb9badd763e9fd978c1b38f57377fbc216"
+  },
+  "unresolved_warnings": []
+}

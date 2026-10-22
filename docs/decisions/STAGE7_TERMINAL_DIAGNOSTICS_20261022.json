@@ -1,0 +1,41 @@
+{
+  "attempt_limit": 5,
+  "authority": "Latest user instruction: follow the sequence with bounds and a terminal not-admitted outcome",
+  "currently_authorized_cases": [
+    "joint_free",
+    "joint_fixed"
+  ],
+  "files_sha256": {
+    "docs/STAGE7_TERMINAL_DIAGNOSTIC_PLAN.md": "39b01f9322951de8d5dbb93f0a5de4cbe92d41f2ca82e546e1221b5bd8656447",
+    "docs/checks/stage7-terminal-20261022/README.md": "e956352e1d2332e58931a171eac7718f1677bc4146a29f4f22c1752f874f849e",
+    "docs/checks/stage7-terminal-20261022/executed_audit_source.py.txt": "787b02e8785ed13c7e22877ca1a0f8c2c868233f2927202d8274af0ba6badaa2",
+    "docs/checks/stage7-terminal-20261022/executed_verification_source.py.txt": "d4390afcbd29113ae709e2e83e40042943f30cbb7b26ed32af1973999dba84c0",
+    "docs/checks/stage7-terminal-20261022/joint_verification.json": "3234a1ce7a9ef25cf25a251f40b8ec6732fe7097b8c1889b4ef717063de28af0",
+    "docs/checks/stage7-terminal-20261022/masked_fallback.json": "0fa06c98f2d99ed314acd730732dc6a437343a731d7cb5515cd89c6e1fb5e977",
+    "docs/checks/stage7-terminal-20261022/matched_one_factor_fallback.json": "e1e70f17f30fa8689d26ca864a9848a5ac3c364139b5aa8c72b68fa7c4d0c339",
+    "docs/checks/stage7-terminal-20261022/saved_scales.json": "6b8be489f53a0c94d88fd7386368810c0fcd89f8d579eecfb0079536170bde58",
+    "docs/fixtures/stage7-terminal/7102/data.npz": "e80de98fe90989992bb5c30c53311b59f54b55628d6ee845e302f436a96b4407",
+    "docs/fixtures/stage7-terminal/7102/options.json": "4f4ea87e189b37688b6866457ef9b9970ac8e3a20049e9e35395177d197e65f5",
+    "docs/fixtures/stage7-terminal/7102/truth.npz": "998787fc7ba8d3b514f8838902395c1d4f86f9836eafa63ae40ffb959aad96c1",
+    "docs/fixtures/stage7-terminal/7103/data.npz": "50348176b8d7b9477acf76a438a552b89bf335dacdbab00c74928a555cda2fce",
+    "docs/fixtures/stage7-terminal/7103/options.json": "902ff3bc18329b8f6f48a58cf27172a3811e08dba6aaa8817a2c3b00bf003ea0",
+    "docs/fixtures/stage7-terminal/7103/truth.npz": "aaacec870369f199d5e9364c03bff495aabc89d5ffec5cc8b1143f1148759b1b",
+    "docs/fixtures/stage7-terminal/manifest.json": "e3f705537c638bada92e1759d0ed2ee80f47ecf38170ea2e806d4faf6ae62a62",
+    "scripts/audit_stage7_terminal_states.py": "dfea8c797ac3281a0cbe8cdaf2cb87daecb5bb4c8e24044bd1f1313fc6974b98",
+    "scripts/launch_stage7_terminal.py": "e5f00ce4ae14fb7e54b9bb3f14ce708ca41aa05997c9bbbd67054c4d6a9e5a0a",
+    "scripts/prepare_stage7_terminal_fixtures.py": "bdd263e16f45fd4c2f77f34f90ccaf4bf40d06c8f03baea458440ed08f98fecf",
+    "scripts/run_stage7_terminal.py": "103f331bb3fa775020073946a584491614c5fd8040274734d0c7a92084fe6662",
+    "scripts/stage7_terminal_model.py": "790f3a8ccccd46f10abf07b2e27022966c2ec0b093409a1140bbfe49ebf991fa",
+    "scripts/stage7_terminal_oracle.py": "cfb77e62f49e27c9b72bcc6470c472fb9badd763e9fd978c1b38f57377fbc216",
+    "scripts/verify_stage7_terminal.py": "cfbdd56d4cbb2c7d5ce1d6090ddf7ebc02eec363301000103457735bd1695d33",
+    "tests/test_stage7_terminal_guards.py": "f54b24f0215f243ec1a49118a1c614069ba9760edc685c23d5fff95f6cf73ae6"
+  },
+  "global_deadline_utc": "2026-10-22T21:31:00+00:00",
+  "held_out_scoring_enabled": false,
+  "max_parallel_fits": 2,
+  "one_attempt_per_case": true,
+  "per_attempt_wall_seconds": 1200,
+  "prior_changed": false,
+  "stage8_enabled": false,
+  "status": "diagnostics_active"
+}

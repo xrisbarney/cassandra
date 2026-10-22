@@ -1,0 +1,42 @@
+{
+  "categories": 10,
+  "conditional_level": false,
+  "count_parameterization": "conditional",
+  "factor_parameterization": "anchored",
+  "factors": 1,
+  "fallback_index": 9,
+  "gaussian_solver": "block",
+  "kernel": false,
+  "known_auxiliary_coefficients": false,
+  "level_settings": {
+    "amplitude_multiplier": 1.0,
+    "anchor": 3.414550897978582,
+    "candidate": "primary",
+    "fallback_anchor": -0.6931471805599453,
+    "fallback_index": 9,
+    "hyper_sd": 1.0,
+    "known_indices": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "scale_sd": 1.0,
+    "scale_upper": 2.0,
+    "training_months": 108
+  },
+  "mass_matrix": "diagonal",
+  "months": 108,
+  "prior_candidate": "primary",
+  "prior_id": "anchored_levels_v2",
+  "regimes": 1,
+  "residual": "none",
+  "scenario": "fallback_zero",
+  "seed": 7103,
+  "severity_factors": 0
+}
