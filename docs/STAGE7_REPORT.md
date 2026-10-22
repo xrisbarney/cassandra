@@ -96,6 +96,14 @@ persistence and non-contiguous arrays are tested. The first representative
 full-gradient preflight improved from about 0.00252 to 0.00111 seconds under
 concurrent load; this is not an end-to-end sampling speedup estimate.
 
+Timing fields distinguish graph construction, explicit step compilation,
+sampling calls, per-draw warmup/retained time, diagnostics and serialization.
+Deferred compilation may occur inside the first warmup draw: its first-draw
+marker is therefore not an additional disjoint cost to add to warmup time.
+Sequential-chain fits do not measure four separate operating-system worker
+startups. Concurrent wall times are workload-dependent; the synthetic cases
+do not replace a production pilot when budgeting all rolling origins.
+
 Computational changes and original attempts are recorded in the
 [count coordinate decision](decisions/STAGE7_COUNT_COORDINATES_20261021.md),
 [severity coordinate decision](decisions/STAGE7_SEVERITY_COORDINATES_20261021.md),
@@ -122,6 +130,14 @@ diagnostic pass with unresolved warnings does not count as an admitted fit.
 Interrupted engineering trials and execution errors remain separate from
 fully exhausted diagnostic schedules. The final audit must independently
 recompute diagnostics from each admitted saved posterior.
+
+The [matched effort analysis](simulations/stage7-effort-20261022/README.md) is
+complete: eight of nine cases are admitted, with oracle seed 7103 failing its
+schedule. The count-derived proxy's pointwise 90% intervals cover about 23--27%
+of the generating physical log-intensity values across its three seeds, despite
+improved expected-count RMSE relative to no offset. These are latent-trajectory
+recovery measurements, not held-out forecast calibration. They do not support
+a claim that smoothing publication counts identifies physical reporting effort.
 
 The [mode diagnostic](checks/stage7-mode-diagnostic-20261022/audit.json) documents
 opposite loading/decomposition regions in unsuccessful factor/kernel attempts.
