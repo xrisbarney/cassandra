@@ -204,16 +204,28 @@ To reproduce the v2 prior audit with a new output path:
 Revised posterior runs verify and record the activation hashes:
 
     . .\scripts\Use-Compiler.ps1
-    .\.venv\Scripts\python.exe scripts/run_stage7.py --scenario factors_sparse --seed 7101 --anchor-factors --dense-mass --output artifacts/stage7/new-amended-factor-case
+    $env:NUMBA_OPT='1'
+    .\.venv\Scripts\python.exe scripts/run_stage7.py --scenario factors_sparse --seed 7101 --anchor-factors --dense-mass --conditional-counts --block-coordinates --output artifacts/stage7/new-amended-factor-case
 
-`scripts/stage7_batch.py` executes the 43 primary cases. The separately labelled
-12-case sensitivity campaign is `scripts/stage7_sensitivity.py --root <fresh-path>`.
-New fit processes record and limit native numerical pools to one thread.
+The campaign comprises 43 primary cases and 12 sensitivity cases, including
+deliberate reuse of observations in the three effort variants. Coordinate and
+metric repairs follow the decisions linked in the report; one generic batch
+command is not the complete routed campaign. `scripts/stage7_batch.py` accepts
+explicit scenario/seed/candidate subsets and preserves existing partial fits.
+`scripts/stage7_rank_two.py` starts its dependent grid only after representative
+diagnostic admission. New fit processes record and limit native numerical pools
+to one thread. Four chains are sampled sequentially within each fit.
 
 The historical campaign's control cases used a diagonal metric, as recorded in
 the geometry decision. `scripts/summarize_stage7.py --controls-from` preserves
-that distinction in its audit. `scripts/analyze_stage7.py` and
-`scripts/plot_stage7.py` describe admitted posteriors; failed fits remain failures.
+that distinction in its audit. The current summary accepts explicit `--routing`
+and `--candidate` arguments. `scripts/audit_stage7_campaign.py` checks completion,
+preserved earlier attempts and source/data hashes; `--recompute-diagnostics`
+independently checks admitted saved posteriors. `scripts/analyze_stage7.py`
+describes admitted posteriors, and `scripts/plot_stage7.py --audit` follows the
+same routed summary. Failed fits remain failures. The
+[test audit](docs/checks/stage7-test-suite-20261022/audit.json) records 175 distinct
+passing tests; posterior convergence is a separate gate.
 
 Use locked commands to prevent unnoticed dependency resolution changes; see
 [uv locking and syncing](https://docs.astral.sh/uv/concepts/projects/sync/).

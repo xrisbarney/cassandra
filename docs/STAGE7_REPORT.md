@@ -1,119 +1,156 @@
-# Stage 7 synthetic validation record
+﻿# Stage 7 synthetic validation record
 
-Current status, 2026-10-21: **v2 campaign running; not complete**. The
-[second amendment](amendments/STATE_SPACE_LEVELS_20261021.md) now governs new
-fits. Its primary prior passed all declared pilot plausibility gates. The wider
-level candidate failed the tail gate; the wider dynamic candidate remains
-unresolved after its declared 8,000-draw repeat. Both remain stress comparisons.
-The [prior audit](checks/stage7-levels-20261021/audit.json) uses only the initial
-2010--2018 count panel; posterior fixtures use synthetic data only. The new
-campaign contains 43 primary and 12 sensitivity cases. All 161 tests passed
-before the runtime-only native-thread policy change. The first sparse-factor
-fits have passed; full recovery and component decisions await the campaign.
-The record below is historical evidence and will be replaced by the completed
-audit, not reinterpreted as v2 validation.
+Status, 2026-10-22: **posterior campaign in progress; not yet complete**.
+The active laws are `anchored_levels_v2`. The primary prior-plausibility gates
+pass, and 175 distinct tests pass. The remaining work is the full posterior
+campaign, sensitivity analysis and final component decisions. No real-data
+proposed-model fitting or January 2024--December 2025 scoring has started.
 
-## Historical campaigns
+## Scope and evidence
 
-Status: revised-prior validation resumed, 2026-10-21; Stage 7 incomplete. The
-[recorded design](STAGE7_DESIGN.md) fixes seeds, component checks, scenarios,
-budgets and interpretation before fitting. Forty generated datasets
-were planned; none uses a real-data panel or held-out outcomes. The
-[interruption audit](simulations/stage7-20261021-interrupted/audit.json) records
-13 completed cases (6 accepted, 7 failed diagnostic gates), 5 user-stopped
-cases and 22 not started. Completed files were hash-verified, and partial
-directories were preserved. No old-prior sampling jobs remain. The
-[prior amendment](amendments/STATE_SPACE_PRIORS_20261021.md) is now
-[activated](amendments/STATE_SPACE_PRIORS_ACTIVATION_20261021.md) for a separate
-synthetic campaign. Its original sealed draft remains unchanged. The fitting,
-forecast, covariance and truth-coordinate code now use the stationary-amplitude
-law together. New directories preserve both original and translated truth.
+The [design](STAGE7_DESIGN.md) and
+[level amendment](amendments/STATE_SPACE_LEVELS_20261021.md) prescribe 43 primary
+scenario/seed cases and 12 sensitivity cases. The three effort variants share
+the same observations for each seed. Repeated coordinate fits and sensitivity
+fits are not additional independent datasets. These are fixed-truth recovery
+experiments, **not simulation-based calibration**. Neither three seeds nor
+coverage over dependent category-month cells establishes general calibration.
 
-## Implementation and verification
+The small factor fixtures use four categories and 96 months; kernel fixtures
+use 144 months, dispersion fixtures one category and 192 months, and the
+representative/fallback fixtures ten categories, two factors and 108 months.
+The generator uses NumPy/SciPy separately from the PyMC likelihood. All
+posterior fixtures and future targets are synthetic. Only the prior-plausibility
+check reads the real initial-window counts, January 2010--December 2018.
 
-The generator uses NumPy/SciPy independently of the PyMC likelihood. Shared
-components include an emission-only HMM with exact first derivatives, forward
-filtering/backward sampling, stationary factors, constrained loadings, a causal
-kernel and gathered-cell observation likelihoods. Censored mark endpoints are
-classified on the original mark scale to avoid floating-point misclassification
-after division by ten.
+## Prior correction
 
-Numerical checks compare HMM likelihoods with exhaustive enumeration through
-six months and three regimes, compare gradients with finite differences and
-native/NUMBA evaluation, check backward samples against exact marginals, and
-check observation densities, masking, kernel covariance and conditional forecasts.
-The factor and kernel forecast tests compare Monte Carlo means with independent
-analytic lognormal-mixture calculations. Finite kernel-truncation and
-known-parameter count-calibration outputs are in
-[the numerical audit](checks/stage7-numerics-20261021/numerics.json).
-Across 72 widths from 0.25 to 18 and integer lags 0 to 120, the largest observed
-kernel-covariance discrepancy is about 0.0002384 (width 18, lag 34). This is a
-finite-grid result, not an all-width error bound. The known-parameter count
-experiment compares interval coverage with exact discrete coverage, which need
-not equal the nominal level when counts have large atoms.
+The original laws gave infinite prior rate moments and generated counts beyond
+the integer range; see the [tail finding](STAGE7_PRIOR_FINDING.md). The first
+amendment bounded the dynamic variance but left the level contribution broad.
+The second amendment centers the known-category hierarchy on the training-only
+log mean plus 0.5, with hypermean SD 1 and category scale HalfNormal(1) truncated
+to (0,2). The independently recomputed real-panel anchor is 4.301907835285142;
+4.1972994 includes the fallback and is not the nine-category anchor. Synthetic
+fits derive their own anchor from observed synthetic training counts.
 
-The full suite passed 137 tests; two additional runner tests then verified early
-rejection and checkpoint handling. Ruff and the lock check passed. The original
-five-file protocol freeze and the panel-manifest hash still match.
+The declared fallback has its own Normal level centered on its initial mean
+plus 0.5. It keeps the count likelihood, shared dynamics and forecast/scoring
+role. This is neither a point mass at zero nor an intensity floor. An all-zero
+series informs the rate, but cannot determine arbitrarily small positive rates.
+Its independent level prevents the known-category scale from directly absorbing
+that separation. Shared factors still permit indirect dependence.
 
-Hierarchical Gaussian group means are integrated out exactly: the category-level
-prior covariance is `s^2 I + hyper_sd^2 11'`. An independent quadrature check
-confirms equality with the original hierarchical prior. This improves geometry
-without changing that prior. Two earlier uncompleted engineering runs retain
-their source/data records and explicit abort records under `artifacts/stage7/`;
-they are not recovery evidence. The interrupted campaign used
-`artifacts/stage7/recovery-v3`, retaining the six independent/latent-AR controls
-from `recovery-v1`. The [geometry decision](decisions/STAGE7_GEOMETRY_20261021.md)
-records the centered factor coordinates and dense metric selected from
-computational diagnostics. Earlier factor attempts remain available as geometry
-comparisons; they are not additional independent simulated datasets.
+Stationary unit-variance factors, bounded loading/noise amplitudes, removal of
+the former 0.01 noise floor and the level revision are substantive changes to
+the original prior. The current conditional Gaussian variance envelope is 11
+before independent regime shifts; the moment argument is in the amendments.
+The original freeze and both amendments remain preserved.
 
-Known missing-BLAS, noncontiguous-dot and object-mode indexing warnings are
-recorded as performance messages after native/compiled value and gradient
-checks. Numerical warnings and all frozen convergence thresholds remain gates.
-The [fail-fast execution decision](decisions/STAGE7_FAIL_FAST_20261021.md) stops
-later attempts once a retained divergence/depth event makes admission impossible.
-Partial failed attempts are explicit and provide no recovery evidence. Accepted
-fits still require their entire four-chain budget. Processes started before
-that decision retained their original complete-attempt behavior until stopped.
+The [prior audit](checks/stage7-levels-20261021/README.md) used 2,000 trajectories
+and whole-trajectory bootstrap intervals. At zero effort the primary pilot has
+median count 68, 99.9th percentile 20,794, and zero probability 0.00838 for known
+categories. Their 95% bootstrap intervals are 65--72, 17,356--25,649 and
+0.00746--0.00919. All declared pilot gates pass. Along the initial-window effort
+trajectory the median is 65 and the 99.9th percentile 43,763; the separately
+specified longitudinal finite-simulation/envelope gate passes.
 
-Before its fits began, the deliberately zero-inflated fixture's reference mean
-was corrected to include its 30% independent zero inflation. It retains the
-unselected NB-component intensity as a separate generating target. Consequently,
-observable-mean recovery and underlying-intensity recovery answer different
-questions in that misspecified scenario; the generated observations were unchanged.
+Both tighter candidates pass the prior gates. `level_wide` fails the tail gate.
+`dynamics_wide` remains unresolved after the prescribed 8,000-trajectory repeat:
+its 99.9th percentile is 50,854 with interval 47,678--54,119 crossing the 50,000
+threshold. The original classifier's incorrect fail label is preserved with a
+correction record. These wide candidates remain labelled sensitivity stress
+cases, not admitted priors. The R=3 + iid + kernel joint prior is broader
+(q99.9 about 147,120 at reference effort); the pilot gate does not validate that
+extension. The maximum-effort/highest-regime envelope is stress-only.
 
-## Findings already established
+The generic prior-predictive Potential warning is retained. This audit uses
+innovation coordinates with proper generative priors; the ignored Potential
+is the observation likelihood, which must not condition a prior draw.
 
-The [prior-tail finding](STAGE7_PRIOR_FINDING.md) records 16 integer-range failures
-among 80,000 generated category-count draws and derives the infinite prior
-rate-scale first moment under the frozen level and factor priors. The original
-priors remain unchanged in this campaign. A documented prior amendment and
-revalidation are required before real-data proposed-model fitting.
+## Numerical correctness and computation
 
-The three independent-count fixtures passed their first four-chain budgets.
-Two of three sparse-factor cases and one completed regime case passed. The
-three latent-AR cases, remaining sparse-factor case, one severity/missingness
-case and two dispersion cases failed their diagnostic gates. The other cases
-were interrupted or unstarted; their status must not be classified as a
-diagnostic outcome. Accepted fits are conditional old-prior evidence, not
-validation of the proposed revision. No old-prior recovery claim resolves
-the prior-tail finding.
+Independent checks cover NB2 and censored mark densities, missing masks,
+endpoint classification, HMM marginalization against exhaustive enumeration
+through six months/three regimes, forward/backward state probabilities, analytic
+and finite-difference gradients, covariance and posterior forecast simulation.
+The [numerical audit](checks/stage7-numerics-20261021/numerics.json) distinguishes
+exact discrete coverage from nominal interval levels. Its finite kernel grid
+finds maximum covariance error about 0.0002384 at width 18, lag 34; this is not
+a uniform mathematical error bound over all widths/lags.
 
-The prior revision changes the model. Fresh diagnostic/recovery runs are
-required and are recorded separately. The optional iid-noise
-identification and kernel identification gates remain unresolved.
+The hierarchical Gaussian hypermean is integrated out exactly, giving
+`s_m^2 I + hyper_sd^2 11'`. Conditional Gaussian coordinates are exact changes
+of variables, with their normalized state prior and Jacobian retained. The
+working Gaussian count/mark approximation chooses coordinates only; the NB2
+and censored mark likelihoods remain unchanged. Dense independent calculations,
+finite differences and native/Numba complete-target comparisons verify both
+count and severity transformations.
 
-## Limits and next gates
+A block-tridiagonal implementation and scalar rank-one/rank-two specialization
+remove unnecessary dense operations and small-array allocations. No jitter,
+fast-math approximation or statistical tolerance was added. Near-unit
+persistence and non-contiguous arrays are tested. The first representative
+full-gradient preflight improved from about 0.00252 to 0.00111 seconds under
+concurrent load; this is not an end-to-end sampling speedup estimate.
 
-These are fixed-truth stress cases, not prior-generated SBC. Coverage over three
-datasets and correlated category-month cells cannot establish general Bayesian
-calibration. Within-fit regime probabilities are retrospective. Auxiliary-channel
-coefficients and synthetic exposure are known in the missing-channel fixture;
-it does not establish real-channel eligibility or coefficient identification.
+Computational changes and original attempts are recorded in the
+[count coordinate decision](decisions/STAGE7_COUNT_COORDINATES_20261021.md),
+[severity coordinate decision](decisions/STAGE7_SEVERITY_COORDINATES_20261021.md),
+[metric decision](decisions/STAGE7_WHITENED_METRIC_20261022.md) and
+[matched-fit decision](decisions/STAGE7_MATCHED_COUNT_REPAIRS_20261022.md).
+The matched count comparisons repeat accepted cases as well as failed ones;
+coordinates are not chosen separately by recovery scores. Figures use the
+explicit routed records and fixed seed 7101, displaying failures as failures.
 
-Stage 8 must integrate separately tested additions into production model variants
-and revalidate their combinations. Stage 9 must assess full-model inference cost.
-The six remaining named comparison systems, incident/economic eligibility and
-economic calibration remain later work. January 2024-December 2025 remains
-unscored, and the Stage 6 score tables and original Stage 2 freeze are unchanged.
+## Admission and recovery
+
+Every admitted posterior requires four complete chains, maximum R-hat below
+1.01, minimum bulk/tail ESS above 400, minimum BFMI above 0.3, finite diagnostics,
+zero retained divergences/depth saturations and no unresolved numerical warnings.
+The fixed attempts use warmup/retained draws 1000/1000, 2000/1000 and 2000/2000
+per chain, target acceptance .95/.99/.99 and depth limits 12/15/15. Early
+termination after an irreversible retained violation preserves the partial
+attempt and advances only through the prescribed schedule. Partial counts
+are lower bounds and partial chains are not recovery evidence.
+
+**Final case counts, recovery tables, sensitivity findings and component
+admission decisions are pending completion of the declared fits.** A numerical
+diagnostic pass with unresolved warnings does not count as an admitted fit.
+Interrupted engineering trials and execution errors remain separate from
+fully exhausted diagnostic schedules. The final audit must independently
+recompute diagnostics from each admitted saved posterior.
+
+The [mode diagnostic](checks/stage7-mode-diagnostic-20261022/audit.json) documents
+opposite loading/decomposition regions in unsuccessful factor/kernel attempts.
+Because the positive anchor constraint is retained, these are not exact
+sign-equivalent labelings that can be repaired by relabeling a chain. Unmixed
+chains provide no reliable posterior mode weights. No chain is discarded or
+relabeled to satisfy the admission gates.
+
+Recovery targets include operational log intensity, generating interpretation,
+expected observed counts, censored-severity location and implied covariance.
+The effort-only and threat-only interpretations can produce the same count
+likelihood; good operational recovery cannot resolve that identification issue.
+Regime probabilities inferred with full synthetic records are retrospective,
+not evidence of a successful early-warning system. The deliberately misspecified
+fixture has 30% zero inflation; its observable mean includes that reduction and
+is distinct from its underlying NB-component intensity.
+
+## Verification and limits
+
+The [test record](checks/stage7-test-suite-20261022/audit.json) contains **175
+distinct passing tests** across 20 files. Each file ran in a fresh process;
+the subsequently expanded audit file's five tests replace its earlier four.
+The interrupted single-process test invocation is not counted as passing.
+The test result is software verification, not evidence that every posterior
+converges or every component is identified.
+
+Final lint, freeze/provenance checks and the completion audit remain to be
+recorded alongside the completed posterior tables. The original Stage 2 freeze,
+Stage 5 panel and Stage 6 results remain preserved. Stage 8 production integration,
+real auxiliary-channel eligibility, economic calibration and the six remaining
+named comparison systems are outside this stage. The KEV slope and unmatched
+fallback-KEV treatment remain separately pending; synthetic fixtures with known
+auxiliary coefficients do not resolve them. January 2024--December 2025 remains
+unscored.
