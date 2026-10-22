@@ -29,9 +29,14 @@ def fixture(folder, accepted=False):
     attempts = []
     for index, (warmup, draws, target, depth) in enumerate(
             [(1000, 1000, .95, 12), (2000, 1000, .99, 15), (2000, 2000, .99, 15)]):
+        diagnostic = {'accepted': accepted}
+        if accepted:
+            diagnostic.update(all_diagnostics_finite=True, max_rhat=1., min_bulk_ess=1000.,
+                              min_tail_ess=1000., min_bfmi=.8, divergences=0,
+                              tree_depth_saturations=0)
         attempts.append(dict(retry=index, warmup=warmup, draws=draws, chains=4,
                              target_accept=target, max_treedepth=depth,
-                             accepted=accepted, diagnostics={'accepted': accepted},
+                             accepted=accepted, diagnostics=diagnostic,
                              unresolved_warnings=[]))
         if accepted:
             break
@@ -72,3 +77,10 @@ def test_route_cannot_read_outside_project(tmp_path):
     with pytest.raises(ValueError, match='escapes'):
         AUDIT['routed_folder']({'primary': {'case': '../elsewhere'}},
                                'primary', 'case', 'unused', tmp_path)
+
+
+def test_reported_acceptance_cannot_override_failed_bfmi_gate(tmp_path):
+    record = fixture(tmp_path, accepted=True)
+    record['attempts'][0]['diagnostics']['min_bfmi'] = .25
+    with pytest.raises(ValueError, match='diagnostic gates'):
+        check(tmp_path, record)

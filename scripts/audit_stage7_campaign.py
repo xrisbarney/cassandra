@@ -15,7 +15,7 @@ from cyber_threat_modelling.models.stage7_priors import (
 from cyber_threat_modelling.provenance import file_hash
 
 
-def checked_run(folder, candidate, scenario, seed, activation):
+def checked_run(folder, candidate, scenario, seed, activation, recompute=False):
     result = json.loads((folder/'result.json').read_text())
     run = json.loads((folder/'run.json').read_text())
     options = result['options']
@@ -43,6 +43,17 @@ def checked_run(folder, candidate, scenario, seed, activation):
                          ['warmup', 'draws', 'target_accept', 'max_treedepth'])
         if observed != budgets[index] or attempt['chains'] != 4:
             raise ValueError(f'Changed sampling budget: {folder}')
+        diagnostic = attempt['diagnostics']
+        numerical_pass = bool(
+            diagnostic.get('all_diagnostics_finite', False)
+            and diagnostic['max_rhat'] < 1.01
+            and diagnostic['min_bulk_ess'] > 400 and diagnostic['min_tail_ess'] > 400
+            and diagnostic['min_bfmi'] > .3 and diagnostic['divergences'] == 0
+            and diagnostic['tree_depth_saturations'] == 0
+        )
+        if (diagnostic['accepted'] != numerical_pass or
+                attempt['accepted'] != (numerical_pass and not attempt['unresolved_warnings'])):
+            raise ValueError(f'Admission does not follow diagnostic gates: {folder}')
     if result['status'] == 'accepted':
         if len(admitted) != 1 or not admitted[0]['diagnostics']['accepted']:
             raise ValueError(f'Inconsistent admission: {folder}')
@@ -56,6 +67,18 @@ def checked_run(folder, candidate, scenario, seed, activation):
         with xr.open_dataset(folder/f'posterior_{retry}.nc', group='posterior') as posterior:
             if posterior.sizes['chain'] != 4 or posterior.sizes['draw'] != budgets[retry][1]:
                 raise ValueError(f'Incomplete accepted posterior: {folder}')
+        if recompute:
+            import arviz as az
+            import numpy as np
+
+            from cyber_threat_modelling.models.bayesian_controls import diagnostic_report
+
+            idata = az.from_netcdf(folder/f'posterior_{retry}.nc')
+            actual, _ = diagnostic_report(idata, budgets[retry][3])
+            idata.close()
+            for key, expected in admitted[0]['diagnostics'].items():
+                if not np.isclose(actual[key], expected, rtol=1e-10, atol=1e-10):
+                    raise ValueError(f'Recomputed diagnostic differs ({key}): {folder}')
     elif result['status'] == 'failed_diagnostic_gate':
         if admitted or len(result['attempts']) != 3 or (folder/'recovery.json').exists():
             raise ValueError(f'Incomplete or mislabelled failed case: {folder}')
@@ -69,6 +92,7 @@ def checked_run(folder, candidate, scenario, seed, activation):
         'original_truth_sha256': run['truth_original_coordinates_sha256'],
         'source_control': run['source_control'],
         'options': options,
+        'accepted_diagnostics_recomputed': recompute and result['status'] == 'accepted',
         'compute_thread_policy': run.get('compute_thread_policy', 'original library defaults'),
     }
 
@@ -91,6 +115,7 @@ def main():
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--routing', type=Path,
                         help='Explicit replacement routes and preserved earlier attempts.')
+    parser.add_argument('--recompute-diagnostics', action='store_true')
     args = parser.parse_args()
     routing = json.loads(args.routing.read_text()) if args.routing else {}
     primary_keys = {f'{name}/{seed}' for name in SCENARIOS for seed in [7101, 7102, 7103]
@@ -98,7 +123,9 @@ def main():
     sensitivity_keys = {f'{candidate}/{name}/7101' for candidate in CANDIDATES
                         if candidate != 'primary'
                         for name in ['factors_sparse', 'representative', 'fallback_zero']}
-    for campaign, expected in [('primary', primary_keys), ('sensitivity', sensitivity_keys)]:
+    severity_keys = {f'severity_missing/{seed}' for seed in [7101, 7102, 7103]}
+    for campaign, expected in [('primary', primary_keys), ('sensitivity', sensitivity_keys),
+                               ('severity_coordinates', severity_keys)]:
         if set(routing.get(campaign, {})) - expected:
             raise ValueError(f'Unknown {campaign} routing keys.')
     activation = verify_activation(Path.cwd(), CURRENT_PRIOR_ID)
@@ -109,7 +136,8 @@ def main():
                 continue
             folder = routed_folder(routing, 'primary', f'{scenario}/{seed}',
                                    args.primary/f'{scenario}-{seed}', Path.cwd())
-            record = checked_run(folder, 'primary', scenario, seed, activation)
+            record = checked_run(folder, 'primary', scenario, seed, activation,
+                                 args.recompute_diagnostics)
             record['campaign'] = 'primary'
             records.append(record)
             primary[scenario, seed] = record
@@ -119,18 +147,23 @@ def main():
         for scenario in ['factors_sparse', 'representative', 'fallback_zero']:
             folder = routed_folder(routing, 'sensitivity', f'{candidate}/{scenario}/7101',
                                    args.sensitivity/candidate/f'{scenario}-7101', Path.cwd())
-            record = checked_run(folder, candidate, scenario, 7101, activation)
+            record = checked_run(folder, candidate, scenario, 7101, activation,
+                                 args.recompute_diagnostics)
             record['campaign'] = 'sensitivity'
             records.append(record)
     # The predeclared repair continues beyond seed 7101 only if that fit passes.
-    first = checked_run(args.severity_repair/'severity_missing-7101', 'primary',
-                        'severity_missing', 7101, activation)
+    first_folder = routed_folder(routing, 'severity_coordinates', 'severity_missing/7101',
+                                 args.severity_repair/'severity_missing-7101', Path.cwd())
+    first = checked_run(first_folder, 'primary', 'severity_missing', 7101, activation,
+                        args.recompute_diagnostics)
     first['campaign'] = 'severity_coordinates'
     records.append(first)
     if first['status'] == 'accepted':
         for seed in [7102, 7103]:
-            record = checked_run(args.severity_repair/f'severity_missing-{seed}', 'primary',
-                                 'severity_missing', seed, activation)
+            folder = routed_folder(routing, 'severity_coordinates', f'severity_missing/{seed}',
+                                   args.severity_repair/f'severity_missing-{seed}', Path.cwd())
+            record = checked_run(folder, 'primary', 'severity_missing', seed, activation,
+                                 args.recompute_diagnostics)
             record['campaign'] = 'severity_coordinates'
             records.append(record)
     for record in records:
@@ -167,6 +200,7 @@ def main():
                    for name in ['primary', 'sensitivity', 'severity_coordinates']},
         'runs': records, 'held_out_scoring_enabled': False,
         'routing_sha256': file_hash(args.routing) if args.routing else None,
+        'recompute_diagnostics_requested': args.recompute_diagnostics,
         'earlier_attempts': earlier,
         'interpretation': 'Completion includes explicit diagnostic failures. Sensitivity and '
                           'coordinate refits are not independent generated datasets.',

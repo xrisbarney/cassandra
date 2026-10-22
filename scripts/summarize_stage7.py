@@ -41,7 +41,7 @@ def main():
             raise ValueError(f'Run directory escapes project: {folder}')
         path = folder / 'result.json'
         record = json.loads(path.read_text())
-        if (record['options']['prior_candidate'] != args.candidate
+        if (record['options'].get('prior_candidate', 'primary') != args.candidate
                 or record['options']['scenario'] != name or record['options']['seed'] != seed):
             raise ValueError(f'Run does not match requested case: {folder}')
         for relative, digest in record['artifacts'].items():
