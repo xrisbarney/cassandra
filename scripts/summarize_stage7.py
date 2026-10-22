@@ -99,11 +99,13 @@ def main():
     pd.DataFrame(recoveries).to_csv(args.output/'recovery.csv', index=False)
     pd.DataFrame(parameters).to_csv(args.output/'parameters.csv', index=False)
     write_json(args.output/'audit.json', {
-        'runs': audit, 'expected_datasets': len(expected),
+        'runs': audit, 'expected_cases': len(expected),
         'accepted': sum(r['status'] == 'accepted' for r in audit),
         'held_out_scoring_enabled': False, 'real_data_read': False,
         'routing_sha256': file_hash(args.routing) if args.routing else None,
-        'interpretation': 'Fixed-truth stress/recovery cases; not SBC or real-data validation.',
+        'interpretation': 'Fixed-truth stress/recovery cases; not SBC or real-data validation. '
+                          'Same-seed effort variants reuse observations, so the case count '
+                          'is not a count of independent replications.',
         'artifacts': {p.name: file_hash(p) for p in args.output.iterdir() if p.is_file()},
     })
 

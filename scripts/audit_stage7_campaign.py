@@ -3,7 +3,10 @@
 import argparse
 import json
 from collections import Counter
+from hashlib import sha256
 from pathlib import Path
+
+import numpy as np
 
 from cyber_threat_modelling.data.store import write_json
 from cyber_threat_modelling.evaluation.synthetic import SCENARIOS
@@ -69,7 +72,6 @@ def checked_run(folder, candidate, scenario, seed, activation, recompute=False):
                 raise ValueError(f'Incomplete accepted posterior: {folder}')
         if recompute:
             import arviz as az
-            import numpy as np
 
             from cyber_threat_modelling.models.bayesian_controls import diagnostic_report
 
@@ -141,6 +143,17 @@ def main():
             record['campaign'] = 'primary'
             records.append(record)
             primary[scenario, seed] = record
+    count_panels = {}
+    for record in primary.values():
+        with np.load(Path(record['directory'])/'data.npz') as observed:
+            mask = observed['mask_N'].astype(bool)
+            counts = np.where(mask, observed['N'], 0).astype('<i8')
+            digest = sha256(np.asarray(counts.shape, dtype='<i8').tobytes()
+                            + mask.astype('u1').tobytes() + counts.tobytes()).hexdigest()
+        record['observed_count_fingerprint'] = digest
+        count_panels.setdefault(digest, []).append({
+            'scenario': record['scenario'], 'seed': record['seed'],
+        })
     for candidate in CANDIDATES:
         if candidate == 'primary':
             continue
@@ -208,7 +221,9 @@ def main():
     args.output.mkdir(parents=True, exist_ok=False)
     write_json(args.output/'audit.json', {
         'prior_id': CURRENT_PRIOR_ID, 'activation': activation,
-        'complete': True, 'unique_primary_datasets': len(primary),
+        'complete': True, 'primary_cases': len(primary),
+        'distinct_observed_training_count_panels': len(count_panels),
+        'observed_training_count_panel_groups': count_panels,
         'counts': counts, 'verification_groups_overlap': overlapping_groups,
         'runs': records, 'held_out_scoring_enabled': False,
         'routing_sha256': file_hash(args.routing) if args.routing else None,
@@ -217,10 +232,14 @@ def main():
         'interpretation': 'Completion includes explicit diagnostic failures. Sensitivity and '
                           'coordinate refits are not independent generated datasets. '
                           'Severity-coordinate verification may reference the same files as '
-                          'routed primary cases; runs contains each directory only once.',
+                          'routed primary cases; runs contains each directory only once. '
+                          'Effort variants share observations. Count-panel fingerprints show '
+                          'reuse; distinct fingerprints are not a claim of independent '
+                          'replication or simulation-based calibration.',
         'source_sha256': file_hash(Path(__file__)),
     })
-    print(json.dumps({'complete': True, 'fits': len(records), 'datasets': len(primary)}))
+    print(json.dumps({'complete': True, 'fits': len(records), 'primary_cases': len(primary),
+                      'distinct_count_panels': len(count_panels)}))
 
 
 if __name__ == '__main__':

@@ -1,0 +1,230 @@
+{
+  "all_passed": true,
+  "files": 20,
+  "mode": "Every test file run in a fresh process. The audit file was rerun after its additional gate test; its five current tests replace the earlier four in this count.",
+  "note": "The solver optimization was covered by its focused six checks and then by the complete block, count and severity files in the isolated suite. The interrupted monolithic suite is not counted as passing.",
+  "passed_distinct_tests": 175,
+  "raw_suite_result_sha256": "e9e0a3feb9bee8644fd399f9d28387cc303e8d51d8494bb44ebb52a72b98a604",
+  "records": [
+    {
+      "exit_code": 0,
+      "file": "tests/test_ar1_transform.py",
+      "log": "artifacts/stage7-test-files-v1/test_ar1_transform.log",
+      "log_sha256": "3aee9e242b1266bb221dd014f36074e853694a3b0d26c4628decf5c9c6bed43e",
+      "passed": 3,
+      "sha256": "0553803179914a2315044bad2678823bafd1c36752b6e85d6c9d9f391a9c9793"
+    },
+    {
+      "exit_code": 0,
+      "file": "tests/test_backtest.py",
+      "log": "artifacts/stage7-test-files-v1/test_backtest.log",
+      "log_sha256": "695ccb4d34c6bdc89f38a06b8f1445fe1b631b957cf139ba9dcef50bdd1ee847",
+      "passed": 8,
+      "sha256": "91297e93f775ce230dcbd6ec04c9fd7f3b63282af0e7c2220c99da169b1fb089"
+    },
+    {
+      "exit_code": 0,
+      "file": "tests/test_bayesian_controls.py",
+      "log": "artifacts/stage7-test-files-v1/test_bayesian_controls.log",
+      "log_sha256": "fe882e807c9947aa2e4380bdbf823cbf2c14b393ed41602209ed9c1a57ae8888",
+      "passed": 18,
+      "sha256": "86afde445390eea63157a613df5d372fed55f852350281906b8c4b6c4b5328bf"
+    },
+    {
+      "exit_code": 0,
+      "file": "tests/test_count_forecasts.py",
+      "log": "artifacts/stage7-test-files-v1/test_count_forecasts.log",
+      "log_sha256": "23f30147d659c82fe3589384ed72023f0590a167b3473c1c115c059fb1de9ffd",
+      "passed": 18,
+      "sha256": "f9eec67811205cd9e5b578309714559ba9c5f3be4ef181a3acde57fe926283df"
+    },
+    {
+      "exit_code": 0,
+      "file": "tests/test_data.py",
+      "log": "artifacts/stage7-test-files-v1/test_data.log",
+      "log_sha256": "d5562375a9bbb2716cf1aefc376dfad59fd44a786a0014314660ac5ba57aed40",
+      "passed": 20,
+      "sha256": "9764088afff216b9a6d55f88888a56875f0252d86b96fe54cef9d1c5cce092ea"
+    },
+    {
+      "exit_code": 0,
+      "file": "tests/test_independent_controls.py",
+      "log": "artifacts/stage7-test-files-v1/test_independent_controls.log",
+      "log_sha256": "b49436e929b6802ed921edd82f4f0f8578766602ea488a318bd91a853a4b88c1",
+      "passed": 4,
+      "sha256": "a0a265cb94a4561aedab5b47dac35baa300c3c70fcff1992dc9bdfc5768bed3f"
+    },
+    {
+      "exit_code": 0,
+      "file": "tests/test_observation_nb.py",
+      "log": "artifacts/stage7-test-files-v1/test_observation_nb.log",
+      "log_sha256": "5966cd6e46e6a62e3ed011a1166d7bd09babe1522ea8ea9ab4ea28388fb92be2",
+      "passed": 5,
+      "sha256": "3e75ad50466af6914fb93a4e355b037edcb00f946169c2467accaa88ad3edf21"
+    },
+    {
+      "exit_code": 0,
+      "file": "tests/test_panels.py",
+      "log": "artifacts/stage7-test-files-v1/test_panels.log",
+      "log_sha256": "0f1073b1726599f8914051b4d4e3d6815cee248269868b12fa6f643660c487bf",
+      "passed": 11,
+      "sha256": "ab148e211765aed7f6c98ee25883a935aca21f82422e25f4cfa7a34fbfe25114"
+    },
+    {
+      "exit_code": 0,
+      "file": "tests/test_reissue.py",
+      "log": "artifacts/stage7-test-files-v1/test_reissue.log",
+      "log_sha256": "86e72dc333bb1db2e7cebb947fc45bdb57176a069c98ded5f8c28db626f6fa04",
+      "passed": 4,
+      "sha256": "4a4a323be7d70dcdc334c1e0561294cc215f0f1c2ddf5d2ed8b5167bf0cadf76"
+    },
+    {
+      "exit_code": 0,
+      "file": "tests/test_scaffold.py",
+      "log": "artifacts/stage7-test-files-v1/test_scaffold.log",
+      "log_sha256": "b40a3c6f4ecfff55c90681728f6648b7d125da5952f694e34943cb131760af0d",
+      "passed": 17,
+      "sha256": "0a8b139ca7f09ef01ee28f321a1eac1dd104a9008b4b6f0b8fc618ba7cc16c45"
+    },
+    {
+      "exit_code": 0,
+      "file": "tests/test_stage7_amended.py",
+      "log": "artifacts/stage7-test-files-v1/test_stage7_amended.log",
+      "log_sha256": "6f9dd77cd21eef6808b11c5ae8827ba317f6268982a57756ca97c306ad75c595",
+      "passed": 12,
+      "sha256": "655e680f766d7bd5c65784cd2310cb9d2e552ed39cf17a4602b188ead3b5cb75"
+    },
+    {
+      "exit_code": 0,
+      "file": "tests/test_stage7_block_coordinates.py",
+      "log": "artifacts/stage7-test-files-v1/test_stage7_block_coordinates.log",
+      "log_sha256": "afca03ec22bef58940f6138ed8262b4b5a2864cbfc31ec2af2bcdd31e1933c92",
+      "passed": 4,
+      "sha256": "b01370df64f91e5fcd9377add8461f187e32cec65d07041581d66469fa9feb1a"
+    },
+    {
+      "exit_code": 0,
+      "file": "tests/test_stage7_campaign_audit.py",
+      "log": "artifacts/stage7-audit-final-tests.log",
+      "log_sha256": "db02a3a65cbddffe7258a09b12407badd1e04605c3a8d084ffa04956a8d9899b",
+      "passed": 5,
+      "sha256": "88cfa5a9f800626db1bbdcc69c306b8e66c2f0a0388dbc44cfcc8cb1d61aa9a4",
+      "superseded_verification": {
+        "exit_code": 0,
+        "file": "tests/test_stage7_campaign_audit.py",
+        "log_sha256": "0a9151b01b6e265fc9c301ade548cb997cac2e811f068171df15470ac7877ad4",
+        "passed": 4,
+        "sha256": "969cdd4dcdd38370f479c2974876f356fb98a91c325815610bbfbf88e56af1dd"
+      }
+    },
+    {
+      "exit_code": 0,
+      "file": "tests/test_stage7_count_coordinates.py",
+      "log": "artifacts/stage7-test-files-v1/test_stage7_count_coordinates.log",
+      "log_sha256": "9876c02503c6de129eda8dc7c6624ec5879d33c37c0bf291dc60cfe2fc334f2b",
+      "passed": 2,
+      "sha256": "ba309c45bb3de0cf2ca039eac1dc9f8727f5f5bbda61e006637780d0efa5c191"
+    },
+    {
+      "exit_code": 0,
+      "file": "tests/test_stage7_levels.py",
+      "log": "artifacts/stage7-test-files-v1/test_stage7_levels.log",
+      "log_sha256": "ae9df0d7adf41aef68957b78e2c756f0ddc3d0e6f2f63730c6df5b5434385d9e",
+      "passed": 9,
+      "sha256": "a962e10868881698a61505d12c1967794ee6c4caf33046d372f445d59e422b4e"
+    },
+    {
+      "exit_code": 0,
+      "file": "tests/test_stage7_severity_coordinates.py",
+      "log": "artifacts/stage7-test-files-v1/test_stage7_severity_coordinates.log",
+      "log_sha256": "d860a0d4b94f32d5ed073f2c58e54cd506ac51bba3cdc1b5073cb205169749ef",
+      "passed": 2,
+      "sha256": "b8a858ef43d9cbb2ec51d051f117dddc43c2acf7c9d5cc077b69965c4186a7ed"
+    },
+    {
+      "exit_code": 0,
+      "file": "tests/test_synthetic_components.py",
+      "log": "artifacts/stage7-test-files-v1/test_synthetic_components.log",
+      "log_sha256": "75b3ec21775bb8d2dc8d2fc7c0afa0425e8b26ebd79fa8e1af1b2d7c0d380c10",
+      "passed": 22,
+      "sha256": "85c4b448bfdce06cdcaf9ae6acaf153549b4cb426c3216f606dd61979eb1c0f3"
+    },
+    {
+      "exit_code": 0,
+      "file": "tests/test_synthetic_forecasts.py",
+      "log": "artifacts/stage7-test-files-v1/test_synthetic_forecasts.log",
+      "log_sha256": "12b2db303b0f3f2c4903e72aa51da6c7bcfa3b63579de4b8f919c205178b9293",
+      "passed": 4,
+      "sha256": "e7f07f776952ed8114db08d8145b7f79e09e1fe5854570b825d780326a76e814"
+    },
+    {
+      "exit_code": 0,
+      "file": "tests/test_synthetic_runner.py",
+      "log": "artifacts/stage7-test-files-v1/test_synthetic_runner.log",
+      "log_sha256": "eabeea1e143592978f8814e0d1895cb5afc35e9b365f0ba26838d124a903e065",
+      "passed": 2,
+      "sha256": "6824db77d523a340196b8d21b4b5c7a237c17bd640ed626d68414f3888592465"
+    },
+    {
+      "exit_code": 0,
+      "file": "tests/test_zero_boundary.py",
+      "log": "artifacts/stage7-test-files-v1/test_zero_boundary.log",
+      "log_sha256": "426f6debc997124d4e283d7d5fbc2ae607a213e48af0af9bc78e07aceb0a72fb",
+      "passed": 5,
+      "sha256": "8726adb103d08dd3e546e03bc1d32baad4f97d371c40b2a25e001d0b9cee2d19"
+    }
+  ],
+  "source_control": {
+    "dirty": false,
+    "revision": "bcdafe24c7ccf4915a09d0c72c16aaa0a6dd8a54",
+    "status": "available"
+  },
+  "source_sha256": {
+    "src/cyber_threat_modelling/__init__.py": "a365c84764dda6c2a1d2f23a60b695fad2bc1f1f96ca753160b48fa86812f510",
+    "src/cyber_threat_modelling/__main__.py": "307299fda7b77d22c64cb51430ec75e5f59d78e9c948786afb3b2544fe45e4b7",
+    "src/cyber_threat_modelling/cli.py": "6f48feb5ed5570f522955c067d4d986ce375e23bf071e807018fd8c67a7f9f75",
+    "src/cyber_threat_modelling/config.py": "6acd3a1575636a59d802b16a7f44bf882f932b7b8c969a1c48d2dede93f1dd06",
+    "src/cyber_threat_modelling/data/__init__.py": "72edef16e28ab678d0ffcd0bb74758685c228fc831c7fe60183c85d8104470e6",
+    "src/cyber_threat_modelling/data/audit.py": "32003ff51046fa5649d0a0dbd9b81de48a25fca0419711a5dab23857aeb32a89",
+    "src/cyber_threat_modelling/data/economics.py": "7d227c5a03c3d9e178501a1c4928871c21fbe9f1cd0a20cd898e613eeff04003",
+    "src/cyber_threat_modelling/data/history.py": "30e1a5bad35c8d9a87f088ceea0421164c93e6412734d0f0e8a6094453bf586f",
+    "src/cyber_threat_modelling/data/nvd.py": "241f92b018873dd62c183ea1e35bc2055f43e3812002d575edfc3b9dc0eaf034",
+    "src/cyber_threat_modelling/data/sec.py": "9adb45f889a7283c169c6469f5d2e2fdb11cdcfece6a3686344f3f083004658c",
+    "src/cyber_threat_modelling/data/signals.py": "ec59a8a24cbe8274ddcf0be1f186412b48d943faca2871e841ea0579076cb375",
+    "src/cyber_threat_modelling/data/store.py": "2df8fc5608ca0e24ac35c12241d716459d4f1e756487cc359b3d632ad2a3f7ce",
+    "src/cyber_threat_modelling/economics/__init__.py": "c73b4ff032284d1260b13324ffc69789c59a4eab138331f55afb69f3d2d5b232",
+    "src/cyber_threat_modelling/evaluation/__init__.py": "32b970481d63a50f9433ca70e0125c40bfa4f4f2dfb809c20d06354e2f8a97d4",
+    "src/cyber_threat_modelling/evaluation/backtest.py": "19fbb714f9ab51a32817432036fa9bf16eb8f3f125cc959c2c54fec240c5d370",
+    "src/cyber_threat_modelling/evaluation/control_checks.py": "d733a2105c9c56b3cc3f0db53b149067126efa5b37816fb0e2ce96fad4d6e223",
+    "src/cyber_threat_modelling/evaluation/reissue.py": "91e2a6ae40a515b1dc293e4a3761c29ca7b92d8485f0eddf140d700d035d4f1c",
+    "src/cyber_threat_modelling/evaluation/scores.py": "d68d1e1e25462dc5f7ff2948abb7ddc3b80f6dfaeca251f33e4f3e2f9cf4c824",
+    "src/cyber_threat_modelling/evaluation/synthetic.py": "a43f4183345762257e92b38f393676651ce9bdd36d127930977088f1a608bf51",
+    "src/cyber_threat_modelling/evaluation/synthetic_recovery.py": "dfb87e3683c9e3fd1543bf5a24e0900c764d9a89c39d819ee21ab0a8f7f9a818",
+    "src/cyber_threat_modelling/features/__init__.py": "72f05635dcf6149500afbc9ba3369318ff95b172d15b9b267579804a9a6ec6f0",
+    "src/cyber_threat_modelling/features/build.py": "b8ff24238a346f2fcb2016ce35a6981601536e506ce26cd6ddca025726993e71",
+    "src/cyber_threat_modelling/features/incidents.py": "6013dbee9f67c674781a51f2648210484a2d8410a508ee50b38d0ffcabf9a708",
+    "src/cyber_threat_modelling/features/panels.py": "43b4c55b6f69ba8ea0d937529893f9d9465cdd8c6928db323917968b1d350e4d",
+    "src/cyber_threat_modelling/features/topics.py": "0bec3b7748dbab2501208bdfd5ac64056424593a6efca74f6ba0a1322f647c99",
+    "src/cyber_threat_modelling/forecasting/__init__.py": "7ad7fbc5f27e43fc0fa3cf66fe582e2766e355c00cbcfdb04be456835cde1997",
+    "src/cyber_threat_modelling/forecasting/count_laws.py": "5bdefbf807eb4163cbdea02bca03fc013044a41664fc35552800538da5212d97",
+    "src/cyber_threat_modelling/inference/__init__.py": "976866d35c206c6ef8514821ee7ada0f6ad43e694919056c182d3960a1265b7d",
+    "src/cyber_threat_modelling/inference/hmm.py": "0e9c459bd3982ecd86c1f43887b5322c03de7973409ade22b9f7d691ff04b6b1",
+    "src/cyber_threat_modelling/models/__init__.py": "15a3242e7279d76725844a5491ee8391e4c15f024c5330277a0dae4e61ad495a",
+    "src/cyber_threat_modelling/models/ar1_transform.py": "5b6c601f0f94efd542411dd154ee41e5143ea8eeb30ed5276fff8c4d3727d53b",
+    "src/cyber_threat_modelling/models/bayesian_controls.py": "19c4bdaae4e5c5bd74537e757a1deb6e7f1b12c4f644fcc8e44ac621b1a75717",
+    "src/cyber_threat_modelling/models/block_gaussian.py": "b497916c36ec5a78586674f6abaff50f19a7f811937628e183de36fb0823f980",
+    "src/cyber_threat_modelling/models/boundaries.py": "eb736f0645d0abc91d908943ff6f499df1ae32b75c7cb9ae6891542b95bb84b6",
+    "src/cyber_threat_modelling/models/components.py": "039507ed3f80c10313285cf0fdc68818a0b25b2f28d23fd207af86e0ea9782ff",
+    "src/cyber_threat_modelling/models/control_priors.py": "1fdb2b76fff3dbb3480c6145206a5c124bc719d889c327bc827ae3ee738039e5",
+    "src/cyber_threat_modelling/models/count_baselines.py": "377431a8a70fdc84ef285b7a33ff63d40a067f7926c628779a4ed29d41338a1e",
+    "src/cyber_threat_modelling/models/gaussian_coordinates.py": "cd8db6fe4d38d82dc875d6b3db599af690147b29e1cb966008bba048aefe3188",
+    "src/cyber_threat_modelling/models/independent_controls.py": "68727fab54c8bdcace227142fb80d20575f440156f36410bafc59392c3ff6e63",
+    "src/cyber_threat_modelling/models/independent_geometry.py": "6c9efbb84e36ed3a6c74e2e548245e256d78305c3ad62dfc7807d6080f108b27",
+    "src/cyber_threat_modelling/models/observation_nb.py": "d799afd5ca58178c0581962fa2ad96ed80b6498a8dcf0c8a5b64500306a5f664",
+    "src/cyber_threat_modelling/models/ordering.py": "8469f3e7ae2f4dab5df7c21b15a428518078a41bb9ee0c92812a38e5f78aea91",
+    "src/cyber_threat_modelling/models/stage7_priors.py": "89b8e2d4166c84c0f3742a799daf75f1bf77b2688c9616236e08b7427f7ef381",
+    "src/cyber_threat_modelling/models/synthetic_state_space.py": "90ed8e75648de807628633608ddf1fc6796f9460f660e4e0be2c5561ae75dea2",
+    "src/cyber_threat_modelling/provenance.py": "b117a21e34d2ad287878ffc60d9ade061a8f3c4e0b73cd48ea6bcc5ee991402a",
+    "src/cyber_threat_modelling/reporting/__init__.py": "55a810f3a5eb1047b7a23f1fa80c565391f2ffc8b62143c5a65fab28cfd9fef6"
+  }
+}
