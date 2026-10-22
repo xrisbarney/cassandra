@@ -1,0 +1,100 @@
+{
+  "case": "reduced_representative",
+  "comparisons": [
+    {
+      "gradient_max_abs_error": 4.4168288582113746e-08,
+      "logp_abs_error": 2.2737367544323206e-12,
+      "point": "initial"
+    },
+    {
+      "gradient_max_abs_error": 6.022239062986046e-08,
+      "logp_abs_error": 1.3642420526593924e-12,
+      "point": "perturbed"
+    },
+    {
+      "gradient_max_abs_error": 4.669286042258136e-07,
+      "logp_abs_error": 5.926222002017312e-08,
+      "point": "near_unit"
+    }
+  ],
+  "declaration_sha256": "6e1b063212d39f449b1c1f0596c9df38cf415ae79d94ff584205b385ebc382bc",
+  "explicit_compile_seconds": 90.7541060000076,
+  "fixture_manifest_sha256": "981b6e3255accc60ca09a5d2c2e96b3863f26f5ad6bf34c86819af6e2c69aa39",
+  "graph_seconds": 0.7990979000023799,
+  "held_out_scoring_enabled": false,
+  "host": {
+    "compiler": {
+      "compiler": "GCC 14.2.0, MinGW-w64 12.0.0, x86_64 POSIX SEH UCRT",
+      "compiler_bin": "C:\\Users\\Chris\\AppData\\Local\\Programs\\CassandraToolchain\\14.2.0posix-12.0.0-ucrt-r3\\mingw64\\bin",
+      "compiler_binary_sha256": "f45f8fd915aecbf8a15692089dee8ebef0f210148f13ea5c1642e55376dd234c",
+      "compiler_path": "C:\\Users\\Chris\\AppData\\Local\\Programs\\CassandraToolchain\\14.2.0posix-12.0.0-ucrt-r3\\mingw64\\bin\\g++.exe",
+      "release": "14.2.0posix-12.0.0-ucrt-r3",
+      "sha256": "88868d745b807f083a117ff69348d8bc021ad7389aa503379dbed1866efcaeb9",
+      "url": "https://github.com/brechtsanders/winlibs_mingw/releases/download/14.2.0posix-12.0.0-ucrt-r3/winlibs-x86_64-posix-seh-gcc-14.2.0-mingw-w64ucrt-12.0.0-r3.zip",
+      "version_output": "g++.exe (MinGW-W64 x86_64-ucrt-posix-seh, built by Brecht Sanders, r3) 14.2.0"
+    },
+    "github_run_id": null,
+    "github_sha": null,
+    "numba_cache": true,
+    "numba_fastmath": true,
+    "numba_opt": "3",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "processor": "Intel64 Family 6 Model 142 Stepping 12, GenuineIntel",
+    "python": "3.12.0 (tags/v3.12.0:0fb18b0, Oct  2 2023, 13:03:39) [MSC v.1935 64 bit (AMD64)]"
+  },
+  "median_full_target_seconds": 0.0013431000043055974,
+  "options": {
+    "categories": 10,
+    "conditional_level": false,
+    "count_parameterization": "conditional",
+    "factor_parameterization": "anchored",
+    "factors": 1,
+    "gaussian_solver": "block",
+    "kernel": false,
+    "known_auxiliary_coefficients": false,
+    "level_settings": {
+      "amplitude_multiplier": 1.0,
+      "anchor": 3.5030238822606967,
+      "candidate": "primary",
+      "fallback_anchor": null,
+      "fallback_index": null,
+      "hyper_sd": 1.0,
+      "known_indices": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "scale_sd": 1.0,
+      "scale_upper": 2.0,
+      "training_months": 108
+    },
+    "mass_matrix": "diagonal",
+    "months": 108,
+    "prior_candidate": "primary",
+    "prior_id": "anchored_levels_v2",
+    "regimes": 1,
+    "residual": "none",
+    "scenario": "representative",
+    "seed": 7101,
+    "severity_factors": 0,
+    "supplement_case": "reduced_representative"
+  },
+  "passed": true,
+  "performance_warnings": [
+    {
+      "category": "UserWarning",
+      "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\pytensor\\link\\c\\cmodule.py",
+      "lineno": 2986,
+      "message": "PyTensor could not link to a BLAS installation. Operations that might benefit from BLAS will be severely degraded.\nThis usually happens when PyTensor is installed via pip. We recommend it be installed via conda/mamba/pixi instead.\nAlternatively, you can use an experimental backend such as Numba or JAX that perform their own BLAS optimizations, by setting `pytensor.config.mode == 'NUMBA'` or passing `mode='NUMBA'` when compiling a PyTensor function.\nFor more options and details see https://pytensor.readthedocs.io/en/latest/troubleshooting.html#how-do-i-configure-test-my-blas-library"
+    }
+  ],
+  "regeneration_matches": true,
+  "unresolved_warnings": []
+}

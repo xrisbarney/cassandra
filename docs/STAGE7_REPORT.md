@@ -1,7 +1,7 @@
 # Stage 7 synthetic validation record
 
 Status, 2026-10-22: **original 55-case campaign complete; pilot validation failed;
-bounded repair supplement planned; Stage 8 closed**.
+bounded repair supplement activated; Stage 8 closed**.
 The active laws are `anchored_levels_v2`. The primary prior-plausibility gates
 pass. A fresh full-suite run passes all 222 tests across 29 files with unchanged
 source hashes. All 43 primary and 12 sensitivity cases have verified terminal
@@ -9,7 +9,8 @@ results. The combined campaign has 30 numerical passes, 27 recovery-eligible
 cases, 25 diagnostic failures and three exploration exclusions. The
 [completion audit](simulations/stage7-complete-20261022/README.md) preserves
 every case. The [bounded supplement](STAGE7_REPAIR_SUPPLEMENT.md) specifies the
-next convergence investigation; its fits have not started. No real-data
+next convergence investigation; its [execution record](STAGE7_SUPPLEMENT_REPORT.md)
+tracks the separate bounded round. No real-data
 proposed-model fitting or January 2024--December 2025 scoring has started.
 
 ## Scope and evidence

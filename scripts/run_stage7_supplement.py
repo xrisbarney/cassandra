@@ -194,6 +194,8 @@ def fit(root, case, output):
         idata.to_netcdf(output/'posterior.nc')
     serialization_seconds = time.perf_counter() - start
     accepted = diagnostic['accepted'] and not unresolved
+    diagnostic = {k: None if isinstance(v, float) and not np.isfinite(v) else v
+                  for k, v in diagnostic.items()}
     write_json(output/'result.json', {
         'case': case, 'status': 'accepted' if accepted else 'failed_diagnostic_gate',
         'options': options, 'attempt_count': 1, 'budget': run['budget'],
