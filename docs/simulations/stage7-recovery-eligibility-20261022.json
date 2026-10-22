@@ -1,0 +1,19 @@
+{
+  "decision": "docs/decisions/STAGE7_RECOVERY_ELIGIBILITY_20261022.md",
+  "recovery_exclusions": [
+    {
+      "directory": "artifacts/stage7/recovery-v6/kernel_present-7101",
+      "result_sha256": "9a81911821eda2daaf0e945d93114ecee31e4d4232eb750ddcd2e0aecc50c0ea",
+      "evidence": "docs/checks/stage7-kernel-mode-20261022/audit.json",
+      "evidence_sha256": "b8dffa9dcf197c3517a0097a3d62d7fca6bf4e17c5e5a80f6ca168ff6d77d034",
+      "reason": "Numerically admitted attempt remains in one known retained orientation; global exploration unresolved."
+    },
+    {
+      "directory": "artifacts/stage7/count-block-v3/primary/effort_proxy-7102",
+      "result_sha256": "eb0a132e051b503679d1730f66bfc6bee475fb5be1825cf44ef4dca47e908346",
+      "evidence": "docs/checks/stage7-proxy-mode-20261022/audit.json",
+      "evidence_sha256": "6fffa7b4a84eac32daedec0acef3ccdf511294ec374b76ad2345e62d71d797b1",
+      "reason": "Numerically admitted attempt remains in one known retained orientation; global exploration unresolved."
+    }
+  ]
+}

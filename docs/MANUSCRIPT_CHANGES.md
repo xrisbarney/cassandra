@@ -231,3 +231,25 @@ malicious activity from disclosure throughput. Similarly, fitted regime
 probabilities using the complete synthetic history are retrospective and do not
 validate an early-warning claim. Preserve these distinctions in the abstract,
 methodology and eventual evaluation discussion.
+
+### Noise separation and posterior exploration (2026-10-22)
+
+The [iid conditional-coordinate decision](decisions/STAGE7_IID_COORDINATES_20261022.md)
+is a computational change of variables, not a new prior or likelihood. The
+six conditional noise-separation fits pass numerical diagnostics, but sparse
+observations leave log dispersion close to its prior. Report the positive
+tau/log(psi) tradeoff and the favorable fixed-level conditioning explicitly;
+see the [noise analysis](simulations/stage7-noise-20261022/README.md). This supports
+keeping iid noise optional and the initial pilot parsimonious, not a claim
+that its two noise components are generally identified.
+
+Numerical admission alone is insufficient when an earlier retained attempt
+reveals another orientation that an admitted retry does not explore. The
+[recovery-eligibility decision](decisions/STAGE7_RECOVERY_ELIGIBILITY_20261022.md)
+requires separate numerical and recovery counts, with evidence-bound exclusions.
+Do not call the existing proxy or kernel mode-conditional recovery a verified
+marginal posterior result. The [working sign chart](decisions/STAGE7_SIGN_GAUGE_20261022.md)
+preserves the rank-one target and canonical positive-first-loading convention;
+it changes the smooth sampling coordinates, not the reported model or category
+order. Its actual exploration results must be reported after the verification
+and refits, without inferring mode probabilities from the old chain split.
