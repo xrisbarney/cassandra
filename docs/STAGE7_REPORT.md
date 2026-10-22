@@ -1,4 +1,4 @@
-Ã¯Â»Â¿# Stage 7 synthetic validation record
+# Stage 7 synthetic validation record
 
 Status, 2026-10-22: **posterior campaign in progress; not yet complete**.
 The active laws are `anchored_levels_v2`. The primary prior-plausibility gates
