@@ -1,0 +1,4253 @@
+{
+  "activation": {
+    "authority": "User: okay, treat all and proceed; take stage 7 to the end",
+    "files": [
+      {
+        "path": "docs/amendments/STATE_SPACE_LEVELS_20261021.md",
+        "sha256": "7b3c340989576750de28504503af52e86db317e4df7f372914ea2d4e70c99d16"
+      },
+      {
+        "path": "docs/amendments/STATE_SPACE_PRIORS_ACTIVATION_20261021.json",
+        "sha256": "8aeecc526dee9dfd86c7c51037f7d35117cdefbaaa682cff70fe92e4c5895e39"
+      }
+    ],
+    "held_out_scoring_enabled": false,
+    "parent_freeze_sha256": "7597b76276b837f8db9bc2baff63cb035e14cdfa8656885c782795d38cb598e7",
+    "path": "docs/amendments/STATE_SPACE_LEVELS_20261021.json",
+    "prior_id": "anchored_levels_v2",
+    "sha256": "9aeaa185fdfffd4cca9589236a9154fccac5a85a1d9c28c47e4ff6915f39b7ec",
+    "status": "active"
+  },
+  "complete": true,
+  "counts": {
+    "primary": {
+      "accepted": 28,
+      "failed_diagnostic_gate": 15
+    },
+    "sensitivity": {
+      "accepted": 2,
+      "failed_diagnostic_gate": 10
+    },
+    "severity_coordinates": {
+      "accepted": 3
+    }
+  },
+  "distinct_observed_training_count_panels": 37,
+  "earlier_attempts": [
+    {
+      "artifacts": {
+        "data.npz": "2f16c14da6f108731a36c429e2d532a6c4f7ab343a4e989a3cda9c5473faef19",
+        "gradient_timing.json": "d7b96a9bc9288318763a0ec653909f2b9de462976dd23e5d93c05311de693762",
+        "heartbeat.json": "25719bde40a8c2336acd6496409ff99b017269662ebb0e2ff50ec2ef8d6c3fd5",
+        "interruption.json": "7d35d5e4236030ea9bab5d174f6e84206ab8292e8ad6e24caa473be48707d56a",
+        "run.json": "40d2c5b52e8b6e1ea9a07c7ffb5a94992d267e4b3a93fc11bdaec54dfad60aa6",
+        "truth.npz": "92e92d139ba48feaf06569b34db715a2fc9c58870b6aeb5a6dbc76f3628945af",
+        "truth_original_coordinates.npz": "9fca1f6c6e33992fe0a0bb22a0599a87ac6aa677385e5b6873808e7e12fd3eec"
+      },
+      "directory": "artifacts/stage7/count-block-diagonal-v1/primary/representative-7101",
+      "status": "interrupted"
+    },
+    {
+      "artifacts": {
+        "data.npz": "764d2e6d26f0541bd1cab1c4c01a6c872c25be8aeee724faeabda6403f035b2c",
+        "execution_failure.json": "36ea90a5a4bf7c1ddec6c1eda85ef9e9266d492e4c1b0b1e017b472cae75a1b9",
+        "run.json": "455b37668f9647fcdd515caab2bb29932715fd57bc07992950ef4c4306b2bcbd",
+        "truth.npz": "7100a323810afc6fc49ec9be3d76f10023a2ebf536b3569c40ae4336b067f96a",
+        "truth_original_coordinates.npz": "f76de2bd2974630b626d37b5c619e0f9a13ec583a15b62e80cea9fc3b7ea156f"
+      },
+      "directory": "artifacts/stage7/count-block-v2/primary/effort_proxy-7101",
+      "status": "execution_failed"
+    },
+    {
+      "artifacts": {
+        "data.npz": "2f16c14da6f108731a36c429e2d532a6c4f7ab343a4e989a3cda9c5473faef19",
+        "execution_failure.json": "6e6ba86a5ac19acd9e91984e4d817a953a81e6be2c70544da9b81cbcfa6e0075",
+        "gradient_timing.json": "dee6ef8752b6fe227d5a7227a67817c98e775bb731233088d87541135041e5a5",
+        "run.json": "31d55d813292c1efb599f49e864026b2f5fc80b2259e06c59f5af19fb0b36c13",
+        "truth.npz": "92e92d139ba48feaf06569b34db715a2fc9c58870b6aeb5a6dbc76f3628945af",
+        "truth_original_coordinates.npz": "9fca1f6c6e33992fe0a0bb22a0599a87ac6aa677385e5b6873808e7e12fd3eec"
+      },
+      "directory": "artifacts/stage7/count-block-v2/primary/representative-7101",
+      "status": "execution_failed"
+    },
+    {
+      "artifacts": {
+        "attempt_0.json": "cf7525e4d831149ca95b00d58928a5848665a392f19b01d8dba41e2c0cdf5466",
+        "data.npz": "764d2e6d26f0541bd1cab1c4c01a6c872c25be8aeee724faeabda6403f035b2c",
+        "diagnostics_0.csv": "14c271ea3010564d666597bd7e5813850bbd34dc3c7ba44b3a49828a484006bf",
+        "future.npz": "95142c867b39b2e800f758f4f177ea2b9cc4b24b27b9ea0b2f1762f086d44834",
+        "posterior_0.nc": "2b9be129b1cf48d3b8514f7d7605265428d3bdb20b5b7b5bfaa49139693cf69b",
+        "recovery.json": "9fc08ae00cbc16313c75749347ea3ddb89bcf54711f2d580d4b296d0165c574a",
+        "result.json": "3796d40e9b2b15e4859b8adb8daaf7d911218ac9239c8ab38954f88cc20907c3",
+        "run.json": "428140bde17160c9230322eb4f63244e8b64fabdd789e402cd2f3c37676eaa58",
+        "truth.npz": "7100a323810afc6fc49ec9be3d76f10023a2ebf536b3569c40ae4336b067f96a",
+        "truth_original_coordinates.npz": "f76de2bd2974630b626d37b5c619e0f9a13ec583a15b62e80cea9fc3b7ea156f"
+      },
+      "directory": "artifacts/stage7/count-block-v3/primary/effort_proxy-7101",
+      "status": "accepted"
+    },
+    {
+      "artifacts": {
+        "attempt_0.json": "1c95712f54f1e06628189f8efcf44d721f0419a1b223049f0a9f6114d79aee4e",
+        "attempt_1.json": "aab1e767501763a79c40078f01d72889f36a7eeaaefd76b6c0c3abd9ff46c1f3",
+        "data.npz": "832d7cb1c1091c4209119805bd44f8dc1e0b5b029167c737da0a5b79a7073dc0",
+        "diagnostics_0.csv": "c40f291b6a16956e47574bffd24f19738b1b306245e1685239a94431f358bb47",
+        "diagnostics_1.csv": "84716bb69453b1ba867b5fd29c7f41e9fb192d231866091a87f357a59a52c78d",
+        "future.npz": "ac175bb1793cf75686049ef4c3550d2f45f569c359a54e009ead56a14dcd30c1",
+        "heartbeat.json": "974786e52a41179e99e59c75d680357944c0ff2e11216c6f15cf57754529e873",
+        "posterior_0.nc": "9dcae4a5cd0f1896d7b9f0afb479b56bec0e6283c9948872177f12f0f5d4f651",
+        "posterior_1.nc": "0c6392db1a245672e42bd832b2f948c61be9df3229d43572aac37a930da1c194",
+        "recovery.json": "c91bb98e372225c5e4f58fe8b214e534c0e9fec34c167c5d19a9b036ff594ced",
+        "result.json": "eb0a132e051b503679d1730f66bfc6bee475fb5be1825cf44ef4dca47e908346",
+        "run.json": "764f54bd9e276b9f0b5ff449b47bb113d8d8c073d4f6dca4ba48a80c3eae1801",
+        "truth.npz": "165bcd2cc13d529b6c37b8672b8614d777c5769ea2bb2db5e2e95d8bb1340dac",
+        "truth_original_coordinates.npz": "815db5eaf7b0eabada9f43d82e5152df4e369568989e62a2d56c226d29391f60"
+      },
+      "directory": "artifacts/stage7/count-block-v3/primary/effort_proxy-7102",
+      "status": "accepted"
+    },
+    {
+      "artifacts": {
+        "attempt_0.json": "6bacdaf6f784813ddaa63532a9449df69e0e338dac87b32d7d57cbf44ad7e2f6",
+        "data.npz": "0f6a665fef2ab8d039005ddea1e8a355bd3ff46fdcc71c99af275dc165b7ff9a",
+        "diagnostics_0.csv": "50af13b40fd6824472a08650ad4aa224e4632081ad00ab2cd97ed6c8d9dcfd0e",
+        "future.npz": "0e8f02e8ed2aeb27b598b6e7e7cb912ac7417789110b1a4e1cda4bdadcbf765c",
+        "heartbeat.json": "50c99c2930f74aba6ae7a95f85145248bf4d96c9119d90e238728c954d1355b6",
+        "posterior_0.nc": "3ff71d8a15c9159021b88eedd739aaed9d3386b5eaad8cd4d74a46d3d67b35c1",
+        "recovery.json": "aadf29a45e7aaedaf323e52346656b8d32772a3913a4f1ee35ff5ce58140fe54",
+        "result.json": "cd81ffe47fdb8cd17a312d485d8efc970a4a7fc241170d220a2d25da374f456b",
+        "run.json": "7ba3676ba80bd34a389d4320375859c96f15636e8a8c4677765b340f98e18c77",
+        "truth.npz": "fcc15c01eb7f92c1c2690852632565bb7c37327447a5dcec534bf4ae908e3ba9",
+        "truth_original_coordinates.npz": "6208b91c16c044c1d7fc5dc7cb48db65caeb88f88e2a079d1186b00821fa4d31"
+      },
+      "directory": "artifacts/stage7/count-block-v3/primary/effort_proxy-7103",
+      "status": "accepted"
+    },
+    {
+      "artifacts": {
+        "attempt_0.json": "f0d7a11f8f82e09d21ceaf4e065268e9e8f677bc5ac560191548eecff6c42f3a",
+        "data.npz": "2f16c14da6f108731a36c429e2d532a6c4f7ab343a4e989a3cda9c5473faef19",
+        "early_failure_0.json": "474569f08f6f5b67014d1671f7a944340254308fc82d075cbeaf38cd8769e584",
+        "failed_state_0.npz": "1c55cd5a3c6bc5da48eea17875406857a1829922c129ed97d430c17cc02a04c5",
+        "gradient_timing.json": "2fec5ba1210d6af7a60a57bf839a2ac55f101bc90d90871692805d3e922ad4be",
+        "interruption.json": "7d35d5e4236030ea9bab5d174f6e84206ab8292e8ad6e24caa473be48707d56a",
+        "run.json": "1d80bbe8c0e73d70e52a4d6fcb670db9589e1fc14bb7aecb790b6e02fdc7582d",
+        "truth.npz": "92e92d139ba48feaf06569b34db715a2fc9c58870b6aeb5a6dbc76f3628945af",
+        "truth_original_coordinates.npz": "9fca1f6c6e33992fe0a0bb22a0599a87ac6aa677385e5b6873808e7e12fd3eec"
+      },
+      "directory": "artifacts/stage7/count-block-v3/primary/representative-7101",
+      "status": "interrupted"
+    },
+    {
+      "artifacts": {
+        "attempt_0.json": "6fbacf4dfa07a43c641f25d8fd48290b3dccf279db74556fc98d0c97ccb117ad",
+        "data.npz": "764d2e6d26f0541bd1cab1c4c01a6c872c25be8aeee724faeabda6403f035b2c",
+        "diagnostics_0.csv": "03ba0fde160a96f25c0220c24b747938450e898762dcd1c84f7a56f032a430ea",
+        "interruption.json": "363a12c49ea30bd5e51cf8276a4491973fb88d95fe8bbc37276a9a56b4a01a4d",
+        "posterior_0.nc": "3504888c6b97243e375261e110997b99957394bee36b3c9c2b1ca40e22cc23b5",
+        "run.json": "bd8aed9daca86a66c6ad1c017ce3395aed0f3900640c0a38720887ff6ed9d877",
+        "truth.npz": "7100a323810afc6fc49ec9be3d76f10023a2ebf536b3569c40ae4336b067f96a",
+        "truth_original_coordinates.npz": "f76de2bd2974630b626d37b5c619e0f9a13ec583a15b62e80cea9fc3b7ea156f"
+      },
+      "directory": "artifacts/stage7/count-conditional-v2/primary/effort_proxy-7101",
+      "status": "interrupted"
+    },
+    {
+      "artifacts": {
+        "data.npz": "2f16c14da6f108731a36c429e2d532a6c4f7ab343a4e989a3cda9c5473faef19",
+        "gradient_timing.json": "7cce1ff5c890965fcfa942f0c41c0143166a47eb481d78f21811619920e50a99",
+        "interruption.json": "0d0ceb10ed28c3a57dad8f02ac1a5348d77226505b18ea82f580fedc28f12a73",
+        "run.json": "b1280f8f26957dafff51a676c0a19abeb7223c40b5bdf65fb4cd44bc0acd1e21",
+        "truth.npz": "92e92d139ba48feaf06569b34db715a2fc9c58870b6aeb5a6dbc76f3628945af",
+        "truth_original_coordinates.npz": "9fca1f6c6e33992fe0a0bb22a0599a87ac6aa677385e5b6873808e7e12fd3eec"
+      },
+      "directory": "artifacts/stage7/count-conditional-v2/primary/representative-7101",
+      "status": "interrupted"
+    },
+    {
+      "artifacts": {
+        "attempt_0.json": "8e2409b87dcf4a865fc4c31daadc0745e309e14ed362f0be444cb61366326d5f",
+        "data.npz": "2f16c14da6f108731a36c429e2d532a6c4f7ab343a4e989a3cda9c5473faef19",
+        "early_failure_0.json": "9151d6d77f9f2261d0e8dde7859631a3d71a567f2a435a46626002c47046697e",
+        "failed_state_0.npz": "df27ba2c01b05ac9aea2a40489a264398e6e315419045f785e338b5eee2197d0",
+        "gradient_timing.json": "b93a929e17d3afbd3d9161860b5542414f22a1ba4c9a530bf260d2123e7bb501",
+        "heartbeat.json": "bd8f5a5f874ab363f0fd9993d3fec611029c416dd389bd30d14e5a5c542cc63e",
+        "interruption.json": "c26b3c5029f9b2130ae58fe7b066e3a55950faa6bff62ed34e0aed817386d59b",
+        "run.json": "d20b91e6fa576deb857e957fe1036238bec3ae167f618343ae92e3f8d5aca050",
+        "truth.npz": "92e92d139ba48feaf06569b34db715a2fc9c58870b6aeb5a6dbc76f3628945af",
+        "truth_original_coordinates.npz": "9fca1f6c6e33992fe0a0bb22a0599a87ac6aa677385e5b6873808e7e12fd3eec"
+      },
+      "directory": "artifacts/stage7/count-scalar-dense-v4/primary/representative-7101",
+      "status": "interrupted"
+    },
+    {
+      "artifacts": {
+        "attempt_0.json": "6bc07c24ec2df2d7b78b51d91d3c54a23371f6dd7b2068cc4e351496ad052459",
+        "attempt_1.json": "e866fb7671f844a0b5fe524e4b798990ebbc0c14054e986c3b4da9ef18f62572",
+        "data.npz": "2f16c14da6f108731a36c429e2d532a6c4f7ab343a4e989a3cda9c5473faef19",
+        "diagnostics_0.csv": "1864d752916400fb83956a142472b4337d7444d33bacffb828f2ccc345adea16",
+        "diagnostics_1.csv": "b788ab6acc1d04b0a656b7587e44fdcfc07e1ded81d2622018ea573d19c5c19d",
+        "gradient_timing.json": "d1b538bfcb569d09dadc8c0001e25b8b0b6702e9f838840f6ca5dbf94f4d02f8",
+        "heartbeat.json": "94713cd51837b55504b392d635129667f8ff8a378dc0e9fa78b4c61ac434ff9c",
+        "interruption.json": "6b455a83dc8577747e725e6962ca73e0fb9f9ba6faea6baa8bf05cf17dada939",
+        "posterior_0.nc": "1d4939447377782ea9cb335249a9589110948fb0561c55502baedcd96349c13f",
+        "posterior_1.nc": "ee1614071c4745105882d0850b246bac6d4dc19822eb02f2a87546ef52e84be3",
+        "run.json": "c73a41112a0810a14d7b0c0bbff306ada85e417ce411465b9729e1c4a73a96fa",
+        "truth.npz": "92e92d139ba48feaf06569b34db715a2fc9c58870b6aeb5a6dbc76f3628945af",
+        "truth_original_coordinates.npz": "9fca1f6c6e33992fe0a0bb22a0599a87ac6aa677385e5b6873808e7e12fd3eec"
+      },
+      "directory": "artifacts/stage7/count-scalar-v4/primary/representative-7101",
+      "status": "interrupted"
+    },
+    {
+      "artifacts": {
+        "attempt_0.json": "bf3de73ae004cc54b19d3d891eee2a42bd2d618f488f3d43862b9f54471e8db8",
+        "attempt_1.json": "4e1e38d17ddf9f7841f125c89a79297dbbaf31d4aad1478fef602cd5a2b00e3f",
+        "attempt_2.json": "61b6e1328bee9afb925ab9e45c09d85a01aa90b76cf29c00dcba2c327ba49383",
+        "data.npz": "643433a57070e5b72171625dfb28f6a23522efb7c37d1cdd122add662220d1d8",
+        "diagnostics_0.csv": "4969e3dcc43832028ed570371518b0390314429555cc3f5369d3c5d0af232ead",
+        "diagnostics_1.csv": "4950ba1336c2197d156e7d2492897946fa2acaa36a9adc98bbcd285d677cfe46",
+        "diagnostics_2.csv": "e295b24d325548c79f28db8aa9a6951604a1ba4c3341e18acd1154419483b26b",
+        "heartbeat.json": "dfbf5cfdb604dab3ce9ae9602868d886dfb1ac8185f75279ac4da85e62ea0ec2",
+        "posterior_0.nc": "b51c3288f1f9009871e576db09e5fec535d6f8329731d778ba5d29e5f0eb64a5",
+        "posterior_1.nc": "6115a128518a91a0570258ba2f02adddd3285710dfb6951fceca7ab5e77fef46",
+        "posterior_2.nc": "cf0f35b8ca460a83d32269de37560fafad65e558a7a6078d4af2216b07b21e5a",
+        "result.json": "2f1c5b66b01e029b204c7c7a7d400c0a5d1ca6054851e7a1ddd4232d8865f534",
+        "run.json": "d12eef843acc0329c3ed643ad9323a88fbe145f7b82f2373571e6cdf717fdcd4",
+        "truth.npz": "161ec04ea54720835c56b6d9faf7e9a5280e9574d0f6439dea6393adba3c1940",
+        "truth_original_coordinates.npz": "161ec04ea54720835c56b6d9faf7e9a5280e9574d0f6439dea6393adba3c1940"
+      },
+      "directory": "artifacts/stage7/recovery-v6/dispersion_dense-7101",
+      "status": "failed_diagnostic_gate"
+    },
+    {
+      "artifacts": {
+        "attempt_0.json": "d4d4b37f5abfbe434058c00e1c0fb54354b9b11c0d5f9ce32ba4e8ab7c8c184d",
+        "attempt_1.json": "5e60a8d11c69ddd34a6efd6a80c766ad093f3b781b1a667f563d75a50784b694",
+        "attempt_2.json": "9a1169644eff6e4e9321992c640d3c98706a90449c0e429e2d3b8d1609dffc10",
+        "data.npz": "da103a36c2216621b15c961d0add2fda41e24fa17ad330c2d95e16a68bceeab1",
+        "diagnostics_0.csv": "51599d363a96715ac0c1f9f8a40f8f8fc12709a9c1978cc9784f5e3f38164d2a",
+        "diagnostics_1.csv": "1410660a5cba864e0691b8b4fc063598551aff1e981ae3ff07a257771c2e7a81",
+        "diagnostics_2.csv": "a342c0726ace62b7844740b3a2f5ad534bfb36d5be309065507b4a42ee290c94",
+        "heartbeat.json": "852717d4f5d7f035527835567d5e79328ade5b0e16354b2072eb8514c18b7a4c",
+        "posterior_0.nc": "12e585d16d7117dd18ba83837b0704cca9f5926cfe29665a6676a33925a16220",
+        "posterior_1.nc": "66ebba003a6bbddd1ea06ccc1a943b3d7883ea4571ad3d2a54e04284e9ed0741",
+        "posterior_2.nc": "9db6f9ea26f43e8457cb8a21b1e1ff731736339688004f231375f2e0ca029627",
+        "result.json": "c054a11667c1f6393af42507d99b4473aada7101b3ea597fa37d7b4fb79f3c09",
+        "run.json": "236cd23cf205cd5d484c4902b780b2a7ee0d28104bc88d5bdd31b5a8586f5f06",
+        "truth.npz": "0f7c7f7cfddc52d509785f0a19d9e9e957f0e8e24fd1e1a33e4caf52734170b7",
+        "truth_original_coordinates.npz": "0f7c7f7cfddc52d509785f0a19d9e9e957f0e8e24fd1e1a33e4caf52734170b7"
+      },
+      "directory": "artifacts/stage7/recovery-v6/dispersion_dense-7102",
+      "status": "failed_diagnostic_gate"
+    },
+    {
+      "artifacts": {
+        "attempt_0.json": "1fc50abe6f5a2a5e604014e371e065c2397453df18c8cbb7677dc5ea3769a72d",
+        "attempt_1.json": "9af9407c506c631dd0497482e0319165ad78c6dff12f935bd5bc915f58f9fa99",
+        "attempt_2.json": "65f7ea5d4f3ed3a9243afbbe8d1267a270723e49b84cc6caf473061f733a3832",
+        "data.npz": "d5f2a20dde97830ed7b752ec24863498b83065be42a00b22b8060af47e9b9d65",
+        "diagnostics_1.csv": "771616079fb398b7f053d1b01fab5f85f20f4ea8363754184e3f798f4b79420d",
+        "diagnostics_2.csv": "d3e8b6e155ae9fabc2a615f0079846193361d0b538d219e00be3b5b6a1e25fe1",
+        "early_failure_0.json": "df752c0905010f823f5d0fd677693696eb5aac83c85fa0c15c52722e643b096a",
+        "failed_state_0.npz": "4c82652962a16c0436431eb90f0ae04d2710f0e998d80e329e784af288008283",
+        "heartbeat.json": "9ee87606e7c1a33d41beb294f776d70efa564132d6b3e2a16bf139737f3791f3",
+        "posterior_1.nc": "61b9b5c29042dd969fe17716ee35e57c9894e4dc5677d5a2b37d46e3a2b33c78",
+        "posterior_2.nc": "82afde54d12886205b4ad76421738f21f8fc84939b8e88bc473e1aed8e25bfc8",
+        "result.json": "a90251c74e52ca47c6309ad95d81cc4822fdd9b195f4deb9303f5a133603e2bb",
+        "run.json": "1ddea338897a29d9ee1fb5e11854effce28072c56b63a45c860a8ba860f207f4",
+        "truth.npz": "04aae480f479020a7dc5e9d6da2c166578ea7ff8c7a78628a5995213f112e20d",
+        "truth_original_coordinates.npz": "04aae480f479020a7dc5e9d6da2c166578ea7ff8c7a78628a5995213f112e20d"
+      },
+      "directory": "artifacts/stage7/recovery-v6/dispersion_dense-7103",
+      "status": "failed_diagnostic_gate"
+    },
+    {
+      "artifacts": {
+        "data.npz": "2c9da41b96a1dacbb05dee12408b29a6ea764759d5957866d6cbbf5965ba28d4",
+        "heartbeat.json": "85bc9d120cb3409729a03720822c8748fa9f59755daaf7494d1f6fedc9b8ee66",
+        "interruption.json": "ab35a28a37434f448a43517920238449417522c23e8ece59ddd67b971ffb15ff",
+        "run.json": "ed98d6e32540fd61a33fe57cf3fecb6cea949cd480a965f106b80f334b4da4fa",
+        "truth.npz": "6117d342d214bfc936f4cccba34814db619c1cbdc22f9d020161ef83f25fed4d",
+        "truth_original_coordinates.npz": "6117d342d214bfc936f4cccba34814db619c1cbdc22f9d020161ef83f25fed4d"
+      },
+      "directory": "artifacts/stage7/recovery-v6/dispersion_sparse-7101",
+      "status": "interrupted"
+    },
+    {
+      "artifacts": {
+        "attempt_0.json": "63595a069351dd58b8570593655da4e709c3451322df291bcc14307d01d480a5",
+        "data.npz": "4df770f9c0dc5add5079eb59ca18a6c4ce6034cf77cbf3e02104f9d0ecef2cd4",
+        "diagnostics_0.csv": "35187a7f9b38c590a3f2a1f70608adced26c82f13c287fc70ba76a43912ebeda",
+        "future.npz": "55c90db8547b7e14aeed6240a9d243c915627591f6e11c079c58c36cd34a2f8f",
+        "posterior_0.nc": "629cc03db33ff8c0db87e14b7f6d7d87f37855dac489be6546fd2ef5c5f50cbb",
+        "recovery.json": "f7c5fee83bf133adf4551372c41c66985743f5bb00b2fab83f9aa64673349f63",
+        "result.json": "3a98e015bbfc24ce3ce62574772fa501611b125ed191056203c5b4f07e581cb0",
+        "run.json": "acdedaa8b77d7b29766859e46a7f6dd9b53f6fc0017df9372d8e74ec9008b3e4",
+        "truth.npz": "7100a323810afc6fc49ec9be3d76f10023a2ebf536b3569c40ae4336b067f96a",
+        "truth_original_coordinates.npz": "f76de2bd2974630b626d37b5c619e0f9a13ec583a15b62e80cea9fc3b7ea156f"
+      },
+      "directory": "artifacts/stage7/recovery-v6/effort_none-7101",
+      "status": "accepted"
+    },
+    {
+      "artifacts": {
+        "attempt_0.json": "5dd1d762448a3e19dfdd3f9db3f8fb8407ed8075735d2e31fea2e13e2d9a8dbc",
+        "attempt_1.json": "d35d1ca07ef57cf03955016e4e9d3c00b66de3ce2082b1d3a51fabfc1d8f5285",
+        "attempt_2.json": "13c6af59ffb1f14fe43852f5f0a4301903c3c250b9b7cd9fc761e3543a27baf1",
+        "data.npz": "211b33fabbad4f83236ca6749c1e6c98bb68202948228b17fbd8e19917a36222",
+        "diagnostics_1.csv": "cf10b801477ccafb7f16d2b0852ca61c64d2f7c840f325cd342563c395b3fb45",
+        "diagnostics_2.csv": "6cf67600320e2702f81a26f8d43691a003c0bd543b5df45be91a67d5ae53a603",
+        "early_failure_0.json": "4814dfecf1e209436922407332daabacd6915e72584cff559b9db2e396b12453",
+        "failed_state_0.npz": "bcde58a761f45776556817e2277dabb2221f2fc754998425478f58826b29d93c",
+        "posterior_1.nc": "7f897050cd4fec427f10177ffa8243ef753cb2a77140dd859fa4d306fc32abdf",
+        "posterior_2.nc": "dd35a93ce661abc20bb82ff23c1a2f2334bd0519dfe95aeb16a16d626ea013eb",
+        "result.json": "2f07a810aa62cd4cf7c1ff2de2e09aa3629f699c73f0ec00b4d02c0a50521427",
+        "run.json": "a3fe0842ff7cfd94b66a8a9877ab4f55f6d7d9f169b6494a71cf8e7c2e71dcd2",
+        "truth.npz": "165bcd2cc13d529b6c37b8672b8614d777c5769ea2bb2db5e2e95d8bb1340dac",
+        "truth_original_coordinates.npz": "815db5eaf7b0eabada9f43d82e5152df4e369568989e62a2d56c226d29391f60"
+      },
+      "directory": "artifacts/stage7/recovery-v6/effort_none-7102",
+      "status": "failed_diagnostic_gate"
+    },
+    {
+      "artifacts": {
+        "attempt_0.json": "f919cc20026a43e5352d2ffdc7ce37167a002a0b47625976bcf5a102ae1aed6a",
+        "attempt_1.json": "2434c0c1e7e6f4799674c77ef490de5fbbc1a3f5d3501d9a04ddef87138ae3af",
+        "attempt_2.json": "96fbcb6e752f385ec06a705b012fcefeded2c3e242d8c82808122b55a6cee88e",
+        "data.npz": "fdb11bb72fa940459f97d8646c9c395395dd008ab7504f9c871faa95fe4f2c64",
+        "diagnostics_1.csv": "0bebe17fb6f418d4e4604ea9abaf22ae3d366b67b5864113657ffb3c89174532",
+        "diagnostics_2.csv": "411310fec6c7418e7e00193afce4dd2c3e0d1fd4514246dd6270eb80a686c7fc",
+        "early_failure_0.json": "a950b8a56025c10131310be214f1e4f6b90dcad14b33024c8f079bb6ebe394a7",
+        "failed_state_0.npz": "3e10c22a8770412155ccf3eb18614c2b1fa6e33076b91503dbebde2089728840",
+        "posterior_1.nc": "a24c12fd999a9524599d8e0ff13a4f38cb234ca720d9f52e8d20e04f31b85e91",
+        "posterior_2.nc": "4f9bb994bda1efe2a3551ccc61109fd72e7b08571e12cd7de8ad37ae84f8ad9f",
+        "result.json": "b1f05859a11a1acc605f4874b2bd8f37f1c7d1316003caabefefdfa1fae33bbe",
+        "run.json": "d84c3c0bffbfd5d3df8d22166c73b9dd08f30469d8de109db9219ff38491e80a",
+        "truth.npz": "fcc15c01eb7f92c1c2690852632565bb7c37327447a5dcec534bf4ae908e3ba9",
+        "truth_original_coordinates.npz": "6208b91c16c044c1d7fc5dc7cb48db65caeb88f88e2a079d1186b00821fa4d31"
+      },
+      "directory": "artifacts/stage7/recovery-v6/effort_none-7103",
+      "status": "failed_diagnostic_gate"
+    },
+    {
+      "artifacts": {
+        "attempt_0.json": "dcea09d50bfd2bbce478e54dff400d2c1e803e60e4f14149a72eef066994ccd4",
+        "attempt_1.json": "3165e319eda2aa72ebb6533f52b626eb2a1b91176590a9be4d82fcb7d48933df",
+        "attempt_2.json": "988dedc047088d6a6e75164294526b37822f3a7f6065c0159b8e1b9c37420bc6",
+        "data.npz": "db66bc255fe03085a1bfaac67ff3cb6ff3efa22f3a393adf653b08599457c302",
+        "diagnostics_0.csv": "926ed14c1fee47fefce3efed6001d9704c2ec91be9e651e82ccb76916b16e685",
+        "diagnostics_1.csv": "4ea06cd952b8a461008b32e3b5f77b32b8ce14038574426982fbfcfacd9e7fb2",
+        "diagnostics_2.csv": "4cb656feb2d007e2a280881986f9229961042d656d6ea3375eec35faf80c4e7d",
+        "future.npz": "3d34aa793b13aa6fdd64ce9b301b8d42534721169a75d31276a38289ecdbb9a8",
+        "posterior_0.nc": "1633b4659a2c2563c9aeb9cf4a40abe3ce5b6e00186deb008ac7d7d60f23f329",
+        "posterior_1.nc": "15a71edc1885172d63d813655c025e7c2a81611663fc47ae36f3118192a23ee6",
+        "posterior_2.nc": "609530bc94e694a808f156911ebe4f235c81bd88e3e29db9325b5ddc11a460a7",
+        "recovery.json": "a617a1ef354f01ff9964b6ad11da904030b5abebae8cc538adb85bfcec60a489",
+        "result.json": "025391d209c35280961ad274851096da671f752835743503f82a0f55f79c1791",
+        "run.json": "2198683a1b847fb248adf45f0fd86598da0e597c3823f21ba522bb6e34943d91",
+        "truth.npz": "7100a323810afc6fc49ec9be3d76f10023a2ebf536b3569c40ae4336b067f96a",
+        "truth_original_coordinates.npz": "f76de2bd2974630b626d37b5c619e0f9a13ec583a15b62e80cea9fc3b7ea156f"
+      },
+      "directory": "artifacts/stage7/recovery-v6/effort_oracle-7101",
+      "status": "accepted"
+    },
+    {
+      "artifacts": {
+        "attempt_0.json": "0e73a03bbf2ff9b1eafba734dd5d73f1fde99341f777b9221347ef428d8b42f1",
+        "attempt_1.json": "bd9d9b8aabc94ce846ff553bb88f0723b75bd127de8dcacef312b5de92b38c16",
+        "attempt_2.json": "1b74031ecaeb55e39bfa1fa9cc4a3f0e2fe3cb17e436b1103e4a840e5c0db5f0",
+        "data.npz": "bb47b1c29521ecefbb9cfdd1cba3b0c4676f943229ebca05908aee52c564fa5b",
+        "early_failure_0.json": "83a0d3c1f895da30ff1ad45bf7f53fd4b53a3e2684e158d9970652948348c394",
+        "early_failure_1.json": "dc4ca2788e02ac8b37515f14225a182258abb8276b3cb5895802fa258d9761db",
+        "early_failure_2.json": "2143ef5aeed16c39791fa95f4dc3e02fedcf218a0bee83a780231817f4edc9dc",
+        "failed_state_0.npz": "eef332557466a20a21ad7bf1e718e46c744f4031b22f162ce2ada4a253081294",
+        "failed_state_1.npz": "eb8f2410d5b107dff463015edf8f73b335da990505bd0e9bd28e0a9d553daf4e",
+        "failed_state_2.npz": "d658ea958ff96be2fb82f0174e025d94e02e2b233a656b1e1fcda28cb0db5b10",
+        "result.json": "a05ce6fdcb20179f5c89bdb6bb8b610bb1995bb5f7e5f989cee6bae86cc1e068",
+        "run.json": "8859af14a68bb4b5a615491d248d49562fd6b2fab1836a59b10c863a5196cad3",
+        "truth.npz": "165bcd2cc13d529b6c37b8672b8614d777c5769ea2bb2db5e2e95d8bb1340dac",
+        "truth_original_coordinates.npz": "815db5eaf7b0eabada9f43d82e5152df4e369568989e62a2d56c226d29391f60"
+      },
+      "directory": "artifacts/stage7/recovery-v6/effort_oracle-7102",
+      "status": "failed_diagnostic_gate"
+    },
+    {
+      "artifacts": {
+        "attempt_0.json": "f1b169e97477781491bb015384268adc09242eb7a0441bc3a55baa9e7cf76bf6",
+        "attempt_1.json": "5d7fef546c5fa748e7fa1570cda8b76db496616616d9f552d3b641ee31596aa6",
+        "attempt_2.json": "ab4441e80ff7ef78857780958b4a0154936684665a466e571646885589485ffe",
+        "data.npz": "48d7e478f25c575362fead0d46c05b463751b02e18d11cfa9d23a30cf97a1551",
+        "early_failure_0.json": "9c54d7f2aa01ab0651c2224dbf7a9f2a92757101b2129d4b3dacd9c69009201f",
+        "early_failure_1.json": "832a7ab3b8b56db61236daec3882ff5e73f8ad073ddf803436cfac6bdf6d3f61",
+        "early_failure_2.json": "46cd3c544491e4c9722cb5da467e16fa3f720dbfa45a06ce7f21127642f135b1",
+        "failed_state_0.npz": "c9796b4d48fe2f276b034696bfcc309f7bc9d8addd66b93a314e15ec71d90f85",
+        "failed_state_1.npz": "bf9cf9a57f33e7e3f4b6b1bfa3ee64463fbe237e30c0effb33f36eeac7f29d83",
+        "failed_state_2.npz": "52b39c96b75ee6ce8111be03cab6dea95609310cbc656f0eaa218d73ae1b36b2",
+        "result.json": "4d4f0f1606afeb63391d1e04e64ff8043fb5551764110d13a42f5692859595fb",
+        "run.json": "e657e9a702e06540384c5e667286bd9406b655db5f419a058823c3c16ef2f03f",
+        "truth.npz": "fcc15c01eb7f92c1c2690852632565bb7c37327447a5dcec534bf4ae908e3ba9",
+        "truth_original_coordinates.npz": "6208b91c16c044c1d7fc5dc7cb48db65caeb88f88e2a079d1186b00821fa4d31"
+      },
+      "directory": "artifacts/stage7/recovery-v6/effort_oracle-7103",
+      "status": "failed_diagnostic_gate"
+    },
+    {
+      "artifacts": {
+        "attempt_0.json": "44019eb6e9db9b79135596cf0a82aaefdde64289d97560832741e27382d9d7c9",
+        "attempt_1.json": "5506f0f8a9bdf8d1a600ab1d42acdf0d8184f131e59f343364c232e86a3f3382",
+        "attempt_2.json": "9cd203033bb4c16734671b1e654af890b78bcc72789b13ee821cf9e609b4efc2",
+        "data.npz": "764d2e6d26f0541bd1cab1c4c01a6c872c25be8aeee724faeabda6403f035b2c",
+        "diagnostics_1.csv": "321d7530a712bf71a30f91f9d73fa701bd6e808a26d2b8fd86ae666187c31fcd",
+        "early_failure_0.json": "aa5c01a056b9d455a1198c4097c0e98608fabc6ade7228e194abd18440ca79b6",
+        "early_failure_2.json": "90c793d884571ea79321b2da370fb8b7d796dfb51fa653afc4aa32b501b864ad",
+        "failed_state_0.npz": "74144810dc5336830e09bdc315dd295c5ef831839fcdfa79b4fc9409d2017ff8",
+        "failed_state_2.npz": "9e3735f0bf5b86fbfe640b203fb93b2f40dbff0c522a13751ffe33352cb5f088",
+        "posterior_1.nc": "5b892abe2727a57151052b47acb6e7e9db0ac42496a068bfd9985e1e3256fed4",
+        "result.json": "dcc4eaaf5c54fb8f8c47fc311e5a05640e50bb6ce16ddcff5484b1ab87a1e8c8",
+        "run.json": "72d7be23948e41286d7091feb6ceef2be0571174c0e5f23dcbb55efe762355fb",
+        "truth.npz": "7100a323810afc6fc49ec9be3d76f10023a2ebf536b3569c40ae4336b067f96a",
+        "truth_original_coordinates.npz": "f76de2bd2974630b626d37b5c619e0f9a13ec583a15b62e80cea9fc3b7ea156f"
+      },
+      "directory": "artifacts/stage7/recovery-v6/effort_proxy-7101",
+      "status": "failed_diagnostic_gate"
+    },
+    {
+      "artifacts": {
+        "attempt_0.json": "d9a48ce40730526715858634d11d60c8d3f60f11bd4a5a8d31501493aef44e06",
+        "attempt_1.json": "caed2d1376cbb4d71d01cc819e4ff8e395ac205e4219789d089d1cfca093df1b",
+        "attempt_2.json": "72ac07d068e20ebd5b12d8d12c3e08878199f6a1a84ab8505a472b4d1b25d11d",
+        "data.npz": "832d7cb1c1091c4209119805bd44f8dc1e0b5b029167c737da0a5b79a7073dc0",
+        "early_failure_0.json": "60acc7bfdad36b6026257a7db92c90a973c61b251570545d5edc1c040cbc36b9",
+        "early_failure_1.json": "889e1f84d01457e65f20c8db186b01f89b92b53043ef41fe00c59d31793085a1",
+        "early_failure_2.json": "d0fcab32dabff3831ad7c7ff27fca49adc64a821c8c77caeafc261b6b37649fb",
+        "failed_state_0.npz": "35d30da35191529dc688dc0003bdf631bd63fb986ee4c473bbeb5a14c24d92e6",
+        "failed_state_1.npz": "0b8e13f3c5febf93f56c1a86bc769fc3512b6d83e4951372b0f642c57cbfd6e5",
+        "failed_state_2.npz": "33cea1733ee4027ea3421ed6be1cf044bcc1d589643e8f3fb545b60ac63360bb",
+        "result.json": "98e309181a59fd67fea374ad6cc0da845085ea8da7751089d374fa10e2a44b16",
+        "run.json": "e4875a2972294c87efbe6fedec58e7e707135255a81b08d53eea7aba152c29f9",
+        "truth.npz": "165bcd2cc13d529b6c37b8672b8614d777c5769ea2bb2db5e2e95d8bb1340dac",
+        "truth_original_coordinates.npz": "815db5eaf7b0eabada9f43d82e5152df4e369568989e62a2d56c226d29391f60"
+      },
+      "directory": "artifacts/stage7/recovery-v6/effort_proxy-7102",
+      "status": "failed_diagnostic_gate"
+    },
+    {
+      "artifacts": {
+        "attempt_0.json": "48060d89f751a91ba439e21cbe98c1eb52943a51d70cd613712e3f5402ab1ca1",
+        "attempt_1.json": "0674bb20e0d70ccb4eca2903178db0eccea7c5d8e201891add7c786590b40c27",
+        "attempt_2.json": "c218580dffb15b6f99fd7dbd66d0fc080eb38df84e545128574bd0197da3ced5",
+        "data.npz": "0f6a665fef2ab8d039005ddea1e8a355bd3ff46fdcc71c99af275dc165b7ff9a",
+        "early_failure_0.json": "45e4ce670f9f5e374804fe019251ef9c4166e21941c5eba265148f0af9615eec",
+        "early_failure_1.json": "d6321dbd8ff3261a72e959b872a640c94013f35aa0642490a3aef04afa251d48",
+        "early_failure_2.json": "f9212d4424a8caa9e7e54d03fba55e2eb5ff5171da1b23bde611ba2ef7898e84",
+        "failed_state_0.npz": "6fa5cf50be2ff54f95e50070dbcb13fb7453ec5609e5cca17457fd375b0cf9aa",
+        "failed_state_1.npz": "a39264004f122678d2531428e5c7cbfaf410915bdfeb41f435d7ed1f7aa1cae4",
+        "failed_state_2.npz": "db0fcbf7842f1be9387b866065c4bf4092a6c333ee180149e209cf6fd91d5b0e",
+        "result.json": "fc4d331ed019ca97c1fb931460e4078a665f1b2216546ac8433ba28c62e9972e",
+        "run.json": "d5855f2a727fc5448e54f0136c3269290f37b6c7b94d00379634bae0e57d94ee",
+        "truth.npz": "fcc15c01eb7f92c1c2690852632565bb7c37327447a5dcec534bf4ae908e3ba9",
+        "truth_original_coordinates.npz": "6208b91c16c044c1d7fc5dc7cb48db65caeb88f88e2a079d1186b00821fa4d31"
+      },
+      "directory": "artifacts/stage7/recovery-v6/effort_proxy-7103",
+      "status": "failed_diagnostic_gate"
+    },
+    {
+      "artifacts": {
+        "attempt_0.json": "73d6ecd8202e248339106700334f3d50f39fee3a4608509fa7086c181fa9522c",
+        "data.npz": "53a7f3bd8c4eba71e76b1cd015bad5980be48a402dd59e517574727f8e7cbd33",
+        "diagnostics_0.csv": "27c46fd3f2a00d350defb30d07bf46f7daabe7b869f533f1e40956d4c7405123",
+        "future.npz": "fa2652c4817a27deb861ffa0adc7611f8ae3e8d7bf1db32c58d2620dbd470f49",
+        "posterior_0.nc": "ac0eb4ca961819419d7361b48bbf947449b04adbaa0c5fdd4fe56d70d41898ed",
+        "recovery.json": "0feaffd292de2ea1eb97e9c6be33fdcc550f523dddb575abb05d63c319c0a83a",
+        "result.json": "7b1f829846e564cbfc931ef6a8f309ff99aef7c3bb9bc2faf2c2eb21e409ecad",
+        "run.json": "ad1df74b3fa2252f2bbe4629b9f82458c145bee5a3ee131eb30546b3285982c4",
+        "truth.npz": "ce354834e88c98c08f34175e057f1c4792ce84bfebba7d7231cd5fd670de9c43",
+        "truth_original_coordinates.npz": "7c03723bfb675719d75df36145a322ddb0ed0c6b67745bddf321b6681700e95e"
+      },
+      "directory": "artifacts/stage7/recovery-v6/factors_sparse-7101",
+      "status": "accepted"
+    },
+    {
+      "artifacts": {
+        "attempt_0.json": "23c25239d0a8ce7429296bc83deb0a000a16131419adf00ae92f59a7d16a4ee9",
+        "attempt_1.json": "8298b5acd217630dd805fb62df3299d7f0f760d372292e921b93256b2b84782c",
+        "data.npz": "b05b466fb78f7234afc26ac11254b82ccf020ecb4392155e5383c6e5e864ff66",
+        "diagnostics_0.csv": "e7a26c485fa3da7a0ffe7437cf6533331f588292b7e4a90fd8cd8edb44a25ab8",
+        "diagnostics_1.csv": "018c85e4c7ddb92a4999d21d08b2d44f3ca1ed88e4a54bf7bf1da12feeca3bf0",
+        "future.npz": "3ccca6219a51d864a6851ff9db3088b6d673241de183cbd5f00412f4d044234d",
+        "posterior_0.nc": "712348f1754537f3c89c2f4ecc4206cb7ddf1fee09fd223417a511e351225c88",
+        "posterior_1.nc": "a85124bf77ade41bed835903f41b1a763c8c545bbf9362f47a364ad92f4d3cec",
+        "recovery.json": "84776995dd167c385371d64200082d1b8b61023e81e1e41251a53be573e6a421",
+        "result.json": "afb04bc3da823fba9155f82f18cb56449876c34d40f9528695dfe3638925c147",
+        "run.json": "852f8b7656c4951c81ae7997891e6b16c374de411aef09f14f65f4749b215fe0",
+        "truth.npz": "550aef99f435b80ff0bcaff3fe9b267888bab9a98290d517f19b2668081eb329",
+        "truth_original_coordinates.npz": "fdf1726ad738f31dc87cb075d92dca3eaed0d691b60648e10934466d16db6923"
+      },
+      "directory": "artifacts/stage7/recovery-v6/factors_sparse-7102",
+      "status": "accepted"
+    },
+    {
+      "artifacts": {
+        "attempt_0.json": "bcda4244863be67dd95a88b9098bdca9dd4320f4efceaf1d38efedf66d152b70",
+        "data.npz": "8cf556c442547b75faec53bfe7e5c0298096177d4d4928b488101a724a92169d",
+        "diagnostics_0.csv": "bb3359126fd62ba63634d2482100f8b5ea0d2bcd79174073c319b71f90c4a9b5",
+        "future.npz": "56b120a35492c921fdf1f4a5008befbffc997fc0ab7274a194a05915e2da2138",
+        "posterior_0.nc": "7abbf4392ce7946ea1c680e386da23f6dd6179b1570e74843d222303433242d8",
+        "recovery.json": "d1688aa4f8b86ec1ee64c04a4ee69d24f7b20872551835c83cffc0514cc35977",
+        "result.json": "5761b7d5c8eb95144425909139dc3a3e3da5a827e8bee142b928ee48bda0b587",
+        "run.json": "ffd2c1b72e3f2c58317008fa1f37b85f192c1d9258cb7a3a540caff9b753b57a",
+        "truth.npz": "584772a2b0af044d36d1e48893271153a2df5952915c7028181bea1cbb0b4f73",
+        "truth_original_coordinates.npz": "38b023cdee17cb92a93940490bc53e5246e29ad885c12fdbee0730529846bc0a"
+      },
+      "directory": "artifacts/stage7/recovery-v6/factors_sparse-7103",
+      "status": "accepted"
+    },
+    {
+      "artifacts": {
+        "attempt_0.json": "f45c90b857e448d0820bfced43488ec2a535c81e88e34d7bd5dca53db8f758f2",
+        "attempt_1.json": "ea73f9f465fc8bd6908cd06681481b8ef2b123efb7057e7eb995db2851ecd7a7",
+        "data.npz": "2f16c14da6f108731a36c429e2d532a6c4f7ab343a4e989a3cda9c5473faef19",
+        "early_failure_0.json": "2b2ddc5375c95f65c2cec158b212bc39f5e37ee6d88f9578a5820b55e206bb3d",
+        "early_failure_1.json": "2b482c51e9113baa34e90a1a054a192824855b2db376b306070128133efefa27",
+        "failed_state_0.npz": "c85b2016b743eaad40008e4a071d3a4e20698e7cb3d0d56c7869d49874590397",
+        "failed_state_1.npz": "a3ec48e273a22a6472bb1127e2aa9226555169d0b92f4dac16d60dbf899c04b9",
+        "gradient_timing.json": "34954d4e14611b46ed0e0c82464954f72ea46233e3cde0b64383df672cf15324",
+        "interruption.json": "9ee5a5a98962c027cfb36cc64abaa7d22ae3f6dfa1d80713daf3650562adaed3",
+        "run.json": "7429540137ebfca2a659882660e41c038691f71c20f8a7c2ad34f7d37517f3a7",
+        "truth.npz": "92e92d139ba48feaf06569b34db715a2fc9c58870b6aeb5a6dbc76f3628945af",
+        "truth_original_coordinates.npz": "9fca1f6c6e33992fe0a0bb22a0599a87ac6aa677385e5b6873808e7e12fd3eec"
+      },
+      "directory": "artifacts/stage7/recovery-v6/representative-7101",
+      "status": "interrupted"
+    },
+    {
+      "artifacts": {
+        "attempt_0.json": "e905c73d6298fb2364d274b68ceff08a5fc541e2ba122cc52e5eab9a75c42df2",
+        "attempt_1.json": "bece66b1d1943f898ac0db3b6b4e5d801d53ed485286606553d454d9a792cd6a",
+        "attempt_2.json": "d36d88e98278ac7cf3df2af3ae8143e4ed854ee2eca1eef15e01d714f38b92be",
+        "data.npz": "10437cc9f0aa78a77dd47938462fc56c2e36ff631c0d072cc6afc5fb4c1b0788",
+        "early_failure_0.json": "92c09832f073e156038c5882e27bb9d8933f04e2b0cb14deae4e75ded4c7d505",
+        "early_failure_1.json": "f7b4c5dcce9994f3af8207b6c3bea47de5c3a65df2af4938990334d7f2cd8606",
+        "early_failure_2.json": "eb6ea2df4f8306ca3d926739bf19c9483f5f79d5fd6ae1aae78ddc6249741a9e",
+        "failed_state_0.npz": "001e0e62c5647a475bd3307425b7479be358e6dbd0759bc87aa2cec93aaaacf4",
+        "failed_state_1.npz": "c0dc70af55af85d3dce84fec59ca878cdfe0e122921368973a9a256ef2d5d16c",
+        "failed_state_2.npz": "0775f5e0fb5971b31009f0b48e65a7cd80e6d95830a206ce7d7a60280b828128",
+        "result.json": "8666f5d407bb64280454400a2aa4b93320a4b75f0b3e269e2c95eeac6d6986d1",
+        "run.json": "27d48470293b60e6b9da9b9cb9825fbf0bbe854abdf51173222f535fc5439052",
+        "truth.npz": "6a844e1b502b7e96dcdcb66e2782cd04ef32b0da75b48091d2bd87a316b40c35",
+        "truth_original_coordinates.npz": "ff50d3d699b1bbd646edf73d943793137cedcc50ac7be27a4b3f4c665ddfd0f5"
+      },
+      "directory": "artifacts/stage7/recovery-v6/severity_missing-7101",
+      "status": "failed_diagnostic_gate"
+    },
+    {
+      "artifacts": {
+        "attempt_0.json": "56b9febe05b3e3e56b5cf776968b8c0114334a456e1ca051ea8023d4bbed4bc7",
+        "attempt_1.json": "ba7fd78aa2944c984cacdea8f6b1a61ddb09048fc08973ec26fc30eedd8d9d66",
+        "attempt_2.json": "755f6e64147ec15ddf8fc2d6729f89d3fdc1a5082c603b9bd807f6a0ea8f0db0",
+        "data.npz": "3e934be2636988b7000f2d166c3e684e788b349a7f36b847080ebd2932fde430",
+        "early_failure_0.json": "b5375538d99f14246c2fee30673cc080a38a5081fa08de055737eb9bbd5c43b6",
+        "early_failure_1.json": "7912b1a966ebc03325daf397a4111de62c3cc80dd527925ecbe8f95982af2aa9",
+        "early_failure_2.json": "c92221c2c6d029825ab0d50b2e886675aaab729fea2ebbd0068546679d96ddd3",
+        "failed_state_0.npz": "575d04a4d70bc84054c2e07e0865cf55d5fa275dd1fd825136c0068688c16eed",
+        "failed_state_1.npz": "925c6adc40e2cfb41672ac2cb1605466d74c007d5d7daf2e41aa7d815410065f",
+        "failed_state_2.npz": "30242f091ccec4a6c5712cd88656b8179b24b0bffcacefa8485e92a942e45835",
+        "result.json": "cdac3477813a8600270fdfdad29b30025e0a416e48bc3e4741161b4d9208dede",
+        "run.json": "6987c9a28a3acd9ba200a7e475f382295ba33ceb9cda2ba13243e56f32d04ec6",
+        "truth.npz": "0b05a74f44aaa8b83363ef90e2e66dd6c77166bc6649e79b326d462ba934a9b8",
+        "truth_original_coordinates.npz": "6203371026c575a603ab441f6086f56c594c0d466f3569ded9dd39267c892185"
+      },
+      "directory": "artifacts/stage7/recovery-v6/severity_missing-7102",
+      "status": "failed_diagnostic_gate"
+    },
+    {
+      "artifacts": {
+        "attempt_0.json": "123369239c917964b19356d0493fd64c11990163e1a62d040aeb2ef6c220db99",
+        "attempt_1.json": "44b57d2442c1302d06f217766452d70373d4377d7e735fe2ace8dd92c0ab6c0c",
+        "attempt_2.json": "70dbc9d865bdfc9305158396b943abea2f1a83447172c80856736e4d9641f091",
+        "data.npz": "70951e642f22adbeb1897ffcf05f046165eb4eebed9526d3983744b1b1f95d1f",
+        "diagnostics_0.csv": "4096b521592c21d55a76a8020eba0ec7c73a6dbe1619969e69c5ce837e12464c",
+        "diagnostics_1.csv": "3bc3d70c0b457636bf5d704c76cae73c7593a2cd919ebe47eec998cdfd0f34d8",
+        "early_failure_2.json": "318cda8a57022d2e9c29d7add7004d63d69f6c70bf49112dc12e1a877dbd9365",
+        "failed_state_2.npz": "25a2298b87e6a7072d7a600c9c8cbeb6eb78a9f12be7af970203b3e716b2c123",
+        "posterior_0.nc": "63c3afab5f0c6d19ced8b0d527e51658f7c18c50dfc474670177ece437b7d99f",
+        "posterior_1.nc": "aacac9b7fa2412ada82dbf4e35be042de6c25da75a5b80dc81af4f7ee2f7babc",
+        "result.json": "f03a6b7d750aabe974555ede8b2669b4848e8a2736bfee44b9d3fbf971ef0b93",
+        "run.json": "0330f5ffe01ea2ac2921677f829153b17b8dbdc2acdd83155cae6c1111442197",
+        "truth.npz": "01acda39cca64d7354237040033dc2d94ed441bd744c8f14f7b69f53e2fc819c",
+        "truth_original_coordinates.npz": "8d5aaf070d26f7af56e92c3b2bfef568f130eb8e008d3e00081645dca24ea096"
+      },
+      "directory": "artifacts/stage7/recovery-v6/severity_missing-7103",
+      "status": "failed_diagnostic_gate"
+    },
+    {
+      "artifacts": {
+        "attempt_0.json": "8d126669a380fd6bdd88b02de8c3135863b15dff037c3a794dc1e64441aa4a35",
+        "data.npz": "53a7f3bd8c4eba71e76b1cd015bad5980be48a402dd59e517574727f8e7cbd33",
+        "diagnostics_0.csv": "3ba45eb3ac8ccf9a41ee37265bab98f74da4afebe3360531cbb40a265be4d5cf",
+        "future.npz": "9ce82c9c534c28631244d98f70185c8ee1b816b7bcf5f57f15aca4ae15b9f37f",
+        "posterior_0.nc": "011fb5c77877ef1852f801fa86f1512b7dde8bf5833fae2be71a93526a491549",
+        "recovery.json": "042f39881d12a566b8c0b3d30fbd62d2eae13610a64b0e7d54bc51d97b472a50",
+        "result.json": "c8b9e69da55d9cd7f94cc20b2538d88eadba8104b22d332db7564104d85333f0",
+        "run.json": "209607a2009bfa5e967ff043c57840a0fc154e70d41b5398308b80d759543636",
+        "truth.npz": "ce354834e88c98c08f34175e057f1c4792ce84bfebba7d7231cd5fd670de9c43",
+        "truth_original_coordinates.npz": "7c03723bfb675719d75df36145a322ddb0ed0c6b67745bddf321b6681700e95e"
+      },
+      "directory": "artifacts/stage7/sensitivity-v2/dynamics_tight/factors_sparse-7101",
+      "status": "accepted"
+    },
+    {
+      "artifacts": {
+        "attempt_0.json": "c0faabe9a3721bc572459254d7592bd606556b45a64eb11d100a05ab07ddf481",
+        "attempt_1.json": "dc4031e59becb1c320fbad0cb75237ec32bf51d4828dc96c5d19331e255536d9",
+        "attempt_2.json": "94d7b78ec6581219b2d9e30656532baa2ee38ad290b85bb8f5d0bf67cab7b959",
+        "data.npz": "53a7f3bd8c4eba71e76b1cd015bad5980be48a402dd59e517574727f8e7cbd33",
+        "diagnostics_1.csv": "bc8dd94aa36ec2561e977fa29875701201b1fc693db291d7288e25346e2f23c6",
+        "early_failure_0.json": "1f37d8ead4d39e1aedce55970cf9ad863348a31e5ff9c9a64ad3206170730c4b",
+        "early_failure_2.json": "4ef9507e8dfb97b6d3b13222d8ccf7e5bf86bfd12747ae681f0567740f7f485b",
+        "failed_state_0.npz": "737924b409899d731aab552331c91ab23ef64ac76bd751b3ef6e5507380773b2",
+        "failed_state_2.npz": "f15afeeefcbb92041687b7922c1ba37c18de195352afb45af01620a8eb4e6186",
+        "posterior_1.nc": "4e594d43b753c8ca67e53768740fa0a643704b3f6614aa07b6a0a725beee0e77",
+        "result.json": "3bd32edf57b6acb6a4883de59898ebfbebed287b7dffd8b09087a517c0d27bae",
+        "run.json": "5ec10e9cf7cc27d1245dd19ba673db88918ba479527b874d2a5009413ee69f28",
+        "truth.npz": "ce354834e88c98c08f34175e057f1c4792ce84bfebba7d7231cd5fd670de9c43",
+        "truth_original_coordinates.npz": "7c03723bfb675719d75df36145a322ddb0ed0c6b67745bddf321b6681700e95e"
+      },
+      "directory": "artifacts/stage7/sensitivity-v2/dynamics_wide/factors_sparse-7101",
+      "status": "failed_diagnostic_gate"
+    },
+    {
+      "artifacts": {
+        "attempt_0.json": "dccf9710c637f6438107d9177bc8936b0053609933fba3926d66f4042c78f027",
+        "attempt_1.json": "54c4207d458ec6af83151e74f78831d43b3db8ba65ff1dd1dc354041f95c6a26",
+        "attempt_2.json": "6e7eef7fd19c4a3b070e8a90938e8ad29cfb4a08e83e9316a26915a9dcd496ca",
+        "data.npz": "53a7f3bd8c4eba71e76b1cd015bad5980be48a402dd59e517574727f8e7cbd33",
+        "early_failure_0.json": "8108764263ce4232c29b69e894b7ff5881a1b42ef629dd9f5919310ed6b8cf0c",
+        "early_failure_1.json": "a8421c638d154c26d815eb76c88a0d64dd06583e2a428ff7906eeeae9c4e1844",
+        "early_failure_2.json": "08ed62fa70440866c711b951dcd56b6e411273f6744eb1a660523a2d37ad9ee8",
+        "failed_state_0.npz": "12c25e8d466d5da827e82f4d85c4d6817b2cf2d9c5ad22acfbf69e94521c24d6",
+        "failed_state_1.npz": "3123a039bc70b7bc997ad74b1733b36e50c15512f941aa68ef2a7374ed59245b",
+        "failed_state_2.npz": "637daeaa2633d15a25176644afb7a1961dd4432b9588a2a5ec51b11ae53825a9",
+        "result.json": "753f21722e8bfedf955e74aeba4e0759fdfd05cf2a6d74f6e7c4dcea242d58e3",
+        "run.json": "3b0c64baa494d069dc4b63f487a494f39cb1464873613448278ed232851b73b6",
+        "truth.npz": "ce354834e88c98c08f34175e057f1c4792ce84bfebba7d7231cd5fd670de9c43",
+        "truth_original_coordinates.npz": "7c03723bfb675719d75df36145a322ddb0ed0c6b67745bddf321b6681700e95e"
+      },
+      "directory": "artifacts/stage7/sensitivity-v2/level_tight/factors_sparse-7101",
+      "status": "failed_diagnostic_gate"
+    },
+    {
+      "artifacts": {
+        "attempt_0.json": "089d14b70e304873b7677658efe8dc39c74dd175a9821aeb08e5752904268a3b",
+        "data.npz": "2f16c14da6f108731a36c429e2d532a6c4f7ab343a4e989a3cda9c5473faef19",
+        "early_failure_0.json": "c7db8941be48c23c8f6927b89ea4bbaa9bd90c2e67d9a705f5175ef113545881",
+        "failed_state_0.npz": "04c5dab1048ad2516425b28a99bd1ff0970a549bf8d92fbea8414e2722533052",
+        "gradient_timing.json": "3570dee856b8975c8c78e3672ee3a36d621cb0f3c660677aedee560b16552e0d",
+        "interruption.json": "5171188fea0c6f6c6ca153a8c2eca8bcf46a1fb564ca0cb06e21671a18105445",
+        "run.json": "3306a4bd3963f880cb5ced59fe84cb46480604b554a82649ffbe05cc20c75b75",
+        "truth.npz": "92e92d139ba48feaf06569b34db715a2fc9c58870b6aeb5a6dbc76f3628945af",
+        "truth_original_coordinates.npz": "9fca1f6c6e33992fe0a0bb22a0599a87ac6aa677385e5b6873808e7e12fd3eec"
+      },
+      "directory": "artifacts/stage7/sensitivity-v2/level_tight/representative-7101",
+      "status": "interrupted"
+    },
+    {
+      "artifacts": {
+        "attempt_0.json": "88b8cee0ea9d6300086350037f3abb67fb8123554fb307e4a2b4179c9a8daa95",
+        "data.npz": "53a7f3bd8c4eba71e76b1cd015bad5980be48a402dd59e517574727f8e7cbd33",
+        "diagnostics_0.csv": "1b649d1ec17df9c211d3af44965c5346657e7b50c6babb94226fb61db93f7dd9",
+        "future.npz": "d3d86c4ae6fac4d1602b45ef9682f8d0aa6a786d981ad5d012d4ccf205a36739",
+        "posterior_0.nc": "2607054b72d9641ba322385577a13a216e7e7472b7638e6403597ad361ea93ad",
+        "recovery.json": "c34ce60c0b6ac99d45843bb9d9b6e9737cd99de3285fcc64c8759c440d7b316b",
+        "result.json": "b6da296206a1d4e2c8ce036119a921b399165d225bbe428319e14bc9005edeea",
+        "run.json": "389009b03eda02f71a7332695ad030431322fda1c9c8b49511bab6b5b78650d2",
+        "truth.npz": "ce354834e88c98c08f34175e057f1c4792ce84bfebba7d7231cd5fd670de9c43",
+        "truth_original_coordinates.npz": "7c03723bfb675719d75df36145a322ddb0ed0c6b67745bddf321b6681700e95e"
+      },
+      "directory": "artifacts/stage7/sensitivity-v2/level_wide/factors_sparse-7101",
+      "status": "accepted"
+    },
+    {
+      "artifacts": {
+        "attempt_0.json": "4b6a8eabef9f5dfba37e1fec33eb8476a4b3d8eb3fa2230bc1a1d74f23e94e25",
+        "data.npz": "c6d23bdf858acc4fe9141915fa9d6bbb3314c60843c8e18e1f070bdb26d438cc",
+        "early_failure_0.json": "0a27289d364c258f8bd4e64b73b566cffd74d3db6e61aabb633dc9cfd84a2236",
+        "failed_state_0.npz": "ce979de2632118c1c17cae7efd6fbf20ce28fa162d0f5105b94cecef4a0203eb",
+        "interruption.json": "aa62b0f85ede182651bccb0f76438a1d11c4176a89b034df2b51e1835b4d7a4c",
+        "run.json": "bac7e5ec1d08cb279b9af6c016b066c20211bb5452973f1a7d0b46e64be0019f",
+        "truth.npz": "dac3654db20054410876005868f2f268d33d9d7901bc4a2949a8f4039fd5aafb",
+        "truth_original_coordinates.npz": "b48cdc70e3dff4635810daf06d6b1910d3e03c43d9db27b1745919cdc1186b2a"
+      },
+      "directory": "artifacts/stage7/sensitivity-v2/level_wide/fallback_zero-7101",
+      "status": "interrupted"
+    },
+    {
+      "artifacts": {
+        "attempt_0.json": "9c18f4a55c217f6bea443fae8447c3ea9904415854ec483ab9157a21db3eb511",
+        "data.npz": "2f16c14da6f108731a36c429e2d532a6c4f7ab343a4e989a3cda9c5473faef19",
+        "early_failure_0.json": "c1191fc3ad7f10a8cf84e4a62391cda3a4a1b9c76e59bc1b8f38ce5321c6a85f",
+        "failed_state_0.npz": "2952cc8d9742fda386e0de3d5efb6d749a83b00803f6732f7ab5c5508be09dcf",
+        "gradient_timing.json": "afa72a08df959d101921d39c9448d251cdf46b7411bb4da5838fc0f17b043b21",
+        "interruption.json": "df525b1a67c19abadd72ae440d5a295bb4325cb77007b95dd7959c3066c09af5",
+        "run.json": "9d2f2d6dd367a40d5bb66e8026577a90f63682397ad18d4db2769c4755798433",
+        "truth.npz": "92e92d139ba48feaf06569b34db715a2fc9c58870b6aeb5a6dbc76f3628945af",
+        "truth_original_coordinates.npz": "9fca1f6c6e33992fe0a0bb22a0599a87ac6aa677385e5b6873808e7e12fd3eec"
+      },
+      "directory": "artifacts/stage7/sensitivity-v2/level_wide/representative-7101",
+      "status": "interrupted"
+    },
+    {
+      "artifacts": {
+        "data.npz": "3e934be2636988b7000f2d166c3e684e788b349a7f36b847080ebd2932fde430",
+        "interruption.json": "cd65a002421b5e8044af4162ae031f0c8bfeab028515d1b6a3d74f93c9d276f4",
+        "run.json": "7dec78d6f417498bd462c4e5c7bfab6db9dee673cd70185c86df3b6596fb8a0a",
+        "truth.npz": "0b05a74f44aaa8b83363ef90e2e66dd6c77166bc6649e79b326d462ba934a9b8",
+        "truth_original_coordinates.npz": "6203371026c575a603ab441f6086f56c594c0d466f3569ded9dd39267c892185"
+      },
+      "directory": "artifacts/stage7/severity-conditional-v2/severity_missing-7102",
+      "status": "interrupted"
+    }
+  ],
+  "held_out_scoring_enabled": false,
+  "interpretation": "Completion includes explicit diagnostic failures. Sensitivity and coordinate refits are not independent generated datasets. Severity-coordinate verification may reference the same files as routed primary cases; runs contains each directory only once. Effort variants share observations. Count-panel fingerprints show reuse; distinct fingerprints are not a claim of independent replication or simulation-based calibration.",
+  "observed_training_count_panel_groups": {
+    "003add026b197cccdca035c93a167ba9094ff124a7f4fc09831651702a4030d2": [
+      {
+        "scenario": "fallback_zero",
+        "seed": 7103
+      }
+    ],
+    "08911d7f62d7733f35ecbd53e703d466160d2e820835f34c595ac5c05089727f": [
+      {
+        "scenario": "independent",
+        "seed": 7103
+      }
+    ],
+    "0d1827b4a05ea07a23f579502dc7fc71e998aff211dfe4704186ad7ce8373c4d": [
+      {
+        "scenario": "effort_proxy",
+        "seed": 7101
+      },
+      {
+        "scenario": "effort_oracle",
+        "seed": 7101
+      },
+      {
+        "scenario": "effort_none",
+        "seed": 7101
+      }
+    ],
+    "338cffb3e6be4e498ca8957a1998c7488f6f8efb7292328f25a51dd31df171bb": [
+      {
+        "scenario": "kernel_present",
+        "seed": 7103
+      }
+    ],
+    "37d5a18af1c1d0e0c38760359d6932b625106264ca9ff82ff30f25bf98c54949": [
+      {
+        "scenario": "dispersion_dense",
+        "seed": 7102
+      }
+    ],
+    "37e95b7937520cb37574dcac6181080aa7b95e0716ca26e3b9772fdb063cf017": [
+      {
+        "scenario": "independent",
+        "seed": 7101
+      }
+    ],
+    "4c2def7de2f516fa40964ec0ccc0e061bd4b9da0ec7035976b23710703d140d4": [
+      {
+        "scenario": "regimes",
+        "seed": 7103
+      }
+    ],
+    "568143759c01cf6208288592ef04091efbb5cc6b66fc1ed3c4d75ad89993853c": [
+      {
+        "scenario": "dispersion_dense",
+        "seed": 7103
+      }
+    ],
+    "5b3c010af5384d714f83bc841feb1514f4b0456d36cbb8414debff0be161d998": [
+      {
+        "scenario": "regimes",
+        "seed": 7101
+      }
+    ],
+    "5d931806ebb49da867e891930916f3650e6f3733063b169bb60445f2885867bf": [
+      {
+        "scenario": "factors_sparse",
+        "seed": 7101
+      }
+    ],
+    "5ff379fdbc9851928ab81e172318f9d1ba7dd4832a02db8586d946b58ee44fc8": [
+      {
+        "scenario": "kernel_absent",
+        "seed": 7102
+      }
+    ],
+    "67b4735d9f18562f39c51f2fbd40228181ebec182e495c7d8bd3a88fa38b1fc5": [
+      {
+        "scenario": "dispersion_dense",
+        "seed": 7101
+      }
+    ],
+    "688d9d894895c669fb9c4bff91bd960cbd9c70a542659ab2cabeb2220c7ed03b": [
+      {
+        "scenario": "dispersion_sparse",
+        "seed": 7102
+      }
+    ],
+    "6dd75d3f6335b6169aa5c90d9c77351eaf98650b9ad2a5cab921dc34bc80c28f": [
+      {
+        "scenario": "misspecified",
+        "seed": 7102
+      }
+    ],
+    "75c5dd75d45b2556ffc60262b57c82893a4354b521bd36d3f4ce800b3beb9154": [
+      {
+        "scenario": "kernel_absent",
+        "seed": 7101
+      }
+    ],
+    "762e7ba08aa0f83ee84572c7e59943939e4da021a2d747708168a797655ff755": [
+      {
+        "scenario": "fallback_zero",
+        "seed": 7101
+      }
+    ],
+    "8371c7a12dbd7e10847f58cbf567fc1fe6635c9762c242b3204309cde849286c": [
+      {
+        "scenario": "effort_proxy",
+        "seed": 7103
+      },
+      {
+        "scenario": "effort_oracle",
+        "seed": 7103
+      },
+      {
+        "scenario": "effort_none",
+        "seed": 7103
+      }
+    ],
+    "83d0dc58e60cc2d140af7d6c9acd6df715d51d0ba930d6b80e299ef3a3e6a2ed": [
+      {
+        "scenario": "severity_missing",
+        "seed": 7101
+      }
+    ],
+    "8b02aec2091a6c5dfd71e0101f734999e9892d5471b9fc8d3543ceb2f40f99be": [
+      {
+        "scenario": "misspecified",
+        "seed": 7103
+      }
+    ],
+    "8cf8e74986d9577ccee49f9841c089d95ababf7b189e4ccef36bd3bcdb8dccba": [
+      {
+        "scenario": "kernel_absent",
+        "seed": 7103
+      }
+    ],
+    "987d6c228efb7b7a85a3f9626bd32ddd7809b15d51e56954cda5825dc2de02a1": [
+      {
+        "scenario": "representative",
+        "seed": 7101
+      }
+    ],
+    "a5c9fc57ad0aa4292f3d62ef6554174a5f26be237c9877661d818db78adb9bfc": [
+      {
+        "scenario": "dispersion_sparse",
+        "seed": 7101
+      }
+    ],
+    "acd36df34a172cc93f75ab25262a28bd3c1a79c98d7c316f71dee944c30c2846": [
+      {
+        "scenario": "latent_ar",
+        "seed": 7102
+      }
+    ],
+    "b5e629fa98305a763f57f5f7086dd983ae2cf58c0ec4e39f520c7c02bc020b35": [
+      {
+        "scenario": "factors_sparse",
+        "seed": 7103
+      }
+    ],
+    "bef234d13fa67400d5190c94b3ebe96bedd706b7440ac77d70e7467d59c27484": [
+      {
+        "scenario": "kernel_present",
+        "seed": 7102
+      }
+    ],
+    "c3193bfa83e9946556ebfaf983aa461497b8ac065b5b9f6e7754f5897fe0d00e": [
+      {
+        "scenario": "fallback_zero",
+        "seed": 7102
+      }
+    ],
+    "c3993b78e2d3088ef51ac4c4b1fe1c322997dc75dbd95a777e033ab98aa2036a": [
+      {
+        "scenario": "severity_missing",
+        "seed": 7102
+      }
+    ],
+    "ce141cd39c8fd83ee7f2421c05d9e51652c9d0ee3ab454ed8e6305b2fe07de3b": [
+      {
+        "scenario": "misspecified",
+        "seed": 7101
+      }
+    ],
+    "d4bff105fe020ebf7de437f6e0995c601576774c92cc8513587b71be62754624": [
+      {
+        "scenario": "factors_sparse",
+        "seed": 7102
+      }
+    ],
+    "d6364f907c3f6c5455ad24fc5b2819a47c6929e73418e5aa80efcbd75be35e94": [
+      {
+        "scenario": "regimes",
+        "seed": 7102
+      }
+    ],
+    "dbc98ad377646d081ad56c6c9f7a86c447ad212ceab5319b55cf93ef6033f101": [
+      {
+        "scenario": "dispersion_sparse",
+        "seed": 7103
+      }
+    ],
+    "de9549bba9c00b3211f52c77312930a171cd3b0f1442961dbdd72a6db5ebc6fd": [
+      {
+        "scenario": "severity_missing",
+        "seed": 7103
+      }
+    ],
+    "e78c13df4856d1438e76e67a88e5f3f1adf9fd8da176f74b930d57fef297003e": [
+      {
+        "scenario": "independent",
+        "seed": 7102
+      }
+    ],
+    "ea828dc44671d0c75c7fc9d918e8ea9a81d6f77c9d35a594bebacc89dd43338b": [
+      {
+        "scenario": "latent_ar",
+        "seed": 7103
+      }
+    ],
+    "ef1d79722acdd81df15d7cb4272a8a6ec89676e3fe833f50559b19eca79eb558": [
+      {
+        "scenario": "kernel_present",
+        "seed": 7101
+      }
+    ],
+    "fc441935d4347bbe328f0be9297985643cbaf7db61add82d54142ad00bc9b125": [
+      {
+        "scenario": "latent_ar",
+        "seed": 7101
+      }
+    ],
+    "ff8ba44f9b928bf2f466b2d026201835b578b9d1431b46ba34f86e1ce5b8c4ea": [
+      {
+        "scenario": "effort_proxy",
+        "seed": 7102
+      },
+      {
+        "scenario": "effort_oracle",
+        "seed": 7102
+      },
+      {
+        "scenario": "effort_none",
+        "seed": 7102
+      }
+    ]
+  },
+  "primary_cases": 43,
+  "prior_id": "anchored_levels_v2",
+  "recompute_diagnostics_requested": true,
+  "routing_sha256": "a23cfc9d55c2dfafc862f5047b5bb07191b816e6764d1c82bb9375f8b7460218",
+  "runs": [
+    {
+      "accepted_diagnostics_recomputed": true,
+      "attempts": 1,
+      "campaign": "primary",
+      "candidate": "primary",
+      "compute_thread_policy": "original library defaults",
+      "data_sha256": "6a642082fa2b5588d6d577cb73bba72c1e094b445232cc9f3ba235d75c95e288",
+      "directory": "artifacts/stage7/recovery-v6/independent-7101",
+      "observed_count_fingerprint": "37e95b7937520cb37574dcac6181080aa7b95e0716ca26e3b9772fdb063cf017",
+      "options": {
+        "categories": 4,
+        "conditional_level": false,
+        "factor_parameterization": "anchored",
+        "factors": 0,
+        "kernel": false,
+        "known_auxiliary_coefficients": false,
+        "level_settings": {
+          "amplitude_multiplier": 1.0,
+          "anchor": 3.4612499444591895,
+          "candidate": "primary",
+          "fallback_anchor": null,
+          "fallback_index": null,
+          "hyper_sd": 1.0,
+          "known_indices": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "scale_sd": 1.0,
+          "scale_upper": 2.0,
+          "training_months": 96
+        },
+        "mass_matrix": "dense",
+        "months": 96,
+        "prior_candidate": "primary",
+        "prior_id": "anchored_levels_v2",
+        "regimes": 1,
+        "residual": "none",
+        "scenario": "independent",
+        "seed": 7101,
+        "severity_factors": 0
+      },
+      "original_truth_sha256": "058c127f872643e0b83d00a9b42cf3147293d42abb8577a1462dbe6075542f91",
+      "recovery_eligible": true,
+      "recovery_exclusion": null,
+      "result_sha256": "86c4ea5b7f189c4246ab7a3e24987b9450047e118167eb0053b7c028aa3179c3",
+      "scenario": "independent",
+      "seed": 7101,
+      "source_control": {
+        "dirty": false,
+        "revision": "de3e33c37bc3cfbe14adeded6b1370dd47604832",
+        "status": "available"
+      },
+      "status": "accepted",
+      "truth_sha256": "058c127f872643e0b83d00a9b42cf3147293d42abb8577a1462dbe6075542f91"
+    },
+    {
+      "accepted_diagnostics_recomputed": true,
+      "attempts": 1,
+      "campaign": "primary",
+      "candidate": "primary",
+      "compute_thread_policy": "original library defaults",
+      "data_sha256": "85059e6dec89897108928de65a5b1e481def4edcec969e5f13c0b51ee7b268a4",
+      "directory": "artifacts/stage7/recovery-v6/independent-7102",
+      "observed_count_fingerprint": "e78c13df4856d1438e76e67a88e5f3f1adf9fd8da176f74b930d57fef297003e",
+      "options": {
+        "categories": 4,
+        "conditional_level": false,
+        "factor_parameterization": "anchored",
+        "factors": 0,
+        "kernel": false,
+        "known_auxiliary_coefficients": false,
+        "level_settings": {
+          "amplitude_multiplier": 1.0,
+          "anchor": 3.4941373304445174,
+          "candidate": "primary",
+          "fallback_anchor": null,
+          "fallback_index": null,
+          "hyper_sd": 1.0,
+          "known_indices": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "scale_sd": 1.0,
+          "scale_upper": 2.0,
+          "training_months": 96
+        },
+        "mass_matrix": "dense",
+        "months": 96,
+        "prior_candidate": "primary",
+        "prior_id": "anchored_levels_v2",
+        "regimes": 1,
+        "residual": "none",
+        "scenario": "independent",
+        "seed": 7102,
+        "severity_factors": 0
+      },
+      "original_truth_sha256": "6cd5410688fad24c5fc7ec2825306724f39c5c7921387a057cbee61b024c2eab",
+      "recovery_eligible": true,
+      "recovery_exclusion": null,
+      "result_sha256": "6232a5b4fd8496cbe7a6ccb590c47121d208408eb8a6cb8cd07885e0cd0ebcda",
+      "scenario": "independent",
+      "seed": 7102,
+      "source_control": {
+        "dirty": false,
+        "revision": "de3e33c37bc3cfbe14adeded6b1370dd47604832",
+        "status": "available"
+      },
+      "status": "accepted",
+      "truth_sha256": "6cd5410688fad24c5fc7ec2825306724f39c5c7921387a057cbee61b024c2eab"
+    },
+    {
+      "accepted_diagnostics_recomputed": true,
+      "attempts": 1,
+      "campaign": "primary",
+      "candidate": "primary",
+      "compute_thread_policy": "original library defaults",
+      "data_sha256": "c9f2ebd7eddd652035fd5823bacd5154593875c4d21e66164e5dbf99e3e7ed84",
+      "directory": "artifacts/stage7/recovery-v6/independent-7103",
+      "observed_count_fingerprint": "08911d7f62d7733f35ecbd53e703d466160d2e820835f34c595ac5c05089727f",
+      "options": {
+        "categories": 4,
+        "conditional_level": false,
+        "factor_parameterization": "anchored",
+        "factors": 0,
+        "kernel": false,
+        "known_auxiliary_coefficients": false,
+        "level_settings": {
+          "amplitude_multiplier": 1.0,
+          "anchor": 3.472871839665175,
+          "candidate": "primary",
+          "fallback_anchor": null,
+          "fallback_index": null,
+          "hyper_sd": 1.0,
+          "known_indices": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "scale_sd": 1.0,
+          "scale_upper": 2.0,
+          "training_months": 96
+        },
+        "mass_matrix": "dense",
+        "months": 96,
+        "prior_candidate": "primary",
+        "prior_id": "anchored_levels_v2",
+        "regimes": 1,
+        "residual": "none",
+        "scenario": "independent",
+        "seed": 7103,
+        "severity_factors": 0
+      },
+      "original_truth_sha256": "03ed14222904acd33a48afbe3fc908da5a96160474120850d2b2f34c90eb1f6a",
+      "recovery_eligible": true,
+      "recovery_exclusion": null,
+      "result_sha256": "3d23faf1f787ab1ccd850b4b8f4886d074831d768c3568626e9ef3319849e6cb",
+      "scenario": "independent",
+      "seed": 7103,
+      "source_control": {
+        "dirty": false,
+        "revision": "de3e33c37bc3cfbe14adeded6b1370dd47604832",
+        "status": "available"
+      },
+      "status": "accepted",
+      "truth_sha256": "03ed14222904acd33a48afbe3fc908da5a96160474120850d2b2f34c90eb1f6a"
+    },
+    {
+      "accepted_diagnostics_recomputed": true,
+      "attempts": 2,
+      "campaign": "primary",
+      "candidate": "primary",
+      "compute_thread_policy": "original library defaults",
+      "data_sha256": "dceedb013ea71a2080ab3ff69442aaadaf7d1aa8169d041aa863d0899ab1dc83",
+      "directory": "artifacts/stage7/recovery-v6/latent_ar-7101",
+      "observed_count_fingerprint": "fc441935d4347bbe328f0be9297985643cbaf7db61add82d54142ad00bc9b125",
+      "options": {
+        "categories": 1,
+        "conditional_level": false,
+        "factor_parameterization": "anchored",
+        "factors": 0,
+        "kernel": false,
+        "known_auxiliary_coefficients": false,
+        "level_settings": {
+          "amplitude_multiplier": 1.0,
+          "anchor": 3.8574348151437428,
+          "candidate": "primary",
+          "fallback_anchor": null,
+          "fallback_index": null,
+          "hyper_sd": 1.0,
+          "known_indices": [
+            0
+          ],
+          "scale_sd": 1.0,
+          "scale_upper": 2.0,
+          "training_months": 96
+        },
+        "mass_matrix": "dense",
+        "months": 96,
+        "prior_candidate": "primary",
+        "prior_id": "anchored_levels_v2",
+        "regimes": 1,
+        "residual": "ar",
+        "scenario": "latent_ar",
+        "seed": 7101,
+        "severity_factors": 0
+      },
+      "original_truth_sha256": "ba9834c201c1f45cbbb3a8d5dfb3cd89583c82adc97865d62e55706194dbc699",
+      "recovery_eligible": true,
+      "recovery_exclusion": null,
+      "result_sha256": "dee6a6ce546d0478dc86eeea98c6a0c53723fe5c2606acf6c796cd9d320a5e2c",
+      "scenario": "latent_ar",
+      "seed": 7101,
+      "source_control": {
+        "dirty": true,
+        "revision": "de3e33c37bc3cfbe14adeded6b1370dd47604832",
+        "status": "available"
+      },
+      "status": "accepted",
+      "truth_sha256": "082223d815834114c88546d9e078cdad8aab59afa797ffdfcfd0a53ad982378e"
+    },
+    {
+      "accepted_diagnostics_recomputed": true,
+      "attempts": 1,
+      "campaign": "primary",
+      "candidate": "primary",
+      "compute_thread_policy": "original library defaults",
+      "data_sha256": "8c49665f3ab610dd03a3162c054e4d833a63209410c481842b04a4e9289a0548",
+      "directory": "artifacts/stage7/recovery-v6/latent_ar-7102",
+      "observed_count_fingerprint": "acd36df34a172cc93f75ab25262a28bd3c1a79c98d7c316f71dee944c30c2846",
+      "options": {
+        "categories": 1,
+        "conditional_level": false,
+        "factor_parameterization": "anchored",
+        "factors": 0,
+        "kernel": false,
+        "known_auxiliary_coefficients": false,
+        "level_settings": {
+          "amplitude_multiplier": 1.0,
+          "anchor": 3.7565867774155737,
+          "candidate": "primary",
+          "fallback_anchor": null,
+          "fallback_index": null,
+          "hyper_sd": 1.0,
+          "known_indices": [
+            0
+          ],
+          "scale_sd": 1.0,
+          "scale_upper": 2.0,
+          "training_months": 96
+        },
+        "mass_matrix": "dense",
+        "months": 96,
+        "prior_candidate": "primary",
+        "prior_id": "anchored_levels_v2",
+        "regimes": 1,
+        "residual": "ar",
+        "scenario": "latent_ar",
+        "seed": 7102,
+        "severity_factors": 0
+      },
+      "original_truth_sha256": "a52c54b497fbc709353252f8143842e0fb72b9362812c3a81394a7f522cf9345",
+      "recovery_eligible": true,
+      "recovery_exclusion": null,
+      "result_sha256": "0a490cc20a2de8cdfe8cb46f72417cfd665d99f4128f6c801ee35fca17e90ef6",
+      "scenario": "latent_ar",
+      "seed": 7102,
+      "source_control": {
+        "dirty": true,
+        "revision": "de3e33c37bc3cfbe14adeded6b1370dd47604832",
+        "status": "available"
+      },
+      "status": "accepted",
+      "truth_sha256": "77987a315e847bb990044e7274b46711604cadf815ceec1f861d5e805aa6a19f"
+    },
+    {
+      "accepted_diagnostics_recomputed": false,
+      "attempts": 3,
+      "campaign": "primary",
+      "candidate": "primary",
+      "compute_thread_policy": "original library defaults",
+      "data_sha256": "1544101b43302b3c3194f58ce2147e00a18be30718b55d637fea96844d334f21",
+      "directory": "artifacts/stage7/recovery-v6/latent_ar-7103",
+      "observed_count_fingerprint": "ea828dc44671d0c75c7fc9d918e8ea9a81d6f77c9d35a594bebacc89dd43338b",
+      "options": {
+        "categories": 1,
+        "conditional_level": false,
+        "factor_parameterization": "anchored",
+        "factors": 0,
+        "kernel": false,
+        "known_auxiliary_coefficients": false,
+        "level_settings": {
+          "amplitude_multiplier": 1.0,
+          "anchor": 3.682085594692528,
+          "candidate": "primary",
+          "fallback_anchor": null,
+          "fallback_index": null,
+          "hyper_sd": 1.0,
+          "known_indices": [
+            0
+          ],
+          "scale_sd": 1.0,
+          "scale_upper": 2.0,
+          "training_months": 96
+        },
+        "mass_matrix": "dense",
+        "months": 96,
+        "prior_candidate": "primary",
+        "prior_id": "anchored_levels_v2",
+        "regimes": 1,
+        "residual": "ar",
+        "scenario": "latent_ar",
+        "seed": 7103,
+        "severity_factors": 0
+      },
+      "original_truth_sha256": "7224fa23969fb038fe90ba944c2166535e063c3b87a50e8936801b525651f9a6",
+      "recovery_eligible": false,
+      "recovery_exclusion": null,
+      "result_sha256": "4f201446ce91bb2efa2f16151e076b4780425a53e49df8a8a28c61c24a1b22e9",
+      "scenario": "latent_ar",
+      "seed": 7103,
+      "source_control": {
+        "dirty": true,
+        "revision": "de3e33c37bc3cfbe14adeded6b1370dd47604832",
+        "status": "available"
+      },
+      "status": "failed_diagnostic_gate",
+      "truth_sha256": "890ba704f568c01f90aa66123280888fe71c89f2c5beb36f9d06d24e3afbca64"
+    },
+    {
+      "accepted_diagnostics_recomputed": true,
+      "attempts": 2,
+      "campaign": "primary",
+      "candidate": "primary",
+      "compute_thread_policy": "One native numerical thread per sequential-chain fit process.",
+      "data_sha256": "53a7f3bd8c4eba71e76b1cd015bad5980be48a402dd59e517574727f8e7cbd33",
+      "directory": "artifacts/stage7/count-matched-v1/primary/factors_sparse-7101",
+      "observed_count_fingerprint": "5d931806ebb49da867e891930916f3650e6f3733063b169bb60445f2885867bf",
+      "options": {
+        "categories": 4,
+        "conditional_level": false,
+        "count_parameterization": "conditional",
+        "factor_parameterization": "anchored",
+        "factors": 1,
+        "gaussian_solver": "block",
+        "kernel": false,
+        "known_auxiliary_coefficients": false,
+        "level_settings": {
+          "amplitude_multiplier": 1.0,
+          "anchor": 3.5876337249873824,
+          "candidate": "primary",
+          "fallback_anchor": null,
+          "fallback_index": null,
+          "hyper_sd": 1.0,
+          "known_indices": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "scale_sd": 1.0,
+          "scale_upper": 2.0,
+          "training_months": 96
+        },
+        "mass_matrix": "dense",
+        "months": 96,
+        "prior_candidate": "primary",
+        "prior_id": "anchored_levels_v2",
+        "regimes": 1,
+        "residual": "none",
+        "scenario": "factors_sparse",
+        "seed": 7101,
+        "severity_factors": 0
+      },
+      "original_truth_sha256": "7c03723bfb675719d75df36145a322ddb0ed0c6b67745bddf321b6681700e95e",
+      "recovery_eligible": true,
+      "recovery_exclusion": null,
+      "result_sha256": "860258865459c640d786456a0ae8d2adf9351a6e1cb61692b456b20eb4e36fa7",
+      "scenario": "factors_sparse",
+      "seed": 7101,
+      "source_control": {
+        "dirty": false,
+        "revision": "9297bb69c297bd0f4ac5cd67d894c043bfd020e8",
+        "status": "available"
+      },
+      "status": "accepted",
+      "truth_sha256": "ce354834e88c98c08f34175e057f1c4792ce84bfebba7d7231cd5fd670de9c43"
+    },
+    {
+      "accepted_diagnostics_recomputed": true,
+      "attempts": 2,
+      "campaign": "primary",
+      "candidate": "primary",
+      "compute_thread_policy": "One native numerical thread per sequential-chain fit process.",
+      "data_sha256": "b05b466fb78f7234afc26ac11254b82ccf020ecb4392155e5383c6e5e864ff66",
+      "directory": "artifacts/stage7/count-matched-v1/primary/factors_sparse-7102",
+      "observed_count_fingerprint": "d4bff105fe020ebf7de437f6e0995c601576774c92cc8513587b71be62754624",
+      "options": {
+        "categories": 4,
+        "conditional_level": false,
+        "count_parameterization": "conditional",
+        "factor_parameterization": "anchored",
+        "factors": 1,
+        "gaussian_solver": "block",
+        "kernel": false,
+        "known_auxiliary_coefficients": false,
+        "level_settings": {
+          "amplitude_multiplier": 1.0,
+          "anchor": 3.6003754864921804,
+          "candidate": "primary",
+          "fallback_anchor": null,
+          "fallback_index": null,
+          "hyper_sd": 1.0,
+          "known_indices": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "scale_sd": 1.0,
+          "scale_upper": 2.0,
+          "training_months": 96
+        },
+        "mass_matrix": "dense",
+        "months": 96,
+        "prior_candidate": "primary",
+        "prior_id": "anchored_levels_v2",
+        "regimes": 1,
+        "residual": "none",
+        "scenario": "factors_sparse",
+        "seed": 7102,
+        "severity_factors": 0
+      },
+      "original_truth_sha256": "fdf1726ad738f31dc87cb075d92dca3eaed0d691b60648e10934466d16db6923",
+      "recovery_eligible": true,
+      "recovery_exclusion": null,
+      "result_sha256": "95aa0eb652529917de6a6beeeb4aa59a9c8e945a889cc37ab31235bcd0e4f2df",
+      "scenario": "factors_sparse",
+      "seed": 7102,
+      "source_control": {
+        "dirty": false,
+        "revision": "e145c8db36c0c61bceabd4e2023b85cde62adad6",
+        "status": "available"
+      },
+      "status": "accepted",
+      "truth_sha256": "550aef99f435b80ff0bcaff3fe9b267888bab9a98290d517f19b2668081eb329"
+    },
+    {
+      "accepted_diagnostics_recomputed": true,
+      "attempts": 3,
+      "campaign": "primary",
+      "candidate": "primary",
+      "compute_thread_policy": "One native numerical thread per sequential-chain fit process.",
+      "data_sha256": "8cf556c442547b75faec53bfe7e5c0298096177d4d4928b488101a724a92169d",
+      "directory": "artifacts/stage7/count-matched-v1/primary/factors_sparse-7103",
+      "observed_count_fingerprint": "b5e629fa98305a763f57f5f7086dd983ae2cf58c0ec4e39f520c7c02bc020b35",
+      "options": {
+        "categories": 4,
+        "conditional_level": false,
+        "count_parameterization": "conditional",
+        "factor_parameterization": "anchored",
+        "factors": 1,
+        "gaussian_solver": "block",
+        "kernel": false,
+        "known_auxiliary_coefficients": false,
+        "level_settings": {
+          "amplitude_multiplier": 1.0,
+          "anchor": 3.497454083070511,
+          "candidate": "primary",
+          "fallback_anchor": null,
+          "fallback_index": null,
+          "hyper_sd": 1.0,
+          "known_indices": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "scale_sd": 1.0,
+          "scale_upper": 2.0,
+          "training_months": 96
+        },
+        "mass_matrix": "dense",
+        "months": 96,
+        "prior_candidate": "primary",
+        "prior_id": "anchored_levels_v2",
+        "regimes": 1,
+        "residual": "none",
+        "scenario": "factors_sparse",
+        "seed": 7103,
+        "severity_factors": 0
+      },
+      "original_truth_sha256": "38b023cdee17cb92a93940490bc53e5246e29ad885c12fdbee0730529846bc0a",
+      "recovery_eligible": true,
+      "recovery_exclusion": null,
+      "result_sha256": "0f54c9a9209506007fe6a48d13ed73d2d1b1106a36fb0f1da8912819d76218f4",
+      "scenario": "factors_sparse",
+      "seed": 7103,
+      "source_control": {
+        "dirty": true,
+        "revision": "b628ae1b7a111d29152359648c9196bb6bdc1e1c",
+        "status": "available"
+      },
+      "status": "accepted",
+      "truth_sha256": "584772a2b0af044d36d1e48893271153a2df5952915c7028181bea1cbb0b4f73"
+    },
+    {
+      "accepted_diagnostics_recomputed": true,
+      "also_verified_as": [
+        "severity_coordinates"
+      ],
+      "attempts": 3,
+      "campaign": "primary",
+      "candidate": "primary",
+      "compute_thread_policy": "One native numerical thread per sequential-chain fit process.",
+      "data_sha256": "10437cc9f0aa78a77dd47938462fc56c2e36ff631c0d072cc6afc5fb4c1b0788",
+      "directory": "artifacts/stage7/severity-conditional-v2/severity_missing-7101",
+      "observed_count_fingerprint": "83d0dc58e60cc2d140af7d6c9acd6df715d51d0ba930d6b80e299ef3a3e6a2ed",
+      "options": {
+        "categories": 4,
+        "conditional_level": false,
+        "factor_parameterization": "anchored",
+        "factors": 1,
+        "kernel": false,
+        "known_auxiliary_coefficients": true,
+        "level_settings": {
+          "amplitude_multiplier": 1.0,
+          "anchor": 3.5962694299539026,
+          "candidate": "primary",
+          "fallback_anchor": null,
+          "fallback_index": null,
+          "hyper_sd": 1.0,
+          "known_indices": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "scale_sd": 1.0,
+          "scale_upper": 2.0,
+          "training_months": 96
+        },
+        "mass_matrix": "dense",
+        "months": 96,
+        "prior_candidate": "primary",
+        "prior_id": "anchored_levels_v2",
+        "regimes": 1,
+        "residual": "none",
+        "scenario": "severity_missing",
+        "seed": 7101,
+        "severity_factors": 1,
+        "severity_parameterization": "conditional"
+      },
+      "original_truth_sha256": "ff50d3d699b1bbd646edf73d943793137cedcc50ac7be27a4b3f4c665ddfd0f5",
+      "recovery_eligible": true,
+      "recovery_exclusion": null,
+      "result_sha256": "8943b5a546f0cb85583b331aeb384091d9949f1ce075ff79edade80a53a85994",
+      "scenario": "severity_missing",
+      "seed": 7101,
+      "source_control": {
+        "dirty": false,
+        "revision": "c6ddca2964b73b820176659c330322a95ccab862",
+        "status": "available"
+      },
+      "status": "accepted",
+      "truth_sha256": "6a844e1b502b7e96dcdcb66e2782cd04ef32b0da75b48091d2bd87a316b40c35"
+    },
+    {
+      "accepted_diagnostics_recomputed": true,
+      "also_verified_as": [
+        "severity_coordinates"
+      ],
+      "attempts": 3,
+      "campaign": "primary",
+      "candidate": "primary",
+      "compute_thread_policy": "One native numerical thread per sequential-chain fit process.",
+      "data_sha256": "3e934be2636988b7000f2d166c3e684e788b349a7f36b847080ebd2932fde430",
+      "directory": "artifacts/stage7/severity-block-v3/severity_missing-7102",
+      "observed_count_fingerprint": "c3993b78e2d3088ef51ac4c4b1fe1c322997dc75dbd95a777e033ab98aa2036a",
+      "options": {
+        "categories": 4,
+        "conditional_level": false,
+        "factor_parameterization": "anchored",
+        "factors": 1,
+        "gaussian_solver": "block",
+        "kernel": false,
+        "known_auxiliary_coefficients": true,
+        "level_settings": {
+          "amplitude_multiplier": 1.0,
+          "anchor": 3.6661363665944866,
+          "candidate": "primary",
+          "fallback_anchor": null,
+          "fallback_index": null,
+          "hyper_sd": 1.0,
+          "known_indices": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "scale_sd": 1.0,
+          "scale_upper": 2.0,
+          "training_months": 96
+        },
+        "mass_matrix": "dense",
+        "months": 96,
+        "prior_candidate": "primary",
+        "prior_id": "anchored_levels_v2",
+        "regimes": 1,
+        "residual": "none",
+        "scenario": "severity_missing",
+        "seed": 7102,
+        "severity_factors": 1,
+        "severity_parameterization": "conditional"
+      },
+      "original_truth_sha256": "6203371026c575a603ab441f6086f56c594c0d466f3569ded9dd39267c892185",
+      "recovery_eligible": true,
+      "recovery_exclusion": null,
+      "result_sha256": "ec1ea27e48ab9c3c6b8b741c75a4a1ebbdaac10fcee48fc8ac56f9dcb6201b20",
+      "scenario": "severity_missing",
+      "seed": 7102,
+      "source_control": {
+        "dirty": false,
+        "revision": "8c622cb4813b6aa1b5f1fe9d3d1ba29fc668a9e7",
+        "status": "available"
+      },
+      "status": "accepted",
+      "truth_sha256": "0b05a74f44aaa8b83363ef90e2e66dd6c77166bc6649e79b326d462ba934a9b8"
+    },
+    {
+      "accepted_diagnostics_recomputed": true,
+      "also_verified_as": [
+        "severity_coordinates"
+      ],
+      "attempts": 1,
+      "campaign": "primary",
+      "candidate": "primary",
+      "compute_thread_policy": "One native numerical thread per sequential-chain fit process.",
+      "data_sha256": "70951e642f22adbeb1897ffcf05f046165eb4eebed9526d3983744b1b1f95d1f",
+      "directory": "artifacts/stage7/severity-block-v3/severity_missing-7103",
+      "observed_count_fingerprint": "de9549bba9c00b3211f52c77312930a171cd3b0f1442961dbdd72a6db5ebc6fd",
+      "options": {
+        "categories": 4,
+        "conditional_level": false,
+        "factor_parameterization": "anchored",
+        "factors": 1,
+        "gaussian_solver": "block",
+        "kernel": false,
+        "known_auxiliary_coefficients": true,
+        "level_settings": {
+          "amplitude_multiplier": 1.0,
+          "anchor": 3.40409173968852,
+          "candidate": "primary",
+          "fallback_anchor": null,
+          "fallback_index": null,
+          "hyper_sd": 1.0,
+          "known_indices": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "scale_sd": 1.0,
+          "scale_upper": 2.0,
+          "training_months": 96
+        },
+        "mass_matrix": "dense",
+        "months": 96,
+        "prior_candidate": "primary",
+        "prior_id": "anchored_levels_v2",
+        "regimes": 1,
+        "residual": "none",
+        "scenario": "severity_missing",
+        "seed": 7103,
+        "severity_factors": 1,
+        "severity_parameterization": "conditional"
+      },
+      "original_truth_sha256": "8d5aaf070d26f7af56e92c3b2bfef568f130eb8e008d3e00081645dca24ea096",
+      "recovery_eligible": true,
+      "recovery_exclusion": null,
+      "result_sha256": "d0dda3ce8a3e10e5abd1341c71c68c237187201543c16b3a8370618baf29edf0",
+      "scenario": "severity_missing",
+      "seed": 7103,
+      "source_control": {
+        "dirty": false,
+        "revision": "4c0f5ff2c592ffa16850eab0b72cdaa7a18cbd8f",
+        "status": "available"
+      },
+      "status": "accepted",
+      "truth_sha256": "01acda39cca64d7354237040033dc2d94ed441bd744c8f14f7b69f53e2fc819c"
+    },
+    {
+      "accepted_diagnostics_recomputed": true,
+      "attempts": 1,
+      "campaign": "primary",
+      "candidate": "primary",
+      "compute_thread_policy": "One native numerical thread per sequential-chain fit process.",
+      "data_sha256": "019fcc76b1c551c11058c3101266c19e10fb9327aa50bc77ba615cbab2dd7d9b",
+      "directory": "artifacts/stage7/recovery-v6/regimes-7101",
+      "observed_count_fingerprint": "5b3c010af5384d714f83bc841feb1514f4b0456d36cbb8414debff0be161d998",
+      "options": {
+        "categories": 4,
+        "conditional_level": false,
+        "factor_parameterization": "anchored",
+        "factors": 1,
+        "kernel": false,
+        "known_auxiliary_coefficients": false,
+        "level_settings": {
+          "amplitude_multiplier": 1.0,
+          "anchor": 4.5196633584143235,
+          "candidate": "primary",
+          "fallback_anchor": null,
+          "fallback_index": null,
+          "hyper_sd": 1.0,
+          "known_indices": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "scale_sd": 1.0,
+          "scale_upper": 2.0,
+          "training_months": 96
+        },
+        "mass_matrix": "dense",
+        "months": 96,
+        "prior_candidate": "primary",
+        "prior_id": "anchored_levels_v2",
+        "regimes": 2,
+        "residual": "none",
+        "scenario": "regimes",
+        "seed": 7101,
+        "severity_factors": 0
+      },
+      "original_truth_sha256": "c7d578aa9722cffbfdf46e7ad4845e117149b2bcda1fac6d2c36a3349a22bb40",
+      "recovery_eligible": true,
+      "recovery_exclusion": null,
+      "result_sha256": "1b127b70aa14246e9bb001dbf613ed5f3836b05034d3e0762a5898c885d4742f",
+      "scenario": "regimes",
+      "seed": 7101,
+      "source_control": {
+        "dirty": false,
+        "revision": "880d7a4281b7255e291fc4e13bdc8feb9d0881f7",
+        "status": "available"
+      },
+      "status": "accepted",
+      "truth_sha256": "11c366ae09648dac8c9ebe756bc47c83a5da467e265a9c960b72057528a0162c"
+    },
+    {
+      "accepted_diagnostics_recomputed": false,
+      "attempts": 3,
+      "campaign": "primary",
+      "candidate": "primary",
+      "compute_thread_policy": "One native numerical thread per sequential-chain fit process.",
+      "data_sha256": "5de64d7674bd1ec0df5b8be2f474729cf36394fb6e3a5d8d358dca6e968abdf6",
+      "directory": "artifacts/stage7/recovery-v6/regimes-7102",
+      "observed_count_fingerprint": "d6364f907c3f6c5455ad24fc5b2819a47c6929e73418e5aa80efcbd75be35e94",
+      "options": {
+        "categories": 4,
+        "conditional_level": false,
+        "factor_parameterization": "anchored",
+        "factors": 1,
+        "kernel": false,
+        "known_auxiliary_coefficients": false,
+        "level_settings": {
+          "amplitude_multiplier": 1.0,
+          "anchor": 4.416516121120927,
+          "candidate": "primary",
+          "fallback_anchor": null,
+          "fallback_index": null,
+          "hyper_sd": 1.0,
+          "known_indices": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "scale_sd": 1.0,
+          "scale_upper": 2.0,
+          "training_months": 96
+        },
+        "mass_matrix": "dense",
+        "months": 96,
+        "prior_candidate": "primary",
+        "prior_id": "anchored_levels_v2",
+        "regimes": 2,
+        "residual": "none",
+        "scenario": "regimes",
+        "seed": 7102,
+        "severity_factors": 0
+      },
+      "original_truth_sha256": "249920ed9ac95dd804b5dc3b6ef6e722e045366a90d5c16fc40044f0a3ab6eba",
+      "recovery_eligible": false,
+      "recovery_exclusion": null,
+      "result_sha256": "aee4dd76c7f72c88db4dcbdd6e3164d8de7f1e3778ed56392b7c41b7205634e7",
+      "scenario": "regimes",
+      "seed": 7102,
+      "source_control": {
+        "dirty": false,
+        "revision": "fea942b46c0e682dc047996665094a9139937278",
+        "status": "available"
+      },
+      "status": "failed_diagnostic_gate",
+      "truth_sha256": "e72f21539097ced288ecb7f4e71c24f9e3d91ffaf24374c79395422f0a014bef"
+    },
+    {
+      "accepted_diagnostics_recomputed": true,
+      "attempts": 3,
+      "campaign": "primary",
+      "candidate": "primary",
+      "compute_thread_policy": "One native numerical thread per sequential-chain fit process.",
+      "data_sha256": "6f8a92fa71540d248e866873139ec0fc2b9bf4b225bd939c6137a36173dedd8f",
+      "directory": "artifacts/stage7/recovery-v6/regimes-7103",
+      "observed_count_fingerprint": "4c2def7de2f516fa40964ec0ccc0e061bd4b9da0ec7035976b23710703d140d4",
+      "options": {
+        "categories": 4,
+        "conditional_level": false,
+        "factor_parameterization": "anchored",
+        "factors": 1,
+        "kernel": false,
+        "known_auxiliary_coefficients": false,
+        "level_settings": {
+          "amplitude_multiplier": 1.0,
+          "anchor": 4.113304309885221,
+          "candidate": "primary",
+          "fallback_anchor": null,
+          "fallback_index": null,
+          "hyper_sd": 1.0,
+          "known_indices": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "scale_sd": 1.0,
+          "scale_upper": 2.0,
+          "training_months": 96
+        },
+        "mass_matrix": "dense",
+        "months": 96,
+        "prior_candidate": "primary",
+        "prior_id": "anchored_levels_v2",
+        "regimes": 2,
+        "residual": "none",
+        "scenario": "regimes",
+        "seed": 7103,
+        "severity_factors": 0
+      },
+      "original_truth_sha256": "2ac5a3a3cab9108f3a02d8437500796f82268710a9c49d2df1ed8acdf829e974",
+      "recovery_eligible": true,
+      "recovery_exclusion": null,
+      "result_sha256": "4dca275f6a4638180c9a68430abcdc948d69625051a1b2c2927de59e17692e1e",
+      "scenario": "regimes",
+      "seed": 7103,
+      "source_control": {
+        "dirty": false,
+        "revision": "fea942b46c0e682dc047996665094a9139937278",
+        "status": "available"
+      },
+      "status": "accepted",
+      "truth_sha256": "0156ef9bfe5b62adcae537b9c259eae75c5b8a66217dd61345bb1cfe471e7b76"
+    },
+    {
+      "accepted_diagnostics_recomputed": true,
+      "attempts": 2,
+      "campaign": "primary",
+      "candidate": "primary",
+      "compute_thread_policy": "One native numerical thread per sequential-chain fit process.",
+      "data_sha256": "764d2e6d26f0541bd1cab1c4c01a6c872c25be8aeee724faeabda6403f035b2c",
+      "directory": "artifacts/stage7/sign-chart-v1/effort_proxy-7101",
+      "observed_count_fingerprint": "0d1827b4a05ea07a23f579502dc7fc71e998aff211dfe4704186ad7ce8373c4d",
+      "options": {
+        "categories": 4,
+        "conditional_level": false,
+        "count_parameterization": "conditional",
+        "factor_parameterization": "anchored",
+        "factors": 1,
+        "gaussian_solver": "block",
+        "kernel": false,
+        "known_auxiliary_coefficients": false,
+        "level_settings": {
+          "amplitude_multiplier": 1.0,
+          "anchor": 4.35195663408439,
+          "candidate": "primary",
+          "fallback_anchor": null,
+          "fallback_index": null,
+          "hyper_sd": 1.0,
+          "known_indices": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "scale_sd": 1.0,
+          "scale_upper": 2.0,
+          "training_months": 96
+        },
+        "mass_matrix": "dense",
+        "months": 96,
+        "prior_candidate": "primary",
+        "prior_id": "anchored_levels_v2",
+        "regimes": 1,
+        "residual": "none",
+        "scenario": "effort_proxy",
+        "seed": 7101,
+        "severity_factors": 0,
+        "working_sign_anchor": 3
+      },
+      "original_truth_sha256": "f76de2bd2974630b626d37b5c619e0f9a13ec583a15b62e80cea9fc3b7ea156f",
+      "recovery_eligible": false,
+      "recovery_exclusion": {
+        "directory": "artifacts/stage7/sign-chart-v1/effort_proxy-7101",
+        "evidence": "docs/checks/stage7-sign-exploration-20261022/seed7101.json",
+        "evidence_sha256": "b1c5b20549bd6906bb44c42fb926a67169d9a1ca5d2ce409cfb50db41f856782",
+        "reason": "A retained opposite orientation was found in attempt 0; numerically admitted attempt 1 has no crossings in any chain. Global exploration remains unresolved after the exact sign-chart change.",
+        "result_sha256": "7c864e7ee3faf99411d894b4601c30d147c206bc456fc73bf49a1a221bf6ca84"
+      },
+      "result_sha256": "7c864e7ee3faf99411d894b4601c30d147c206bc456fc73bf49a1a221bf6ca84",
+      "scenario": "effort_proxy",
+      "seed": 7101,
+      "source_control": {
+        "dirty": true,
+        "revision": "52b96a9a7979c8c4e52ce97ff00b1da531125c80",
+        "status": "available"
+      },
+      "status": "accepted",
+      "truth_sha256": "7100a323810afc6fc49ec9be3d76f10023a2ebf536b3569c40ae4336b067f96a"
+    },
+    {
+      "accepted_diagnostics_recomputed": true,
+      "attempts": 1,
+      "campaign": "primary",
+      "candidate": "primary",
+      "compute_thread_policy": "One native numerical thread per sequential-chain fit process.",
+      "data_sha256": "832d7cb1c1091c4209119805bd44f8dc1e0b5b029167c737da0a5b79a7073dc0",
+      "directory": "artifacts/stage7/sign-chart-v1/effort_proxy-7102",
+      "observed_count_fingerprint": "ff8ba44f9b928bf2f466b2d026201835b578b9d1431b46ba34f86e1ce5b8c4ea",
+      "options": {
+        "categories": 4,
+        "conditional_level": false,
+        "count_parameterization": "conditional",
+        "factor_parameterization": "anchored",
+        "factors": 1,
+        "gaussian_solver": "block",
+        "kernel": false,
+        "known_auxiliary_coefficients": false,
+        "level_settings": {
+          "amplitude_multiplier": 1.0,
+          "anchor": 4.365682862385978,
+          "candidate": "primary",
+          "fallback_anchor": null,
+          "fallback_index": null,
+          "hyper_sd": 1.0,
+          "known_indices": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "scale_sd": 1.0,
+          "scale_upper": 2.0,
+          "training_months": 96
+        },
+        "mass_matrix": "dense",
+        "months": 96,
+        "prior_candidate": "primary",
+        "prior_id": "anchored_levels_v2",
+        "regimes": 1,
+        "residual": "none",
+        "scenario": "effort_proxy",
+        "seed": 7102,
+        "severity_factors": 0,
+        "working_sign_anchor": 3
+      },
+      "original_truth_sha256": "815db5eaf7b0eabada9f43d82e5152df4e369568989e62a2d56c226d29391f60",
+      "recovery_eligible": true,
+      "recovery_exclusion": null,
+      "result_sha256": "600a601b87ee92330c325c22e5dbce00f40e899ad9c70d4373449ab0d0789e75",
+      "scenario": "effort_proxy",
+      "seed": 7102,
+      "source_control": {
+        "dirty": true,
+        "revision": "f7a9ee346c1567d0a18af49beb303e10667eb0e6",
+        "status": "available"
+      },
+      "status": "accepted",
+      "truth_sha256": "165bcd2cc13d529b6c37b8672b8614d777c5769ea2bb2db5e2e95d8bb1340dac"
+    },
+    {
+      "accepted_diagnostics_recomputed": true,
+      "attempts": 2,
+      "campaign": "primary",
+      "candidate": "primary",
+      "compute_thread_policy": "One native numerical thread per sequential-chain fit process.",
+      "data_sha256": "0f6a665fef2ab8d039005ddea1e8a355bd3ff46fdcc71c99af275dc165b7ff9a",
+      "directory": "artifacts/stage7/sign-chart-v1/effort_proxy-7103",
+      "observed_count_fingerprint": "8371c7a12dbd7e10847f58cbf567fc1fe6635c9762c242b3204309cde849286c",
+      "options": {
+        "categories": 4,
+        "conditional_level": false,
+        "count_parameterization": "conditional",
+        "factor_parameterization": "anchored",
+        "factors": 1,
+        "gaussian_solver": "block",
+        "kernel": false,
+        "known_auxiliary_coefficients": false,
+        "level_settings": {
+          "amplitude_multiplier": 1.0,
+          "anchor": 4.142390401831675,
+          "candidate": "primary",
+          "fallback_anchor": null,
+          "fallback_index": null,
+          "hyper_sd": 1.0,
+          "known_indices": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "scale_sd": 1.0,
+          "scale_upper": 2.0,
+          "training_months": 96
+        },
+        "mass_matrix": "dense",
+        "months": 96,
+        "prior_candidate": "primary",
+        "prior_id": "anchored_levels_v2",
+        "regimes": 1,
+        "residual": "none",
+        "scenario": "effort_proxy",
+        "seed": 7103,
+        "severity_factors": 0,
+        "working_sign_anchor": 3
+      },
+      "original_truth_sha256": "6208b91c16c044c1d7fc5dc7cb48db65caeb88f88e2a079d1186b00821fa4d31",
+      "recovery_eligible": false,
+      "recovery_exclusion": {
+        "directory": "artifacts/stage7/sign-chart-v1/effort_proxy-7103",
+        "evidence": "docs/checks/stage7-sign-exploration-20261022/pattern_audit.json",
+        "evidence_sha256": "1562957d1265c0ddab10a8983df9c0282e20ca0f0459337adefb984a8e35b655",
+        "reason": "Numerically admitted retry never visits the documented alternative canonical loading-sign region (+,+,-), despite finding it in the earlier retained attempt. Rare row-zero sign crossings visit a different region and do not resolve it.",
+        "result_sha256": "d52eae7bf56f98f15b5542356e6677769957779df84be3edbd9dac9b52a496d4"
+      },
+      "result_sha256": "d52eae7bf56f98f15b5542356e6677769957779df84be3edbd9dac9b52a496d4",
+      "scenario": "effort_proxy",
+      "seed": 7103,
+      "source_control": {
+        "dirty": false,
+        "revision": "2cc8959e4199f5423af415537bd687f6ddd02fb4",
+        "status": "available"
+      },
+      "status": "accepted",
+      "truth_sha256": "fcc15c01eb7f92c1c2690852632565bb7c37327447a5dcec534bf4ae908e3ba9"
+    },
+    {
+      "accepted_diagnostics_recomputed": true,
+      "attempts": 1,
+      "campaign": "primary",
+      "candidate": "primary",
+      "compute_thread_policy": "One native numerical thread per sequential-chain fit process.",
+      "data_sha256": "db66bc255fe03085a1bfaac67ff3cb6ff3efa22f3a393adf653b08599457c302",
+      "directory": "artifacts/stage7/count-matched-v1/primary/effort_oracle-7101",
+      "observed_count_fingerprint": "0d1827b4a05ea07a23f579502dc7fc71e998aff211dfe4704186ad7ce8373c4d",
+      "options": {
+        "categories": 4,
+        "conditional_level": false,
+        "count_parameterization": "conditional",
+        "factor_parameterization": "anchored",
+        "factors": 1,
+        "gaussian_solver": "block",
+        "kernel": false,
+        "known_auxiliary_coefficients": false,
+        "level_settings": {
+          "amplitude_multiplier": 1.0,
+          "anchor": 4.35195663408439,
+          "candidate": "primary",
+          "fallback_anchor": null,
+          "fallback_index": null,
+          "hyper_sd": 1.0,
+          "known_indices": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "scale_sd": 1.0,
+          "scale_upper": 2.0,
+          "training_months": 96
+        },
+        "mass_matrix": "dense",
+        "months": 96,
+        "prior_candidate": "primary",
+        "prior_id": "anchored_levels_v2",
+        "regimes": 1,
+        "residual": "none",
+        "scenario": "effort_oracle",
+        "seed": 7101,
+        "severity_factors": 0
+      },
+      "original_truth_sha256": "f76de2bd2974630b626d37b5c619e0f9a13ec583a15b62e80cea9fc3b7ea156f",
+      "recovery_eligible": true,
+      "recovery_exclusion": null,
+      "result_sha256": "a3ccadaad36ef59ea27b9500cb0e6787773d8a509dfc9d7ddaf36ae790442a9f",
+      "scenario": "effort_oracle",
+      "seed": 7101,
+      "source_control": {
+        "dirty": false,
+        "revision": "8fff92fa888b834367700168b89c73c17b50ff48",
+        "status": "available"
+      },
+      "status": "accepted",
+      "truth_sha256": "7100a323810afc6fc49ec9be3d76f10023a2ebf536b3569c40ae4336b067f96a"
+    },
+    {
+      "accepted_diagnostics_recomputed": true,
+      "attempts": 1,
+      "campaign": "primary",
+      "candidate": "primary",
+      "compute_thread_policy": "One native numerical thread per sequential-chain fit process.",
+      "data_sha256": "bb47b1c29521ecefbb9cfdd1cba3b0c4676f943229ebca05908aee52c564fa5b",
+      "directory": "artifacts/stage7/count-matched-v1/primary/effort_oracle-7102",
+      "observed_count_fingerprint": "ff8ba44f9b928bf2f466b2d026201835b578b9d1431b46ba34f86e1ce5b8c4ea",
+      "options": {
+        "categories": 4,
+        "conditional_level": false,
+        "count_parameterization": "conditional",
+        "factor_parameterization": "anchored",
+        "factors": 1,
+        "gaussian_solver": "block",
+        "kernel": false,
+        "known_auxiliary_coefficients": false,
+        "level_settings": {
+          "amplitude_multiplier": 1.0,
+          "anchor": 4.365682862385978,
+          "candidate": "primary",
+          "fallback_anchor": null,
+          "fallback_index": null,
+          "hyper_sd": 1.0,
+          "known_indices": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "scale_sd": 1.0,
+          "scale_upper": 2.0,
+          "training_months": 96
+        },
+        "mass_matrix": "dense",
+        "months": 96,
+        "prior_candidate": "primary",
+        "prior_id": "anchored_levels_v2",
+        "regimes": 1,
+        "residual": "none",
+        "scenario": "effort_oracle",
+        "seed": 7102,
+        "severity_factors": 0
+      },
+      "original_truth_sha256": "815db5eaf7b0eabada9f43d82e5152df4e369568989e62a2d56c226d29391f60",
+      "recovery_eligible": true,
+      "recovery_exclusion": null,
+      "result_sha256": "ad25a3a0243a77d170b2655a2ab46f9483c2d9eab01d7262773555380c89f3d2",
+      "scenario": "effort_oracle",
+      "seed": 7102,
+      "source_control": {
+        "dirty": false,
+        "revision": "8fff92fa888b834367700168b89c73c17b50ff48",
+        "status": "available"
+      },
+      "status": "accepted",
+      "truth_sha256": "165bcd2cc13d529b6c37b8672b8614d777c5769ea2bb2db5e2e95d8bb1340dac"
+    },
+    {
+      "accepted_diagnostics_recomputed": false,
+      "attempts": 3,
+      "campaign": "primary",
+      "candidate": "primary",
+      "compute_thread_policy": "One native numerical thread per sequential-chain fit process.",
+      "data_sha256": "48d7e478f25c575362fead0d46c05b463751b02e18d11cfa9d23a30cf97a1551",
+      "directory": "artifacts/stage7/count-matched-v1/primary/effort_oracle-7103",
+      "observed_count_fingerprint": "8371c7a12dbd7e10847f58cbf567fc1fe6635c9762c242b3204309cde849286c",
+      "options": {
+        "categories": 4,
+        "conditional_level": false,
+        "count_parameterization": "conditional",
+        "factor_parameterization": "anchored",
+        "factors": 1,
+        "gaussian_solver": "block",
+        "kernel": false,
+        "known_auxiliary_coefficients": false,
+        "level_settings": {
+          "amplitude_multiplier": 1.0,
+          "anchor": 4.142390401831675,
+          "candidate": "primary",
+          "fallback_anchor": null,
+          "fallback_index": null,
+          "hyper_sd": 1.0,
+          "known_indices": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "scale_sd": 1.0,
+          "scale_upper": 2.0,
+          "training_months": 96
+        },
+        "mass_matrix": "dense",
+        "months": 96,
+        "prior_candidate": "primary",
+        "prior_id": "anchored_levels_v2",
+        "regimes": 1,
+        "residual": "none",
+        "scenario": "effort_oracle",
+        "seed": 7103,
+        "severity_factors": 0
+      },
+      "original_truth_sha256": "6208b91c16c044c1d7fc5dc7cb48db65caeb88f88e2a079d1186b00821fa4d31",
+      "recovery_eligible": false,
+      "recovery_exclusion": null,
+      "result_sha256": "e7eee23ca456cdd6832a2f57bbafbcf6d48cdaffeb42872ef17930b660eb4b2f",
+      "scenario": "effort_oracle",
+      "seed": 7103,
+      "source_control": {
+        "dirty": false,
+        "revision": "bc61ee6980c70c8f0c3e2e705284869bd507858d",
+        "status": "available"
+      },
+      "status": "failed_diagnostic_gate",
+      "truth_sha256": "fcc15c01eb7f92c1c2690852632565bb7c37327447a5dcec534bf4ae908e3ba9"
+    },
+    {
+      "accepted_diagnostics_recomputed": true,
+      "attempts": 1,
+      "campaign": "primary",
+      "candidate": "primary",
+      "compute_thread_policy": "One native numerical thread per sequential-chain fit process.",
+      "data_sha256": "4df770f9c0dc5add5079eb59ca18a6c4ce6034cf77cbf3e02104f9d0ecef2cd4",
+      "directory": "artifacts/stage7/count-matched-v1/primary/effort_none-7101",
+      "observed_count_fingerprint": "0d1827b4a05ea07a23f579502dc7fc71e998aff211dfe4704186ad7ce8373c4d",
+      "options": {
+        "categories": 4,
+        "conditional_level": false,
+        "count_parameterization": "conditional",
+        "factor_parameterization": "anchored",
+        "factors": 1,
+        "gaussian_solver": "block",
+        "kernel": false,
+        "known_auxiliary_coefficients": false,
+        "level_settings": {
+          "amplitude_multiplier": 1.0,
+          "anchor": 4.35195663408439,
+          "candidate": "primary",
+          "fallback_anchor": null,
+          "fallback_index": null,
+          "hyper_sd": 1.0,
+          "known_indices": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "scale_sd": 1.0,
+          "scale_upper": 2.0,
+          "training_months": 96
+        },
+        "mass_matrix": "dense",
+        "months": 96,
+        "prior_candidate": "primary",
+        "prior_id": "anchored_levels_v2",
+        "regimes": 1,
+        "residual": "none",
+        "scenario": "effort_none",
+        "seed": 7101,
+        "severity_factors": 0
+      },
+      "original_truth_sha256": "f76de2bd2974630b626d37b5c619e0f9a13ec583a15b62e80cea9fc3b7ea156f",
+      "recovery_eligible": true,
+      "recovery_exclusion": null,
+      "result_sha256": "cdbee4ba46404dbca73824bed0a6af548a99cb9f4e596d15256b7b72486ad03d",
+      "scenario": "effort_none",
+      "seed": 7101,
+      "source_control": {
+        "dirty": false,
+        "revision": "3b4f294c3edb9ed498eb6ab469ada9a0a6c0bae2",
+        "status": "available"
+      },
+      "status": "accepted",
+      "truth_sha256": "7100a323810afc6fc49ec9be3d76f10023a2ebf536b3569c40ae4336b067f96a"
+    },
+    {
+      "accepted_diagnostics_recomputed": true,
+      "attempts": 1,
+      "campaign": "primary",
+      "candidate": "primary",
+      "compute_thread_policy": "One native numerical thread per sequential-chain fit process.",
+      "data_sha256": "211b33fabbad4f83236ca6749c1e6c98bb68202948228b17fbd8e19917a36222",
+      "directory": "artifacts/stage7/count-matched-v1/primary/effort_none-7102",
+      "observed_count_fingerprint": "ff8ba44f9b928bf2f466b2d026201835b578b9d1431b46ba34f86e1ce5b8c4ea",
+      "options": {
+        "categories": 4,
+        "conditional_level": false,
+        "count_parameterization": "conditional",
+        "factor_parameterization": "anchored",
+        "factors": 1,
+        "gaussian_solver": "block",
+        "kernel": false,
+        "known_auxiliary_coefficients": false,
+        "level_settings": {
+          "amplitude_multiplier": 1.0,
+          "anchor": 4.365682862385978,
+          "candidate": "primary",
+          "fallback_anchor": null,
+          "fallback_index": null,
+          "hyper_sd": 1.0,
+          "known_indices": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "scale_sd": 1.0,
+          "scale_upper": 2.0,
+          "training_months": 96
+        },
+        "mass_matrix": "dense",
+        "months": 96,
+        "prior_candidate": "primary",
+        "prior_id": "anchored_levels_v2",
+        "regimes": 1,
+        "residual": "none",
+        "scenario": "effort_none",
+        "seed": 7102,
+        "severity_factors": 0
+      },
+      "original_truth_sha256": "815db5eaf7b0eabada9f43d82e5152df4e369568989e62a2d56c226d29391f60",
+      "recovery_eligible": true,
+      "recovery_exclusion": null,
+      "result_sha256": "790f6b36b1c15627265782417d0d25bb7353bfb18c3399a176ec9aba45b07f86",
+      "scenario": "effort_none",
+      "seed": 7102,
+      "source_control": {
+        "dirty": false,
+        "revision": "dc682441b4e41211eb1cc35c4546a0b1a200c2cc",
+        "status": "available"
+      },
+      "status": "accepted",
+      "truth_sha256": "165bcd2cc13d529b6c37b8672b8614d777c5769ea2bb2db5e2e95d8bb1340dac"
+    },
+    {
+      "accepted_diagnostics_recomputed": true,
+      "attempts": 1,
+      "campaign": "primary",
+      "candidate": "primary",
+      "compute_thread_policy": "One native numerical thread per sequential-chain fit process.",
+      "data_sha256": "fdb11bb72fa940459f97d8646c9c395395dd008ab7504f9c871faa95fe4f2c64",
+      "directory": "artifacts/stage7/count-matched-v1/primary/effort_none-7103",
+      "observed_count_fingerprint": "8371c7a12dbd7e10847f58cbf567fc1fe6635c9762c242b3204309cde849286c",
+      "options": {
+        "categories": 4,
+        "conditional_level": false,
+        "count_parameterization": "conditional",
+        "factor_parameterization": "anchored",
+        "factors": 1,
+        "gaussian_solver": "block",
+        "kernel": false,
+        "known_auxiliary_coefficients": false,
+        "level_settings": {
+          "amplitude_multiplier": 1.0,
+          "anchor": 4.142390401831675,
+          "candidate": "primary",
+          "fallback_anchor": null,
+          "fallback_index": null,
+          "hyper_sd": 1.0,
+          "known_indices": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "scale_sd": 1.0,
+          "scale_upper": 2.0,
+          "training_months": 96
+        },
+        "mass_matrix": "dense",
+        "months": 96,
+        "prior_candidate": "primary",
+        "prior_id": "anchored_levels_v2",
+        "regimes": 1,
+        "residual": "none",
+        "scenario": "effort_none",
+        "seed": 7103,
+        "severity_factors": 0
+      },
+      "original_truth_sha256": "6208b91c16c044c1d7fc5dc7cb48db65caeb88f88e2a079d1186b00821fa4d31",
+      "recovery_eligible": true,
+      "recovery_exclusion": null,
+      "result_sha256": "d8b9ebf8e34c0ebd1321b2b28039eb94739f9ad54771cd73f940f60d2ea341a6",
+      "scenario": "effort_none",
+      "seed": 7103,
+      "source_control": {
+        "dirty": true,
+        "revision": "3be1caa26882c75ed6b74ab9049ce7865ee9d3c8",
+        "status": "available"
+      },
+      "status": "accepted",
+      "truth_sha256": "fcc15c01eb7f92c1c2690852632565bb7c37327447a5dcec534bf4ae908e3ba9"
+    },
+    {
+      "accepted_diagnostics_recomputed": true,
+      "attempts": 3,
+      "campaign": "primary",
+      "candidate": "primary",
+      "compute_thread_policy": "One native numerical thread per sequential-chain fit process.",
+      "data_sha256": "f2480005714cf6fdc5fd4329ea2cce8998e371f7f20c8ff6b57c9148819bbd73",
+      "directory": "artifacts/stage7/recovery-v6/kernel_present-7101",
+      "observed_count_fingerprint": "ef1d79722acdd81df15d7cb4272a8a6ec89676e3fe833f50559b19eca79eb558",
+      "options": {
+        "categories": 4,
+        "conditional_level": false,
+        "factor_parameterization": "anchored",
+        "factors": 1,
+        "kernel": true,
+        "known_auxiliary_coefficients": false,
+        "level_settings": {
+          "amplitude_multiplier": 1.0,
+          "anchor": 4.114926055815731,
+          "candidate": "primary",
+          "fallback_anchor": null,
+          "fallback_index": null,
+          "hyper_sd": 1.0,
+          "known_indices": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "scale_sd": 1.0,
+          "scale_upper": 2.0,
+          "training_months": 108
+        },
+        "mass_matrix": "dense",
+        "months": 144,
+        "prior_candidate": "primary",
+        "prior_id": "anchored_levels_v2",
+        "regimes": 1,
+        "residual": "none",
+        "scenario": "kernel_present",
+        "seed": 7101,
+        "severity_factors": 0
+      },
+      "original_truth_sha256": "dfa2559c014ba63935f23cb0c3ae7297e87e79e7aa5b2986e420179ef975aaed",
+      "recovery_eligible": false,
+      "recovery_exclusion": {
+        "directory": "artifacts/stage7/recovery-v6/kernel_present-7101",
+        "evidence": "docs/checks/stage7-kernel-mode-20261022/audit.json",
+        "evidence_sha256": "b8dffa9dcf197c3517a0097a3d62d7fca6bf4e17c5e5a80f6ca168ff6d77d034",
+        "reason": "Numerically admitted attempt remains in one known retained orientation; global exploration unresolved.",
+        "result_sha256": "9a81911821eda2daaf0e945d93114ecee31e4d4232eb750ddcd2e0aecc50c0ea"
+      },
+      "result_sha256": "9a81911821eda2daaf0e945d93114ecee31e4d4232eb750ddcd2e0aecc50c0ea",
+      "scenario": "kernel_present",
+      "seed": 7101,
+      "source_control": {
+        "dirty": true,
+        "revision": "71c79b3c45813a3c82da8f7db219cdad4b7afb07",
+        "status": "available"
+      },
+      "status": "accepted",
+      "truth_sha256": "aafda911ab1119a799c339fef0d5a0327b509b7522c030078ed7e9d7f288d90d"
+    },
+    {
+      "accepted_diagnostics_recomputed": false,
+      "attempts": 3,
+      "campaign": "primary",
+      "candidate": "primary",
+      "compute_thread_policy": "One native numerical thread per sequential-chain fit process.",
+      "data_sha256": "50d4766ccdf9133cdbd32097966511cbf821361a0a4b3cf6e21f39972be7effe",
+      "directory": "artifacts/stage7/recovery-v6/kernel_present-7102",
+      "observed_count_fingerprint": "bef234d13fa67400d5190c94b3ebe96bedd706b7440ac77d70e7467d59c27484",
+      "options": {
+        "categories": 4,
+        "conditional_level": false,
+        "factor_parameterization": "anchored",
+        "factors": 1,
+        "kernel": true,
+        "known_auxiliary_coefficients": false,
+        "level_settings": {
+          "amplitude_multiplier": 1.0,
+          "anchor": 4.279908029124033,
+          "candidate": "primary",
+          "fallback_anchor": null,
+          "fallback_index": null,
+          "hyper_sd": 1.0,
+          "known_indices": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "scale_sd": 1.0,
+          "scale_upper": 2.0,
+          "training_months": 108
+        },
+        "mass_matrix": "dense",
+        "months": 144,
+        "prior_candidate": "primary",
+        "prior_id": "anchored_levels_v2",
+        "regimes": 1,
+        "residual": "none",
+        "scenario": "kernel_present",
+        "seed": 7102,
+        "severity_factors": 0
+      },
+      "original_truth_sha256": "babc286c78ae966b4d56c33b81747bf5906d8b62606990ff5df48d9fccc8fe50",
+      "recovery_eligible": false,
+      "recovery_exclusion": null,
+      "result_sha256": "6124699a17e44ead6efb5fea47b8738ee900893ef3c8af2a2aaf961ea9ddc585",
+      "scenario": "kernel_present",
+      "seed": 7102,
+      "source_control": {
+        "dirty": false,
+        "revision": "bf5f61d7271c3027a61666e5eeac79be892da405",
+        "status": "available"
+      },
+      "status": "failed_diagnostic_gate",
+      "truth_sha256": "7b26da1a2f19613bcaf156570a3c23f320029790071e78e697b17cb9bfe454ec"
+    },
+    {
+      "accepted_diagnostics_recomputed": false,
+      "attempts": 3,
+      "campaign": "primary",
+      "candidate": "primary",
+      "compute_thread_policy": "One native numerical thread per sequential-chain fit process.",
+      "data_sha256": "e63af1b8181c8a98e5118a337525ffb90189dfb833de74745bd5e8e4125e380f",
+      "directory": "artifacts/stage7/recovery-v6/kernel_present-7103",
+      "observed_count_fingerprint": "338cffb3e6be4e498ca8957a1998c7488f6f8efb7292328f25a51dd31df171bb",
+      "options": {
+        "categories": 4,
+        "conditional_level": false,
+        "factor_parameterization": "anchored",
+        "factors": 1,
+        "kernel": true,
+        "known_auxiliary_coefficients": false,
+        "level_settings": {
+          "amplitude_multiplier": 1.0,
+          "anchor": 3.657907037449422,
+          "candidate": "primary",
+          "fallback_anchor": null,
+          "fallback_index": null,
+          "hyper_sd": 1.0,
+          "known_indices": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "scale_sd": 1.0,
+          "scale_upper": 2.0,
+          "training_months": 108
+        },
+        "mass_matrix": "dense",
+        "months": 144,
+        "prior_candidate": "primary",
+        "prior_id": "anchored_levels_v2",
+        "regimes": 1,
+        "residual": "none",
+        "scenario": "kernel_present",
+        "seed": 7103,
+        "severity_factors": 0
+      },
+      "original_truth_sha256": "0543d1db71cb80338eabb552ae4b18a9771553e84ff7700d58a2b92383e5b03a",
+      "recovery_eligible": false,
+      "recovery_exclusion": null,
+      "result_sha256": "bb3039607fe66a11af63e1b8be82a61d834c6491904ffc49ae1c42697a0b3e49",
+      "scenario": "kernel_present",
+      "seed": 7103,
+      "source_control": {
+        "dirty": true,
+        "revision": "bf5f61d7271c3027a61666e5eeac79be892da405",
+        "status": "available"
+      },
+      "status": "failed_diagnostic_gate",
+      "truth_sha256": "6f7d8a6568ee494288a937a0a69450e36cbbf28f98d59d6827b61865058d6fe5"
+    },
+    {
+      "accepted_diagnostics_recomputed": false,
+      "attempts": 3,
+      "campaign": "primary",
+      "candidate": "primary",
+      "compute_thread_policy": "One native numerical thread per sequential-chain fit process.",
+      "data_sha256": "267ee5a4d31fab670e447f6047c282aa0b143f7df0291eff66085b72210f53ee",
+      "directory": "artifacts/stage7/recovery-v6/kernel_absent-7101",
+      "observed_count_fingerprint": "75c5dd75d45b2556ffc60262b57c82893a4354b521bd36d3f4ce800b3beb9154",
+      "options": {
+        "categories": 4,
+        "conditional_level": false,
+        "factor_parameterization": "anchored",
+        "factors": 1,
+        "kernel": true,
+        "known_auxiliary_coefficients": false,
+        "level_settings": {
+          "amplitude_multiplier": 1.0,
+          "anchor": 3.59165192811634,
+          "candidate": "primary",
+          "fallback_anchor": null,
+          "fallback_index": null,
+          "hyper_sd": 1.0,
+          "known_indices": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "scale_sd": 1.0,
+          "scale_upper": 2.0,
+          "training_months": 108
+        },
+        "mass_matrix": "dense",
+        "months": 144,
+        "prior_candidate": "primary",
+        "prior_id": "anchored_levels_v2",
+        "regimes": 1,
+        "residual": "none",
+        "scenario": "kernel_absent",
+        "seed": 7101,
+        "severity_factors": 0
+      },
+      "original_truth_sha256": "e0cfe62608c9a3f279b95566872646b57749f9237102fe7d398b59914440633d",
+      "recovery_eligible": false,
+      "recovery_exclusion": null,
+      "result_sha256": "a16c0b1d95f2228812ae706ee7b75ea99ad7a9ba530c35aae31af68c766f1b86",
+      "scenario": "kernel_absent",
+      "seed": 7101,
+      "source_control": {
+        "dirty": false,
+        "revision": "dc682441b4e41211eb1cc35c4546a0b1a200c2cc",
+        "status": "available"
+      },
+      "status": "failed_diagnostic_gate",
+      "truth_sha256": "ac9cac37fc24ec86cb03a4bc5804b3a5ea743f3e9d757793ef61892763d0c0a1"
+    },
+    {
+      "accepted_diagnostics_recomputed": false,
+      "attempts": 3,
+      "campaign": "primary",
+      "candidate": "primary",
+      "compute_thread_policy": "One native numerical thread per sequential-chain fit process.",
+      "data_sha256": "77aae7c87ea49360f0922cd8ffba6f55831e4bfc3fc8ebcb8426e9c6c6d792cf",
+      "directory": "artifacts/stage7/recovery-v6/kernel_absent-7102",
+      "observed_count_fingerprint": "5ff379fdbc9851928ab81e172318f9d1ba7dd4832a02db8586d946b58ee44fc8",
+      "options": {
+        "categories": 4,
+        "conditional_level": false,
+        "factor_parameterization": "anchored",
+        "factors": 1,
+        "kernel": true,
+        "known_auxiliary_coefficients": false,
+        "level_settings": {
+          "amplitude_multiplier": 1.0,
+          "anchor": 3.6627897433510643,
+          "candidate": "primary",
+          "fallback_anchor": null,
+          "fallback_index": null,
+          "hyper_sd": 1.0,
+          "known_indices": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "scale_sd": 1.0,
+          "scale_upper": 2.0,
+          "training_months": 108
+        },
+        "mass_matrix": "dense",
+        "months": 144,
+        "prior_candidate": "primary",
+        "prior_id": "anchored_levels_v2",
+        "regimes": 1,
+        "residual": "none",
+        "scenario": "kernel_absent",
+        "seed": 7102,
+        "severity_factors": 0
+      },
+      "original_truth_sha256": "96071b28352d633ec744d8e113f233408574b44044872b8410ea0850606cf03e",
+      "recovery_eligible": false,
+      "recovery_exclusion": null,
+      "result_sha256": "fae3471275109a39e273b4f92c8a8f2993ea24bebdb2204377c0fae1f8524e89",
+      "scenario": "kernel_absent",
+      "seed": 7102,
+      "source_control": {
+        "dirty": true,
+        "revision": "a5cc5b3e1b30823758fc68460968565f40da9006",
+        "status": "available"
+      },
+      "status": "failed_diagnostic_gate",
+      "truth_sha256": "0b669c4c151623dcd5f8ae13b2bf256e3e0bf4d7b43a8318a6d5e813f38c2c28"
+    },
+    {
+      "accepted_diagnostics_recomputed": false,
+      "attempts": 3,
+      "campaign": "primary",
+      "candidate": "primary",
+      "compute_thread_policy": "One native numerical thread per sequential-chain fit process.",
+      "data_sha256": "1a6a50750e98158a3b80720fb56e8dd8399c0e565109e4d146a584226c8dc69c",
+      "directory": "artifacts/stage7/recovery-v6/kernel_absent-7103",
+      "observed_count_fingerprint": "8cf8e74986d9577ccee49f9841c089d95ababf7b189e4ccef36bd3bcdb8dccba",
+      "options": {
+        "categories": 4,
+        "conditional_level": false,
+        "factor_parameterization": "anchored",
+        "factors": 1,
+        "kernel": true,
+        "known_auxiliary_coefficients": false,
+        "level_settings": {
+          "amplitude_multiplier": 1.0,
+          "anchor": 3.5620057440355564,
+          "candidate": "primary",
+          "fallback_anchor": null,
+          "fallback_index": null,
+          "hyper_sd": 1.0,
+          "known_indices": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "scale_sd": 1.0,
+          "scale_upper": 2.0,
+          "training_months": 108
+        },
+        "mass_matrix": "dense",
+        "months": 144,
+        "prior_candidate": "primary",
+        "prior_id": "anchored_levels_v2",
+        "regimes": 1,
+        "residual": "none",
+        "scenario": "kernel_absent",
+        "seed": 7103,
+        "severity_factors": 0
+      },
+      "original_truth_sha256": "48b871bf646f27356d5819a16d27b5c82b31edb293f5d6e0b60a1b7975999759",
+      "recovery_eligible": false,
+      "recovery_exclusion": null,
+      "result_sha256": "da2e0ae2a035f1d3a695ff435219ceb190fa2ac629a94cc512debdc57b59c82a",
+      "scenario": "kernel_absent",
+      "seed": 7103,
+      "source_control": {
+        "dirty": true,
+        "revision": "a5cc5b3e1b30823758fc68460968565f40da9006",
+        "status": "available"
+      },
+      "status": "failed_diagnostic_gate",
+      "truth_sha256": "2000ffa9101311771552205007fb34cf61a5a1f53995dab7c1a1c5fe86254a67"
+    },
+    {
+      "accepted_diagnostics_recomputed": true,
+      "attempts": 1,
+      "campaign": "primary",
+      "candidate": "primary",
+      "compute_thread_policy": "One native numerical thread per sequential-chain fit process.",
+      "data_sha256": "643433a57070e5b72171625dfb28f6a23522efb7c37d1cdd122add662220d1d8",
+      "directory": "artifacts/stage7/iid-conditional-v1/dispersion_dense-7101",
+      "observed_count_fingerprint": "67b4735d9f18562f39c51f2fbd40228181ebec182e495c7d8bd3a88fa38b1fc5",
+      "options": {
+        "categories": 1,
+        "conditional_level": true,
+        "factor_parameterization": "anchored",
+        "factors": 0,
+        "kernel": false,
+        "known_auxiliary_coefficients": false,
+        "level_settings": {
+          "amplitude_multiplier": 1.0,
+          "anchor": 3.7780682427718975,
+          "candidate": "primary",
+          "fallback_anchor": null,
+          "fallback_index": null,
+          "hyper_sd": 1.0,
+          "known_indices": [
+            0
+          ],
+          "scale_sd": 1.0,
+          "scale_upper": 2.0,
+          "training_months": 108
+        },
+        "mass_matrix": "dense",
+        "months": 192,
+        "prior_candidate": "primary",
+        "prior_id": "anchored_levels_v2",
+        "regimes": 1,
+        "residual": "iid",
+        "residual_parameterization": "conditional",
+        "scenario": "dispersion_dense",
+        "seed": 7101,
+        "severity_factors": 0
+      },
+      "original_truth_sha256": "161ec04ea54720835c56b6d9faf7e9a5280e9574d0f6439dea6393adba3c1940",
+      "recovery_eligible": true,
+      "recovery_exclusion": null,
+      "result_sha256": "9d71a8f1ce7b3142969dc74ac6c35b2f961b2424e988dbfd34c572257b920c39",
+      "scenario": "dispersion_dense",
+      "seed": 7101,
+      "source_control": {
+        "dirty": false,
+        "revision": "ee6e694c0ac270072b38cfee23496620251d0a43",
+        "status": "available"
+      },
+      "status": "accepted",
+      "truth_sha256": "161ec04ea54720835c56b6d9faf7e9a5280e9574d0f6439dea6393adba3c1940"
+    },
+    {
+      "accepted_diagnostics_recomputed": true,
+      "attempts": 1,
+      "campaign": "primary",
+      "candidate": "primary",
+      "compute_thread_policy": "One native numerical thread per sequential-chain fit process.",
+      "data_sha256": "da103a36c2216621b15c961d0add2fda41e24fa17ad330c2d95e16a68bceeab1",
+      "directory": "artifacts/stage7/iid-conditional-v1/dispersion_dense-7102",
+      "observed_count_fingerprint": "37d5a18af1c1d0e0c38760359d6932b625106264ca9ff82ff30f25bf98c54949",
+      "options": {
+        "categories": 1,
+        "conditional_level": true,
+        "factor_parameterization": "anchored",
+        "factors": 0,
+        "kernel": false,
+        "known_auxiliary_coefficients": false,
+        "level_settings": {
+          "amplitude_multiplier": 1.0,
+          "anchor": 3.7942399697717626,
+          "candidate": "primary",
+          "fallback_anchor": null,
+          "fallback_index": null,
+          "hyper_sd": 1.0,
+          "known_indices": [
+            0
+          ],
+          "scale_sd": 1.0,
+          "scale_upper": 2.0,
+          "training_months": 108
+        },
+        "mass_matrix": "dense",
+        "months": 192,
+        "prior_candidate": "primary",
+        "prior_id": "anchored_levels_v2",
+        "regimes": 1,
+        "residual": "iid",
+        "residual_parameterization": "conditional",
+        "scenario": "dispersion_dense",
+        "seed": 7102,
+        "severity_factors": 0
+      },
+      "original_truth_sha256": "0f7c7f7cfddc52d509785f0a19d9e9e957f0e8e24fd1e1a33e4caf52734170b7",
+      "recovery_eligible": true,
+      "recovery_exclusion": null,
+      "result_sha256": "1d7b19e7f0c1d1651e87637578643f3ff133b2975a4d338bcfea2d927cd7d67c",
+      "scenario": "dispersion_dense",
+      "seed": 7102,
+      "source_control": {
+        "dirty": true,
+        "revision": "74ac71e038bc05e62636907022077984e124ecc3",
+        "status": "available"
+      },
+      "status": "accepted",
+      "truth_sha256": "0f7c7f7cfddc52d509785f0a19d9e9e957f0e8e24fd1e1a33e4caf52734170b7"
+    },
+    {
+      "accepted_diagnostics_recomputed": true,
+      "attempts": 1,
+      "campaign": "primary",
+      "candidate": "primary",
+      "compute_thread_policy": "One native numerical thread per sequential-chain fit process.",
+      "data_sha256": "d5f2a20dde97830ed7b752ec24863498b83065be42a00b22b8060af47e9b9d65",
+      "directory": "artifacts/stage7/iid-conditional-v1/dispersion_dense-7103",
+      "observed_count_fingerprint": "568143759c01cf6208288592ef04091efbb5cc6b66fc1ed3c4d75ad89993853c",
+      "options": {
+        "categories": 1,
+        "conditional_level": true,
+        "factor_parameterization": "anchored",
+        "factors": 0,
+        "kernel": false,
+        "known_auxiliary_coefficients": false,
+        "level_settings": {
+          "amplitude_multiplier": 1.0,
+          "anchor": 3.7162784283020507,
+          "candidate": "primary",
+          "fallback_anchor": null,
+          "fallback_index": null,
+          "hyper_sd": 1.0,
+          "known_indices": [
+            0
+          ],
+          "scale_sd": 1.0,
+          "scale_upper": 2.0,
+          "training_months": 108
+        },
+        "mass_matrix": "dense",
+        "months": 192,
+        "prior_candidate": "primary",
+        "prior_id": "anchored_levels_v2",
+        "regimes": 1,
+        "residual": "iid",
+        "residual_parameterization": "conditional",
+        "scenario": "dispersion_dense",
+        "seed": 7103,
+        "severity_factors": 0
+      },
+      "original_truth_sha256": "04aae480f479020a7dc5e9d6da2c166578ea7ff8c7a78628a5995213f112e20d",
+      "recovery_eligible": true,
+      "recovery_exclusion": null,
+      "result_sha256": "f3c4d231f361c97f389a1ae923c80314bdbd767c7b186a06a559ee814adc6032",
+      "scenario": "dispersion_dense",
+      "seed": 7103,
+      "source_control": {
+        "dirty": false,
+        "revision": "2587dc5a78d1b7d6e643e497329b4102bb5799e0",
+        "status": "available"
+      },
+      "status": "accepted",
+      "truth_sha256": "04aae480f479020a7dc5e9d6da2c166578ea7ff8c7a78628a5995213f112e20d"
+    },
+    {
+      "accepted_diagnostics_recomputed": true,
+      "attempts": 1,
+      "campaign": "primary",
+      "candidate": "primary",
+      "compute_thread_policy": "One native numerical thread per sequential-chain fit process.",
+      "data_sha256": "2c9da41b96a1dacbb05dee12408b29a6ea764759d5957866d6cbbf5965ba28d4",
+      "directory": "artifacts/stage7/iid-conditional-v1/dispersion_sparse-7101",
+      "observed_count_fingerprint": "a5c9fc57ad0aa4292f3d62ef6554174a5f26be237c9877661d818db78adb9bfc",
+      "options": {
+        "categories": 1,
+        "conditional_level": true,
+        "factor_parameterization": "anchored",
+        "factors": 0,
+        "kernel": false,
+        "known_auxiliary_coefficients": false,
+        "level_settings": {
+          "amplitude_multiplier": 1.0,
+          "anchor": 0.2946025152963547,
+          "candidate": "primary",
+          "fallback_anchor": null,
+          "fallback_index": null,
+          "hyper_sd": 1.0,
+          "known_indices": [
+            0
+          ],
+          "scale_sd": 1.0,
+          "scale_upper": 2.0,
+          "training_months": 108
+        },
+        "mass_matrix": "dense",
+        "months": 192,
+        "prior_candidate": "primary",
+        "prior_id": "anchored_levels_v2",
+        "regimes": 1,
+        "residual": "iid",
+        "residual_parameterization": "conditional",
+        "scenario": "dispersion_sparse",
+        "seed": 7101,
+        "severity_factors": 0
+      },
+      "original_truth_sha256": "6117d342d214bfc936f4cccba34814db619c1cbdc22f9d020161ef83f25fed4d",
+      "recovery_eligible": true,
+      "recovery_exclusion": null,
+      "result_sha256": "f8771bef9210045b0a40975c949919d63d140f935d79268c3b160051d7c5d789",
+      "scenario": "dispersion_sparse",
+      "seed": 7101,
+      "source_control": {
+        "dirty": false,
+        "revision": "2587dc5a78d1b7d6e643e497329b4102bb5799e0",
+        "status": "available"
+      },
+      "status": "accepted",
+      "truth_sha256": "6117d342d214bfc936f4cccba34814db619c1cbdc22f9d020161ef83f25fed4d"
+    },
+    {
+      "accepted_diagnostics_recomputed": true,
+      "attempts": 1,
+      "campaign": "primary",
+      "candidate": "primary",
+      "compute_thread_policy": "One native numerical thread per sequential-chain fit process.",
+      "data_sha256": "e4f6e7be1351a99b1ee5e2f2dfb1894a41376fd325c6385606ef6d2d888aa8a8",
+      "directory": "artifacts/stage7/iid-conditional-v1/dispersion_sparse-7102",
+      "observed_count_fingerprint": "688d9d894895c669fb9c4bff91bd960cbd9c70a542659ab2cabeb2220c7ed03b",
+      "options": {
+        "categories": 1,
+        "conditional_level": true,
+        "factor_parameterization": "anchored",
+        "factors": 0,
+        "kernel": false,
+        "known_auxiliary_coefficients": false,
+        "level_settings": {
+          "amplitude_multiplier": 1.0,
+          "anchor": 0.287682072451781,
+          "candidate": "primary",
+          "fallback_anchor": null,
+          "fallback_index": null,
+          "hyper_sd": 1.0,
+          "known_indices": [
+            0
+          ],
+          "scale_sd": 1.0,
+          "scale_upper": 2.0,
+          "training_months": 108
+        },
+        "mass_matrix": "dense",
+        "months": 192,
+        "prior_candidate": "primary",
+        "prior_id": "anchored_levels_v2",
+        "regimes": 1,
+        "residual": "iid",
+        "residual_parameterization": "conditional",
+        "scenario": "dispersion_sparse",
+        "seed": 7102,
+        "severity_factors": 0
+      },
+      "original_truth_sha256": "c2302e21aa1c7faf3e2e3302c39e3309c4e4ec67d99ba7b3d8082ace8cf9f248",
+      "recovery_eligible": true,
+      "recovery_exclusion": null,
+      "result_sha256": "fb6a247dab3af14483fb63ac8e306d7a3dacc68c21e0ec36b83d16174940051c",
+      "scenario": "dispersion_sparse",
+      "seed": 7102,
+      "source_control": {
+        "dirty": false,
+        "revision": "2587dc5a78d1b7d6e643e497329b4102bb5799e0",
+        "status": "available"
+      },
+      "status": "accepted",
+      "truth_sha256": "c2302e21aa1c7faf3e2e3302c39e3309c4e4ec67d99ba7b3d8082ace8cf9f248"
+    },
+    {
+      "accepted_diagnostics_recomputed": true,
+      "attempts": 1,
+      "campaign": "primary",
+      "candidate": "primary",
+      "compute_thread_policy": "One native numerical thread per sequential-chain fit process.",
+      "data_sha256": "8e0a65f87ab6c1abc779acc1658f1d4ff85798e90965e01ece4e101624d34c66",
+      "directory": "artifacts/stage7/iid-conditional-v1/dispersion_sparse-7103",
+      "observed_count_fingerprint": "dbc98ad377646d081ad56c6c9f7a86c447ad212ceab5319b55cf93ef6033f101",
+      "options": {
+        "categories": 1,
+        "conditional_level": true,
+        "factor_parameterization": "anchored",
+        "factors": 0,
+        "kernel": false,
+        "known_auxiliary_coefficients": false,
+        "level_settings": {
+          "amplitude_multiplier": 1.0,
+          "anchor": 0.13005312824819776,
+          "candidate": "primary",
+          "fallback_anchor": null,
+          "fallback_index": null,
+          "hyper_sd": 1.0,
+          "known_indices": [
+            0
+          ],
+          "scale_sd": 1.0,
+          "scale_upper": 2.0,
+          "training_months": 108
+        },
+        "mass_matrix": "dense",
+        "months": 192,
+        "prior_candidate": "primary",
+        "prior_id": "anchored_levels_v2",
+        "regimes": 1,
+        "residual": "iid",
+        "residual_parameterization": "conditional",
+        "scenario": "dispersion_sparse",
+        "seed": 7103,
+        "severity_factors": 0
+      },
+      "original_truth_sha256": "b81fc6ddcef86d3d7fc48745ffcaddf766bcad8526a40298ac2aead08cc69171",
+      "recovery_eligible": true,
+      "recovery_exclusion": null,
+      "result_sha256": "8961d5d80fe8629e6c3699d393282c56e625ed8fba6ea2b459c07d23a4aea9f8",
+      "scenario": "dispersion_sparse",
+      "seed": 7103,
+      "source_control": {
+        "dirty": false,
+        "revision": "2587dc5a78d1b7d6e643e497329b4102bb5799e0",
+        "status": "available"
+      },
+      "status": "accepted",
+      "truth_sha256": "b81fc6ddcef86d3d7fc48745ffcaddf766bcad8526a40298ac2aead08cc69171"
+    },
+    {
+      "accepted_diagnostics_recomputed": false,
+      "attempts": 3,
+      "campaign": "primary",
+      "candidate": "primary",
+      "compute_thread_policy": "One native numerical thread per sequential-chain fit process.",
+      "data_sha256": "7767b705c51106521225c13758f78db6658f53cb042a5eab76bd0eb94b684281",
+      "directory": "artifacts/stage7/count-misspecified-v1/misspecified-7101",
+      "observed_count_fingerprint": "ce141cd39c8fd83ee7f2421c05d9e51652c9d0ee3ab454ed8e6305b2fe07de3b",
+      "options": {
+        "categories": 4,
+        "conditional_level": false,
+        "count_parameterization": "conditional",
+        "factor_parameterization": "anchored",
+        "factors": 1,
+        "gaussian_solver": "block",
+        "kernel": false,
+        "known_auxiliary_coefficients": false,
+        "level_settings": {
+          "amplitude_multiplier": 1.0,
+          "anchor": 3.1938784783511625,
+          "candidate": "primary",
+          "fallback_anchor": null,
+          "fallback_index": null,
+          "hyper_sd": 1.0,
+          "known_indices": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "scale_sd": 1.0,
+          "scale_upper": 2.0,
+          "training_months": 96
+        },
+        "mass_matrix": "dense",
+        "months": 96,
+        "prior_candidate": "primary",
+        "prior_id": "anchored_levels_v2",
+        "regimes": 1,
+        "residual": "none",
+        "scenario": "misspecified",
+        "seed": 7101,
+        "severity_factors": 0
+      },
+      "original_truth_sha256": "af20c5a7212bd978b0f2b446d0cedf1f28b519cd1fd2fba2d43be507f11c7364",
+      "recovery_eligible": false,
+      "recovery_exclusion": null,
+      "result_sha256": "96808226ad5e1dbda8df31f8e2cb9e78d2d01398d2f81e3955f4564551e88c22",
+      "scenario": "misspecified",
+      "seed": 7101,
+      "source_control": {
+        "dirty": false,
+        "revision": "2587dc5a78d1b7d6e643e497329b4102bb5799e0",
+        "status": "available"
+      },
+      "status": "failed_diagnostic_gate",
+      "truth_sha256": "120d2b69a682856b13a563808914554552cc9655b9ca6b60008aed105238ffe4"
+    },
+    {
+      "accepted_diagnostics_recomputed": false,
+      "attempts": 3,
+      "campaign": "primary",
+      "candidate": "primary",
+      "compute_thread_policy": "One native numerical thread per sequential-chain fit process.",
+      "data_sha256": "fccc5fb1e671207d05bfbc824319e0abc8c50948efadd1da85573447b27e03f0",
+      "directory": "artifacts/stage7/count-misspecified-v1/misspecified-7102",
+      "observed_count_fingerprint": "6dd75d3f6335b6169aa5c90d9c77351eaf98650b9ad2a5cab921dc34bc80c28f",
+      "options": {
+        "categories": 4,
+        "conditional_level": false,
+        "count_parameterization": "conditional",
+        "factor_parameterization": "anchored",
+        "factors": 1,
+        "gaussian_solver": "block",
+        "kernel": false,
+        "known_auxiliary_coefficients": false,
+        "level_settings": {
+          "amplitude_multiplier": 1.0,
+          "anchor": 3.375790538375309,
+          "candidate": "primary",
+          "fallback_anchor": null,
+          "fallback_index": null,
+          "hyper_sd": 1.0,
+          "known_indices": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "scale_sd": 1.0,
+          "scale_upper": 2.0,
+          "training_months": 96
+        },
+        "mass_matrix": "dense",
+        "months": 96,
+        "prior_candidate": "primary",
+        "prior_id": "anchored_levels_v2",
+        "regimes": 1,
+        "residual": "none",
+        "scenario": "misspecified",
+        "seed": 7102,
+        "severity_factors": 0
+      },
+      "original_truth_sha256": "e354981c9740215c0915803afcddf5857b5b1a4c57b56f8b54cec9bfe6ebe1ce",
+      "recovery_eligible": false,
+      "recovery_exclusion": null,
+      "result_sha256": "56261025b69986cba40350bbd3898af94b25580362d816b48fdec7aecfdc07f0",
+      "scenario": "misspecified",
+      "seed": 7102,
+      "source_control": {
+        "dirty": false,
+        "revision": "52b96a9a7979c8c4e52ce97ff00b1da531125c80",
+        "status": "available"
+      },
+      "status": "failed_diagnostic_gate",
+      "truth_sha256": "e9366c97f80e314e1dd864f164d76e1a0e2eebcb7555ed0de0912cacd28fe14c"
+    },
+    {
+      "accepted_diagnostics_recomputed": false,
+      "attempts": 3,
+      "campaign": "primary",
+      "candidate": "primary",
+      "compute_thread_policy": "One native numerical thread per sequential-chain fit process.",
+      "data_sha256": "819cdf7bcf42c56263fed9303385a43b2ea31931f7ceffad8b127f6f765285a4",
+      "directory": "artifacts/stage7/count-misspecified-v1/misspecified-7103",
+      "observed_count_fingerprint": "8b02aec2091a6c5dfd71e0101f734999e9892d5471b9fc8d3543ceb2f40f99be",
+      "options": {
+        "categories": 4,
+        "conditional_level": false,
+        "count_parameterization": "conditional",
+        "factor_parameterization": "anchored",
+        "factors": 1,
+        "gaussian_solver": "block",
+        "kernel": false,
+        "known_auxiliary_coefficients": false,
+        "level_settings": {
+          "amplitude_multiplier": 1.0,
+          "anchor": 2.977069621239354,
+          "candidate": "primary",
+          "fallback_anchor": null,
+          "fallback_index": null,
+          "hyper_sd": 1.0,
+          "known_indices": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "scale_sd": 1.0,
+          "scale_upper": 2.0,
+          "training_months": 96
+        },
+        "mass_matrix": "dense",
+        "months": 96,
+        "prior_candidate": "primary",
+        "prior_id": "anchored_levels_v2",
+        "regimes": 1,
+        "residual": "none",
+        "scenario": "misspecified",
+        "seed": 7103,
+        "severity_factors": 0
+      },
+      "original_truth_sha256": "2bd6cf33e55a9b89b0970527ebdb6f1132b0db053ff4edd7713ccf78d00071e3",
+      "recovery_eligible": false,
+      "recovery_exclusion": null,
+      "result_sha256": "6b616c7ae8feef412acfc33520db979a95021a201420832933c0c1d94592389b",
+      "scenario": "misspecified",
+      "seed": 7103,
+      "source_control": {
+        "dirty": false,
+        "revision": "2cc8959e4199f5423af415537bd687f6ddd02fb4",
+        "status": "available"
+      },
+      "status": "failed_diagnostic_gate",
+      "truth_sha256": "d687402f4c1d3eda30bb86bf76e81903392c94e1f5e3ac73db9e30573db9ba44"
+    },
+    {
+      "accepted_diagnostics_recomputed": false,
+      "attempts": 3,
+      "campaign": "primary",
+      "candidate": "primary",
+      "compute_thread_policy": "One native numerical thread per sequential-chain fit process.",
+      "data_sha256": "2f16c14da6f108731a36c429e2d532a6c4f7ab343a4e989a3cda9c5473faef19",
+      "directory": "artifacts/stage7/joint-level-v1/primary/representative-7101",
+      "observed_count_fingerprint": "987d6c228efb7b7a85a3f9626bd32ddd7809b15d51e56954cda5825dc2de02a1",
+      "options": {
+        "categories": 10,
+        "conditional_level": false,
+        "count_parameterization": "conditional",
+        "factor_parameterization": "anchored",
+        "factors": 2,
+        "gaussian_solver": "block",
+        "kernel": false,
+        "known_auxiliary_coefficients": false,
+        "level_parameterization": "joint_conditional",
+        "level_settings": {
+          "amplitude_multiplier": 1.0,
+          "anchor": 3.5030238822606967,
+          "candidate": "primary",
+          "fallback_anchor": null,
+          "fallback_index": null,
+          "hyper_sd": 1.0,
+          "known_indices": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "scale_sd": 1.0,
+          "scale_upper": 2.0,
+          "training_months": 108
+        },
+        "mass_matrix": "diagonal",
+        "months": 108,
+        "prior_candidate": "primary",
+        "prior_id": "anchored_levels_v2",
+        "regimes": 1,
+        "residual": "none",
+        "scenario": "representative",
+        "seed": 7101,
+        "severity_factors": 0
+      },
+      "original_truth_sha256": "9fca1f6c6e33992fe0a0bb22a0599a87ac6aa677385e5b6873808e7e12fd3eec",
+      "recovery_eligible": false,
+      "recovery_exclusion": null,
+      "result_sha256": "0807e1bfca52ab66d1ef6c8a1765fbc9d4cad10f6b054120c6d1577956d2dbac",
+      "scenario": "representative",
+      "seed": 7101,
+      "source_control": {
+        "dirty": true,
+        "revision": "9ed9081635f8c534e2952178583ec0bd3d91cdb7",
+        "status": "available"
+      },
+      "status": "failed_diagnostic_gate",
+      "truth_sha256": "92e92d139ba48feaf06569b34db715a2fc9c58870b6aeb5a6dbc76f3628945af"
+    },
+    {
+      "accepted_diagnostics_recomputed": false,
+      "attempts": 3,
+      "campaign": "primary",
+      "candidate": "primary",
+      "compute_thread_policy": "One native numerical thread per sequential-chain fit process.",
+      "data_sha256": "c6d23bdf858acc4fe9141915fa9d6bbb3314c60843c8e18e1f070bdb26d438cc",
+      "directory": "artifacts/stage7/rank-two-joint-v1/primary/fallback_zero-7101",
+      "observed_count_fingerprint": "762e7ba08aa0f83ee84572c7e59943939e4da021a2d747708168a797655ff755",
+      "options": {
+        "categories": 10,
+        "conditional_level": false,
+        "count_parameterization": "conditional",
+        "factor_parameterization": "anchored",
+        "factors": 2,
+        "fallback_index": 9,
+        "gaussian_solver": "block",
+        "kernel": false,
+        "known_auxiliary_coefficients": false,
+        "level_parameterization": "joint_conditional",
+        "level_settings": {
+          "amplitude_multiplier": 1.0,
+          "anchor": 3.613195375092311,
+          "candidate": "primary",
+          "fallback_anchor": -0.6931471805599453,
+          "fallback_index": 9,
+          "hyper_sd": 1.0,
+          "known_indices": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "scale_sd": 1.0,
+          "scale_upper": 2.0,
+          "training_months": 108
+        },
+        "mass_matrix": "diagonal",
+        "months": 108,
+        "prior_candidate": "primary",
+        "prior_id": "anchored_levels_v2",
+        "regimes": 1,
+        "residual": "none",
+        "scenario": "fallback_zero",
+        "seed": 7101,
+        "severity_factors": 0
+      },
+      "original_truth_sha256": "b48cdc70e3dff4635810daf06d6b1910d3e03c43d9db27b1745919cdc1186b2a",
+      "recovery_eligible": false,
+      "recovery_exclusion": null,
+      "result_sha256": "fbcde703cd1a246bfc9b84c524d586d988298abc25b42150b91ecf6617455a5f",
+      "scenario": "fallback_zero",
+      "seed": 7101,
+      "source_control": {
+        "dirty": false,
+        "revision": "62042bd99a29e407d73523d173f59d071e30b06a",
+        "status": "available"
+      },
+      "status": "failed_diagnostic_gate",
+      "truth_sha256": "dac3654db20054410876005868f2f268d33d9d7901bc4a2949a8f4039fd5aafb"
+    },
+    {
+      "accepted_diagnostics_recomputed": false,
+      "attempts": 3,
+      "campaign": "primary",
+      "candidate": "primary",
+      "compute_thread_policy": "One native numerical thread per sequential-chain fit process.",
+      "data_sha256": "910f3c1d7a9c27575c861f335973bd3226b59ceaa8004d1028d800d4b5bb143f",
+      "directory": "artifacts/stage7/rank-two-joint-v1/primary/fallback_zero-7102",
+      "observed_count_fingerprint": "c3193bfa83e9946556ebfaf983aa461497b8ac065b5b9f6e7754f5897fe0d00e",
+      "options": {
+        "categories": 10,
+        "conditional_level": false,
+        "count_parameterization": "conditional",
+        "factor_parameterization": "anchored",
+        "factors": 2,
+        "fallback_index": 9,
+        "gaussian_solver": "block",
+        "kernel": false,
+        "known_auxiliary_coefficients": false,
+        "level_parameterization": "joint_conditional",
+        "level_settings": {
+          "amplitude_multiplier": 1.0,
+          "anchor": 3.5675310422731674,
+          "candidate": "primary",
+          "fallback_anchor": -0.6931471805599453,
+          "fallback_index": 9,
+          "hyper_sd": 1.0,
+          "known_indices": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "scale_sd": 1.0,
+          "scale_upper": 2.0,
+          "training_months": 108
+        },
+        "mass_matrix": "diagonal",
+        "months": 108,
+        "prior_candidate": "primary",
+        "prior_id": "anchored_levels_v2",
+        "regimes": 1,
+        "residual": "none",
+        "scenario": "fallback_zero",
+        "seed": 7102,
+        "severity_factors": 0
+      },
+      "original_truth_sha256": "4498c0957f3222ab17955f60de4858270d23a616033014931d2bdb0a421f90f7",
+      "recovery_eligible": false,
+      "recovery_exclusion": null,
+      "result_sha256": "64e3013a095683d5e992667f7c37c8c88a32be6fcdb19094511591531be5ad6f",
+      "scenario": "fallback_zero",
+      "seed": 7102,
+      "source_control": {
+        "dirty": false,
+        "revision": "62042bd99a29e407d73523d173f59d071e30b06a",
+        "status": "available"
+      },
+      "status": "failed_diagnostic_gate",
+      "truth_sha256": "d67a99082ec7dbcfe671761aa6e4171a1055588197caf78060fcaed0e53bf20a"
+    },
+    {
+      "accepted_diagnostics_recomputed": false,
+      "attempts": 3,
+      "campaign": "primary",
+      "candidate": "primary",
+      "compute_thread_policy": "One native numerical thread per sequential-chain fit process.",
+      "data_sha256": "6556b3fb7258acda4ba1e969af026ce8c54cd2ddbd4f051ac375e6ccc37da112",
+      "directory": "artifacts/stage7/rank-two-joint-v1/primary/fallback_zero-7103",
+      "observed_count_fingerprint": "003add026b197cccdca035c93a167ba9094ff124a7f4fc09831651702a4030d2",
+      "options": {
+        "categories": 10,
+        "conditional_level": false,
+        "count_parameterization": "conditional",
+        "factor_parameterization": "anchored",
+        "factors": 2,
+        "fallback_index": 9,
+        "gaussian_solver": "block",
+        "kernel": false,
+        "known_auxiliary_coefficients": false,
+        "level_parameterization": "joint_conditional",
+        "level_settings": {
+          "amplitude_multiplier": 1.0,
+          "anchor": 3.425354536925721,
+          "candidate": "primary",
+          "fallback_anchor": -0.6931471805599453,
+          "fallback_index": 9,
+          "hyper_sd": 1.0,
+          "known_indices": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "scale_sd": 1.0,
+          "scale_upper": 2.0,
+          "training_months": 108
+        },
+        "mass_matrix": "diagonal",
+        "months": 108,
+        "prior_candidate": "primary",
+        "prior_id": "anchored_levels_v2",
+        "regimes": 1,
+        "residual": "none",
+        "scenario": "fallback_zero",
+        "seed": 7103,
+        "severity_factors": 0
+      },
+      "original_truth_sha256": "67d2efbf6cff1817eee11a71db6d758dd0d05e0e49ec706cb8df94250fae9def",
+      "recovery_eligible": false,
+      "recovery_exclusion": null,
+      "result_sha256": "9d169d13314dceb332d0fd588214ebc7b69fa6c74ee8247c33e2adbadb65e5a0",
+      "scenario": "fallback_zero",
+      "seed": 7103,
+      "source_control": {
+        "dirty": false,
+        "revision": "72ea2b3ed387a8a17b4f157973b7a5b90fefe6ad",
+        "status": "available"
+      },
+      "status": "failed_diagnostic_gate",
+      "truth_sha256": "3c0b8a27d8ebd4fdb5fb204d4e367d2d16b871916566d2935ac3e88401243328"
+    },
+    {
+      "accepted_diagnostics_recomputed": false,
+      "attempts": 3,
+      "campaign": "sensitivity",
+      "candidate": "level_tight",
+      "compute_thread_policy": "One native numerical thread per sequential-chain fit process.",
+      "data_sha256": "53a7f3bd8c4eba71e76b1cd015bad5980be48a402dd59e517574727f8e7cbd33",
+      "directory": "artifacts/stage7/count-matched-v1/level_tight/factors_sparse-7101",
+      "options": {
+        "categories": 4,
+        "conditional_level": false,
+        "count_parameterization": "conditional",
+        "factor_parameterization": "anchored",
+        "factors": 1,
+        "gaussian_solver": "block",
+        "kernel": false,
+        "known_auxiliary_coefficients": false,
+        "level_settings": {
+          "amplitude_multiplier": 1.0,
+          "anchor": 3.5876337249873824,
+          "candidate": "level_tight",
+          "fallback_anchor": null,
+          "fallback_index": null,
+          "hyper_sd": 0.75,
+          "known_indices": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "scale_sd": 0.75,
+          "scale_upper": 1.5,
+          "training_months": 96
+        },
+        "mass_matrix": "dense",
+        "months": 96,
+        "prior_candidate": "level_tight",
+        "prior_id": "anchored_levels_v2",
+        "regimes": 1,
+        "residual": "none",
+        "scenario": "factors_sparse",
+        "seed": 7101,
+        "severity_factors": 0
+      },
+      "original_truth_sha256": "7c03723bfb675719d75df36145a322ddb0ed0c6b67745bddf321b6681700e95e",
+      "recovery_eligible": false,
+      "recovery_exclusion": null,
+      "result_sha256": "37e43d0cb6154dbed440e48592cbfb6b43a6c14654745b5467f04740d5e85d6e",
+      "scenario": "factors_sparse",
+      "seed": 7101,
+      "source_control": {
+        "dirty": true,
+        "revision": "f10d43b02fc2c80d64a9f13f9d80bc0bb7fa8555",
+        "status": "available"
+      },
+      "status": "failed_diagnostic_gate",
+      "truth_sha256": "ce354834e88c98c08f34175e057f1c4792ce84bfebba7d7231cd5fd670de9c43"
+    },
+    {
+      "accepted_diagnostics_recomputed": false,
+      "attempts": 3,
+      "campaign": "sensitivity",
+      "candidate": "level_tight",
+      "compute_thread_policy": "One native numerical thread per sequential-chain fit process.",
+      "data_sha256": "2f16c14da6f108731a36c429e2d532a6c4f7ab343a4e989a3cda9c5473faef19",
+      "directory": "artifacts/stage7/rank-two-joint-v1/level_tight/representative-7101",
+      "options": {
+        "categories": 10,
+        "conditional_level": false,
+        "count_parameterization": "conditional",
+        "factor_parameterization": "anchored",
+        "factors": 2,
+        "gaussian_solver": "block",
+        "kernel": false,
+        "known_auxiliary_coefficients": false,
+        "level_parameterization": "joint_conditional",
+        "level_settings": {
+          "amplitude_multiplier": 1.0,
+          "anchor": 3.5030238822606967,
+          "candidate": "level_tight",
+          "fallback_anchor": null,
+          "fallback_index": null,
+          "hyper_sd": 0.75,
+          "known_indices": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "scale_sd": 0.75,
+          "scale_upper": 1.5,
+          "training_months": 108
+        },
+        "mass_matrix": "diagonal",
+        "months": 108,
+        "prior_candidate": "level_tight",
+        "prior_id": "anchored_levels_v2",
+        "regimes": 1,
+        "residual": "none",
+        "scenario": "representative",
+        "seed": 7101,
+        "severity_factors": 0
+      },
+      "original_truth_sha256": "9fca1f6c6e33992fe0a0bb22a0599a87ac6aa677385e5b6873808e7e12fd3eec",
+      "recovery_eligible": false,
+      "recovery_exclusion": null,
+      "result_sha256": "ec9c95ff5b8074957023ba52ed0a14ec8f80e747daef7eb46a83090517cf48c7",
+      "scenario": "representative",
+      "seed": 7101,
+      "source_control": {
+        "dirty": false,
+        "revision": "72ea2b3ed387a8a17b4f157973b7a5b90fefe6ad",
+        "status": "available"
+      },
+      "status": "failed_diagnostic_gate",
+      "truth_sha256": "92e92d139ba48feaf06569b34db715a2fc9c58870b6aeb5a6dbc76f3628945af"
+    },
+    {
+      "accepted_diagnostics_recomputed": false,
+      "attempts": 3,
+      "campaign": "sensitivity",
+      "candidate": "level_tight",
+      "compute_thread_policy": "One native numerical thread per sequential-chain fit process.",
+      "data_sha256": "c6d23bdf858acc4fe9141915fa9d6bbb3314c60843c8e18e1f070bdb26d438cc",
+      "directory": "artifacts/stage7/rank-two-joint-v1/level_tight/fallback_zero-7101",
+      "options": {
+        "categories": 10,
+        "conditional_level": false,
+        "count_parameterization": "conditional",
+        "factor_parameterization": "anchored",
+        "factors": 2,
+        "fallback_index": 9,
+        "gaussian_solver": "block",
+        "kernel": false,
+        "known_auxiliary_coefficients": false,
+        "level_parameterization": "joint_conditional",
+        "level_settings": {
+          "amplitude_multiplier": 1.0,
+          "anchor": 3.613195375092311,
+          "candidate": "level_tight",
+          "fallback_anchor": -0.6931471805599453,
+          "fallback_index": 9,
+          "hyper_sd": 0.75,
+          "known_indices": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "scale_sd": 0.75,
+          "scale_upper": 1.5,
+          "training_months": 108
+        },
+        "mass_matrix": "diagonal",
+        "months": 108,
+        "prior_candidate": "level_tight",
+        "prior_id": "anchored_levels_v2",
+        "regimes": 1,
+        "residual": "none",
+        "scenario": "fallback_zero",
+        "seed": 7101,
+        "severity_factors": 0
+      },
+      "original_truth_sha256": "b48cdc70e3dff4635810daf06d6b1910d3e03c43d9db27b1745919cdc1186b2a",
+      "recovery_eligible": false,
+      "recovery_exclusion": null,
+      "result_sha256": "c58efc2a0ccdb402b53e27b6ecb6fba767408e115d7e8ef0acf5c56defa3a58a",
+      "scenario": "fallback_zero",
+      "seed": 7101,
+      "source_control": {
+        "dirty": false,
+        "revision": "72ea2b3ed387a8a17b4f157973b7a5b90fefe6ad",
+        "status": "available"
+      },
+      "status": "failed_diagnostic_gate",
+      "truth_sha256": "dac3654db20054410876005868f2f268d33d9d7901bc4a2949a8f4039fd5aafb"
+    },
+    {
+      "accepted_diagnostics_recomputed": true,
+      "attempts": 1,
+      "campaign": "sensitivity",
+      "candidate": "level_wide",
+      "compute_thread_policy": "One native numerical thread per sequential-chain fit process.",
+      "data_sha256": "53a7f3bd8c4eba71e76b1cd015bad5980be48a402dd59e517574727f8e7cbd33",
+      "directory": "artifacts/stage7/count-matched-v1/level_wide/factors_sparse-7101",
+      "options": {
+        "categories": 4,
+        "conditional_level": false,
+        "count_parameterization": "conditional",
+        "factor_parameterization": "anchored",
+        "factors": 1,
+        "gaussian_solver": "block",
+        "kernel": false,
+        "known_auxiliary_coefficients": false,
+        "level_settings": {
+          "amplitude_multiplier": 1.0,
+          "anchor": 3.5876337249873824,
+          "candidate": "level_wide",
+          "fallback_anchor": null,
+          "fallback_index": null,
+          "hyper_sd": 1.5,
+          "known_indices": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "scale_sd": 1.5,
+          "scale_upper": 3.0,
+          "training_months": 96
+        },
+        "mass_matrix": "dense",
+        "months": 96,
+        "prior_candidate": "level_wide",
+        "prior_id": "anchored_levels_v2",
+        "regimes": 1,
+        "residual": "none",
+        "scenario": "factors_sparse",
+        "seed": 7101,
+        "severity_factors": 0
+      },
+      "original_truth_sha256": "7c03723bfb675719d75df36145a322ddb0ed0c6b67745bddf321b6681700e95e",
+      "recovery_eligible": true,
+      "recovery_exclusion": null,
+      "result_sha256": "7843fc9f1b3f68481e838884f34e763cc4d9f0e5e7bae0a9e43d6922b2f636f4",
+      "scenario": "factors_sparse",
+      "seed": 7101,
+      "source_control": {
+        "dirty": true,
+        "revision": "52b96a9a7979c8c4e52ce97ff00b1da531125c80",
+        "status": "available"
+      },
+      "status": "accepted",
+      "truth_sha256": "ce354834e88c98c08f34175e057f1c4792ce84bfebba7d7231cd5fd670de9c43"
+    },
+    {
+      "accepted_diagnostics_recomputed": false,
+      "attempts": 3,
+      "campaign": "sensitivity",
+      "candidate": "level_wide",
+      "compute_thread_policy": "One native numerical thread per sequential-chain fit process.",
+      "data_sha256": "2f16c14da6f108731a36c429e2d532a6c4f7ab343a4e989a3cda9c5473faef19",
+      "directory": "artifacts/stage7/rank-two-joint-v1/level_wide/representative-7101",
+      "options": {
+        "categories": 10,
+        "conditional_level": false,
+        "count_parameterization": "conditional",
+        "factor_parameterization": "anchored",
+        "factors": 2,
+        "gaussian_solver": "block",
+        "kernel": false,
+        "known_auxiliary_coefficients": false,
+        "level_parameterization": "joint_conditional",
+        "level_settings": {
+          "amplitude_multiplier": 1.0,
+          "anchor": 3.5030238822606967,
+          "candidate": "level_wide",
+          "fallback_anchor": null,
+          "fallback_index": null,
+          "hyper_sd": 1.5,
+          "known_indices": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "scale_sd": 1.5,
+          "scale_upper": 3.0,
+          "training_months": 108
+        },
+        "mass_matrix": "diagonal",
+        "months": 108,
+        "prior_candidate": "level_wide",
+        "prior_id": "anchored_levels_v2",
+        "regimes": 1,
+        "residual": "none",
+        "scenario": "representative",
+        "seed": 7101,
+        "severity_factors": 0
+      },
+      "original_truth_sha256": "9fca1f6c6e33992fe0a0bb22a0599a87ac6aa677385e5b6873808e7e12fd3eec",
+      "recovery_eligible": false,
+      "recovery_exclusion": null,
+      "result_sha256": "5f63362ede20fc64c5cc1e7f94399d25e9cf214ded843277232540f23e82adf6",
+      "scenario": "representative",
+      "seed": 7101,
+      "source_control": {
+        "dirty": false,
+        "revision": "72ea2b3ed387a8a17b4f157973b7a5b90fefe6ad",
+        "status": "available"
+      },
+      "status": "failed_diagnostic_gate",
+      "truth_sha256": "92e92d139ba48feaf06569b34db715a2fc9c58870b6aeb5a6dbc76f3628945af"
+    },
+    {
+      "accepted_diagnostics_recomputed": false,
+      "attempts": 3,
+      "campaign": "sensitivity",
+      "candidate": "level_wide",
+      "compute_thread_policy": "One native numerical thread per sequential-chain fit process.",
+      "data_sha256": "c6d23bdf858acc4fe9141915fa9d6bbb3314c60843c8e18e1f070bdb26d438cc",
+      "directory": "artifacts/stage7/rank-two-joint-v1/level_wide/fallback_zero-7101",
+      "options": {
+        "categories": 10,
+        "conditional_level": false,
+        "count_parameterization": "conditional",
+        "factor_parameterization": "anchored",
+        "factors": 2,
+        "fallback_index": 9,
+        "gaussian_solver": "block",
+        "kernel": false,
+        "known_auxiliary_coefficients": false,
+        "level_parameterization": "joint_conditional",
+        "level_settings": {
+          "amplitude_multiplier": 1.0,
+          "anchor": 3.613195375092311,
+          "candidate": "level_wide",
+          "fallback_anchor": -0.6931471805599453,
+          "fallback_index": 9,
+          "hyper_sd": 1.5,
+          "known_indices": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "scale_sd": 1.5,
+          "scale_upper": 3.0,
+          "training_months": 108
+        },
+        "mass_matrix": "diagonal",
+        "months": 108,
+        "prior_candidate": "level_wide",
+        "prior_id": "anchored_levels_v2",
+        "regimes": 1,
+        "residual": "none",
+        "scenario": "fallback_zero",
+        "seed": 7101,
+        "severity_factors": 0
+      },
+      "original_truth_sha256": "b48cdc70e3dff4635810daf06d6b1910d3e03c43d9db27b1745919cdc1186b2a",
+      "recovery_eligible": false,
+      "recovery_exclusion": null,
+      "result_sha256": "4afc319479dbd146151aae42eccb653baf0ac4cdd6b470d11b69363ee2ec5fac",
+      "scenario": "fallback_zero",
+      "seed": 7101,
+      "source_control": {
+        "dirty": false,
+        "revision": "72ea2b3ed387a8a17b4f157973b7a5b90fefe6ad",
+        "status": "available"
+      },
+      "status": "failed_diagnostic_gate",
+      "truth_sha256": "dac3654db20054410876005868f2f268d33d9d7901bc4a2949a8f4039fd5aafb"
+    },
+    {
+      "accepted_diagnostics_recomputed": true,
+      "attempts": 1,
+      "campaign": "sensitivity",
+      "candidate": "dynamics_tight",
+      "compute_thread_policy": "One native numerical thread per sequential-chain fit process.",
+      "data_sha256": "53a7f3bd8c4eba71e76b1cd015bad5980be48a402dd59e517574727f8e7cbd33",
+      "directory": "artifacts/stage7/count-matched-v1/dynamics_tight/factors_sparse-7101",
+      "options": {
+        "categories": 4,
+        "conditional_level": false,
+        "count_parameterization": "conditional",
+        "factor_parameterization": "anchored",
+        "factors": 1,
+        "gaussian_solver": "block",
+        "kernel": false,
+        "known_auxiliary_coefficients": false,
+        "level_settings": {
+          "amplitude_multiplier": 0.75,
+          "anchor": 3.5876337249873824,
+          "candidate": "dynamics_tight",
+          "fallback_anchor": null,
+          "fallback_index": null,
+          "hyper_sd": 1.0,
+          "known_indices": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "scale_sd": 1.0,
+          "scale_upper": 2.0,
+          "training_months": 96
+        },
+        "mass_matrix": "dense",
+        "months": 96,
+        "prior_candidate": "dynamics_tight",
+        "prior_id": "anchored_levels_v2",
+        "regimes": 1,
+        "residual": "none",
+        "scenario": "factors_sparse",
+        "seed": 7101,
+        "severity_factors": 0
+      },
+      "original_truth_sha256": "7c03723bfb675719d75df36145a322ddb0ed0c6b67745bddf321b6681700e95e",
+      "recovery_eligible": true,
+      "recovery_exclusion": null,
+      "result_sha256": "fa82ad4f531095e1ec96d9be4285dd99bdfe39d935d66f37e715fbb4a5dc1cfc",
+      "scenario": "factors_sparse",
+      "seed": 7101,
+      "source_control": {
+        "dirty": false,
+        "revision": "2cc8959e4199f5423af415537bd687f6ddd02fb4",
+        "status": "available"
+      },
+      "status": "accepted",
+      "truth_sha256": "ce354834e88c98c08f34175e057f1c4792ce84bfebba7d7231cd5fd670de9c43"
+    },
+    {
+      "accepted_diagnostics_recomputed": false,
+      "attempts": 3,
+      "campaign": "sensitivity",
+      "candidate": "dynamics_tight",
+      "compute_thread_policy": "One native numerical thread per sequential-chain fit process.",
+      "data_sha256": "2f16c14da6f108731a36c429e2d532a6c4f7ab343a4e989a3cda9c5473faef19",
+      "directory": "artifacts/stage7/rank-two-joint-v1/dynamics_tight/representative-7101",
+      "options": {
+        "categories": 10,
+        "conditional_level": false,
+        "count_parameterization": "conditional",
+        "factor_parameterization": "anchored",
+        "factors": 2,
+        "gaussian_solver": "block",
+        "kernel": false,
+        "known_auxiliary_coefficients": false,
+        "level_parameterization": "joint_conditional",
+        "level_settings": {
+          "amplitude_multiplier": 0.75,
+          "anchor": 3.5030238822606967,
+          "candidate": "dynamics_tight",
+          "fallback_anchor": null,
+          "fallback_index": null,
+          "hyper_sd": 1.0,
+          "known_indices": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "scale_sd": 1.0,
+          "scale_upper": 2.0,
+          "training_months": 108
+        },
+        "mass_matrix": "diagonal",
+        "months": 108,
+        "prior_candidate": "dynamics_tight",
+        "prior_id": "anchored_levels_v2",
+        "regimes": 1,
+        "residual": "none",
+        "scenario": "representative",
+        "seed": 7101,
+        "severity_factors": 0
+      },
+      "original_truth_sha256": "9fca1f6c6e33992fe0a0bb22a0599a87ac6aa677385e5b6873808e7e12fd3eec",
+      "recovery_eligible": false,
+      "recovery_exclusion": null,
+      "result_sha256": "4ad7baea4b69570454ab526287dfe46179056c2730b69f9bc7603ae245bfdca4",
+      "scenario": "representative",
+      "seed": 7101,
+      "source_control": {
+        "dirty": false,
+        "revision": "72ea2b3ed387a8a17b4f157973b7a5b90fefe6ad",
+        "status": "available"
+      },
+      "status": "failed_diagnostic_gate",
+      "truth_sha256": "92e92d139ba48feaf06569b34db715a2fc9c58870b6aeb5a6dbc76f3628945af"
+    },
+    {
+      "accepted_diagnostics_recomputed": false,
+      "attempts": 3,
+      "campaign": "sensitivity",
+      "candidate": "dynamics_tight",
+      "compute_thread_policy": "One native numerical thread per sequential-chain fit process.",
+      "data_sha256": "c6d23bdf858acc4fe9141915fa9d6bbb3314c60843c8e18e1f070bdb26d438cc",
+      "directory": "artifacts/stage7/rank-two-joint-v1/dynamics_tight/fallback_zero-7101",
+      "options": {
+        "categories": 10,
+        "conditional_level": false,
+        "count_parameterization": "conditional",
+        "factor_parameterization": "anchored",
+        "factors": 2,
+        "fallback_index": 9,
+        "gaussian_solver": "block",
+        "kernel": false,
+        "known_auxiliary_coefficients": false,
+        "level_parameterization": "joint_conditional",
+        "level_settings": {
+          "amplitude_multiplier": 0.75,
+          "anchor": 3.613195375092311,
+          "candidate": "dynamics_tight",
+          "fallback_anchor": -0.6931471805599453,
+          "fallback_index": 9,
+          "hyper_sd": 1.0,
+          "known_indices": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "scale_sd": 1.0,
+          "scale_upper": 2.0,
+          "training_months": 108
+        },
+        "mass_matrix": "diagonal",
+        "months": 108,
+        "prior_candidate": "dynamics_tight",
+        "prior_id": "anchored_levels_v2",
+        "regimes": 1,
+        "residual": "none",
+        "scenario": "fallback_zero",
+        "seed": 7101,
+        "severity_factors": 0
+      },
+      "original_truth_sha256": "b48cdc70e3dff4635810daf06d6b1910d3e03c43d9db27b1745919cdc1186b2a",
+      "recovery_eligible": false,
+      "recovery_exclusion": null,
+      "result_sha256": "28b138c79d391380ab9576a05c9d70c1e3ec6f8811814b0c7485d72909a48608",
+      "scenario": "fallback_zero",
+      "seed": 7101,
+      "source_control": {
+        "dirty": false,
+        "revision": "72ea2b3ed387a8a17b4f157973b7a5b90fefe6ad",
+        "status": "available"
+      },
+      "status": "failed_diagnostic_gate",
+      "truth_sha256": "dac3654db20054410876005868f2f268d33d9d7901bc4a2949a8f4039fd5aafb"
+    },
+    {
+      "accepted_diagnostics_recomputed": false,
+      "attempts": 3,
+      "campaign": "sensitivity",
+      "candidate": "dynamics_wide",
+      "compute_thread_policy": "One native numerical thread per sequential-chain fit process.",
+      "data_sha256": "53a7f3bd8c4eba71e76b1cd015bad5980be48a402dd59e517574727f8e7cbd33",
+      "directory": "artifacts/stage7/count-matched-v1/dynamics_wide/factors_sparse-7101",
+      "options": {
+        "categories": 4,
+        "conditional_level": false,
+        "count_parameterization": "conditional",
+        "factor_parameterization": "anchored",
+        "factors": 1,
+        "gaussian_solver": "block",
+        "kernel": false,
+        "known_auxiliary_coefficients": false,
+        "level_settings": {
+          "amplitude_multiplier": 1.5,
+          "anchor": 3.5876337249873824,
+          "candidate": "dynamics_wide",
+          "fallback_anchor": null,
+          "fallback_index": null,
+          "hyper_sd": 1.0,
+          "known_indices": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "scale_sd": 1.0,
+          "scale_upper": 2.0,
+          "training_months": 96
+        },
+        "mass_matrix": "dense",
+        "months": 96,
+        "prior_candidate": "dynamics_wide",
+        "prior_id": "anchored_levels_v2",
+        "regimes": 1,
+        "residual": "none",
+        "scenario": "factors_sparse",
+        "seed": 7101,
+        "severity_factors": 0
+      },
+      "original_truth_sha256": "7c03723bfb675719d75df36145a322ddb0ed0c6b67745bddf321b6681700e95e",
+      "recovery_eligible": false,
+      "recovery_exclusion": null,
+      "result_sha256": "a8661d317271b5466cb6db39eaa2d2d9836fd3bc558c1b7964d2b1b12c5fdb7f",
+      "scenario": "factors_sparse",
+      "seed": 7101,
+      "source_control": {
+        "dirty": true,
+        "revision": "2cc8959e4199f5423af415537bd687f6ddd02fb4",
+        "status": "available"
+      },
+      "status": "failed_diagnostic_gate",
+      "truth_sha256": "ce354834e88c98c08f34175e057f1c4792ce84bfebba7d7231cd5fd670de9c43"
+    },
+    {
+      "accepted_diagnostics_recomputed": false,
+      "attempts": 3,
+      "campaign": "sensitivity",
+      "candidate": "dynamics_wide",
+      "compute_thread_policy": "One native numerical thread per sequential-chain fit process.",
+      "data_sha256": "2f16c14da6f108731a36c429e2d532a6c4f7ab343a4e989a3cda9c5473faef19",
+      "directory": "artifacts/stage7/rank-two-joint-v1/dynamics_wide/representative-7101",
+      "options": {
+        "categories": 10,
+        "conditional_level": false,
+        "count_parameterization": "conditional",
+        "factor_parameterization": "anchored",
+        "factors": 2,
+        "gaussian_solver": "block",
+        "kernel": false,
+        "known_auxiliary_coefficients": false,
+        "level_parameterization": "joint_conditional",
+        "level_settings": {
+          "amplitude_multiplier": 1.5,
+          "anchor": 3.5030238822606967,
+          "candidate": "dynamics_wide",
+          "fallback_anchor": null,
+          "fallback_index": null,
+          "hyper_sd": 1.0,
+          "known_indices": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "scale_sd": 1.0,
+          "scale_upper": 2.0,
+          "training_months": 108
+        },
+        "mass_matrix": "diagonal",
+        "months": 108,
+        "prior_candidate": "dynamics_wide",
+        "prior_id": "anchored_levels_v2",
+        "regimes": 1,
+        "residual": "none",
+        "scenario": "representative",
+        "seed": 7101,
+        "severity_factors": 0
+      },
+      "original_truth_sha256": "9fca1f6c6e33992fe0a0bb22a0599a87ac6aa677385e5b6873808e7e12fd3eec",
+      "recovery_eligible": false,
+      "recovery_exclusion": null,
+      "result_sha256": "b950c51862d5603e3b088757f13c940fbdb857b50be8f8bb65250d852e0c4809",
+      "scenario": "representative",
+      "seed": 7101,
+      "source_control": {
+        "dirty": false,
+        "revision": "72ea2b3ed387a8a17b4f157973b7a5b90fefe6ad",
+        "status": "available"
+      },
+      "status": "failed_diagnostic_gate",
+      "truth_sha256": "92e92d139ba48feaf06569b34db715a2fc9c58870b6aeb5a6dbc76f3628945af"
+    },
+    {
+      "accepted_diagnostics_recomputed": false,
+      "attempts": 3,
+      "campaign": "sensitivity",
+      "candidate": "dynamics_wide",
+      "compute_thread_policy": "One native numerical thread per sequential-chain fit process.",
+      "data_sha256": "c6d23bdf858acc4fe9141915fa9d6bbb3314c60843c8e18e1f070bdb26d438cc",
+      "directory": "artifacts/stage7/rank-two-joint-v1/dynamics_wide/fallback_zero-7101",
+      "options": {
+        "categories": 10,
+        "conditional_level": false,
+        "count_parameterization": "conditional",
+        "factor_parameterization": "anchored",
+        "factors": 2,
+        "fallback_index": 9,
+        "gaussian_solver": "block",
+        "kernel": false,
+        "known_auxiliary_coefficients": false,
+        "level_parameterization": "joint_conditional",
+        "level_settings": {
+          "amplitude_multiplier": 1.5,
+          "anchor": 3.613195375092311,
+          "candidate": "dynamics_wide",
+          "fallback_anchor": -0.6931471805599453,
+          "fallback_index": 9,
+          "hyper_sd": 1.0,
+          "known_indices": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "scale_sd": 1.0,
+          "scale_upper": 2.0,
+          "training_months": 108
+        },
+        "mass_matrix": "diagonal",
+        "months": 108,
+        "prior_candidate": "dynamics_wide",
+        "prior_id": "anchored_levels_v2",
+        "regimes": 1,
+        "residual": "none",
+        "scenario": "fallback_zero",
+        "seed": 7101,
+        "severity_factors": 0
+      },
+      "original_truth_sha256": "b48cdc70e3dff4635810daf06d6b1910d3e03c43d9db27b1745919cdc1186b2a",
+      "recovery_eligible": false,
+      "recovery_exclusion": null,
+      "result_sha256": "fb44f250f02e0f166b3ef89022bf62f5a0871bfe3ae05d103ca68cc4f945fba4",
+      "scenario": "fallback_zero",
+      "seed": 7101,
+      "source_control": {
+        "dirty": false,
+        "revision": "9500e7744674f382a7c597ce27d226dabb4508fd",
+        "status": "available"
+      },
+      "status": "failed_diagnostic_gate",
+      "truth_sha256": "dac3654db20054410876005868f2f268d33d9d7901bc4a2949a8f4039fd5aafb"
+    }
+  ],
+  "source_sha256": "e58ef9fde02e36b19ea8f7e68515f055ff62312d7cf4076a9c8e852bd9900336",
+  "verification_groups_overlap": true
+}

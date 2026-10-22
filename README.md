@@ -220,6 +220,11 @@ faces the original admission gates. The joint grid uses `NUMBA_OPT=0`; the
 other recorded conditional-coordinate configurations use their declared profile. New fit processes record and limit native numerical pools
 to one thread. Four chains are sampled sequentially within each fit.
 
+The [original 55-case campaign is complete](docs/simulations/stage7-complete-20261022/README.md):
+30 numerical passes and 27 recovery-eligible cases. The two-factor pilot remains
+unvalidated. The [bounded convergence supplement](docs/STAGE7_REPAIR_SUPPLEMENT.md)
+records the next investigation; Stage 8 and held-out scoring remain closed.
+
 The historical campaign's control cases used a diagonal metric, as recorded in
 the geometry decision. `scripts/summarize_stage7.py --controls-from` preserves
 that distinction in its audit. The current summary accepts explicit `--routing`

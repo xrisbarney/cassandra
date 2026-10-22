@@ -281,3 +281,26 @@ numerical gates, but only six are recovery eligible: proxy seeds 7101 and 7103
 do not explore documented alternative canonical regions. Only proxy seed 7102
 supports the paired three-configuration recovery comparison. Do not omit these
 exclusions or convert its count accuracy into a physical reporting-effort claim.
+
+### Original Stage 7 campaign completion and bounded repair (2026-10-22)
+
+The [55-case audit](simulations/stage7-complete-20261022/README.md) closes the
+original experiment: 30 numerical passes, 27 recovery-eligible cases, 25
+diagnostic failures and three exploration exclusions. The primary subset is
+28/43 numerically admitted and 25/43 recovery eligible; sensitivity is 2/12,
+both in the small one-factor fixture. These are fixed-truth cases with explicit
+data reuse, not 55 independent datasets or simulation-based calibration.
+
+All representative and fallback fits fail, including sensitivity candidates.
+Do not claim the full pilot has converged, that the kernel is validated, or that
+the model is robust to misspecified observations. A successful job or software
+test does not establish any of those claims. Preserve the primary component
+findings, conditional-noise qualification and negative results in the paper.
+
+The next [bounded supplement](STAGE7_REPAIR_SUPPLEMENT.md) is separately planned.
+Its premise check finds strong generating anchors already in the existing
+representative fixture, and a comparatively well-mixed fallback-level marginal
+inside a failed joint fit. Neither density ordering nor the fallback prior
+alone is established as the failure cause. Any adopted one-factor pilot needs
+its own dimensional validation and dated amendment; no amendment has yet been
+activated and no Stage 8 or held-out fit has started.

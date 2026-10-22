@@ -1,11 +1,15 @@
 # Stage 7 synthetic validation record
 
-Status, 2026-10-22: **posterior campaign in progress; not yet complete**.
+Status, 2026-10-22: **original 55-case campaign complete; pilot validation failed;
+bounded repair supplement planned; Stage 8 closed**.
 The active laws are `anchored_levels_v2`. The primary prior-plausibility gates
 pass. A fresh full-suite run passes all 222 tests across 29 files with unchanged
-source hashes. Fifty of the 55 declared cases are complete; five hosted
-sensitivity cases are on their final prescribed attempts. The remaining work is completion
-of those fits, sensitivity analysis and final component decisions. No real-data
+source hashes. All 43 primary and 12 sensitivity cases have verified terminal
+results. The combined campaign has 30 numerical passes, 27 recovery-eligible
+cases, 25 diagnostic failures and three exploration exclusions. The
+[completion audit](simulations/stage7-complete-20261022/README.md) preserves
+every case. The [bounded supplement](STAGE7_REPAIR_SUPPLEMENT.md) specifies the
+next convergence investigation; its fits have not started. No real-data
 proposed-model fitting or January 2024--December 2025 scoring has started.
 
 ## Scope and evidence
@@ -166,12 +170,17 @@ are lower bounds and partial chains are not recovery evidence.
 The [complete primary campaign](simulations/stage7-primary-complete-20261022/README.md)
 contains all 43 primary cases: 28 numerical passes, 25 recovery-eligible fits,
 15 diagnostic failures and three exploration exclusions. The representative
-fixture and all three fallback fixtures fail. **Final sensitivity findings and
-the combined campaign audit remain pending.** A numerical
+fixture and all three fallback fixtures fail. Of the 12 sensitivity cases,
+only the one-factor sparse cases under wider levels and tighter dynamics pass;
+all representative and fallback sensitivity cases fail. Wider levels also fail
+the separate prior-plausibility gate, so that posterior pass does not admit the
+prior as a default. No sensitivity result validates the two-factor pilot. A numerical
 diagnostic pass with unresolved warnings does not count as an admitted fit.
 Interrupted engineering trials and execution errors remain separate from
-fully exhausted diagnostic schedules. The final audit must independently
-recompute diagnostics from each admitted saved posterior.
+fully exhausted diagnostic schedules. The completed audit independently
+recomputes diagnostics from each admitted saved posterior. A separate review
+matches all 77 complete saved attempts, including failures; early stops have no
+complete posterior and do not enter that attempt count.
 
 The [reviewed effort analysis](simulations/stage7-effort-reviewed-20261022/README.md)
 contains nine cases, eight numerical passes and six recovery-eligible fits.
@@ -200,6 +209,29 @@ is distinct from its underlying NB-component intensity.
 
 ## Verification and limits
 
+The three eligible one-factor sparse fixtures recover operational log intensity
+with RMSE 0.232--0.277 and pointwise 90% coverage 0.893--0.951. Zero-lag
+covariance-entry coverage is 0.875--1.000. These dependent-cell summaries from
+three fixed-truth cases do not establish general calibration. The severity
+fixtures give normalized location RMSE 0.039--0.047 and coverage 0.813--0.885;
+their auxiliary coefficients are fixed at known values.
+
+All six conditional noise-separation fits pass, but their level is fixed at
+the generating value. The positive tau/log-dispersion tradeoff and weak sparse
+dispersion contraction support keeping iid noise optional; they do not establish
+general noise-component identification. No kernel case supplies eligible
+recovery evidence, and all three misspecification cases fail their diagnostic
+schedules. No kernel-benefit or misspecification-robustness claim is supported.
+
+The fallback fixtures use a generating reference-level rate of 0.0001, with
+time-varying rates under the shared factors. A finite run of zeros
+cannot precisely identify such a small positive rate. The independent fallback
+level avoids direct pooling through the known-category scale, but shared factors
+still connect categories. Its own prior standard deviation stays fixed across
+the declared sensitivity candidates, so those comparisons do not test robustness
+to alternative fallback-level priors. These limitations remain even if a later
+implementation resolves the present mixing failures.
+
 The [fresh full-suite record](checks/stage7-final-tests-20261022/audit.json)
 contains 222 passing tests across 29 files, each in a fresh process with no
 deselection and unchanged source hashes. It includes the warning classifier,
@@ -209,8 +241,7 @@ targeted test records remain preserved; repeated runs are not additional tests.
 The [hosted verification](checks/stage7-hosted-execution-verification-20261022/audit.json)
 passes all 32 selected execution checks on the exact hosted fitting commit.
 Eight hosted cases use exact canonical synthetic fixtures under OPT3; the
-primary fallback and two sensitivity cases are now verified and imported, with
-five sensitivity cases still on their final attempts. All
+primary fallback and seven sensitivity cases are verified and imported. All
 local OPT0 fits are complete; the four final rank-two local cases exhausted
 their diagnostic schedules unsuccessfully. See the
 [hosted decision](decisions/STAGE7_HOSTED_PENDING_20261022.md)
@@ -230,11 +261,26 @@ excluded cases stay in the experiment's denominators. In particular, completing
 the declared retry schedule with a failed diagnostic gate is a completed
 experiment, not a validated model extension.
 
-Final lint, freeze/provenance checks and the completion audit remain to be
-recorded alongside the completed posterior tables. The original Stage 2 freeze,
+Lint, lock, configuration, panel integrity and packaging checks pass; their
+records are linked from the completion audit. The original Stage 2 freeze,
 Stage 5 panel and Stage 6 results remain preserved. Stage 8 production integration,
 real auxiliary-channel eligibility, economic calibration and the six remaining
 named comparison systems are outside this stage. The KEV slope and unmatched
 fallback-KEV treatment remain separately pending; synthetic fixtures with known
 auxiliary coefficients do not resolve them. January 2024--December 2025 remains
 unscored.
+
+The original campaign consumed 68.477 recorded component job-hours across its
+55 canonical cases and prescribed attempts. This sums overlapping job costs,
+not campaign elapsed time or all research compute. Compilation, sampling and
+diagnostic fields are separated in the [timing audit](simulations/stage7-complete-20261022/timing/audit.json).
+No successful production fit exists from which to extrapolate an 84-origin
+budget.
+
+The [repair-premise check](checks/stage7-repair-premises-20261022/README.md)
+finds that the current generating anchors already maximize columnwise magnitude
+and two-row determinant. In the failed fallback seed-7101 final fit, the fallback
+level itself mixes better than the second persistence and several known-category
+levels. Neither a weak-anchor cause nor a fallback-level-only cause has been
+established. The supplement retains these findings and cannot automatically
+admit Stage 8 through a one-factor label change.

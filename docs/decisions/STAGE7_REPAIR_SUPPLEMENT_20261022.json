@@ -1,0 +1,52 @@
+{
+  "status": "declared_pending_implementation_and_preflight",
+  "date": "2026-10-22",
+  "authority": "User requested a bounded Stage 7 convergence repair, with Stage 8 closed.",
+  "plan": "docs/STAGE7_REPAIR_SUPPLEMENT.md",
+  "plan_sha256": "f2fe1a1e0eb6b88fe979020bae2ff11be3d40d4ecf521eebe47c4e342e48c8e6",
+  "premise_audit_sha256": "38f8225d7ccc52a7937bca9cbb4a0a8f07fe3f574e4b129645bcf97b30bdcfe3",
+  "original_campaign_sha256": "a72d77601138de2812fa56260c4a705daa4c4138662a858eb0856de75f56a828",
+  "parent_prior_activation_sha256": "9aeaa185fdfffd4cca9589236a9154fccac5a85a1d9c28c47e4ff6915f39b7ec",
+  "production_config_sha256_unchanged": "0b302e72acc6b86330aaba64810696ddf699bf3e7e2e8d6ebcd5b45ed4c23339",
+  "canonical_seed": 7101,
+  "sampler_seed": 7103,
+  "initialization_seed": 7301,
+  "matched_count_seed": 78101,
+  "matched_future_state_seed": 78102,
+  "cases": [
+    {
+      "id": "masked_fallback",
+      "source": "fallback_zero-7101",
+      "factors": 2,
+      "mask_fallback_counts": true
+    },
+    {
+      "id": "reduced_representative",
+      "source": "representative-7101",
+      "factors": 1,
+      "mask_fallback_counts": false
+    },
+    {
+      "id": "reduced_fallback",
+      "source": "fallback_zero-7101",
+      "factors": 1,
+      "mask_fallback_counts": false
+    },
+    {
+      "id": "matched_one_factor_fallback",
+      "source": "fallback_zero-7101",
+      "factors": 1,
+      "mask_fallback_counts": false,
+      "regenerate_counts": true
+    }
+  ],
+  "attempts_per_case": 1,
+  "chains": 4,
+  "warmup": 2000,
+  "retained_draws": 2000,
+  "target_accept": 0.99,
+  "max_treedepth": 15,
+  "additional_retries_permitted": false,
+  "stage8_enabled": false,
+  "held_out_scoring_enabled": false
+}

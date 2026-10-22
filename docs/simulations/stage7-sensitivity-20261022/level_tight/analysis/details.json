@@ -1,0 +1,12 @@
+{
+  "analysis_source_sha256": "f51355b2c60718c536a22c4674b3478dee9183e3b17cff99a4a798e889b5e698",
+  "artifacts": {
+    "contraction.csv": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6",
+    "covariance.csv": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6"
+  },
+  "audit_sha256": "b080b9cf1b3e6a2ccb3ad12e3607e2fdc234fe06258c94d878d47c0dee574cdb",
+  "cases": [],
+  "contraction": "Posterior SD divided by the matching recorded marginal prior SD.",
+  "covariance_target": "Stationary log-state covariance conditional on regime and effort.",
+  "interpretation": "Descriptive accepted-fit summaries; no new admission thresholds."
+}

@@ -1,0 +1,101 @@
+{
+  "all_eight_hosted_reservations_resolved": true,
+  "campaign_sha256": "a72d77601138de2812fa56260c4a705daa4c4138662a858eb0856de75f56a828",
+  "handoff_sha256": "132cabf0326218e3f3182732541b29d4ad2c23a46a4cd218ed73c55e1afacdd0",
+  "interpretation": "Original scheduling labels are preserved. All eleven canonical cases have verified terminal results; reservation/helper labels are not additional statistical failures.",
+  "records": [
+    {
+      "directory": "artifacts/stage7/rank-two-joint-v1/primary/fallback_zero-7102",
+      "original_classification": "local_terminal_result",
+      "original_coordinator_status": "failed_diagnostic_gate",
+      "result_sha256": "64e3013a095683d5e992667f7c37c8c88a32be6fcdb19094511591531be5ad6f",
+      "terminal_status": "failed_diagnostic_gate"
+    },
+    {
+      "directory": "artifacts/stage7/rank-two-joint-v1/primary/fallback_zero-7103",
+      "import_audit": "docs/simulations/stage7-hosted-imports-20261022/primary-fallback_zero-7103.json",
+      "import_audit_sha256": "3d83871b2109ad824e4ef8035d42da27feccd75a73207c5b234a6b5a6b6c2eee",
+      "original_classification": "intentional_hosted_reservation_no_local_fit",
+      "original_coordinator_status": "execution_failed",
+      "result_sha256": "9d169d13314dceb332d0fd588214ebc7b69fa6c74ee8247c33e2adbadb65e5a0",
+      "terminal_status": "failed_diagnostic_gate"
+    },
+    {
+      "directory": "artifacts/stage7/rank-two-joint-v1/level_tight/representative-7101",
+      "import_audit": "docs/simulations/stage7-hosted-imports-20261022/level_tight-representative-7101.json",
+      "import_audit_sha256": "2bbc1af0e69833ef3268f97a575e977b97176f307ab7e279e3bb7d957eee9a55",
+      "original_classification": "intentional_hosted_reservation_no_local_fit",
+      "original_coordinator_status": "execution_failed",
+      "result_sha256": "ec9c95ff5b8074957023ba52ed0a14ec8f80e747daef7eb46a83090517cf48c7",
+      "terminal_status": "failed_diagnostic_gate"
+    },
+    {
+      "directory": "artifacts/stage7/rank-two-joint-v1/level_tight/fallback_zero-7101",
+      "import_audit": "docs/simulations/stage7-hosted-imports-20261022/level_tight-fallback_zero-7101.json",
+      "import_audit_sha256": "04df881e0422725968a3ab267e4d091b77688fb4149ed9326a8ed6581a2cec9d",
+      "original_classification": "intentional_hosted_reservation_no_local_fit",
+      "original_coordinator_status": "execution_failed",
+      "result_sha256": "c58efc2a0ccdb402b53e27b6ecb6fba767408e115d7e8ef0acf5c56defa3a58a",
+      "terminal_status": "failed_diagnostic_gate"
+    },
+    {
+      "directory": "artifacts/stage7/rank-two-joint-v1/level_wide/representative-7101",
+      "import_audit": "docs/simulations/stage7-hosted-imports-20261022/level_wide-representative-7101.json",
+      "import_audit_sha256": "8c85f16fef3be34ba4482a053ba992bb4eba0f88b9fa0cd3a0673f4137b40d57",
+      "original_classification": "intentional_hosted_reservation_no_local_fit",
+      "original_coordinator_status": "execution_failed",
+      "result_sha256": "5f63362ede20fc64c5cc1e7f94399d25e9cf214ded843277232540f23e82adf6",
+      "terminal_status": "failed_diagnostic_gate"
+    },
+    {
+      "directory": "artifacts/stage7/rank-two-joint-v1/level_wide/fallback_zero-7101",
+      "import_audit": "docs/simulations/stage7-hosted-imports-20261022/level_wide-fallback_zero-7101.json",
+      "import_audit_sha256": "cb59ec5b9377f79beec0bcf7a746f1cb8a6c214393c24d64dd9a875e5fbcbe01",
+      "original_classification": "intentional_hosted_reservation_no_local_fit",
+      "original_coordinator_status": "execution_failed",
+      "result_sha256": "4afc319479dbd146151aae42eccb653baf0ac4cdd6b470d11b69363ee2ec5fac",
+      "terminal_status": "failed_diagnostic_gate"
+    },
+    {
+      "directory": "artifacts/stage7/rank-two-joint-v1/dynamics_tight/representative-7101",
+      "import_audit": "docs/simulations/stage7-hosted-imports-20261022/dynamics_tight-representative-7101.json",
+      "import_audit_sha256": "ba9f20d1fd338b8deb53424fce6d398e83ac140e83b0a19b63a5d2e6496274c7",
+      "original_classification": "intentional_hosted_reservation_no_local_fit",
+      "original_coordinator_status": "execution_failed",
+      "result_sha256": "4ad7baea4b69570454ab526287dfe46179056c2730b69f9bc7603ae245bfdca4",
+      "terminal_status": "failed_diagnostic_gate"
+    },
+    {
+      "directory": "artifacts/stage7/rank-two-joint-v1/dynamics_tight/fallback_zero-7101",
+      "import_audit": "docs/simulations/stage7-hosted-imports-20261022/dynamics_tight-fallback_zero-7101.json",
+      "import_audit_sha256": "8414d666f9919199280a04af7ad00d1933195bdcffd905e86c85c8a7c3285cec",
+      "original_classification": "intentional_hosted_reservation_no_local_fit",
+      "original_coordinator_status": "execution_failed",
+      "result_sha256": "28b138c79d391380ab9576a05c9d70c1e3ec6f8811814b0c7485d72909a48608",
+      "terminal_status": "failed_diagnostic_gate"
+    },
+    {
+      "directory": "artifacts/stage7/rank-two-joint-v1/dynamics_wide/representative-7101",
+      "import_audit": "docs/simulations/stage7-hosted-imports-20261022/dynamics_wide-representative-7101.json",
+      "import_audit_sha256": "8dd8117e005335b30aa4904d307bfc60899499484ed56313412a2f375c11b274",
+      "original_classification": "intentional_hosted_reservation_no_local_fit",
+      "original_coordinator_status": "execution_failed",
+      "result_sha256": "b950c51862d5603e3b088757f13c940fbdb857b50be8f8bb65250d852e0c4809",
+      "terminal_status": "failed_diagnostic_gate"
+    },
+    {
+      "directory": "artifacts/stage7/rank-two-joint-v1/dynamics_wide/fallback_zero-7101",
+      "original_classification": "independently_running_declared_local_case_preserved",
+      "original_coordinator_status": "execution_failed",
+      "result_sha256": "fb44f250f02e0f166b3ef89022bf62f5a0871bfe3ae05d103ca68cc4f945fba4",
+      "terminal_status": "failed_diagnostic_gate"
+    },
+    {
+      "directory": "artifacts/stage7/rank-two-joint-v1/primary/fallback_zero-7101",
+      "original_classification": "local_terminal_result",
+      "original_coordinator_status": "failed_diagnostic_gate",
+      "result_sha256": "fbcde703cd1a246bfc9b84c524d586d988298abc25b42150b91ecf6617455a5f",
+      "terminal_status": "failed_diagnostic_gate"
+    }
+  ]
+}

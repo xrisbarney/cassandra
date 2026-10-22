@@ -1,0 +1,60 @@
+{
+  "checked_utc": "2026-10-22T17:39:57.174600+00:00",
+  "passed": true,
+  "source_control": {
+    "revision": "8ab7929c94b00895e7878b688de57c1c3c2b93c7",
+    "dirty": true,
+    "status": "available"
+  },
+  "checks": {
+    "configuration": {
+      "command": [
+        ".venv/Scripts/ctm.exe",
+        "validate",
+        "configs/pilot.toml"
+      ],
+      "exit_code": 0,
+      "stdout": "{\n  \"status\": \"valid\",\n  \"configuration_sha256\": \"ba6fcc8c86ed71907472a22d1550a7ea2d458e08c234b7bfcf508632c092d751\",\n  \"evaluation_origin_counts\": {\n    \"1\": 24,\n    \"3\": 22,\n    \"6\": 19,\n    \"12\": 13\n  },\n  \"development_origin_counts\": {\n    \"1\": 60,\n    \"3\": 58,\n    \"6\": 55,\n    \"12\": 49\n  }\n}\n",
+      "stderr": ""
+    },
+    "lock": {
+      "command": [
+        ".tools/Scripts/uv.exe",
+        "lock",
+        "--check"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "Resolved 56 packages in 1ms\n"
+    },
+    "panel_integrity": {
+      "command": [
+        ".venv/Scripts/ctm.exe",
+        "verify-panels",
+        "docs/panels/stage5-20261020/panel_manifest.json"
+      ],
+      "exit_code": 0,
+      "stdout": "{\n  \"status\": \"verified\",\n  \"panel_id\": \"stage5-20261020\",\n  \"primary_count_panel_ready\": true,\n  \"scoring_ready\": false,\n  \"sha256\": \"0448a3eb7f6d4a17d3808b98ad7a315105ed2cc72974cf7828afb4c3d5515840\"\n}\n",
+      "stderr": ""
+    },
+    "ruff": {
+      "command": [
+        ".venv/Scripts/ruff.exe",
+        "check",
+        "."
+      ],
+      "exit_code": 0,
+      "stdout": "All checks passed!\n",
+      "stderr": ""
+    }
+  },
+  "test_audit_sha256": "7003529d65c4930cb7ba52db7f62d8aacd70a6584d0e5328f0a988750ab08785",
+  "tested_source_hashes_still_match": true,
+  "unchanged_parent_hashes": {
+    "docs/STAGE2_FREEZE.json": "7597b76276b837f8db9bc2baff63cb035e14cdfa8656885c782795d38cb598e7",
+    "docs/panels/stage5-20261020/panel_manifest.json": "0448a3eb7f6d4a17d3808b98ad7a315105ed2cc72974cf7828afb4c3d5515840",
+    "uv.lock": "78085a93261539225f90e8e6a2595b71b0f9ae0a46fc9822d93bbe550cbbf05a"
+  },
+  "build_record_sha256": "625b1e34558256b043f53f824da27068b97ad6ed4d06e61c614679a37c00e073",
+  "held_out_scoring_enabled": false
+}

@@ -1,0 +1,28 @@
+{
+  "analysis_source_sha256": "f51355b2c60718c536a22c4674b3478dee9183e3b17cff99a4a798e889b5e698",
+  "artifacts": {
+    "contraction.csv": "6aa4b2f2a83422e1623bac0d6b683b71f950b3465464bf9606875d599eccf287",
+    "covariance.csv": "1bfcab135c68929b8bd9af6ceb11b3042fa6c64ccb3f93d212fde88603f208c8"
+  },
+  "audit_sha256": "1e03c64475c2715164a2c7f2c43ddf50b1af498715eb47f991bf14e2482f1d6a",
+  "cases": [
+    {
+      "scenario": "factors_sparse",
+      "seed": 7101,
+      "upper_support_edge_probability": {
+        "f_diag": [
+          0.0
+        ],
+        "f_free": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "m_sd": 0.07925
+      }
+    }
+  ],
+  "contraction": "Posterior SD divided by the matching recorded marginal prior SD.",
+  "covariance_target": "Stationary log-state covariance conditional on regime and effort.",
+  "interpretation": "Descriptive accepted-fit summaries; no new admission thresholds."
+}

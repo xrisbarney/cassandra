@@ -1,0 +1,186 @@
+{
+  "accepted": 1,
+  "artifacts": {
+    "diagnostics.csv": "4433d58d4514dc8d43d05b2504c455d3a291f9d84a44560bea3f22028676e55c",
+    "parameters.csv": "c6c39d6b2142f0492fff42ac89c79eb2311394f52c55f3cabec653cc55b41d41",
+    "recovery.csv": "ca93a0547d1b6cb96c254f2a10363bbde7694f96be9283a5cbc00f41ee57e47f"
+  },
+  "expected_cases": 3,
+  "held_out_scoring_enabled": false,
+  "interpretation": "Fixed-truth stress/recovery cases; not SBC or real-data validation. Same-seed effort variants reuse observations, so the case count is not a count of independent replications.",
+  "real_data_read": false,
+  "recovery_eligible": 1,
+  "routing_sha256": "a23cfc9d55c2dfafc862f5047b5bb07191b816e6764d1c82bb9375f8b7460218",
+  "runs": [
+    {
+      "data_sha256": "53a7f3bd8c4eba71e76b1cd015bad5980be48a402dd59e517574727f8e7cbd33",
+      "directory": "artifacts/stage7/count-matched-v1/level_wide/factors_sparse-7101",
+      "options": {
+        "categories": 4,
+        "conditional_level": false,
+        "count_parameterization": "conditional",
+        "factor_parameterization": "anchored",
+        "factors": 1,
+        "gaussian_solver": "block",
+        "kernel": false,
+        "known_auxiliary_coefficients": false,
+        "level_settings": {
+          "amplitude_multiplier": 1.0,
+          "anchor": 3.5876337249873824,
+          "candidate": "level_wide",
+          "fallback_anchor": null,
+          "fallback_index": null,
+          "hyper_sd": 1.5,
+          "known_indices": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "scale_sd": 1.5,
+          "scale_upper": 3.0,
+          "training_months": 96
+        },
+        "mass_matrix": "dense",
+        "months": 96,
+        "prior_candidate": "level_wide",
+        "prior_id": "anchored_levels_v2",
+        "regimes": 1,
+        "residual": "none",
+        "scenario": "factors_sparse",
+        "seed": 7101,
+        "severity_factors": 0
+      },
+      "recovery_eligible": true,
+      "recovery_exclusion": null,
+      "result_sha256": "7843fc9f1b3f68481e838884f34e763cc4d9f0e5e7bae0a9e43d6922b2f636f4",
+      "scenario": "factors_sparse",
+      "seed": 7101,
+      "source_control": {
+        "dirty": true,
+        "revision": "52b96a9a7979c8c4e52ce97ff00b1da531125c80",
+        "status": "available"
+      },
+      "status": "accepted",
+      "truth_sha256": "ce354834e88c98c08f34175e057f1c4792ce84bfebba7d7231cd5fd670de9c43"
+    },
+    {
+      "data_sha256": "2f16c14da6f108731a36c429e2d532a6c4f7ab343a4e989a3cda9c5473faef19",
+      "directory": "artifacts/stage7/rank-two-joint-v1/level_wide/representative-7101",
+      "options": {
+        "categories": 10,
+        "conditional_level": false,
+        "count_parameterization": "conditional",
+        "factor_parameterization": "anchored",
+        "factors": 2,
+        "gaussian_solver": "block",
+        "kernel": false,
+        "known_auxiliary_coefficients": false,
+        "level_parameterization": "joint_conditional",
+        "level_settings": {
+          "amplitude_multiplier": 1.0,
+          "anchor": 3.5030238822606967,
+          "candidate": "level_wide",
+          "fallback_anchor": null,
+          "fallback_index": null,
+          "hyper_sd": 1.5,
+          "known_indices": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "scale_sd": 1.5,
+          "scale_upper": 3.0,
+          "training_months": 108
+        },
+        "mass_matrix": "diagonal",
+        "months": 108,
+        "prior_candidate": "level_wide",
+        "prior_id": "anchored_levels_v2",
+        "regimes": 1,
+        "residual": "none",
+        "scenario": "representative",
+        "seed": 7101,
+        "severity_factors": 0
+      },
+      "recovery_eligible": false,
+      "recovery_exclusion": null,
+      "result_sha256": "5f63362ede20fc64c5cc1e7f94399d25e9cf214ded843277232540f23e82adf6",
+      "scenario": "representative",
+      "seed": 7101,
+      "source_control": {
+        "dirty": false,
+        "revision": "72ea2b3ed387a8a17b4f157973b7a5b90fefe6ad",
+        "status": "available"
+      },
+      "status": "failed_diagnostic_gate",
+      "truth_sha256": "92e92d139ba48feaf06569b34db715a2fc9c58870b6aeb5a6dbc76f3628945af"
+    },
+    {
+      "data_sha256": "c6d23bdf858acc4fe9141915fa9d6bbb3314c60843c8e18e1f070bdb26d438cc",
+      "directory": "artifacts/stage7/rank-two-joint-v1/level_wide/fallback_zero-7101",
+      "options": {
+        "categories": 10,
+        "conditional_level": false,
+        "count_parameterization": "conditional",
+        "factor_parameterization": "anchored",
+        "factors": 2,
+        "fallback_index": 9,
+        "gaussian_solver": "block",
+        "kernel": false,
+        "known_auxiliary_coefficients": false,
+        "level_parameterization": "joint_conditional",
+        "level_settings": {
+          "amplitude_multiplier": 1.0,
+          "anchor": 3.613195375092311,
+          "candidate": "level_wide",
+          "fallback_anchor": -0.6931471805599453,
+          "fallback_index": 9,
+          "hyper_sd": 1.5,
+          "known_indices": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "scale_sd": 1.5,
+          "scale_upper": 3.0,
+          "training_months": 108
+        },
+        "mass_matrix": "diagonal",
+        "months": 108,
+        "prior_candidate": "level_wide",
+        "prior_id": "anchored_levels_v2",
+        "regimes": 1,
+        "residual": "none",
+        "scenario": "fallback_zero",
+        "seed": 7101,
+        "severity_factors": 0
+      },
+      "recovery_eligible": false,
+      "recovery_exclusion": null,
+      "result_sha256": "4afc319479dbd146151aae42eccb653baf0ac4cdd6b470d11b69363ee2ec5fac",
+      "scenario": "fallback_zero",
+      "seed": 7101,
+      "source_control": {
+        "dirty": false,
+        "revision": "72ea2b3ed387a8a17b4f157973b7a5b90fefe6ad",
+        "status": "available"
+      },
+      "status": "failed_diagnostic_gate",
+      "truth_sha256": "dac3654db20054410876005868f2f268d33d9d7901bc4a2949a8f4039fd5aafb"
+    }
+  ]
+}
