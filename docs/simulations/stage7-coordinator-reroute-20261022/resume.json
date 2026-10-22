@@ -1,0 +1,11 @@
+{
+  "time_utc": "2026-10-22T00:48:50.453761+00:00",
+  "supersedes_wait_only": true,
+  "stopped_waiting_shell_pid": 8412,
+  "interrupted_fits": [],
+  "reason": "Two spare fit slots are available; resume unstarted cases without waiting for the two slow kernel fits. Existing partial folders are skipped, not overwritten.",
+  "command": "stage7_batch.py --root artifacts/stage7/recovery-v6 --workers 2 --anchor-factors --dense-mass --exclude representative fallback_zero",
+  "numba_optimization_env": "3",
+  "maximum_current_fit_processes": 8,
+  "held_out_scoring_enabled": false
+}
