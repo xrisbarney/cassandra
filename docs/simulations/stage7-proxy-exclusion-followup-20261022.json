@@ -1,0 +1,13 @@
+{
+  "parent_routing_sha256": "c74d4df5a3dc5809ac779e6096faba641c80b26610eba91cb4784911c0c98e4e",
+  "recovery_exclusions": [
+    {
+      "directory": "artifacts/stage7/sign-chart-v1/effort_proxy-7101",
+      "result_sha256": "7c864e7ee3faf99411d894b4601c30d147c206bc456fc73bf49a1a221bf6ca84",
+      "evidence": "docs/checks/stage7-sign-exploration-20261022/seed7101.json",
+      "evidence_sha256": "b1c5b20549bd6906bb44c42fb926a67169d9a1ca5d2ce409cfb50db41f856782",
+      "reason": "A retained opposite orientation was found in attempt 0; numerically admitted attempt 1 has no crossings in any chain. Global exploration remains unresolved after the exact sign-chart change."
+    }
+  ],
+  "decision": "docs/decisions/STAGE7_RECOVERY_ELIGIBILITY_20261022.md"
+}

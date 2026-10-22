@@ -1,0 +1,13 @@
+{
+  "status": "Standalone OPT0 check interrupted and superseded by integrated six-test check",
+  "stopped_pids": [
+    21380,
+    30592
+  ],
+  "reason": "The integrated test file includes both complete candidate checks plus direct model-builder density/gradient equality and unsupported-model guards. Avoid duplicate compiler work.",
+  "partial_log": "artifacts/stage7-joint-candidate-opt0-tests.log",
+  "partial_log_sha256": "07f236e8ccd3b86b0e6595cd8a5679b5f20743ab19fdbbb8026ff782392e3164",
+  "replacement_log": "artifacts/stage7-joint-integration-tests.log",
+  "known_completed_prototype": "candidate_tests.json",
+  "no_posterior_fit_stopped": true
+}

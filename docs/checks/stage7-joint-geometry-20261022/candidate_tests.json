@@ -1,0 +1,20 @@
+{
+  "passed": 2,
+  "seconds": 986.44,
+  "numba_optimization": 1,
+  "log": "artifacts/stage7-joint-candidate-tests.log",
+  "log_sha256": "d24927423b161d7db95799bea2b6f2f0633c51980fc475b0d0aaee3e1cc23aad",
+  "source_sha256": {
+    "artifacts/joint_coordinates_candidate.py": "2bb0e22344bf0f8c85b73851c5b5ac10db62e55898f023b29e8ec275b81080ea",
+    "artifacts/test_joint_candidate.py": "0336ecd975a6549ee9193517ba5a98f5cd4da6d6372c930c982e8491e31ab02c"
+  },
+  "checks": [
+    "Independent dense joint conditional means and states",
+    "Complete density equality with Schur-complement Jacobian",
+    "Native and fused NUMBA values and gradients",
+    "Finite differences in every free parameter block",
+    "Ten-category representative and independent fallback at phi .9999"
+  ],
+  "warning": "Known native BLAS performance warning only",
+  "scope": "Standalone candidate; model-builder integration still requires verification."
+}

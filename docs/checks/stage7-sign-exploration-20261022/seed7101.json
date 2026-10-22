@@ -1,0 +1,18 @@
+{
+  "directory": "artifacts/stage7/sign-chart-v1/effort_proxy-7101",
+  "posterior_sha256": "f239b33c9f79c6de65deab9eefe2d26fd9f7eb50ade5ac20cff1e9e757e559d2",
+  "negative_fractions": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+  ],
+  "orientation_changes": [
+    0,
+    0,
+    0,
+    0
+  ],
+  "known_orientation_screen_passed": false,
+  "interpretation": "Known orientation exploration check; numerical pass alone is not enough."
+}

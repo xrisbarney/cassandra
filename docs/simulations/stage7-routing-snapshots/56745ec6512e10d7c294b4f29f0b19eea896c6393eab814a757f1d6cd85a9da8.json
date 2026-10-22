@@ -1,0 +1,92 @@
+{
+  "status": "Planned computational routes, before final completion audit. Rank-two routes depend on the recorded representative metric decision.",
+  "primary": {
+    "independent/7101": "artifacts/stage7/recovery-v6/independent-7101",
+    "independent/7102": "artifacts/stage7/recovery-v6/independent-7102",
+    "independent/7103": "artifacts/stage7/recovery-v6/independent-7103",
+    "latent_ar/7101": "artifacts/stage7/recovery-v6/latent_ar-7101",
+    "latent_ar/7102": "artifacts/stage7/recovery-v6/latent_ar-7102",
+    "latent_ar/7103": "artifacts/stage7/recovery-v6/latent_ar-7103",
+    "factors_sparse/7101": "artifacts/stage7/count-matched-v1/primary/factors_sparse-7101",
+    "factors_sparse/7102": "artifacts/stage7/count-matched-v1/primary/factors_sparse-7102",
+    "factors_sparse/7103": "artifacts/stage7/count-matched-v1/primary/factors_sparse-7103",
+    "severity_missing/7101": "artifacts/stage7/severity-conditional-v2/severity_missing-7101",
+    "severity_missing/7102": "artifacts/stage7/severity-block-v3/severity_missing-7102",
+    "severity_missing/7103": "artifacts/stage7/severity-block-v3/severity_missing-7103",
+    "regimes/7101": "artifacts/stage7/recovery-v6/regimes-7101",
+    "regimes/7102": "artifacts/stage7/recovery-v6/regimes-7102",
+    "regimes/7103": "artifacts/stage7/recovery-v6/regimes-7103",
+    "effort_proxy/7101": "artifacts/stage7/sign-chart-v1/effort_proxy-7101",
+    "effort_proxy/7102": "artifacts/stage7/sign-chart-v1/effort_proxy-7102",
+    "effort_proxy/7103": "artifacts/stage7/sign-chart-v1/effort_proxy-7103",
+    "effort_oracle/7101": "artifacts/stage7/count-matched-v1/primary/effort_oracle-7101",
+    "effort_oracle/7102": "artifacts/stage7/count-matched-v1/primary/effort_oracle-7102",
+    "effort_oracle/7103": "artifacts/stage7/count-matched-v1/primary/effort_oracle-7103",
+    "effort_none/7101": "artifacts/stage7/count-matched-v1/primary/effort_none-7101",
+    "effort_none/7102": "artifacts/stage7/count-matched-v1/primary/effort_none-7102",
+    "effort_none/7103": "artifacts/stage7/count-matched-v1/primary/effort_none-7103",
+    "kernel_present/7101": "artifacts/stage7/recovery-v6/kernel_present-7101",
+    "kernel_present/7102": "artifacts/stage7/recovery-v6/kernel_present-7102",
+    "kernel_present/7103": "artifacts/stage7/recovery-v6/kernel_present-7103",
+    "kernel_absent/7101": "artifacts/stage7/recovery-v6/kernel_absent-7101",
+    "kernel_absent/7102": "artifacts/stage7/recovery-v6/kernel_absent-7102",
+    "kernel_absent/7103": "artifacts/stage7/recovery-v6/kernel_absent-7103",
+    "dispersion_dense/7101": "artifacts/stage7/iid-conditional-v1/dispersion_dense-7101",
+    "dispersion_dense/7102": "artifacts/stage7/iid-conditional-v1/dispersion_dense-7102",
+    "dispersion_dense/7103": "artifacts/stage7/iid-conditional-v1/dispersion_dense-7103",
+    "dispersion_sparse/7101": "artifacts/stage7/iid-conditional-v1/dispersion_sparse-7101",
+    "dispersion_sparse/7102": "artifacts/stage7/iid-conditional-v1/dispersion_sparse-7102",
+    "dispersion_sparse/7103": "artifacts/stage7/iid-conditional-v1/dispersion_sparse-7103",
+    "misspecified/7101": "artifacts/stage7/count-misspecified-v1/misspecified-7101",
+    "misspecified/7102": "artifacts/stage7/count-misspecified-v1/misspecified-7102",
+    "misspecified/7103": "artifacts/stage7/count-misspecified-v1/misspecified-7103",
+    "representative/7101": "artifacts/stage7/count-scalar-v4/primary/representative-7101",
+    "fallback_zero/7101": "artifacts/stage7/rank-two-v4/primary/fallback_zero-7101",
+    "fallback_zero/7102": "artifacts/stage7/rank-two-v4/primary/fallback_zero-7102",
+    "fallback_zero/7103": "artifacts/stage7/rank-two-v4/primary/fallback_zero-7103"
+  },
+  "sensitivity": {
+    "level_tight/factors_sparse/7101": "artifacts/stage7/count-matched-v1/level_tight/factors_sparse-7101",
+    "level_tight/representative/7101": "artifacts/stage7/rank-two-v4/level_tight/representative-7101",
+    "level_tight/fallback_zero/7101": "artifacts/stage7/rank-two-v4/level_tight/fallback_zero-7101",
+    "level_wide/factors_sparse/7101": "artifacts/stage7/count-matched-v1/level_wide/factors_sparse-7101",
+    "level_wide/representative/7101": "artifacts/stage7/rank-two-v4/level_wide/representative-7101",
+    "level_wide/fallback_zero/7101": "artifacts/stage7/rank-two-v4/level_wide/fallback_zero-7101",
+    "dynamics_tight/factors_sparse/7101": "artifacts/stage7/count-matched-v1/dynamics_tight/factors_sparse-7101",
+    "dynamics_tight/representative/7101": "artifacts/stage7/rank-two-v4/dynamics_tight/representative-7101",
+    "dynamics_tight/fallback_zero/7101": "artifacts/stage7/rank-two-v4/dynamics_tight/fallback_zero-7101",
+    "dynamics_wide/factors_sparse/7101": "artifacts/stage7/count-matched-v1/dynamics_wide/factors_sparse-7101",
+    "dynamics_wide/representative/7101": "artifacts/stage7/rank-two-v4/dynamics_wide/representative-7101",
+    "dynamics_wide/fallback_zero/7101": "artifacts/stage7/rank-two-v4/dynamics_wide/fallback_zero-7101"
+  },
+  "severity_coordinates": {
+    "severity_missing/7101": "artifacts/stage7/severity-conditional-v2/severity_missing-7101",
+    "severity_missing/7102": "artifacts/stage7/severity-block-v3/severity_missing-7102",
+    "severity_missing/7103": "artifacts/stage7/severity-block-v3/severity_missing-7103"
+  },
+  "followup_sha256": "c92fcc7fbb081a166a4f26dcfce23b2c6a2b51e88fd0e29ef5211f2e2a27af1b",
+  "recovery_exclusions": [
+    {
+      "directory": "artifacts/stage7/recovery-v6/kernel_present-7101",
+      "result_sha256": "9a81911821eda2daaf0e945d93114ecee31e4d4232eb750ddcd2e0aecc50c0ea",
+      "evidence": "docs/checks/stage7-kernel-mode-20261022/audit.json",
+      "evidence_sha256": "b8dffa9dcf197c3517a0097a3d62d7fca6bf4e17c5e5a80f6ca168ff6d77d034",
+      "reason": "Numerically admitted attempt remains in one known retained orientation; global exploration unresolved."
+    },
+    {
+      "directory": "artifacts/stage7/count-block-v3/primary/effort_proxy-7102",
+      "result_sha256": "eb0a132e051b503679d1730f66bfc6bee475fb5be1825cf44ef4dca47e908346",
+      "evidence": "docs/checks/stage7-proxy-mode-20261022/audit.json",
+      "evidence_sha256": "6fffa7b4a84eac32daedec0acef3ccdf511294ec374b76ad2345e62d71d797b1",
+      "reason": "Numerically admitted attempt remains in one known retained orientation; global exploration unresolved."
+    },
+    {
+      "directory": "artifacts/stage7/sign-chart-v1/effort_proxy-7101",
+      "result_sha256": "7c864e7ee3faf99411d894b4601c30d147c206bc456fc73bf49a1a221bf6ca84",
+      "evidence": "docs/checks/stage7-sign-exploration-20261022/seed7101.json",
+      "evidence_sha256": "b1c5b20549bd6906bb44c42fb926a67169d9a1ca5d2ce409cfb50db41f856782",
+      "reason": "A retained opposite orientation was found in attempt 0; numerically admitted attempt 1 has no crossings in any chain. Global exploration remains unresolved after the exact sign-chart change."
+    }
+  ],
+  "sign_followup": "docs/simulations/stage7-sign-routing-20261022.json"
+}

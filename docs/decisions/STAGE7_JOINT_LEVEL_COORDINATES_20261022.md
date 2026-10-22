@@ -57,3 +57,16 @@ expansion. Recovery scores cannot select coordinates or metrics.
 This computational follow-up does not establish that near-unit persistence
 is physically meaningful or resolve decomposition identification. Those
 questions remain part of the recovery and prior-sensitivity interpretation.
+
+Compiler follow-up, before fitting: the standalone candidate passed both
+dense-reference/full-density/gradient cases under NUMBA_OPT=1 in 986.44 seconds
+under concurrent load. A stack inspection located the long portion in LLVM's
+final optimization of the fused density/gradient graph. Check NUMBA_OPT=0 on
+the same equations and on the integrated model-builder target. Use that setting
+for the joint representative and dependent grid only if all integrated checks
+pass. Record it with every run and retain the representative's full-gradient
+preflight. Neither setting enables fast-math or changes the numerical gates.
+These overlapping checks have different cache histories; their wall times are
+not a controlled compiler-speed comparison. The unfinished standalone OPT0
+test was explicitly superseded by the integrated six-test run, which includes
+both original cases plus direct builder equality and unsupported-model guards.
