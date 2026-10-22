@@ -1,0 +1,119 @@
+{
+  "directory": "artifacts/stage7/rank-two-joint-v1/dynamics_wide/fallback_zero-7101",
+  "candidate": "dynamics_wide",
+  "source_sha256": "51f7c88951bced0330a12d01126e4aa8d1d5b38b8f0bcb2ec4c05783f2e5efe3",
+  "marker_record": "C:/Users/Chris/Documents/cyber-threat-modelling/docs/checks/stage7-rank-two-mixing-20261022/README.md",
+  "marker_record_sha256": "b43db4c76a9d58dc1aa7c15121d124cdfac8c8656a4b5e947934d54eb2d79cec",
+  "run_sha256": "4414a942c2126f1363da634ec03a50477e62d99969928a2550ac2461958655d6",
+  "data_sha256": "c6d23bdf858acc4fe9141915fa9d6bbb3314c60843c8e18e1f070bdb26d438cc",
+  "attempts": [
+    {
+      "retry": 0,
+      "attempt_sha256": "6633b5e540150a9ae0465fcec08c1d1b464131ac5ffd2d25ed7172ece4274770",
+      "numerical_diagnostics": {
+        "accepted": false,
+        "all_diagnostics_finite": false,
+        "divergences": 1,
+        "max_rhat": null,
+        "min_bfmi": null,
+        "min_bulk_ess": null,
+        "min_tail_ess": null,
+        "tree_depth_saturations": 0
+      },
+      "attempt_accepted": false,
+      "regions": {},
+      "review": "No complete saved posterior; no region inference."
+    },
+    {
+      "retry": 1,
+      "attempt_sha256": "308443a29aab74a4ecd0e610e1570ed82c07cb61d70d9ed795b1eb8eab4db081",
+      "numerical_diagnostics": {
+        "accepted": false,
+        "all_diagnostics_finite": true,
+        "divergences": 0,
+        "max_rhat": 1.5289211820790416,
+        "min_bfmi": 0.7515985824030885,
+        "min_bulk_ess": 7.2073901239110985,
+        "min_tail_ess": 20.408081859097354,
+        "tree_depth_saturations": 0
+      },
+      "attempt_accepted": false,
+      "regions": {
+        "lower_persistence": {
+          "visits_per_chain": [
+            0,
+            998,
+            995,
+            999
+          ],
+          "fraction_per_chain": [
+            0.0,
+            0.998,
+            0.995,
+            0.999
+          ],
+          "transitions_per_chain": [
+            0,
+            3,
+            10,
+            2
+          ],
+          "draws_per_chain": 1000,
+          "every_chain_visits": false,
+          "every_chain_enters_and_leaves": false,
+          "indicator_diagnostics": "Not reported: at least one chain has a constant indicator."
+        },
+        "high_positive_mean": {
+          "visits_per_chain": [
+            773,
+            0,
+            0,
+            0
+          ],
+          "fraction_per_chain": [
+            0.773,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "transitions_per_chain": [
+            78,
+            0,
+            0,
+            0
+          ],
+          "draws_per_chain": 1000,
+          "every_chain_visits": false,
+          "every_chain_enters_and_leaves": false,
+          "indicator_diagnostics": "Not reported: at least one chain has a constant indicator."
+        },
+        "high_negative_mean": {
+          "visits_per_chain": [
+            89,
+            0,
+            0,
+            0
+          ],
+          "fraction_per_chain": [
+            0.089,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "transitions_per_chain": [
+            46,
+            0,
+            0,
+            0
+          ],
+          "draws_per_chain": 1000,
+          "every_chain_visits": false,
+          "every_chain_enters_and_leaves": false,
+          "indicator_diagnostics": "Not reported: at least one chain has a constant indicator."
+        }
+      },
+      "posterior_sha256": "e1cbaa7c0d59dd080d3f2d76fdc8d6fc6664d89035361515d4dc5700efe1bd56"
+    }
+  ],
+  "interpretation": "Visits describe exploration, not posterior region weights. No admission or recovery eligibility is changed by this review. Sensitivity priors have different posterior targets; compare their regions descriptively."
+}

@@ -25,6 +25,8 @@ def main():
     marker_record = Path(__file__).with_name("README.md")
     if options['seed'] == 7102:
         marker_record = Path(__file__).parent / 'fallback7102_attempt1' / 'README.md'
+    elif options['prior_candidate'] == 'dynamics_wide':
+        marker_record = Path(__file__).parent / 'dynamics_wide_attempt1' / 'README.md'
     if file_hash(args.run / "data.npz") != file_hash(reference / "data.npz"):
         raise ValueError("The observations differ from the diagnosed dataset.")
     if run["real_data_read"] or run["held_out_scoring_enabled"]:
