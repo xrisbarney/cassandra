@@ -1,8 +1,8 @@
-ï»¿# Stage 7 synthetic validation record
+Ã¯Â»Â¿# Stage 7 synthetic validation record
 
 Status, 2026-10-22: **posterior campaign in progress; not yet complete**.
 The active laws are `anchored_levels_v2`. The primary prior-plausibility gates
-pass, and 175 distinct tests pass. The remaining work is the full posterior
+pass, and 200 distinct tests pass across the full run and targeted gate checks. The remaining work is the full posterior
 campaign, sensitivity analysis and final component decisions. No real-data
 proposed-model fitting or January 2024--December 2025 scoring has started.
 
@@ -115,6 +115,26 @@ The matched count comparisons repeat accepted cases as well as failed ones;
 coordinates are not chosen separately by recovery scores. Figures use the
 explicit routed records and fixed seed 7101, displaying failures as failures.
 
+The [joint-coordinate decision](decisions/STAGE7_JOINT_LEVEL_COORDINATES_20261022.md)
+whitens levels and factors jointly using a Gaussian Schur complement, retaining
+the original normalized priors, exact NB likelihood and full transformation
+Jacobian. Independent dense calculations, complete density/gradient comparisons,
+near-unit persistence and fallback cases pass. The older conditional-level
+metric trials are explicitly interrupted computational attempts. The
+[grid-completion decision](decisions/STAGE7_SYNTHETIC_GRID_COMPLETION_20261022.md)
+fixes joint coordinates and a diagonal metric uniformly before grid outcomes;
+it removes representative admission only as a synthetic scheduling dependency.
+Every recovery case still faces the original posterior diagnostic gates.
+
+The [complete-model compiler check](checks/stage7-joint-compiler-20261022/selection.json)
+compares three deterministic points with the native target. Maximum absolute
+gradient discrepancy under OPT1 is about 6.3e-8. OPT0 is retained for the joint
+grid: measured median fused evaluation is about 0.00490 seconds versus 0.00552
+under OPT1. These sequential measurements have different cache/load histories
+and are not a controlled sampling speedup experiment. The exact dynamic-global
+Numba cache warning is classified as performance-only, retaining its source
+and full text; numerical and other unresolved warnings are not waived.
+
 ## Admission and recovery
 
 Every admitted posterior requires four complete chains, maximum R-hat below
@@ -160,10 +180,15 @@ is distinct from its underlying NB-component intensity.
 
 ## Verification and limits
 
-The [test record](checks/stage7-test-suite-20261022/audit.json) contains **175
-distinct passing tests** across 20 files. Each file ran in a fresh process;
-the subsequently expanded audit file's five tests replace its earlier four.
-The interrupted single-process test invocation is not counted as passing.
+The [full test record](checks/stage7-full-tests-v5-20261022/audit.json) contains
+190 passing tests across 24 files, each in a fresh process, with unchanged
+source hashes throughout. The [targeted follow-up](checks/stage7-compiler-warning-20261022/grid_followup.json)
+adds ten distinct tests for the narrowly classified cache warning and synthetic
+grid entry guards: 200 distinct passing tests in total. Its repeated seven-test
+warning-only run is not added again. The subsequent changes concern warning
+classification, compiler metadata and synthetic scheduling; the verified model
+algebra and generator remain unchanged. Interrupted test invocations are not
+counted as passing.
 The test result is software verification, not evidence that every posterior
 converges or every component is identified.
 

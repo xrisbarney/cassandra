@@ -8,7 +8,7 @@ coverage audits and hash-verified data manifests. Stage 5 adds frozen initial-wi
 topics, monthly panels and cell eligibility. Models, backtesting, economic
 calibration and paper results remain later-stage work.
 
-The held-out forecast period is January 2024–December 2025. The initial pilot
+The held-out forecast period is January 2024â€“December 2025. The initial pilot
 has ten categories including unknown, two factors, one regime, counts only,
 and no effort adjustment or kernel. The configuration does not launch training.
 
@@ -108,7 +108,7 @@ To rebuild from the pinned local source data, choose a fresh panel ID:
 
     uv run --locked --extra science ctm build-panels --data-manifest docs/audits/stage4-20261020/data_manifest.json --panel-id new-panel-id
 
-The builder fits text features only on 2010–2018, freezes them for all later
+The builder fits text features only on 2010â€“2018, freezes them for all later
 assignments, and refuses to overwrite an existing panel directory.
 
 See [implementation plan](IMPLEMENTATION_PLAN.md),
@@ -212,8 +212,12 @@ deliberate reuse of observations in the three effort variants. Coordinate and
 metric repairs follow the decisions linked in the report; one generic batch
 command is not the complete routed campaign. `scripts/stage7_batch.py` accepts
 explicit scenario/seed/candidate subsets and preserves existing partial fits.
-`scripts/stage7_rank_two.py` starts its dependent grid only after representative
-diagnostic admission. New fit processes record and limit native numerical pools
+`scripts/stage7_rank_two.py` normally requires representative admission. Its
+explicit `--synthetic-grid` mode follows the recorded completion decision:
+verified joint coordinates and generator hashes permit the diagnostic grid
+to run independently of representative success, while every posterior still
+faces the original admission gates. The joint grid uses `NUMBA_OPT=0`; the
+other recorded conditional-coordinate configurations use their declared profile. New fit processes record and limit native numerical pools
 to one thread. Four chains are sampled sequentially within each fit.
 
 The historical campaign's control cases used a diagonal metric, as recorded in
