@@ -1,0 +1,33 @@
+{
+  "time_utc": "2026-10-22T05:25:45.591147+00:00",
+  "case": "artifacts/stage7/rank-two-joint-v1/dynamics_wide/fallback_zero-7101",
+  "candidate": "dynamics_wide",
+  "scenario": "fallback_zero",
+  "seed": 7101,
+  "numba_opt": 0,
+  "coordinates": "joint_conditional/block/diagonal",
+  "purpose": "Execute the already declared final grid case early with spare CPU capacity. The main two-worker coordinator will subsequently resume its completed result by hash. No new dataset or statistical selection.",
+  "max_concurrent_sampler_processes": 4,
+  "native_threads_per_fit": 1,
+  "hardware_physical_cores": 4,
+  "grid_selection_sha256": "2531aca70c406502befef2acf73af095357d1d3245aec8124106f41c05e7e6b2",
+  "command": [
+    ".venv/Scripts/python.exe",
+    "scripts/stage7_batch.py",
+    "--root",
+    "artifacts/stage7/rank-two-joint-v1/dynamics_wide",
+    "--include",
+    "fallback_zero",
+    "--seeds",
+    "7101",
+    "--prior-candidate",
+    "dynamics_wide",
+    "--workers",
+    "1",
+    "--anchor-factors",
+    "--conditional-counts",
+    "--block-coordinates",
+    "--joint-levels"
+  ],
+  "note": "Wall times remain concurrent, not controlled timing comparisons. Existing fit folders/logs are never overwritten."
+}
