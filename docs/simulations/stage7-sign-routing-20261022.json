@@ -1,0 +1,12 @@
+{
+  "parent_routing_sha256": "3427f093515f377d506e4014536b0e6a86787257e36a458e1e1b8493480b7a30",
+  "parent_snapshot": "docs/simulations/stage7-routing-snapshots/3427f093515f377d506e4014536b0e6a86787257e36a458e1e1b8493480b7a30.json",
+  "primary": {
+    "effort_proxy/7101": "artifacts/stage7/sign-chart-v1/effort_proxy-7101",
+    "effort_proxy/7102": "artifacts/stage7/sign-chart-v1/effort_proxy-7102",
+    "effort_proxy/7103": "artifacts/stage7/sign-chart-v1/effort_proxy-7103"
+  },
+  "decision": "docs/decisions/STAGE7_SIGN_GAUGE_20261022.md",
+  "verified_first_case": "docs/checks/stage7-sign-exploration-20261022/seed7102.json",
+  "status": "Uniform coordinate replacement after first-case numerical and known-orientation verification. Other cases still require their own diagnostics and mode review."
+}

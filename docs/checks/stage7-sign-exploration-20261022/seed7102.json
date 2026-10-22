@@ -1,0 +1,83 @@
+{
+  "directory": "artifacts/stage7/sign-chart-v1/effort_proxy-7102",
+  "posterior_sha256": "4540751412f206bfe922f984b1a8f59a94b7aede398b71db58c14e87765aa3fd",
+  "numerical_pass": true,
+  "negative_fractions": [
+    0.021,
+    0.018,
+    0.025,
+    0.025
+  ],
+  "orientation_changes": [
+    42,
+    34,
+    46,
+    46
+  ],
+  "indicator_diagnostics": {
+    "mcse_mean": 0.00253293288134504,
+    "mcse_sd": 0.008203348539128213,
+    "ess_bulk": 3391.712745852158,
+    "ess_tail": 3391.712745851786,
+    "r_hat": 0.9997201179742392
+  },
+  "interpretation": "Working row-zero sign defines the canonical orientations. Direct crossings of both signs in every retained chain; frequencies are Monte Carlo estimates from this corrected chart, not old initialization counts.",
+  "known_orientation_screen_passed": true,
+  "checked_run": {
+    "directory": "artifacts/stage7/sign-chart-v1/effort_proxy-7102",
+    "scenario": "effort_proxy",
+    "seed": 7102,
+    "candidate": "primary",
+    "status": "accepted",
+    "attempts": 1,
+    "result_sha256": "600a601b87ee92330c325c22e5dbce00f40e899ad9c70d4373449ab0d0789e75",
+    "data_sha256": "832d7cb1c1091c4209119805bd44f8dc1e0b5b029167c737da0a5b79a7073dc0",
+    "truth_sha256": "165bcd2cc13d529b6c37b8672b8614d777c5769ea2bb2db5e2e95d8bb1340dac",
+    "original_truth_sha256": "815db5eaf7b0eabada9f43d82e5152df4e369568989e62a2d56c226d29391f60",
+    "source_control": {
+      "dirty": true,
+      "revision": "f7a9ee346c1567d0a18af49beb303e10667eb0e6",
+      "status": "available"
+    },
+    "options": {
+      "categories": 4,
+      "conditional_level": false,
+      "count_parameterization": "conditional",
+      "factor_parameterization": "anchored",
+      "factors": 1,
+      "gaussian_solver": "block",
+      "kernel": false,
+      "known_auxiliary_coefficients": false,
+      "level_settings": {
+        "amplitude_multiplier": 1.0,
+        "anchor": 4.365682862385978,
+        "candidate": "primary",
+        "fallback_anchor": null,
+        "fallback_index": null,
+        "hyper_sd": 1.0,
+        "known_indices": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "scale_sd": 1.0,
+        "scale_upper": 2.0,
+        "training_months": 96
+      },
+      "mass_matrix": "dense",
+      "months": 96,
+      "prior_candidate": "primary",
+      "prior_id": "anchored_levels_v2",
+      "regimes": 1,
+      "residual": "none",
+      "scenario": "effort_proxy",
+      "seed": 7102,
+      "severity_factors": 0,
+      "working_sign_anchor": 3
+    },
+    "accepted_diagnostics_recomputed": true,
+    "compute_thread_policy": "One native numerical thread per sequential-chain fit process."
+  },
+  "shell_status_note": "PowerShell wrapper reported exit 1 after redirected native stderr; complete result and all artifact hashes verified, and numerical diagnostics independently recomputed. No missing posterior or recovery output."
+}

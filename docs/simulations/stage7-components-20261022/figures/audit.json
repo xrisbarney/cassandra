@@ -1,0 +1,43 @@
+{
+  "artifacts": {
+    "synthetic_recovery.pdf": "86d0c369657172d0e36eec6609f8d3309d5f56a30e46a05e14e33b4f00eeb473",
+    "synthetic_recovery.png": "38ccb587c0a0ef92dcfd55afc9c4845681217b761f3f0a74ba8a63b83bc8351d"
+  },
+  "cases": [
+    {
+      "directory": "artifacts/stage7/count-matched-v1/primary/factors_sparse-7101",
+      "recovery_eligible": true,
+      "result_sha256": "860258865459c640d786456a0ae8d2adf9351a6e1cb61692b456b20eb4e36fa7",
+      "scenario": "factors_sparse",
+      "seed": 7101,
+      "status": "accepted"
+    },
+    {
+      "directory": "artifacts/stage7/recovery-v6/regimes-7101",
+      "recovery_eligible": true,
+      "result_sha256": "1b127b70aa14246e9bb001dbf613ed5f3836b05034d3e0762a5898c885d4742f",
+      "scenario": "regimes",
+      "seed": 7101,
+      "status": "accepted"
+    },
+    {
+      "directory": "artifacts/stage7/iid-conditional-v1/dispersion_dense-7101",
+      "recovery_eligible": true,
+      "result_sha256": "9d71a8f1ce7b3142969dc74ac6c35b2f961b2424e988dbfd34c572257b920c39",
+      "scenario": "dispersion_dense",
+      "seed": 7101,
+      "status": "accepted"
+    },
+    {
+      "directory": "artifacts/stage7/recovery-v6/kernel_present-7101",
+      "recovery_eligible": false,
+      "result_sha256": "9a81911821eda2daaf0e945d93114ecee31e4d4232eb750ddcd2e0aecc50c0ea",
+      "scenario": "kernel_present",
+      "seed": 7101,
+      "status": "accepted"
+    }
+  ],
+  "selection": "Predeclared seed 7101; failed posteriors are shown as failures.",
+  "source_sha256": "2ad43bfe2a935982c0d302793f3990c5b8d0aee16bdad4d4854648c3358f6f14",
+  "summary_audit_sha256": "39af6a11f57df619386422aa779d7475c6e9a2b2808f679843dfec4c0fdd8a12"
+}

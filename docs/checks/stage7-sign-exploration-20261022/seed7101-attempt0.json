@@ -1,0 +1,38 @@
+{
+  "posterior_sha256": "a5968a14fd43fd347feda23f2213d72d00510b6f839ab4f2c43369a9808bca2b",
+  "negative_fractions": [
+    1.0,
+    0.0,
+    0.0,
+    0.0
+  ],
+  "orientation_changes": [
+    0,
+    0,
+    0,
+    0
+  ],
+  "canonical_loading_means": [
+    [
+      0.6516779230051991,
+      0.8785279303951811,
+      -0.06748780150506901
+    ],
+    [
+      0.5316612836232999,
+      0.760901654954997,
+      1.0211446008004224
+    ],
+    [
+      0.5382085357227062,
+      0.7725137641367565,
+      1.0345705584387035
+    ],
+    [
+      0.5061975399020135,
+      0.72790375506511,
+      0.9707467315737974
+    ]
+  ],
+  "interpretation": "The replacement first attempt reveals another retained orientation for seed 7101. Its numerical diagnostics fail. Subsequent numerical passes require explicit examination of this known orientation; a common-mode retry alone is insufficient."
+}
