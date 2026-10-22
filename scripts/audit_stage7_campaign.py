@@ -171,6 +171,19 @@ def main():
         for key in ['data_sha256', 'truth_sha256', 'original_truth_sha256']:
             if record[key] != reference[key]:
                 raise ValueError(f'Datasets differ across repeated fits: {record["directory"]}')
+    counts = {name: dict(Counter(r['status'] for r in records if r['campaign'] == name))
+              for name in ['primary', 'sensitivity', 'severity_coordinates']}
+    unique = {}
+    for record in records:
+        key = Path(record['directory']).resolve()
+        if key in unique:
+            if unique[key]['result_sha256'] != record['result_sha256']:
+                raise ValueError(f'Conflicting repeated verification: {key}')
+            unique[key].setdefault('also_verified_as', []).append(record['campaign'])
+        else:
+            unique[key] = record
+    overlapping_groups = len(unique) != len(records)
+    records = list(unique.values())
     earlier = []
     for item in routing.get('earlier_attempts', []):
         folder = routed_folder({}, '', '', item['directory'], Path.cwd())
@@ -196,14 +209,15 @@ def main():
     write_json(args.output/'audit.json', {
         'prior_id': CURRENT_PRIOR_ID, 'activation': activation,
         'complete': True, 'unique_primary_datasets': len(primary),
-        'counts': {name: dict(Counter(r['status'] for r in records if r['campaign'] == name))
-                   for name in ['primary', 'sensitivity', 'severity_coordinates']},
+        'counts': counts, 'verification_groups_overlap': overlapping_groups,
         'runs': records, 'held_out_scoring_enabled': False,
         'routing_sha256': file_hash(args.routing) if args.routing else None,
         'recompute_diagnostics_requested': args.recompute_diagnostics,
         'earlier_attempts': earlier,
         'interpretation': 'Completion includes explicit diagnostic failures. Sensitivity and '
-                          'coordinate refits are not independent generated datasets.',
+                          'coordinate refits are not independent generated datasets. '
+                          'Severity-coordinate verification may reference the same files as '
+                          'routed primary cases; runs contains each directory only once.',
         'source_sha256': file_hash(Path(__file__)),
     })
     print(json.dumps({'complete': True, 'fits': len(records), 'datasets': len(primary)}))
