@@ -45,6 +45,7 @@ def main():
         'representative': args.representative.as_posix(),
         'result_sha256': file_hash(result_path), 'metric': metric,
         'selection': 'Predeclared diagnostic admission; recovery scores were not read.',
+        'level_parameterization': options.get('level_parameterization'),
         'source_sha256': file_hash(Path(__file__)), 'workers': args.workers,
     })
     jobs = [('primary', 'fallback_zero', seed) for seed in [7101, 7102, 7103]]
@@ -59,6 +60,8 @@ def main():
                    '--conditional-counts', '--block-coordinates']
         if metric == 'dense':
             command.append('--dense-mass')
+        if options.get('level_parameterization') == 'joint_conditional':
+            command.append('--joint-levels')
         with log.open('xb') as stream:
             process = subprocess.run(command, stdout=stream, stderr=subprocess.STDOUT)
         path = args.root/candidate/f'{scenario}-{seed}'/'result.json'

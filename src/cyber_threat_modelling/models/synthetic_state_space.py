@@ -102,6 +102,13 @@ def build_model(data, options, conditional=None):
     multiplier = settings['amplitude_multiplier'] if settings else 1.
     t, k = data["N"].shape
     r, rank = options["regimes"], options["factors"]
+    joint_levels = options.get('level_parameterization') == 'joint_conditional'
+    if joint_levels and (
+            not settings or rank != 2 or r != 1 or options['conditional_level']
+            or options['residual'] != 'none' or options['kernel']
+            or options.get('count_parameterization') != 'conditional'
+            or options.get('gaussian_solver') != 'block'):
+        raise ValueError('Joint level coordinates require the v2 rank-two count-only submodel.')
     sign_anchor = options.get('working_sign_anchor')
     if sign_anchor is not None and (
             not revised or rank != 1 or r != 1 or options['residual'] != 'none'
@@ -113,7 +120,20 @@ def build_model(data, options, conditional=None):
                             or options['kernel'] or not options['conditional_level']):
         raise ValueError('Conditional iid coordinates require the isolated noise-separation model.')
     with pm.Model() as model:
-        if options["conditional_level"]:
+        if joint_levels:
+            known = settings['known_indices']
+            sd = pm.TruncatedNormal('m_sd', 0, settings['scale_sd'], lower=0,
+                                     upper=settings['scale_upper'], initval=.7)
+            size = len(known)
+            covariance = pt.zeros((k, k))
+            known_cov = sd**2*np.eye(size)+settings['hyper_sd']**2*np.ones((size, size))
+            covariance = pt.set_subtensor(covariance[np.ix_(known, known)], known_cov)
+            center = np.full(k, settings['anchor'])
+            fallback = settings['fallback_index']
+            if fallback is not None:
+                covariance = pt.set_subtensor(covariance[fallback, fallback], 1.)
+                center[fallback] = settings['fallback_anchor']
+        elif options["conditional_level"]:
             m = pt.as_tensor_variable(np.asarray(conditional["m"]))
         else:
             observed_sum = np.where(data['mask_N'], data['N'], 0).sum(axis=0)
@@ -137,8 +157,18 @@ def build_model(data, options, conditional=None):
             else:
                 m = hierarchical_level("m", k, 0, 3, 2, np.log(initial_rate + 0.5), revised)
         psi = pm.LogNormal("psi", np.log(10), 1, shape=k, initval=np.full(k, 10))
+        if joint_levels:
+            from .joint_coordinates import joint_count_states
+
+            phi_f = pm.Uniform('f_phi', -1, 1, shape=rank, initval=np.full(rank, .4))
+            matrix_f = loading_matrix('f', k, rank, revised, multiplier)
+            m, joint_contribution = joint_count_states(
+                t, rank, phi_f, matrix_f, center, covariance, psi,
+                data['N'], data['mask_N'], data['effort'], known, fallback)
         base = pt.broadcast_to(m, (t, k))
-        if options.get('count_parameterization') == 'conditional':
+        if joint_levels:
+            base = base+joint_contribution
+        elif options.get('count_parameterization') == 'conditional':
             if not revised or not rank or r != 1 or options['residual'] != 'none' \
                     or options['kernel']:
                 raise ValueError('Conditional count coordinates require the factor-only R=1 model.')

@@ -79,8 +79,13 @@ def main():
     parser.add_argument('--conditional-counts', action='store_true')
     parser.add_argument('--conditional-iid', action='store_true')
     parser.add_argument('--sign-anchor', type=int, choices=[3])
+    parser.add_argument('--joint-levels', action='store_true')
     parser.add_argument('--block-coordinates', action='store_true')
     args = parser.parse_args()
+    if args.joint_levels and (args.scenario not in {'representative', 'fallback_zero'}
+                              or not args.conditional_counts or not args.block_coordinates
+                              or args.dense_mass):
+        parser.error('Joint levels require the declared rank-two block/diagonal configuration.')
     if args.sign_anchor is not None and (args.scenario != 'effort_proxy'
                                          or not args.conditional_counts):
         parser.error('The declared working sign chart applies to conditional proxy fits only.')
@@ -111,6 +116,8 @@ def main():
         options['count_parameterization'] = 'conditional'
     if args.sign_anchor is not None:
         options['working_sign_anchor'] = args.sign_anchor
+    if args.joint_levels:
+        options['level_parameterization'] = 'joint_conditional'
     if args.conditional_iid:
         options['residual_parameterization'] = 'conditional'
     if args.block_coordinates:
@@ -134,6 +141,8 @@ def main():
         files.append(root/'docs/decisions/STAGE7_IID_COORDINATES_20261022.md')
     if args.sign_anchor is not None:
         files.append(root/'docs/decisions/STAGE7_SIGN_GAUGE_20261022.md')
+    if args.joint_levels:
+        files.append(root/'docs/decisions/STAGE7_JOINT_LEVEL_COORDINATES_20261022.md')
     if args.conditional_counts:
         files.append(root/'docs/decisions/STAGE7_COUNT_COORDINATES_20261021.md')
         if args.scenario in {'effort_oracle', 'effort_none', 'factors_sparse'}:

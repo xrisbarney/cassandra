@@ -32,6 +32,7 @@ def main():
     parser.add_argument('--conditional-counts', action='store_true')
     parser.add_argument('--conditional-iid', action='store_true')
     parser.add_argument('--sign-anchor', type=int, choices=[3])
+    parser.add_argument('--joint-levels', action='store_true')
     parser.add_argument('--block-coordinates', action='store_true')
     args = parser.parse_args()
     args.root.mkdir(parents=True, exist_ok=True)
@@ -65,6 +66,9 @@ def main():
                 raise ValueError(f'Existing run has different iid coordinates: {folder}')
             if record['options'].get('working_sign_anchor') != args.sign_anchor:
                 raise ValueError(f'Existing run has a different working sign anchor: {folder}')
+            if record['options'].get('level_parameterization') != (
+                    'joint_conditional' if args.joint_levels else None):
+                raise ValueError(f'Existing run has different level coordinates: {folder}')
             solver = 'block' if args.block_coordinates else 'dense'
             if record['options'].get('gaussian_solver', 'dense') != solver:
                 raise ValueError(f'Existing run has a different Gaussian solver: {folder}')
@@ -91,6 +95,8 @@ def main():
                 command.append('--conditional-iid')
             if args.sign_anchor is not None:
                 command.extend(['--sign-anchor', str(args.sign_anchor)])
+            if args.joint_levels:
+                command.append('--joint-levels')
             if args.block_coordinates:
                 command.append('--block-coordinates')
             process = subprocess.run(command, stdout=stream, stderr=subprocess.STDOUT)
