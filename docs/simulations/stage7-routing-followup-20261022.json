@@ -1,0 +1,20 @@
+{
+  "parent": "docs/simulations/stage7-routing-plan-20261022.json",
+  "parent_sha256": "20484c67ce4ef05d94696c676473615286400170b0f9f859220638e7deaa0d8d",
+  "primary": {
+    "dispersion_dense/7101": "artifacts/stage7/iid-conditional-v1/dispersion_dense-7101",
+    "dispersion_dense/7102": "artifacts/stage7/iid-conditional-v1/dispersion_dense-7102",
+    "dispersion_dense/7103": "artifacts/stage7/iid-conditional-v1/dispersion_dense-7103",
+    "dispersion_sparse/7101": "artifacts/stage7/iid-conditional-v1/dispersion_sparse-7101",
+    "dispersion_sparse/7102": "artifacts/stage7/iid-conditional-v1/dispersion_sparse-7102",
+    "dispersion_sparse/7103": "artifacts/stage7/iid-conditional-v1/dispersion_sparse-7103",
+    "misspecified/7101": "artifacts/stage7/count-misspecified-v1/misspecified-7101",
+    "misspecified/7102": "artifacts/stage7/count-misspecified-v1/misspecified-7102",
+    "misspecified/7103": "artifacts/stage7/count-misspecified-v1/misspecified-7103"
+  },
+  "reason": "IID first-seed diagnostic admission after independent exact-coordinate tests; all six separation cases repeated uniformly. Misspecified fits use the already admitted compatible rank-one count coordinates, declared before those cases start. No recovery-score selection.",
+  "decisions": [
+    "docs/decisions/STAGE7_IID_COORDINATES_20261022.md",
+    "docs/decisions/STAGE7_COUNT_COORDINATES_20261021.md"
+  ]
+}

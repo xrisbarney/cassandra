@@ -1,0 +1,18 @@
+{
+  "time_utc": "2026-10-22T01:55:02.283189+00:00",
+  "first_replacement": "artifacts/stage7/iid-conditional-v1/dispersion_dense-7101/result.json",
+  "first_result_sha256": "9d71a8f1ce7b3142969dc74ac6c35b2f961b2424e988dbfd34c572257b920c39",
+  "coordinator_stopped": 25300,
+  "case": "artifacts/stage7/recovery-v6/dispersion_sparse-7101",
+  "status": "interrupted",
+  "reason": "The verified exact iid-coordinate replacement passed first-seed admission. Repeat all six separation cases with those coordinates. Preserve the nearly completed original dense seed 7103; stop unneeded original sparse fitting and pending original sparse jobs.",
+  "held_out_scoring_enabled": false,
+  "artifacts": {
+    "data.npz": "2c9da41b96a1dacbb05dee12408b29a6ea764759d5957866d6cbbf5965ba28d4",
+    "heartbeat.json": "85bc9d120cb3409729a03720822c8748fa9f59755daaf7494d1f6fedc9b8ee66",
+    "interruption.json": "ab35a28a37434f448a43517920238449417522c23e8ece59ddd67b971ffb15ff",
+    "run.json": "ed98d6e32540fd61a33fe57cf3fecb6cea949cd480a965f106b80f334b4da4fa",
+    "truth.npz": "6117d342d214bfc936f4cccba34814db619c1cbdc22f9d020161ef83f25fed4d",
+    "truth_original_coordinates.npz": "6117d342d214bfc936f4cccba34814db619c1cbdc22f9d020161ef83f25fed4d"
+  }
+}

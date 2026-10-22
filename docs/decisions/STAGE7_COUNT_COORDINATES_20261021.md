@@ -128,3 +128,13 @@ microbenchmark, forward/reverse medians became 0.0000327/0.0000852 seconds.
 These measurements were made under concurrent load and do not isolate a sampler
 speedup. Use the verified scalar implementation for subsequent block fits;
 existing partial attempts remain identifiable by their source hashes.
+
+Misspecification follow-up, declared 2026-10-22 before any `misspecified` fit:
+use the same verified conditional count coordinates, scalar block solver and
+dense metric for all three seeds of that compatible one-regime, one-factor
+fixture. The corresponding effort and sparse-factor submodels have already
+produced admitted posteriors. The generator retains its 30% zero inflation,
+while the fitted likelihood remains NB. This avoids conflating a deliberate
+observation-model misspecification with the superseded sampling geometry.
+It does not make the fitted model correctly specified or waive any diagnostic
+gate. Preserve the original generator, truths, priors, seeds and budgets.
