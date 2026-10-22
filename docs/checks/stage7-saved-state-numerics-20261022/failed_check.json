@@ -1,0 +1,13 @@
+{
+  "status": "failed_finite_difference_check",
+  "checkpoint": "artifacts/stage7/rank-two-joint-v1/primary/fallback_zero-7102/failed_state_0.npz",
+  "parameter": "f_phi_interval__[1]",
+  "step": 1e-05,
+  "rtol": 5e-05,
+  "atol": 5e-05,
+  "finite_difference_rounded": 0.708604,
+  "analytic_rounded": 0.707763,
+  "absolute_difference": 0.0008415,
+  "next_check": "Vary difference step to distinguish numerical cancellation from gradient error; do not widen the tolerance.",
+  "source_sha256": "ec016da2637a544fd1332f103babed01516adba04304e7d6b3a36309973432fe"
+}

@@ -1,0 +1,50 @@
+{
+  "source_sha256": "dfa08ddbf7e4d182254833447b126839eeda222353f8c7563de4b0a9fd58e0e5",
+  "decimal_precision": 60,
+  "checkpoint_sha256": "2a4c5077e5c32580980b4c2284cdd8cc2f1659f4ec16e02714c93b1909ef849a",
+  "reference_sha256": "464f899b92813d6202d8296c332535e8b730ae8d450c73250133f55bd09e16f9",
+  "records": [
+    {
+      "index": 0,
+      "analytic_float64": 12.953438106925747,
+      "differences": [
+        {
+          "step": "0.001",
+          "derivative": "12.95343475867878872312638584633752644225629041129819035"
+        },
+        {
+          "step": "0.00001",
+          "derivative": "12.95343787248688891449879009811083929877492481954985"
+        },
+        {
+          "step": "1E-7",
+          "derivative": "12.9534378727982698048673479687404630658438942225855"
+        }
+      ],
+      "absolute_error": 2.3412747651718746e-07,
+      "original_tolerance_passed": true
+    },
+    {
+      "index": 1,
+      "analytic_float64": 0.7077628283684826,
+      "differences": [
+        {
+          "step": "0.001",
+          "derivative": "0.70776237697080884070189785082185922102753384931950585"
+        },
+        {
+          "step": "0.00001",
+          "derivative": "0.70776282767415823542857915397953839995215401653825"
+        },
+        {
+          "step": "1E-7",
+          "derivative": "0.7077628277192285697938057721761079554669469588205"
+        }
+      ],
+      "absolute_error": 6.49253983908693e-10,
+      "original_tolerance_passed": true
+    }
+  ],
+  "passed": true,
+  "interpretation": "Independent 60-digit target derivative at the diagnosed saved state.\n\nReconstruct joint Gaussian coordinates using Decimal block Cholesky algebra,\nthen evaluate all persistence-dependent original-prior, likelihood and Jacobian\nterms. Terms constant in persistence are omitted. No model implementation is\nimported. This checks a visited state, not the rejected leapfrog proposal.\n"
+}

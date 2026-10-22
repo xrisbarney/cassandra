@@ -1,0 +1,133 @@
+{
+  "source_sha256": "ee7e3adc7ee0aae25e883322eb0bc281ef7ed9c3101078bbaeb6fa0b620428f7",
+  "checkpoint_sha256": "2a4c5077e5c32580980b4c2284cdd8cc2f1659f4ec16e02714c93b1909ef849a",
+  "run_sha256": "bfb6570b7ce9d7f214ec7e401d0f161e5439393b65291f41586bc6b155972e79",
+  "logp": -3618.087680711429,
+  "records": [
+    {
+      "variable": "f_phi_interval__",
+      "index": 0,
+      "analytic": 12.953438106925747,
+      "persistence": 0.4584432519749173,
+      "differences": [
+        {
+          "step": 0.01,
+          "finite_difference": 12.9531267030643,
+          "absolute_error": 0.0003114038614473458,
+          "passes_original_tolerance": true
+        },
+        {
+          "step": 0.003,
+          "finite_difference": 12.953410078504627,
+          "absolute_error": 2.8028421120041003e-05,
+          "passes_original_tolerance": true
+        },
+        {
+          "step": 0.001,
+          "finite_difference": 12.9534349896403,
+          "absolute_error": 3.1172854466632316e-06,
+          "passes_original_tolerance": true
+        },
+        {
+          "step": 0.0003,
+          "finite_difference": 12.953437831887035,
+          "absolute_error": 2.7503871180556416e-07,
+          "passes_original_tolerance": true
+        },
+        {
+          "step": 0.0001,
+          "finite_difference": 12.95343811989369,
+          "absolute_error": 1.2967943163744167e-08,
+          "passes_original_tolerance": true
+        },
+        {
+          "step": 3e-05,
+          "finite_difference": 12.95343811307248,
+          "absolute_error": 6.146732900447205e-09,
+          "passes_original_tolerance": true
+        },
+        {
+          "step": 1e-05,
+          "finite_difference": 12.953437885698802,
+          "absolute_error": 2.212269443191417e-07,
+          "passes_original_tolerance": true
+        },
+        {
+          "step": 3e-06,
+          "finite_difference": 12.953437893277925,
+          "absolute_error": 2.1364782121224835e-07,
+          "passes_original_tolerance": true
+        },
+        {
+          "step": 1e-06,
+          "finite_difference": 12.953435543749947,
+          "absolute_error": 2.563175799608075e-06,
+          "passes_original_tolerance": true
+        }
+      ]
+    },
+    {
+      "variable": "f_phi_interval__",
+      "index": 1,
+      "analytic": 0.7077628283684826,
+      "persistence": 0.9998838195666362,
+      "differences": [
+        {
+          "step": 0.01,
+          "finite_difference": 0.7077225111288499,
+          "absolute_error": 4.03172396327145e-05,
+          "passes_original_tolerance": true
+        },
+        {
+          "step": 0.003,
+          "finite_difference": 0.707766968313687,
+          "absolute_error": 4.139945204428841e-06,
+          "passes_original_tolerance": true
+        },
+        {
+          "step": 0.001,
+          "finite_difference": 0.7077665402448474,
+          "absolute_error": 3.71187636483139e-06,
+          "passes_original_tolerance": true
+        },
+        {
+          "step": 0.0003,
+          "finite_difference": 0.7076918988483765,
+          "absolute_error": 7.092952010612219e-05,
+          "passes_original_tolerance": true
+        },
+        {
+          "step": 0.0001,
+          "finite_difference": 0.707511658220028,
+          "absolute_error": 0.0002511701484545492,
+          "passes_original_tolerance": false
+        },
+        {
+          "step": 3e-05,
+          "finite_difference": 0.7067849007095598,
+          "absolute_error": 0.0009779276589227948,
+          "passes_original_tolerance": false
+        },
+        {
+          "step": 1e-05,
+          "finite_difference": 0.7086043297022114,
+          "absolute_error": 0.0008415013337288446,
+          "passes_original_tolerance": false
+        },
+        {
+          "step": 3e-06,
+          "finite_difference": 0.7104165433702292,
+          "absolute_error": 0.002653715001746604,
+          "passes_original_tolerance": false
+        },
+        {
+          "step": 1e-06,
+          "finite_difference": 0.7468572675861651,
+          "absolute_error": 0.03909443921768252,
+          "passes_original_tolerance": false
+        }
+      ]
+    }
+  ],
+  "interpretation": "Step sensitivity diagnosis only; the original failed check is preserved. No acceptance tolerance changed."
+}

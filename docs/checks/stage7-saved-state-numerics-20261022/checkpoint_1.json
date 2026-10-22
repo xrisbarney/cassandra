@@ -1,0 +1,102 @@
+{
+  "checkpoint": "failed_state_0.npz",
+  "checkpoint_sha256": "39f66b7b6b28f89e1f859367a0503da1fbb13e193d14e9da1a19d58f7b025d29",
+  "directory": "artifacts/stage7/joint-level-v1/primary/representative-7101",
+  "finite_differences": [
+    {
+      "absolute_error": 6.230314342214882e-08,
+      "analytic": -0.8926772411514041,
+      "finite_difference": -0.8926773034545475,
+      "index": 0,
+      "variable": "m_sd_interval__"
+    },
+    {
+      "absolute_error": 1.9060131251080747e-08,
+      "analytic": -10.266316398013409,
+      "finite_difference": -10.26631641707354,
+      "index": 0,
+      "variable": "psi_log__"
+    },
+    {
+      "absolute_error": 5.369925393239328e-09,
+      "analytic": -1.8956443628628261,
+      "finite_difference": -1.8956443682327515,
+      "index": 9,
+      "variable": "psi_log__"
+    },
+    {
+      "absolute_error": 1.3227800188531091e-08,
+      "analytic": -4.630484691420752,
+      "finite_difference": -4.630484704648552,
+      "index": 0,
+      "variable": "f_phi_interval__"
+    },
+    {
+      "absolute_error": 1.0172017450571502e-08,
+      "analytic": 1.1336760155102197,
+      "finite_difference": 1.1336760053382022,
+      "index": 1,
+      "variable": "f_phi_interval__"
+    },
+    {
+      "absolute_error": 2.7935173285698056e-08,
+      "analytic": 5.366775071056465,
+      "finite_difference": 5.3667750989916385,
+      "index": 0,
+      "variable": "f_diag_interval__"
+    },
+    {
+      "absolute_error": 1.756510439321346e-07,
+      "analytic": 2.335098640168903,
+      "finite_difference": 2.335098815819947,
+      "index": 1,
+      "variable": "f_diag_interval__"
+    },
+    {
+      "absolute_error": 4.669546083135856e-08,
+      "analytic": -6.68084101229597,
+      "finite_difference": -6.680840965600509,
+      "index": 0,
+      "variable": "f_free_interval__"
+    },
+    {
+      "absolute_error": 9.579973614393111e-08,
+      "analytic": 13.021103386866272,
+      "finite_difference": 13.021103291066536,
+      "index": 16,
+      "variable": "f_free_interval__"
+    },
+    {
+      "absolute_error": 8.113217786487326e-08,
+      "analytic": 1.336750538752519,
+      "finite_difference": 1.3367506198846968,
+      "index": 0,
+      "variable": "joint_level_whitened"
+    },
+    {
+      "absolute_error": 2.8511693006549876e-10,
+      "analytic": 0.18017115081737697,
+      "finite_difference": 0.18017115053226004,
+      "index": 9,
+      "variable": "joint_level_whitened"
+    },
+    {
+      "absolute_error": 4.986903778814167e-09,
+      "analytic": -0.7124884909746093,
+      "finite_difference": -0.7124884859877055,
+      "index": 0,
+      "variable": "f_whitened_states"
+    },
+    {
+      "absolute_error": 6.801260721278624e-08,
+      "analytic": 0.25085887480659264,
+      "finite_difference": 0.2508588067939854,
+      "index": 217,
+      "variable": "f_whitened_states"
+    }
+  ],
+  "gradient_max_abs_error": 1.1130379107271438e-07,
+  "logp_abs_error": 4.547473508864641e-12,
+  "passed": true,
+  "run_sha256": "c7daf08dcce409dc6304541ad39c604880f022a4ac737fa7ad4ea02d45d67a3d"
+}
