@@ -149,6 +149,10 @@ def main():
             files.append(root/'docs/decisions/STAGE7_MATCHED_COUNT_REPAIRS_20261022.md')
         if not args.dense_mass:
             files.append(root/'docs/decisions/STAGE7_WHITENED_METRIC_20261022.md')
+    import pytensor
+
+    from cyber_threat_modelling.models.compiler_warnings import is_dynamic_global_cache_warning
+
     write_json(folder / 'run.json', {
         'source_control': git_revision(root), 'options': options, 'effort_fit': effort,
         'pid': os.getpid(), 'source_sha256': {
@@ -160,11 +164,16 @@ def main():
         'prior_predictive_audit_sha256': file_hash(audit_path),
         'compute_threadpools': threadpool_info(),
         'numba_optimization_env': os.environ.get('NUMBA_OPT', '3 (library default)'),
+        'compiler_settings': {
+            'numba_fastmath': bool(pytensor.config.numba__fastmath),
+            'numba_cache': bool(pytensor.config.numba__cache),
+            'floatX': pytensor.config.floatX,
+            'cxx': pytensor.config.cxx,
+        },
         'compute_thread_policy': 'One native numerical thread per sequential-chain fit process.',
         'truth_original_coordinates_sha256': file_hash(folder/'truth_original_coordinates.npz'),
     })
     import pymc as pm
-    import pytensor
 
     from cyber_threat_modelling.evaluation.synthetic_recovery import summarize
     from cyber_threat_modelling.models.bayesian_controls import diagnostic_report
@@ -313,6 +322,8 @@ def main():
             m.startswith('PyTensor could not link to a BLAS installation.')
             or m.startswith("Numba will use object mode to run AdvancedIncSubtensor's")
             or 'np.dot() is faster on contiguous arrays' in m
+            or all(is_dynamic_global_cache_warning(m, w.category.__name__)
+                   for w in caught if str(w.message) == m)
         )]
         configuration_warnings = [m for m in messages if
                                   m == 'QuadPotentialFullAdapt is an experimental feature']

@@ -1,0 +1,14 @@
+{
+  "passed": 7,
+  "exit_code": 0,
+  "log": "artifacts/stage7-compiler-warning-tests.log",
+  "log_sha256": "88fe191607e2ada8038fa5bfd022f5ec611d263e59bb954a09e89c2cdfe50664",
+  "source_sha256": {
+    "tests/test_compiler_warnings.py": "28a3e5a474889e2b0357a99dee90d6118c4633d1e8732d5d5bb0c1551bae2633",
+    "src/cyber_threat_modelling/models/compiler_warnings.py": "934928337a6b14c99339c7fe538b32d8863df189ff0ec65a9d0ce2dcc36a46da",
+    "scripts/run_stage7.py": "44aaf6cd75e474adf22155c268817169a4299a1a840a34ce8154b3548555c08d",
+    "scripts/stage7_rank_two.py": "438ece1d8455a25cefab9ae3b0694f0e670b4b092af13f2eed19e0034a25ca01"
+  },
+  "full_suite_parent": "docs/checks/stage7-full-tests-v5-20261022/audit.json",
+  "scope": "Seven additional narrow warning-classification tests. The prior unchanged-source full suite has 190 passes; these changes affect warning classification, recorded compiler settings and synthetic scheduling, not model algebra."
+}
