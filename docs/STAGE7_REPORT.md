@@ -3,8 +3,9 @@
 Status, 2026-10-22: **posterior campaign in progress; not yet complete**.
 The active laws are `anchored_levels_v2`. The primary prior-plausibility gates
 pass. A fresh full-suite run passes all 222 tests across 29 files with unchanged
-source hashes. The remaining work is completion of the posterior campaign,
-sensitivity analysis and final component decisions. No real-data
+source hashes. Forty-seven of the 55 declared cases are complete; eight hosted
+cases are on their final prescribed attempts. The remaining work is completion
+of those fits, sensitivity analysis and final component decisions. No real-data
 proposed-model fitting or January 2024--December 2025 scoring has started.
 
 ## Scope and evidence
@@ -98,6 +99,12 @@ is preserved. The [fixed-step-grid follow-up](checks/stage7-saved-state-numerics
 also passes for the two fallback checkpoints. These are local numerical checks;
 the saved states need not be the rejected leapfrog proposals, and their passing
 does not waive any sampling divergence or establish posterior exploration.
+
+The [negative-boundary check](checks/stage7-negative-boundary-20261022/README.md)
+also passes at an actual retained state with persistence -0.99999237. Its
+maximum native/Numba gradient discrepancy is 1.06e-7. The original adjacent-step
+finite-difference rule passes, while smaller unstable differences remain
+explicitly recorded. This local check does not validate the failed posterior.
 
 A block-tridiagonal implementation and scalar rank-one/rank-two specialization
 remove unnecessary dense operations and small-array allocations. No jitter or statistical tolerance was added. The custom block kernels use
@@ -198,9 +205,10 @@ targeted test records remain preserved; repeated runs are not additional tests.
 
 The [hosted verification](checks/stage7-hosted-execution-verification-20261022/audit.json)
 passes all 32 selected execution checks on the exact hosted fitting commit.
-Eight pending cases use exact canonical synthetic fixtures under OPT3. Two
-local OPT0 fits continue; two others exhausted their diagnostic schedules and
-failed mixing. See the [hosted decision](decisions/STAGE7_HOSTED_PENDING_20261022.md)
+Eight pending cases use exact canonical synthetic fixtures under OPT3. All
+local OPT0 fits are complete; the four final rank-two local cases exhausted
+their diagnostic schedules unsuccessfully. See the
+[hosted decision](decisions/STAGE7_HOSTED_PENDING_20261022.md)
 for the preserved OPT0 regeneration-hash failure and separate regeneration
 comparisons. Compiler-profile changes preserve the verified model algebra and
 generator. Interrupted test invocations are not counted as passing.

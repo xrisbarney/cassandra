@@ -1,0 +1,129 @@
+{
+  "artifacts": {
+    "chains.pdf": "746ee8ffd9b55ebc3c4502828801e409a1acfd1b5b24094f4910b78f80564341",
+    "chains.png": "203f6c6a3b1dcff8b3c9d091afecdca9f23d9608e291281f9a46fb42c10068e7"
+  },
+  "attempt_sha256": "c36e5e1771ea35ded6691631160dbc2b1ccd85924aaf5fd1629670f0182d7c59",
+  "data_sha256": "2f16c14da6f108731a36c429e2d532a6c4f7ab343a4e989a3cda9c5473faef19",
+  "directory": "artifacts/stage7/hosted-downloads/39754804660/attempt1/dynamics_tight-representative-7101/rank-two-joint-v1/dynamics_tight/representative-7101",
+  "factor2_time_means_per_chain": [
+    0.20173637235780248,
+    -0.07808810068878122,
+    0.2280513625106666,
+    0.14922378499784963
+  ],
+  "interpretation": "Descriptive chain regions, not posterior region weights or a new recovery threshold. Markers follow the earlier rank-two review: phi2 < .8, or phi2 > .95 with time-mean factor2 above .5 or below -.5. Different prior candidates have different targets. This review itself changes no admission or recovery eligibility.",
+  "numerical_diagnostics": {
+    "accepted": false,
+    "all_diagnostics_finite": true,
+    "divergences": 0,
+    "max_rhat": 1.0385030055079498,
+    "min_bfmi": 0.9460697245266159,
+    "min_bulk_ess": 106.61471644713967,
+    "min_tail_ess": 150.10161492308137,
+    "tree_depth_saturations": 0
+  },
+  "options": {
+    "categories": 10,
+    "conditional_level": false,
+    "count_parameterization": "conditional",
+    "factor_parameterization": "anchored",
+    "factors": 2,
+    "gaussian_solver": "block",
+    "kernel": false,
+    "known_auxiliary_coefficients": false,
+    "level_parameterization": "joint_conditional",
+    "level_settings": {
+      "amplitude_multiplier": 0.75,
+      "anchor": 3.5030238822606967,
+      "candidate": "dynamics_tight",
+      "fallback_anchor": null,
+      "fallback_index": null,
+      "hyper_sd": 1.0,
+      "known_indices": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "scale_sd": 1.0,
+      "scale_upper": 2.0,
+      "training_months": 108
+    },
+    "mass_matrix": "diagonal",
+    "months": 108,
+    "prior_candidate": "dynamics_tight",
+    "prior_id": "anchored_levels_v2",
+    "regimes": 1,
+    "residual": "none",
+    "scenario": "representative",
+    "seed": 7101,
+    "severity_factors": 0
+  },
+  "phi2_means_per_chain": [
+    0.8850723161226721,
+    0.9883840800994408,
+    0.7467773249883143,
+    0.8662540820413288
+  ],
+  "posterior_sha256": "319b789741ddd0bff2a94be296bad8eff3c9535521181104ee088adece40e95d",
+  "regions": {
+    "high_negative_mean": {
+      "fraction_per_chain": [
+        0.221,
+        0.352,
+        0.173,
+        0.214
+      ],
+      "indicator_bulk_ess": 269.2727212875095,
+      "indicator_rhat": 1.0192206812920073,
+      "transitions_per_chain": [
+        244,
+        369,
+        201,
+        241
+      ]
+    },
+    "high_positive_mean": {
+      "fraction_per_chain": [
+        0.366,
+        0.272,
+        0.312,
+        0.323
+      ],
+      "indicator_bulk_ess": 246.16429954347603,
+      "indicator_rhat": 1.0076712051057581,
+      "transitions_per_chain": [
+        356,
+        296,
+        292,
+        294
+      ]
+    },
+    "lower_persistence": {
+      "fraction_per_chain": [
+        0.127,
+        0.012,
+        0.236,
+        0.156
+      ],
+      "indicator_bulk_ess": 66.0258857753766,
+      "indicator_rhat": 1.057489060701668,
+      "transitions_per_chain": [
+        10,
+        8,
+        18,
+        15
+      ]
+    }
+  },
+  "retry": 1,
+  "run_sha256": "ed10ccd3271200662c376610fcbf2096ca1e020e59859dc84750a501adf679d9",
+  "source_sha256": "fd095a6c5862adc8d49ae66b795c63732bea446d1ca58cf895fdf7626c157aa5"
+}

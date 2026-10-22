@@ -1,0 +1,23 @@
+{
+  "chain_zero_based": 2,
+  "directory": "artifacts/stage7/hosted-downloads/39754804660/attempt1/dynamics_tight-representative-7101/rank-two-joint-v1/dynamics_tight/representative-7101",
+  "draw_zero_based": 937,
+  "posterior_sha256": "319b789741ddd0bff2a94be296bad8eff3c9535521181104ee088adece40e95d",
+  "roundtrip_max_abs_errors": {
+    "eta_by_regime": 2.531308496145357e-14,
+    "f_contribution": 2.5174307083375425e-14,
+    "f_diag": 0.0,
+    "f_free": 1.1796119636642288e-16,
+    "f_phi": 0.0,
+    "f_states": 3.5083047578154947e-14,
+    "f_whitened_states": 0.0,
+    "joint_level_whitened": 0.0,
+    "m": 3.552713678800501e-15,
+    "m_known": 3.552713678800501e-15,
+    "m_sd": 0.0,
+    "psi": 0.0
+  },
+  "second_persistence": -0.999992370958849,
+  "selection": "Minimum retained second-factor persistence in the failed retry 1.",
+  "source_sha256": "3be73c417e9d48ba6a8a39443f7a0954ca01f346c770647fa0bacff888ac801f"
+}

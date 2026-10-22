@@ -1,0 +1,23 @@
+{
+  "counts": [
+    0,
+    0,
+    44,
+    2
+  ],
+  "description": "Descriptive negative-boundary visits noticed in the existing failed-chain trace; not a posterior region weight or new admission threshold.",
+  "fractions": [
+    0.0,
+    0.0,
+    0.044,
+    0.002
+  ],
+  "minimum_phi_per_chain": [
+    -0.6290461013469528,
+    -0.4817394505151029,
+    -0.999992370958849,
+    -0.9946219726255956
+  ],
+  "posterior_sha256": "319b789741ddd0bff2a94be296bad8eff3c9535521181104ee088adece40e95d",
+  "threshold": -0.95
+}

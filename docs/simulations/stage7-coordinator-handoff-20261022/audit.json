@@ -1,0 +1,250 @@
+{
+  "interpretation": "Preserves raw coordinator statuses. Eight reserved hosted directories and one already-running helper were correctly left untouched. Their scheduling labels are not independent model fits or statistical outcomes. Final completion audit must resolve all eight hosted reservations.",
+  "plan_sha256": "f52a86c3b022bc5bb099e89fb6e4c0a484ac57cb70b2c70ca60b43fb8df64cf3",
+  "raw_outcomes_sha256": "13e2ec3743e0285a58101a340dbfe28460e26a2afc82362a4bdd22688bc50139",
+  "raw_progress_sha256": "13e2ec3743e0285a58101a340dbfe28460e26a2afc82362a4bdd22688bc50139",
+  "records": [
+    {
+      "classification": "local_terminal_result",
+      "directory": "artifacts/stage7/rank-two-joint-v1/primary/fallback_zero-7102",
+      "log_sha256": "1ffcb908b6caaf62bfc8f822dfc26720f0d74d21cb2de90f8ead7168c6383dee",
+      "raw": {
+        "candidate": "primary",
+        "coordinator_exit_code": 0,
+        "scenario": "fallback_zero",
+        "seed": 7102,
+        "status": "failed_diagnostic_gate"
+      },
+      "result_sha256": "64e3013a095683d5e992667f7c37c8c88a32be6fcdb19094511591531be5ad6f",
+      "terminal_status": "failed_diagnostic_gate"
+    },
+    {
+      "classification": "intentional_hosted_reservation_no_local_fit",
+      "directory": "artifacts/stage7/rank-two-joint-v1/primary/fallback_zero-7103",
+      "hosted_plan_case": {
+        "candidate": "primary",
+        "data_sha256": "6556b3fb7258acda4ba1e969af026ce8c54cd2ddbd4f051ac375e6ccc37da112",
+        "directory": "artifacts/stage7/rank-two-joint-v1/primary/fallback_zero-7103",
+        "fixture_directory": "docs/fixtures/stage7/fallback_zero-7103",
+        "key": "primary-fallback_zero-7103",
+        "scenario": "fallback_zero",
+        "seed": 7103,
+        "truth_original_coordinates_sha256": "67d2efbf6cff1817eee11a71db6d758dd0d05e0e49ec706cb8df94250fae9def",
+        "truth_sha256": "3c0b8a27d8ebd4fdb5fb204d4e367d2d16b871916566d2935ac3e88401243328"
+      },
+      "log_sha256": "a2fce2443524a35e0faab832edd06835286dba91e2a4d4255023bd0798369082",
+      "raw": {
+        "candidate": "primary",
+        "coordinator_exit_code": 0,
+        "scenario": "fallback_zero",
+        "seed": 7103,
+        "status": "execution_failed"
+      },
+      "reservation_sha256": "9ad4604521605c0932e8efdaa9f106103129e2c2952d20b64cc1adc9c683f97d",
+      "terminal_result_pending": true
+    },
+    {
+      "classification": "intentional_hosted_reservation_no_local_fit",
+      "directory": "artifacts/stage7/rank-two-joint-v1/level_tight/representative-7101",
+      "hosted_plan_case": {
+        "candidate": "level_tight",
+        "data_sha256": "2f16c14da6f108731a36c429e2d532a6c4f7ab343a4e989a3cda9c5473faef19",
+        "directory": "artifacts/stage7/rank-two-joint-v1/level_tight/representative-7101",
+        "fixture_directory": "docs/fixtures/stage7/representative-7101",
+        "key": "level_tight-representative-7101",
+        "scenario": "representative",
+        "seed": 7101,
+        "truth_original_coordinates_sha256": "9fca1f6c6e33992fe0a0bb22a0599a87ac6aa677385e5b6873808e7e12fd3eec",
+        "truth_sha256": "92e92d139ba48feaf06569b34db715a2fc9c58870b6aeb5a6dbc76f3628945af"
+      },
+      "log_sha256": "249c828139cb970d526a8d5dab9f55a4b0db17757e608b470a13a25f4672aa1f",
+      "raw": {
+        "candidate": "level_tight",
+        "coordinator_exit_code": 0,
+        "scenario": "representative",
+        "seed": 7101,
+        "status": "execution_failed"
+      },
+      "reservation_sha256": "7b1fcd9420876eca71432f0309832ec7d87226b412aedd73606892481d9ca3c5",
+      "terminal_result_pending": true
+    },
+    {
+      "classification": "intentional_hosted_reservation_no_local_fit",
+      "directory": "artifacts/stage7/rank-two-joint-v1/level_tight/fallback_zero-7101",
+      "hosted_plan_case": {
+        "candidate": "level_tight",
+        "data_sha256": "c6d23bdf858acc4fe9141915fa9d6bbb3314c60843c8e18e1f070bdb26d438cc",
+        "directory": "artifacts/stage7/rank-two-joint-v1/level_tight/fallback_zero-7101",
+        "fixture_directory": "docs/fixtures/stage7/fallback_zero-7101",
+        "key": "level_tight-fallback_zero-7101",
+        "scenario": "fallback_zero",
+        "seed": 7101,
+        "truth_original_coordinates_sha256": "b48cdc70e3dff4635810daf06d6b1910d3e03c43d9db27b1745919cdc1186b2a",
+        "truth_sha256": "dac3654db20054410876005868f2f268d33d9d7901bc4a2949a8f4039fd5aafb"
+      },
+      "log_sha256": "1ad800a26ac539b8efdf1d74cf1c5d43ee9651d5b36e21c6a3547d5f281454b5",
+      "raw": {
+        "candidate": "level_tight",
+        "coordinator_exit_code": 0,
+        "scenario": "fallback_zero",
+        "seed": 7101,
+        "status": "execution_failed"
+      },
+      "reservation_sha256": "7604629268d88ab0076fbfe8478da78ae0525e3a8ff08fd56fe92583368fac81",
+      "terminal_result_pending": true
+    },
+    {
+      "classification": "intentional_hosted_reservation_no_local_fit",
+      "directory": "artifacts/stage7/rank-two-joint-v1/level_wide/representative-7101",
+      "hosted_plan_case": {
+        "candidate": "level_wide",
+        "data_sha256": "2f16c14da6f108731a36c429e2d532a6c4f7ab343a4e989a3cda9c5473faef19",
+        "directory": "artifacts/stage7/rank-two-joint-v1/level_wide/representative-7101",
+        "fixture_directory": "docs/fixtures/stage7/representative-7101",
+        "key": "level_wide-representative-7101",
+        "scenario": "representative",
+        "seed": 7101,
+        "truth_original_coordinates_sha256": "9fca1f6c6e33992fe0a0bb22a0599a87ac6aa677385e5b6873808e7e12fd3eec",
+        "truth_sha256": "92e92d139ba48feaf06569b34db715a2fc9c58870b6aeb5a6dbc76f3628945af"
+      },
+      "log_sha256": "249c828139cb970d526a8d5dab9f55a4b0db17757e608b470a13a25f4672aa1f",
+      "raw": {
+        "candidate": "level_wide",
+        "coordinator_exit_code": 0,
+        "scenario": "representative",
+        "seed": 7101,
+        "status": "execution_failed"
+      },
+      "reservation_sha256": "872f3af4e290d00c2ead6a51228cb7b5c75cfdf5b0be1494ca84351b3392d0ac",
+      "terminal_result_pending": true
+    },
+    {
+      "classification": "intentional_hosted_reservation_no_local_fit",
+      "directory": "artifacts/stage7/rank-two-joint-v1/level_wide/fallback_zero-7101",
+      "hosted_plan_case": {
+        "candidate": "level_wide",
+        "data_sha256": "c6d23bdf858acc4fe9141915fa9d6bbb3314c60843c8e18e1f070bdb26d438cc",
+        "directory": "artifacts/stage7/rank-two-joint-v1/level_wide/fallback_zero-7101",
+        "fixture_directory": "docs/fixtures/stage7/fallback_zero-7101",
+        "key": "level_wide-fallback_zero-7101",
+        "scenario": "fallback_zero",
+        "seed": 7101,
+        "truth_original_coordinates_sha256": "b48cdc70e3dff4635810daf06d6b1910d3e03c43d9db27b1745919cdc1186b2a",
+        "truth_sha256": "dac3654db20054410876005868f2f268d33d9d7901bc4a2949a8f4039fd5aafb"
+      },
+      "log_sha256": "1ad800a26ac539b8efdf1d74cf1c5d43ee9651d5b36e21c6a3547d5f281454b5",
+      "raw": {
+        "candidate": "level_wide",
+        "coordinator_exit_code": 0,
+        "scenario": "fallback_zero",
+        "seed": 7101,
+        "status": "execution_failed"
+      },
+      "reservation_sha256": "fdb8d7f7b585c015a1db57abd0d481d0a95bec05689045d7f78132ed168576f6",
+      "terminal_result_pending": true
+    },
+    {
+      "classification": "intentional_hosted_reservation_no_local_fit",
+      "directory": "artifacts/stage7/rank-two-joint-v1/dynamics_tight/representative-7101",
+      "hosted_plan_case": {
+        "candidate": "dynamics_tight",
+        "data_sha256": "2f16c14da6f108731a36c429e2d532a6c4f7ab343a4e989a3cda9c5473faef19",
+        "directory": "artifacts/stage7/rank-two-joint-v1/dynamics_tight/representative-7101",
+        "fixture_directory": "docs/fixtures/stage7/representative-7101",
+        "key": "dynamics_tight-representative-7101",
+        "scenario": "representative",
+        "seed": 7101,
+        "truth_original_coordinates_sha256": "9fca1f6c6e33992fe0a0bb22a0599a87ac6aa677385e5b6873808e7e12fd3eec",
+        "truth_sha256": "92e92d139ba48feaf06569b34db715a2fc9c58870b6aeb5a6dbc76f3628945af"
+      },
+      "log_sha256": "249c828139cb970d526a8d5dab9f55a4b0db17757e608b470a13a25f4672aa1f",
+      "raw": {
+        "candidate": "dynamics_tight",
+        "coordinator_exit_code": 0,
+        "scenario": "representative",
+        "seed": 7101,
+        "status": "execution_failed"
+      },
+      "reservation_sha256": "7a43f1cd6b613a84130265033cc90c72742bb7b587b84719badee4682084884e",
+      "terminal_result_pending": true
+    },
+    {
+      "classification": "intentional_hosted_reservation_no_local_fit",
+      "directory": "artifacts/stage7/rank-two-joint-v1/dynamics_tight/fallback_zero-7101",
+      "hosted_plan_case": {
+        "candidate": "dynamics_tight",
+        "data_sha256": "c6d23bdf858acc4fe9141915fa9d6bbb3314c60843c8e18e1f070bdb26d438cc",
+        "directory": "artifacts/stage7/rank-two-joint-v1/dynamics_tight/fallback_zero-7101",
+        "fixture_directory": "docs/fixtures/stage7/fallback_zero-7101",
+        "key": "dynamics_tight-fallback_zero-7101",
+        "scenario": "fallback_zero",
+        "seed": 7101,
+        "truth_original_coordinates_sha256": "b48cdc70e3dff4635810daf06d6b1910d3e03c43d9db27b1745919cdc1186b2a",
+        "truth_sha256": "dac3654db20054410876005868f2f268d33d9d7901bc4a2949a8f4039fd5aafb"
+      },
+      "log_sha256": "1ad800a26ac539b8efdf1d74cf1c5d43ee9651d5b36e21c6a3547d5f281454b5",
+      "raw": {
+        "candidate": "dynamics_tight",
+        "coordinator_exit_code": 0,
+        "scenario": "fallback_zero",
+        "seed": 7101,
+        "status": "execution_failed"
+      },
+      "reservation_sha256": "54bd72b059cdf5521658946281567a1e25f91abe66ccb30007a2f58f706a3379",
+      "terminal_result_pending": true
+    },
+    {
+      "classification": "intentional_hosted_reservation_no_local_fit",
+      "directory": "artifacts/stage7/rank-two-joint-v1/dynamics_wide/representative-7101",
+      "hosted_plan_case": {
+        "candidate": "dynamics_wide",
+        "data_sha256": "2f16c14da6f108731a36c429e2d532a6c4f7ab343a4e989a3cda9c5473faef19",
+        "directory": "artifacts/stage7/rank-two-joint-v1/dynamics_wide/representative-7101",
+        "fixture_directory": "docs/fixtures/stage7/representative-7101",
+        "key": "dynamics_wide-representative-7101",
+        "scenario": "representative",
+        "seed": 7101,
+        "truth_original_coordinates_sha256": "9fca1f6c6e33992fe0a0bb22a0599a87ac6aa677385e5b6873808e7e12fd3eec",
+        "truth_sha256": "92e92d139ba48feaf06569b34db715a2fc9c58870b6aeb5a6dbc76f3628945af"
+      },
+      "log_sha256": "249c828139cb970d526a8d5dab9f55a4b0db17757e608b470a13a25f4672aa1f",
+      "raw": {
+        "candidate": "dynamics_wide",
+        "coordinator_exit_code": 0,
+        "scenario": "representative",
+        "seed": 7101,
+        "status": "execution_failed"
+      },
+      "reservation_sha256": "a83ff27314e2eaea257c3b6eda1ae3bea7d5158c12a8798f1f5e578d56e626e8",
+      "terminal_result_pending": true
+    },
+    {
+      "classification": "independently_running_declared_local_case_preserved",
+      "directory": "artifacts/stage7/rank-two-joint-v1/dynamics_wide/fallback_zero-7101",
+      "log_sha256": "1ad800a26ac539b8efdf1d74cf1c5d43ee9651d5b36e21c6a3547d5f281454b5",
+      "raw": {
+        "candidate": "dynamics_wide",
+        "coordinator_exit_code": 0,
+        "scenario": "fallback_zero",
+        "seed": 7101,
+        "status": "execution_failed"
+      },
+      "result_sha256": "fb44f250f02e0f166b3ef89022bf62f5a0871bfe3ae05d103ca68cc4f945fba4",
+      "terminal_status": "failed_diagnostic_gate"
+    },
+    {
+      "classification": "local_terminal_result",
+      "directory": "artifacts/stage7/rank-two-joint-v1/primary/fallback_zero-7101",
+      "log_sha256": "284120b231fae32b2cd00a4588ff4d523d085356ac05b4ffbe3445aec997b4d0",
+      "raw": {
+        "candidate": "primary",
+        "coordinator_exit_code": 0,
+        "scenario": "fallback_zero",
+        "seed": 7101,
+        "status": "failed_diagnostic_gate"
+      },
+      "result_sha256": "fbcde703cd1a246bfc9b84c524d586d988298abc25b42150b91ecf6617455a5f",
+      "terminal_status": "failed_diagnostic_gate"
+    }
+  ]
+}

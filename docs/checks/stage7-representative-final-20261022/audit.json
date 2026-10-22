@@ -1,0 +1,1855 @@
+{
+  "attempts": [
+    {
+      "accepted": false,
+      "chain_wall_markers": {
+        "0": {
+          "first_draw_seconds": 69.45877450000262,
+          "first_retained_seconds": 1114.6557869000026,
+          "last_draw_seconds": 1681.177728900002,
+          "retained_draws_completed": 1000,
+          "retained_perf_counter_diff_sum": 565.7655609001376,
+          "retained_process_time_diff_sum": 541.4375,
+          "warmup_draws_completed": 1000,
+          "warmup_perf_counter_diff_sum": 1088.3378855999908,
+          "warmup_process_time_diff_sum": 970.0625
+        },
+        "1": {
+          "first_draw_seconds": 1681.456285799999,
+          "first_retained_seconds": 2103.6645449999996,
+          "last_draw_seconds": 2819.730936300002,
+          "retained_draws_completed": 1000,
+          "retained_perf_counter_diff_sum": 715.7498524001785,
+          "retained_process_time_diff_sum": 706.328125,
+          "warmup_draws_completed": 1000,
+          "warmup_perf_counter_diff_sum": 420.52407949997723,
+          "warmup_process_time_diff_sum": 412.6875
+        },
+        "2": {
+          "first_draw_seconds": 2819.9194801999984,
+          "first_retained_seconds": 3543.1204246999987,
+          "last_draw_seconds": 4355.138125400001,
+          "retained_draws_completed": 1000,
+          "retained_perf_counter_diff_sum": 811.6601225999038,
+          "retained_process_time_diff_sum": 801.203125,
+          "warmup_draws_completed": 1000,
+          "warmup_perf_counter_diff_sum": 721.397097800058,
+          "warmup_process_time_diff_sum": 711.015625
+        },
+        "3": {
+          "first_draw_seconds": 4355.1905377,
+          "first_retained_seconds": 4870.243485400002,
+          "last_draw_seconds": 4987.427340599999,
+          "retained_draws_completed": 560,
+          "retained_perf_counter_diff_sum": 116.73208239999803,
+          "retained_process_time_diff_sum": 115.28125,
+          "warmup_draws_completed": 1000,
+          "warmup_perf_counter_diff_sum": 513.6428769998456,
+          "warmup_process_time_diff_sum": 505.53125
+        }
+      },
+      "chains": 4,
+      "cores": 1,
+      "diagnostic_seconds": 4.4000043999403715e-06,
+      "diagnostics": {
+        "accepted": false,
+        "all_diagnostics_finite": false,
+        "divergences": 1,
+        "max_rhat": null,
+        "min_bfmi": null,
+        "min_bulk_ess": null,
+        "min_tail_ess": null,
+        "tree_depth_saturations": 0
+      },
+      "draws": 1000,
+      "early_failure": {
+        "chain": 3,
+        "divergences": 1,
+        "draw_index": 1559,
+        "reason": "Retained draw failed a zero-tolerance gate.",
+        "tree_depth_saturations": 0
+      },
+      "graph_seconds": 1.2237700999976369,
+      "max_treedepth": 12,
+      "peak_working_set_bytes": 1335971840,
+      "performance_warnings": [],
+      "retry": 0,
+      "sample_call_seconds": 4987.446603800003,
+      "sampler_configuration_warnings": [],
+      "serialization_seconds": 5.999972927384079e-07,
+      "step_compile_seconds": 22.110452900000382,
+      "target_accept": 0.95,
+      "unresolved_warnings": [
+        "\u001b[1m\u001b[1mCannot cache compiled function \"elemwise\" as it uses dynamic globals (such as ctypes pointers and large global arrays)\u001b[0m\u001b[0m",
+        "\u001b[1m\u001b[1mCannot cache compiled function \"specify_shape\" as it uses dynamic globals (such as ctypes pointers and large global arrays)\u001b[0m\u001b[0m",
+        "\u001b[1m\u001b[1mCannot cache compiled function \"subtensor\" as it uses dynamic globals (such as ctypes pointers and large global arrays)\u001b[0m\u001b[0m"
+      ],
+      "warmup": 1000,
+      "warning_contexts": [
+        {
+          "category": "NumbaWarning",
+          "chain": 0,
+          "draw_index": 0,
+          "filename": "C:\\Users\\Chris\\AppData\\Local\\Temp\\tmpxsqp47te",
+          "lineno": 115,
+          "message": "\u001b[1m\u001b[1mCannot cache compiled function \"elemwise\" as it uses dynamic globals (such as ctypes pointers and large global arrays)\u001b[0m\u001b[0m",
+          "phase": "warmup",
+          "stack": [
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler.py",
+              "function": "_compile_bytecode",
+              "lineno": 505
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler.py",
+              "function": "_compile_core",
+              "lineno": 473
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler_machinery.py",
+              "function": "run",
+              "lineno": 356
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler_lock.py",
+              "function": "_acquire_compile_lock",
+              "lineno": 35
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler_machinery.py",
+              "function": "_runPass",
+              "lineno": 311
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler_machinery.py",
+              "function": "check",
+              "lineno": 272
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\typed_passes.py",
+              "function": "run_pass",
+              "lineno": 114
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\typed_passes.py",
+              "function": "type_inference_stage",
+              "lineno": 80
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\errors.py",
+              "function": "__exit__",
+              "lineno": 530
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\errors.py",
+              "function": "flush",
+              "lineno": 523
+            },
+            {
+              "filename": "C:\\Users\\Chris\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\warnings.py",
+              "function": "_showwarnmsg",
+              "lineno": 109
+            }
+          ]
+        },
+        {
+          "category": "NumbaWarning",
+          "chain": 0,
+          "draw_index": 0,
+          "filename": "C:\\Users\\Chris\\AppData\\Local\\Temp\\tmpxsqp47te",
+          "lineno": 139,
+          "message": "\u001b[1m\u001b[1mCannot cache compiled function \"elemwise\" as it uses dynamic globals (such as ctypes pointers and large global arrays)\u001b[0m\u001b[0m",
+          "phase": "warmup",
+          "stack": [
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler.py",
+              "function": "_compile_bytecode",
+              "lineno": 505
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler.py",
+              "function": "_compile_core",
+              "lineno": 473
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler_machinery.py",
+              "function": "run",
+              "lineno": 356
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler_lock.py",
+              "function": "_acquire_compile_lock",
+              "lineno": 35
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler_machinery.py",
+              "function": "_runPass",
+              "lineno": 311
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler_machinery.py",
+              "function": "check",
+              "lineno": 272
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\typed_passes.py",
+              "function": "run_pass",
+              "lineno": 114
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\typed_passes.py",
+              "function": "type_inference_stage",
+              "lineno": 80
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\errors.py",
+              "function": "__exit__",
+              "lineno": 530
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\errors.py",
+              "function": "flush",
+              "lineno": 523
+            },
+            {
+              "filename": "C:\\Users\\Chris\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\warnings.py",
+              "function": "_showwarnmsg",
+              "lineno": 109
+            }
+          ]
+        },
+        {
+          "category": "NumbaWarning",
+          "chain": 0,
+          "draw_index": 0,
+          "filename": "C:\\Users\\Chris\\AppData\\Local\\Temp\\tmpxsqp47te",
+          "lineno": 517,
+          "message": "\u001b[1m\u001b[1mCannot cache compiled function \"elemwise\" as it uses dynamic globals (such as ctypes pointers and large global arrays)\u001b[0m\u001b[0m",
+          "phase": "warmup",
+          "stack": [
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler.py",
+              "function": "_compile_bytecode",
+              "lineno": 505
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler.py",
+              "function": "_compile_core",
+              "lineno": 473
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler_machinery.py",
+              "function": "run",
+              "lineno": 356
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler_lock.py",
+              "function": "_acquire_compile_lock",
+              "lineno": 35
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler_machinery.py",
+              "function": "_runPass",
+              "lineno": 311
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler_machinery.py",
+              "function": "check",
+              "lineno": 272
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\typed_passes.py",
+              "function": "run_pass",
+              "lineno": 114
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\typed_passes.py",
+              "function": "type_inference_stage",
+              "lineno": 80
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\errors.py",
+              "function": "__exit__",
+              "lineno": 530
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\errors.py",
+              "function": "flush",
+              "lineno": 523
+            },
+            {
+              "filename": "C:\\Users\\Chris\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\warnings.py",
+              "function": "_showwarnmsg",
+              "lineno": 109
+            }
+          ]
+        },
+        {
+          "category": "NumbaWarning",
+          "chain": 0,
+          "draw_index": 0,
+          "filename": "C:\\Users\\Chris\\AppData\\Local\\Temp\\tmpxsqp47te",
+          "lineno": 653,
+          "message": "\u001b[1m\u001b[1mCannot cache compiled function \"specify_shape\" as it uses dynamic globals (such as ctypes pointers and large global arrays)\u001b[0m\u001b[0m",
+          "phase": "warmup",
+          "stack": [
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler.py",
+              "function": "_compile_bytecode",
+              "lineno": 505
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler.py",
+              "function": "_compile_core",
+              "lineno": 473
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler_machinery.py",
+              "function": "run",
+              "lineno": 356
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler_lock.py",
+              "function": "_acquire_compile_lock",
+              "lineno": 35
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler_machinery.py",
+              "function": "_runPass",
+              "lineno": 311
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler_machinery.py",
+              "function": "check",
+              "lineno": 272
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\typed_passes.py",
+              "function": "run_pass",
+              "lineno": 114
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\typed_passes.py",
+              "function": "type_inference_stage",
+              "lineno": 80
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\errors.py",
+              "function": "__exit__",
+              "lineno": 530
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\errors.py",
+              "function": "flush",
+              "lineno": 523
+            },
+            {
+              "filename": "C:\\Users\\Chris\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\warnings.py",
+              "function": "_showwarnmsg",
+              "lineno": 109
+            }
+          ]
+        },
+        {
+          "category": "NumbaWarning",
+          "chain": 0,
+          "draw_index": 0,
+          "filename": "C:\\Users\\Chris\\AppData\\Local\\Temp\\tmpxsqp47te",
+          "lineno": 707,
+          "message": "\u001b[1m\u001b[1mCannot cache compiled function \"elemwise\" as it uses dynamic globals (such as ctypes pointers and large global arrays)\u001b[0m\u001b[0m",
+          "phase": "warmup",
+          "stack": [
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler.py",
+              "function": "_compile_bytecode",
+              "lineno": 505
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler.py",
+              "function": "_compile_core",
+              "lineno": 473
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler_machinery.py",
+              "function": "run",
+              "lineno": 356
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler_lock.py",
+              "function": "_acquire_compile_lock",
+              "lineno": 35
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler_machinery.py",
+              "function": "_runPass",
+              "lineno": 311
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler_machinery.py",
+              "function": "check",
+              "lineno": 272
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\typed_passes.py",
+              "function": "run_pass",
+              "lineno": 114
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\typed_passes.py",
+              "function": "type_inference_stage",
+              "lineno": 80
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\errors.py",
+              "function": "__exit__",
+              "lineno": 530
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\errors.py",
+              "function": "flush",
+              "lineno": 523
+            },
+            {
+              "filename": "C:\\Users\\Chris\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\warnings.py",
+              "function": "_showwarnmsg",
+              "lineno": 109
+            }
+          ]
+        },
+        {
+          "category": "NumbaWarning",
+          "chain": 0,
+          "draw_index": 0,
+          "filename": "C:\\Users\\Chris\\AppData\\Local\\Temp\\tmpxsqp47te",
+          "lineno": 731,
+          "message": "\u001b[1m\u001b[1mCannot cache compiled function \"specify_shape\" as it uses dynamic globals (such as ctypes pointers and large global arrays)\u001b[0m\u001b[0m",
+          "phase": "warmup",
+          "stack": [
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler.py",
+              "function": "_compile_bytecode",
+              "lineno": 505
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler.py",
+              "function": "_compile_core",
+              "lineno": 473
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler_machinery.py",
+              "function": "run",
+              "lineno": 356
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler_lock.py",
+              "function": "_acquire_compile_lock",
+              "lineno": 35
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler_machinery.py",
+              "function": "_runPass",
+              "lineno": 311
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler_machinery.py",
+              "function": "check",
+              "lineno": 272
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\typed_passes.py",
+              "function": "run_pass",
+              "lineno": 114
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\typed_passes.py",
+              "function": "type_inference_stage",
+              "lineno": 80
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\errors.py",
+              "function": "__exit__",
+              "lineno": 530
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\errors.py",
+              "function": "flush",
+              "lineno": 523
+            },
+            {
+              "filename": "C:\\Users\\Chris\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\warnings.py",
+              "function": "_showwarnmsg",
+              "lineno": 109
+            }
+          ]
+        },
+        {
+          "category": "NumbaWarning",
+          "chain": 0,
+          "draw_index": 0,
+          "filename": "C:\\Users\\Chris\\AppData\\Local\\Temp\\tmpxsqp47te",
+          "lineno": 735,
+          "message": "\u001b[1m\u001b[1mCannot cache compiled function \"subtensor\" as it uses dynamic globals (such as ctypes pointers and large global arrays)\u001b[0m\u001b[0m",
+          "phase": "warmup",
+          "stack": [
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler.py",
+              "function": "_compile_bytecode",
+              "lineno": 505
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler.py",
+              "function": "_compile_core",
+              "lineno": 473
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler_machinery.py",
+              "function": "run",
+              "lineno": 356
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler_lock.py",
+              "function": "_acquire_compile_lock",
+              "lineno": 35
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler_machinery.py",
+              "function": "_runPass",
+              "lineno": 311
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler_machinery.py",
+              "function": "check",
+              "lineno": 272
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\typed_passes.py",
+              "function": "run_pass",
+              "lineno": 114
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\typed_passes.py",
+              "function": "type_inference_stage",
+              "lineno": 80
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\errors.py",
+              "function": "__exit__",
+              "lineno": 530
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\errors.py",
+              "function": "flush",
+              "lineno": 523
+            },
+            {
+              "filename": "C:\\Users\\Chris\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\warnings.py",
+              "function": "_showwarnmsg",
+              "lineno": 109
+            }
+          ]
+        },
+        {
+          "category": "NumbaWarning",
+          "chain": 0,
+          "draw_index": 0,
+          "filename": "C:\\Users\\Chris\\AppData\\Local\\Temp\\tmpxsqp47te",
+          "lineno": 791,
+          "message": "\u001b[1m\u001b[1mCannot cache compiled function \"elemwise\" as it uses dynamic globals (such as ctypes pointers and large global arrays)\u001b[0m\u001b[0m",
+          "phase": "warmup",
+          "stack": [
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler.py",
+              "function": "_compile_bytecode",
+              "lineno": 505
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler.py",
+              "function": "_compile_core",
+              "lineno": 473
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler_machinery.py",
+              "function": "run",
+              "lineno": 356
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler_lock.py",
+              "function": "_acquire_compile_lock",
+              "lineno": 35
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler_machinery.py",
+              "function": "_runPass",
+              "lineno": 311
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler_machinery.py",
+              "function": "check",
+              "lineno": 272
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\typed_passes.py",
+              "function": "run_pass",
+              "lineno": 114
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\typed_passes.py",
+              "function": "type_inference_stage",
+              "lineno": 80
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\errors.py",
+              "function": "__exit__",
+              "lineno": 530
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\errors.py",
+              "function": "flush",
+              "lineno": 523
+            },
+            {
+              "filename": "C:\\Users\\Chris\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\warnings.py",
+              "function": "_showwarnmsg",
+              "lineno": 109
+            }
+          ]
+        },
+        {
+          "category": "NumbaWarning",
+          "chain": 0,
+          "draw_index": 0,
+          "filename": "C:\\Users\\Chris\\AppData\\Local\\Temp\\tmpxsqp47te",
+          "lineno": 867,
+          "message": "\u001b[1m\u001b[1mCannot cache compiled function \"elemwise\" as it uses dynamic globals (such as ctypes pointers and large global arrays)\u001b[0m\u001b[0m",
+          "phase": "warmup",
+          "stack": [
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler.py",
+              "function": "_compile_bytecode",
+              "lineno": 505
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler.py",
+              "function": "_compile_core",
+              "lineno": 473
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler_machinery.py",
+              "function": "run",
+              "lineno": 356
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler_lock.py",
+              "function": "_acquire_compile_lock",
+              "lineno": 35
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler_machinery.py",
+              "function": "_runPass",
+              "lineno": 311
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler_machinery.py",
+              "function": "check",
+              "lineno": 272
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\typed_passes.py",
+              "function": "run_pass",
+              "lineno": 114
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\typed_passes.py",
+              "function": "type_inference_stage",
+              "lineno": 80
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\errors.py",
+              "function": "__exit__",
+              "lineno": 530
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\errors.py",
+              "function": "flush",
+              "lineno": 523
+            },
+            {
+              "filename": "C:\\Users\\Chris\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\warnings.py",
+              "function": "_showwarnmsg",
+              "lineno": 109
+            }
+          ]
+        },
+        {
+          "category": "NumbaWarning",
+          "chain": 0,
+          "draw_index": 0,
+          "filename": "C:\\Users\\Chris\\AppData\\Local\\Temp\\tmpxsqp47te",
+          "lineno": 873,
+          "message": "\u001b[1m\u001b[1mCannot cache compiled function \"elemwise\" as it uses dynamic globals (such as ctypes pointers and large global arrays)\u001b[0m\u001b[0m",
+          "phase": "warmup",
+          "stack": [
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler.py",
+              "function": "_compile_bytecode",
+              "lineno": 505
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler.py",
+              "function": "_compile_core",
+              "lineno": 473
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler_machinery.py",
+              "function": "run",
+              "lineno": 356
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler_lock.py",
+              "function": "_acquire_compile_lock",
+              "lineno": 35
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler_machinery.py",
+              "function": "_runPass",
+              "lineno": 311
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler_machinery.py",
+              "function": "check",
+              "lineno": 272
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\typed_passes.py",
+              "function": "run_pass",
+              "lineno": 114
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\typed_passes.py",
+              "function": "type_inference_stage",
+              "lineno": 80
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\errors.py",
+              "function": "__exit__",
+              "lineno": 530
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\errors.py",
+              "function": "flush",
+              "lineno": 523
+            },
+            {
+              "filename": "C:\\Users\\Chris\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\warnings.py",
+              "function": "_showwarnmsg",
+              "lineno": 109
+            }
+          ]
+        },
+        {
+          "category": "NumbaWarning",
+          "chain": 0,
+          "draw_index": 0,
+          "filename": "C:\\Users\\Chris\\AppData\\Local\\Temp\\tmpxsqp47te",
+          "lineno": 881,
+          "message": "\u001b[1m\u001b[1mCannot cache compiled function \"elemwise\" as it uses dynamic globals (such as ctypes pointers and large global arrays)\u001b[0m\u001b[0m",
+          "phase": "warmup",
+          "stack": [
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler.py",
+              "function": "_compile_bytecode",
+              "lineno": 505
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler.py",
+              "function": "_compile_core",
+              "lineno": 473
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler_machinery.py",
+              "function": "run",
+              "lineno": 356
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler_lock.py",
+              "function": "_acquire_compile_lock",
+              "lineno": 35
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler_machinery.py",
+              "function": "_runPass",
+              "lineno": 311
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler_machinery.py",
+              "function": "check",
+              "lineno": 272
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\typed_passes.py",
+              "function": "run_pass",
+              "lineno": 114
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\typed_passes.py",
+              "function": "type_inference_stage",
+              "lineno": 80
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\errors.py",
+              "function": "__exit__",
+              "lineno": 530
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\errors.py",
+              "function": "flush",
+              "lineno": 523
+            },
+            {
+              "filename": "C:\\Users\\Chris\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\warnings.py",
+              "function": "_showwarnmsg",
+              "lineno": 109
+            }
+          ]
+        }
+      ],
+      "warning_locations": [
+        {
+          "category": "NumbaWarning",
+          "filename": "C:\\Users\\Chris\\AppData\\Local\\Temp\\tmpxsqp47te",
+          "lineno": 115,
+          "message": "\u001b[1m\u001b[1mCannot cache compiled function \"elemwise\" as it uses dynamic globals (such as ctypes pointers and large global arrays)\u001b[0m\u001b[0m"
+        },
+        {
+          "category": "NumbaWarning",
+          "filename": "C:\\Users\\Chris\\AppData\\Local\\Temp\\tmpxsqp47te",
+          "lineno": 139,
+          "message": "\u001b[1m\u001b[1mCannot cache compiled function \"elemwise\" as it uses dynamic globals (such as ctypes pointers and large global arrays)\u001b[0m\u001b[0m"
+        },
+        {
+          "category": "NumbaWarning",
+          "filename": "C:\\Users\\Chris\\AppData\\Local\\Temp\\tmpxsqp47te",
+          "lineno": 517,
+          "message": "\u001b[1m\u001b[1mCannot cache compiled function \"elemwise\" as it uses dynamic globals (such as ctypes pointers and large global arrays)\u001b[0m\u001b[0m"
+        },
+        {
+          "category": "NumbaWarning",
+          "filename": "C:\\Users\\Chris\\AppData\\Local\\Temp\\tmpxsqp47te",
+          "lineno": 653,
+          "message": "\u001b[1m\u001b[1mCannot cache compiled function \"specify_shape\" as it uses dynamic globals (such as ctypes pointers and large global arrays)\u001b[0m\u001b[0m"
+        },
+        {
+          "category": "NumbaWarning",
+          "filename": "C:\\Users\\Chris\\AppData\\Local\\Temp\\tmpxsqp47te",
+          "lineno": 707,
+          "message": "\u001b[1m\u001b[1mCannot cache compiled function \"elemwise\" as it uses dynamic globals (such as ctypes pointers and large global arrays)\u001b[0m\u001b[0m"
+        },
+        {
+          "category": "NumbaWarning",
+          "filename": "C:\\Users\\Chris\\AppData\\Local\\Temp\\tmpxsqp47te",
+          "lineno": 731,
+          "message": "\u001b[1m\u001b[1mCannot cache compiled function \"specify_shape\" as it uses dynamic globals (such as ctypes pointers and large global arrays)\u001b[0m\u001b[0m"
+        },
+        {
+          "category": "NumbaWarning",
+          "filename": "C:\\Users\\Chris\\AppData\\Local\\Temp\\tmpxsqp47te",
+          "lineno": 735,
+          "message": "\u001b[1m\u001b[1mCannot cache compiled function \"subtensor\" as it uses dynamic globals (such as ctypes pointers and large global arrays)\u001b[0m\u001b[0m"
+        },
+        {
+          "category": "NumbaWarning",
+          "filename": "C:\\Users\\Chris\\AppData\\Local\\Temp\\tmpxsqp47te",
+          "lineno": 791,
+          "message": "\u001b[1m\u001b[1mCannot cache compiled function \"elemwise\" as it uses dynamic globals (such as ctypes pointers and large global arrays)\u001b[0m\u001b[0m"
+        },
+        {
+          "category": "NumbaWarning",
+          "filename": "C:\\Users\\Chris\\AppData\\Local\\Temp\\tmpxsqp47te",
+          "lineno": 867,
+          "message": "\u001b[1m\u001b[1mCannot cache compiled function \"elemwise\" as it uses dynamic globals (such as ctypes pointers and large global arrays)\u001b[0m\u001b[0m"
+        },
+        {
+          "category": "NumbaWarning",
+          "filename": "C:\\Users\\Chris\\AppData\\Local\\Temp\\tmpxsqp47te",
+          "lineno": 873,
+          "message": "\u001b[1m\u001b[1mCannot cache compiled function \"elemwise\" as it uses dynamic globals (such as ctypes pointers and large global arrays)\u001b[0m\u001b[0m"
+        },
+        {
+          "category": "NumbaWarning",
+          "filename": "C:\\Users\\Chris\\AppData\\Local\\Temp\\tmpxsqp47te",
+          "lineno": 881,
+          "message": "\u001b[1m\u001b[1mCannot cache compiled function \"elemwise\" as it uses dynamic globals (such as ctypes pointers and large global arrays)\u001b[0m\u001b[0m"
+        }
+      ],
+      "warnings": [
+        "\u001b[1m\u001b[1mCannot cache compiled function \"elemwise\" as it uses dynamic globals (such as ctypes pointers and large global arrays)\u001b[0m\u001b[0m",
+        "\u001b[1m\u001b[1mCannot cache compiled function \"specify_shape\" as it uses dynamic globals (such as ctypes pointers and large global arrays)\u001b[0m\u001b[0m",
+        "\u001b[1m\u001b[1mCannot cache compiled function \"subtensor\" as it uses dynamic globals (such as ctypes pointers and large global arrays)\u001b[0m\u001b[0m"
+      ]
+    },
+    {
+      "accepted": false,
+      "chain_wall_markers": {
+        "0": {
+          "first_draw_seconds": 38.48369090000051,
+          "first_retained_seconds": 1888.6722703999985,
+          "last_draw_seconds": 3355.088205100001,
+          "retained_draws_completed": 1000,
+          "retained_perf_counter_diff_sum": 1467.136666200102,
+          "retained_process_time_diff_sum": 1442.5625,
+          "warmup_draws_completed": 2000,
+          "warmup_perf_counter_diff_sum": 1877.433734800019,
+          "warmup_process_time_diff_sum": 1847.9375
+        },
+        "1": {
+          "first_draw_seconds": 3355.1836675000013,
+          "first_retained_seconds": 5720.755252000003,
+          "last_draw_seconds": 6501.337770900005,
+          "retained_draws_completed": 1000,
+          "retained_perf_counter_diff_sum": 780.1108385998959,
+          "retained_process_time_diff_sum": 767.609375,
+          "warmup_draws_completed": 2000,
+          "warmup_perf_counter_diff_sum": 2362.21657289999,
+          "warmup_process_time_diff_sum": 2321.6875
+        },
+        "2": {
+          "first_draw_seconds": 6501.492382199998,
+          "first_retained_seconds": 8426.395074400003,
+          "last_draw_seconds": 9726.8064495,
+          "retained_draws_completed": 1000,
+          "retained_perf_counter_diff_sum": 1300.7703716000542,
+          "retained_process_time_diff_sum": 1278.5,
+          "warmup_draws_completed": 2000,
+          "warmup_perf_counter_diff_sum": 1920.8118661997578,
+          "warmup_process_time_diff_sum": 1889.046875
+        },
+        "3": {
+          "first_draw_seconds": 9726.905874599994,
+          "first_retained_seconds": 11407.179235200005,
+          "last_draw_seconds": 12191.6133137,
+          "retained_draws_completed": 1000,
+          "retained_perf_counter_diff_sum": 783.9566626999294,
+          "retained_process_time_diff_sum": 772.328125,
+          "warmup_draws_completed": 2000,
+          "warmup_perf_counter_diff_sum": 1676.8757592001057,
+          "warmup_process_time_diff_sum": 1642.421875
+        }
+      },
+      "chains": 4,
+      "cores": 1,
+      "diagnostic_seconds": 26.614288299999316,
+      "diagnostics": {
+        "accepted": false,
+        "all_diagnostics_finite": true,
+        "divergences": 0,
+        "max_rhat": 1.0414867630754672,
+        "min_bfmi": 0.9427907963811407,
+        "min_bulk_ess": 87.62127323425078,
+        "min_tail_ess": 323.05365629438325,
+        "tree_depth_saturations": 0
+      },
+      "draws": 1000,
+      "early_failure": null,
+      "graph_seconds": 1.2237700999976369,
+      "max_treedepth": 15,
+      "peak_working_set_bytes": 1649745920,
+      "performance_warnings": [],
+      "retry": 1,
+      "sample_call_seconds": 12194.1704742,
+      "sampler_configuration_warnings": [],
+      "serialization_seconds": 5.495161500002723,
+      "step_compile_seconds": 12.892686300001515,
+      "target_accept": 0.99,
+      "unresolved_warnings": [
+        "\u001b[1m\u001b[1mCannot cache compiled function \"elemwise\" as it uses dynamic globals (such as ctypes pointers and large global arrays)\u001b[0m\u001b[0m",
+        "\u001b[1m\u001b[1mCannot cache compiled function \"subtensor\" as it uses dynamic globals (such as ctypes pointers and large global arrays)\u001b[0m\u001b[0m"
+      ],
+      "warmup": 2000,
+      "warning_contexts": [
+        {
+          "category": "NumbaWarning",
+          "chain": 0,
+          "draw_index": 0,
+          "filename": "C:\\Users\\Chris\\AppData\\Local\\Temp\\tmpcds3puw7",
+          "lineno": 707,
+          "message": "\u001b[1m\u001b[1mCannot cache compiled function \"elemwise\" as it uses dynamic globals (such as ctypes pointers and large global arrays)\u001b[0m\u001b[0m",
+          "phase": "warmup",
+          "stack": [
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler.py",
+              "function": "_compile_bytecode",
+              "lineno": 505
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler.py",
+              "function": "_compile_core",
+              "lineno": 473
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler_machinery.py",
+              "function": "run",
+              "lineno": 356
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler_lock.py",
+              "function": "_acquire_compile_lock",
+              "lineno": 35
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler_machinery.py",
+              "function": "_runPass",
+              "lineno": 311
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler_machinery.py",
+              "function": "check",
+              "lineno": 272
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\typed_passes.py",
+              "function": "run_pass",
+              "lineno": 114
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\typed_passes.py",
+              "function": "type_inference_stage",
+              "lineno": 80
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\errors.py",
+              "function": "__exit__",
+              "lineno": 530
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\errors.py",
+              "function": "flush",
+              "lineno": 523
+            },
+            {
+              "filename": "C:\\Users\\Chris\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\warnings.py",
+              "function": "_showwarnmsg",
+              "lineno": 109
+            }
+          ]
+        },
+        {
+          "category": "NumbaWarning",
+          "chain": 0,
+          "draw_index": 0,
+          "filename": "C:\\Users\\Chris\\AppData\\Local\\Temp\\tmpcds3puw7",
+          "lineno": 735,
+          "message": "\u001b[1m\u001b[1mCannot cache compiled function \"subtensor\" as it uses dynamic globals (such as ctypes pointers and large global arrays)\u001b[0m\u001b[0m",
+          "phase": "warmup",
+          "stack": [
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler.py",
+              "function": "_compile_bytecode",
+              "lineno": 505
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler.py",
+              "function": "_compile_core",
+              "lineno": 473
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler_machinery.py",
+              "function": "run",
+              "lineno": 356
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler_lock.py",
+              "function": "_acquire_compile_lock",
+              "lineno": 35
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler_machinery.py",
+              "function": "_runPass",
+              "lineno": 311
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler_machinery.py",
+              "function": "check",
+              "lineno": 272
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\typed_passes.py",
+              "function": "run_pass",
+              "lineno": 114
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\typed_passes.py",
+              "function": "type_inference_stage",
+              "lineno": 80
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\errors.py",
+              "function": "__exit__",
+              "lineno": 530
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\errors.py",
+              "function": "flush",
+              "lineno": 523
+            },
+            {
+              "filename": "C:\\Users\\Chris\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\warnings.py",
+              "function": "_showwarnmsg",
+              "lineno": 109
+            }
+          ]
+        },
+        {
+          "category": "NumbaWarning",
+          "chain": 0,
+          "draw_index": 0,
+          "filename": "C:\\Users\\Chris\\AppData\\Local\\Temp\\tmpcds3puw7",
+          "lineno": 791,
+          "message": "\u001b[1m\u001b[1mCannot cache compiled function \"elemwise\" as it uses dynamic globals (such as ctypes pointers and large global arrays)\u001b[0m\u001b[0m",
+          "phase": "warmup",
+          "stack": [
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler.py",
+              "function": "_compile_bytecode",
+              "lineno": 505
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler.py",
+              "function": "_compile_core",
+              "lineno": 473
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler_machinery.py",
+              "function": "run",
+              "lineno": 356
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler_lock.py",
+              "function": "_acquire_compile_lock",
+              "lineno": 35
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler_machinery.py",
+              "function": "_runPass",
+              "lineno": 311
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler_machinery.py",
+              "function": "check",
+              "lineno": 272
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\typed_passes.py",
+              "function": "run_pass",
+              "lineno": 114
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\typed_passes.py",
+              "function": "type_inference_stage",
+              "lineno": 80
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\errors.py",
+              "function": "__exit__",
+              "lineno": 530
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\errors.py",
+              "function": "flush",
+              "lineno": 523
+            },
+            {
+              "filename": "C:\\Users\\Chris\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\warnings.py",
+              "function": "_showwarnmsg",
+              "lineno": 109
+            }
+          ]
+        },
+        {
+          "category": "NumbaWarning",
+          "chain": 0,
+          "draw_index": 0,
+          "filename": "C:\\Users\\Chris\\AppData\\Local\\Temp\\tmpcds3puw7",
+          "lineno": 867,
+          "message": "\u001b[1m\u001b[1mCannot cache compiled function \"elemwise\" as it uses dynamic globals (such as ctypes pointers and large global arrays)\u001b[0m\u001b[0m",
+          "phase": "warmup",
+          "stack": [
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler.py",
+              "function": "_compile_bytecode",
+              "lineno": 505
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler.py",
+              "function": "_compile_core",
+              "lineno": 473
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler_machinery.py",
+              "function": "run",
+              "lineno": 356
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler_lock.py",
+              "function": "_acquire_compile_lock",
+              "lineno": 35
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler_machinery.py",
+              "function": "_runPass",
+              "lineno": 311
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler_machinery.py",
+              "function": "check",
+              "lineno": 272
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\typed_passes.py",
+              "function": "run_pass",
+              "lineno": 114
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\typed_passes.py",
+              "function": "type_inference_stage",
+              "lineno": 80
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\errors.py",
+              "function": "__exit__",
+              "lineno": 530
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\errors.py",
+              "function": "flush",
+              "lineno": 523
+            },
+            {
+              "filename": "C:\\Users\\Chris\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\warnings.py",
+              "function": "_showwarnmsg",
+              "lineno": 109
+            }
+          ]
+        },
+        {
+          "category": "NumbaWarning",
+          "chain": 0,
+          "draw_index": 0,
+          "filename": "C:\\Users\\Chris\\AppData\\Local\\Temp\\tmpcds3puw7",
+          "lineno": 873,
+          "message": "\u001b[1m\u001b[1mCannot cache compiled function \"elemwise\" as it uses dynamic globals (such as ctypes pointers and large global arrays)\u001b[0m\u001b[0m",
+          "phase": "warmup",
+          "stack": [
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler.py",
+              "function": "_compile_bytecode",
+              "lineno": 505
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler.py",
+              "function": "_compile_core",
+              "lineno": 473
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler_machinery.py",
+              "function": "run",
+              "lineno": 356
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler_lock.py",
+              "function": "_acquire_compile_lock",
+              "lineno": 35
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler_machinery.py",
+              "function": "_runPass",
+              "lineno": 311
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler_machinery.py",
+              "function": "check",
+              "lineno": 272
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\typed_passes.py",
+              "function": "run_pass",
+              "lineno": 114
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\typed_passes.py",
+              "function": "type_inference_stage",
+              "lineno": 80
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\errors.py",
+              "function": "__exit__",
+              "lineno": 530
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\errors.py",
+              "function": "flush",
+              "lineno": 523
+            },
+            {
+              "filename": "C:\\Users\\Chris\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\warnings.py",
+              "function": "_showwarnmsg",
+              "lineno": 109
+            }
+          ]
+        }
+      ],
+      "warning_locations": [
+        {
+          "category": "NumbaWarning",
+          "filename": "C:\\Users\\Chris\\AppData\\Local\\Temp\\tmpcds3puw7",
+          "lineno": 707,
+          "message": "\u001b[1m\u001b[1mCannot cache compiled function \"elemwise\" as it uses dynamic globals (such as ctypes pointers and large global arrays)\u001b[0m\u001b[0m"
+        },
+        {
+          "category": "NumbaWarning",
+          "filename": "C:\\Users\\Chris\\AppData\\Local\\Temp\\tmpcds3puw7",
+          "lineno": 735,
+          "message": "\u001b[1m\u001b[1mCannot cache compiled function \"subtensor\" as it uses dynamic globals (such as ctypes pointers and large global arrays)\u001b[0m\u001b[0m"
+        },
+        {
+          "category": "NumbaWarning",
+          "filename": "C:\\Users\\Chris\\AppData\\Local\\Temp\\tmpcds3puw7",
+          "lineno": 791,
+          "message": "\u001b[1m\u001b[1mCannot cache compiled function \"elemwise\" as it uses dynamic globals (such as ctypes pointers and large global arrays)\u001b[0m\u001b[0m"
+        },
+        {
+          "category": "NumbaWarning",
+          "filename": "C:\\Users\\Chris\\AppData\\Local\\Temp\\tmpcds3puw7",
+          "lineno": 867,
+          "message": "\u001b[1m\u001b[1mCannot cache compiled function \"elemwise\" as it uses dynamic globals (such as ctypes pointers and large global arrays)\u001b[0m\u001b[0m"
+        },
+        {
+          "category": "NumbaWarning",
+          "filename": "C:\\Users\\Chris\\AppData\\Local\\Temp\\tmpcds3puw7",
+          "lineno": 873,
+          "message": "\u001b[1m\u001b[1mCannot cache compiled function \"elemwise\" as it uses dynamic globals (such as ctypes pointers and large global arrays)\u001b[0m\u001b[0m"
+        }
+      ],
+      "warnings": [
+        "\u001b[1m\u001b[1mCannot cache compiled function \"elemwise\" as it uses dynamic globals (such as ctypes pointers and large global arrays)\u001b[0m\u001b[0m",
+        "\u001b[1m\u001b[1mCannot cache compiled function \"subtensor\" as it uses dynamic globals (such as ctypes pointers and large global arrays)\u001b[0m\u001b[0m"
+      ]
+    },
+    {
+      "accepted": false,
+      "chain_wall_markers": {
+        "0": {
+          "first_draw_seconds": 37.59839329999522,
+          "first_retained_seconds": 2098.1529318999965,
+          "last_draw_seconds": 3876.618168300003,
+          "retained_draws_completed": 2000,
+          "retained_perf_counter_diff_sum": 1776.5736393001425,
+          "retained_process_time_diff_sum": 1740.5625,
+          "warmup_draws_completed": 2000,
+          "warmup_perf_counter_diff_sum": 2088.6034825003007,
+          "warmup_process_time_diff_sum": 2048.015625
+        },
+        "1": {
+          "first_draw_seconds": 3876.8065464999963,
+          "first_retained_seconds": 5333.384116100002,
+          "last_draw_seconds": 6994.484907099992,
+          "retained_draws_completed": 2000,
+          "retained_perf_counter_diff_sum": 1659.2430006001669,
+          "retained_process_time_diff_sum": 1594.734375,
+          "warmup_draws_completed": 2000,
+          "warmup_perf_counter_diff_sum": 1453.3258551000908,
+          "warmup_process_time_diff_sum": 1428.046875
+        },
+        "2": {
+          "first_draw_seconds": 6994.642145399994,
+          "first_retained_seconds": 8613.407510000005,
+          "last_draw_seconds": 10146.0597098,
+          "retained_draws_completed": 2000,
+          "retained_perf_counter_diff_sum": 1530.867214999962,
+          "retained_process_time_diff_sum": 1504.703125,
+          "warmup_draws_completed": 2000,
+          "warmup_perf_counter_diff_sum": 1615.8881539005524,
+          "warmup_process_time_diff_sum": 1595.328125
+        },
+        "3": {
+          "first_draw_seconds": 10146.217088199992,
+          "first_retained_seconds": 11526.315712399999,
+          "last_draw_seconds": 11690.516612099993,
+          "retained_draws_completed": 294,
+          "retained_perf_counter_diff_sum": 164.55492249997042,
+          "retained_process_time_diff_sum": 162.953125,
+          "warmup_draws_completed": 2000,
+          "warmup_perf_counter_diff_sum": 1377.46337710011,
+          "warmup_process_time_diff_sum": 1359.828125
+        }
+      },
+      "chains": 4,
+      "cores": 1,
+      "diagnostic_seconds": 0.00012280000373721123,
+      "diagnostics": {
+        "accepted": false,
+        "all_diagnostics_finite": false,
+        "divergences": 1,
+        "max_rhat": null,
+        "min_bfmi": null,
+        "min_bulk_ess": null,
+        "min_tail_ess": null,
+        "tree_depth_saturations": 0
+      },
+      "draws": 2000,
+      "early_failure": {
+        "chain": 3,
+        "divergences": 1,
+        "draw_index": 2293,
+        "reason": "Retained draw failed a zero-tolerance gate.",
+        "tree_depth_saturations": 0
+      },
+      "graph_seconds": 1.2237700999976369,
+      "max_treedepth": 15,
+      "peak_working_set_bytes": 1901891584,
+      "performance_warnings": [],
+      "retry": 2,
+      "sample_call_seconds": 11690.544179499993,
+      "sampler_configuration_warnings": [],
+      "serialization_seconds": 3.00002284348011e-07,
+      "step_compile_seconds": 13.864645399997244,
+      "target_accept": 0.99,
+      "unresolved_warnings": [
+        "\u001b[1m\u001b[1mCannot cache compiled function \"elemwise\" as it uses dynamic globals (such as ctypes pointers and large global arrays)\u001b[0m\u001b[0m",
+        "\u001b[1m\u001b[1mCannot cache compiled function \"subtensor\" as it uses dynamic globals (such as ctypes pointers and large global arrays)\u001b[0m\u001b[0m"
+      ],
+      "warmup": 2000,
+      "warning_contexts": [
+        {
+          "category": "NumbaWarning",
+          "chain": 0,
+          "draw_index": 0,
+          "filename": "C:\\Users\\Chris\\AppData\\Local\\Temp\\tmpksk7sw3n",
+          "lineno": 707,
+          "message": "\u001b[1m\u001b[1mCannot cache compiled function \"elemwise\" as it uses dynamic globals (such as ctypes pointers and large global arrays)\u001b[0m\u001b[0m",
+          "phase": "warmup",
+          "stack": [
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler.py",
+              "function": "_compile_bytecode",
+              "lineno": 505
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler.py",
+              "function": "_compile_core",
+              "lineno": 473
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler_machinery.py",
+              "function": "run",
+              "lineno": 356
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler_lock.py",
+              "function": "_acquire_compile_lock",
+              "lineno": 35
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler_machinery.py",
+              "function": "_runPass",
+              "lineno": 311
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler_machinery.py",
+              "function": "check",
+              "lineno": 272
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\typed_passes.py",
+              "function": "run_pass",
+              "lineno": 114
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\typed_passes.py",
+              "function": "type_inference_stage",
+              "lineno": 80
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\errors.py",
+              "function": "__exit__",
+              "lineno": 530
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\errors.py",
+              "function": "flush",
+              "lineno": 523
+            },
+            {
+              "filename": "C:\\Users\\Chris\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\warnings.py",
+              "function": "_showwarnmsg",
+              "lineno": 109
+            }
+          ]
+        },
+        {
+          "category": "NumbaWarning",
+          "chain": 0,
+          "draw_index": 0,
+          "filename": "C:\\Users\\Chris\\AppData\\Local\\Temp\\tmpksk7sw3n",
+          "lineno": 735,
+          "message": "\u001b[1m\u001b[1mCannot cache compiled function \"subtensor\" as it uses dynamic globals (such as ctypes pointers and large global arrays)\u001b[0m\u001b[0m",
+          "phase": "warmup",
+          "stack": [
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler.py",
+              "function": "_compile_bytecode",
+              "lineno": 505
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler.py",
+              "function": "_compile_core",
+              "lineno": 473
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler_machinery.py",
+              "function": "run",
+              "lineno": 356
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler_lock.py",
+              "function": "_acquire_compile_lock",
+              "lineno": 35
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler_machinery.py",
+              "function": "_runPass",
+              "lineno": 311
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler_machinery.py",
+              "function": "check",
+              "lineno": 272
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\typed_passes.py",
+              "function": "run_pass",
+              "lineno": 114
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\typed_passes.py",
+              "function": "type_inference_stage",
+              "lineno": 80
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\errors.py",
+              "function": "__exit__",
+              "lineno": 530
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\errors.py",
+              "function": "flush",
+              "lineno": 523
+            },
+            {
+              "filename": "C:\\Users\\Chris\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\warnings.py",
+              "function": "_showwarnmsg",
+              "lineno": 109
+            }
+          ]
+        },
+        {
+          "category": "NumbaWarning",
+          "chain": 0,
+          "draw_index": 0,
+          "filename": "C:\\Users\\Chris\\AppData\\Local\\Temp\\tmpksk7sw3n",
+          "lineno": 791,
+          "message": "\u001b[1m\u001b[1mCannot cache compiled function \"elemwise\" as it uses dynamic globals (such as ctypes pointers and large global arrays)\u001b[0m\u001b[0m",
+          "phase": "warmup",
+          "stack": [
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler.py",
+              "function": "_compile_bytecode",
+              "lineno": 505
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler.py",
+              "function": "_compile_core",
+              "lineno": 473
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler_machinery.py",
+              "function": "run",
+              "lineno": 356
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler_lock.py",
+              "function": "_acquire_compile_lock",
+              "lineno": 35
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler_machinery.py",
+              "function": "_runPass",
+              "lineno": 311
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler_machinery.py",
+              "function": "check",
+              "lineno": 272
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\typed_passes.py",
+              "function": "run_pass",
+              "lineno": 114
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\typed_passes.py",
+              "function": "type_inference_stage",
+              "lineno": 80
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\errors.py",
+              "function": "__exit__",
+              "lineno": 530
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\errors.py",
+              "function": "flush",
+              "lineno": 523
+            },
+            {
+              "filename": "C:\\Users\\Chris\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\warnings.py",
+              "function": "_showwarnmsg",
+              "lineno": 109
+            }
+          ]
+        },
+        {
+          "category": "NumbaWarning",
+          "chain": 0,
+          "draw_index": 0,
+          "filename": "C:\\Users\\Chris\\AppData\\Local\\Temp\\tmpksk7sw3n",
+          "lineno": 867,
+          "message": "\u001b[1m\u001b[1mCannot cache compiled function \"elemwise\" as it uses dynamic globals (such as ctypes pointers and large global arrays)\u001b[0m\u001b[0m",
+          "phase": "warmup",
+          "stack": [
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler.py",
+              "function": "_compile_bytecode",
+              "lineno": 505
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler.py",
+              "function": "_compile_core",
+              "lineno": 473
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler_machinery.py",
+              "function": "run",
+              "lineno": 356
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler_lock.py",
+              "function": "_acquire_compile_lock",
+              "lineno": 35
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler_machinery.py",
+              "function": "_runPass",
+              "lineno": 311
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler_machinery.py",
+              "function": "check",
+              "lineno": 272
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\typed_passes.py",
+              "function": "run_pass",
+              "lineno": 114
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\typed_passes.py",
+              "function": "type_inference_stage",
+              "lineno": 80
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\errors.py",
+              "function": "__exit__",
+              "lineno": 530
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\errors.py",
+              "function": "flush",
+              "lineno": 523
+            },
+            {
+              "filename": "C:\\Users\\Chris\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\warnings.py",
+              "function": "_showwarnmsg",
+              "lineno": 109
+            }
+          ]
+        },
+        {
+          "category": "NumbaWarning",
+          "chain": 0,
+          "draw_index": 0,
+          "filename": "C:\\Users\\Chris\\AppData\\Local\\Temp\\tmpksk7sw3n",
+          "lineno": 873,
+          "message": "\u001b[1m\u001b[1mCannot cache compiled function \"elemwise\" as it uses dynamic globals (such as ctypes pointers and large global arrays)\u001b[0m\u001b[0m",
+          "phase": "warmup",
+          "stack": [
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler.py",
+              "function": "_compile_bytecode",
+              "lineno": 505
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler.py",
+              "function": "_compile_core",
+              "lineno": 473
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler_machinery.py",
+              "function": "run",
+              "lineno": 356
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler_lock.py",
+              "function": "_acquire_compile_lock",
+              "lineno": 35
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler_machinery.py",
+              "function": "_runPass",
+              "lineno": 311
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\compiler_machinery.py",
+              "function": "check",
+              "lineno": 272
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\typed_passes.py",
+              "function": "run_pass",
+              "lineno": 114
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\typed_passes.py",
+              "function": "type_inference_stage",
+              "lineno": 80
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\errors.py",
+              "function": "__exit__",
+              "lineno": 530
+            },
+            {
+              "filename": "C:\\Users\\Chris\\Documents\\cyber-threat-modelling\\.venv\\Lib\\site-packages\\numba\\core\\errors.py",
+              "function": "flush",
+              "lineno": 523
+            },
+            {
+              "filename": "C:\\Users\\Chris\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\warnings.py",
+              "function": "_showwarnmsg",
+              "lineno": 109
+            }
+          ]
+        }
+      ],
+      "warning_locations": [
+        {
+          "category": "NumbaWarning",
+          "filename": "C:\\Users\\Chris\\AppData\\Local\\Temp\\tmpksk7sw3n",
+          "lineno": 707,
+          "message": "\u001b[1m\u001b[1mCannot cache compiled function \"elemwise\" as it uses dynamic globals (such as ctypes pointers and large global arrays)\u001b[0m\u001b[0m"
+        },
+        {
+          "category": "NumbaWarning",
+          "filename": "C:\\Users\\Chris\\AppData\\Local\\Temp\\tmpksk7sw3n",
+          "lineno": 735,
+          "message": "\u001b[1m\u001b[1mCannot cache compiled function \"subtensor\" as it uses dynamic globals (such as ctypes pointers and large global arrays)\u001b[0m\u001b[0m"
+        },
+        {
+          "category": "NumbaWarning",
+          "filename": "C:\\Users\\Chris\\AppData\\Local\\Temp\\tmpksk7sw3n",
+          "lineno": 791,
+          "message": "\u001b[1m\u001b[1mCannot cache compiled function \"elemwise\" as it uses dynamic globals (such as ctypes pointers and large global arrays)\u001b[0m\u001b[0m"
+        },
+        {
+          "category": "NumbaWarning",
+          "filename": "C:\\Users\\Chris\\AppData\\Local\\Temp\\tmpksk7sw3n",
+          "lineno": 867,
+          "message": "\u001b[1m\u001b[1mCannot cache compiled function \"elemwise\" as it uses dynamic globals (such as ctypes pointers and large global arrays)\u001b[0m\u001b[0m"
+        },
+        {
+          "category": "NumbaWarning",
+          "filename": "C:\\Users\\Chris\\AppData\\Local\\Temp\\tmpksk7sw3n",
+          "lineno": 873,
+          "message": "\u001b[1m\u001b[1mCannot cache compiled function \"elemwise\" as it uses dynamic globals (such as ctypes pointers and large global arrays)\u001b[0m\u001b[0m"
+        }
+      ],
+      "warnings": [
+        "\u001b[1m\u001b[1mCannot cache compiled function \"elemwise\" as it uses dynamic globals (such as ctypes pointers and large global arrays)\u001b[0m\u001b[0m",
+        "\u001b[1m\u001b[1mCannot cache compiled function \"subtensor\" as it uses dynamic globals (such as ctypes pointers and large global arrays)\u001b[0m\u001b[0m"
+      ]
+    }
+  ],
+  "interpretation": "All three prescribed attempts completed or ended on an irreversible retained gate failure. Partial attempts are not posterior recovery evidence. Saved complete retry1 diagnostics already independently verified.",
+  "result_sha256": "0807e1bfca52ab66d1ef6c8a1765fbc9d4cad10f6b054120c6d1577956d2dbac",
+  "review": {
+    "accepted_diagnostics_recomputed": false,
+    "attempts": 3,
+    "candidate": "primary",
+    "compute_thread_policy": "One native numerical thread per sequential-chain fit process.",
+    "data_sha256": "2f16c14da6f108731a36c429e2d532a6c4f7ab343a4e989a3cda9c5473faef19",
+    "directory": "artifacts/stage7/joint-level-v1/primary/representative-7101",
+    "options": {
+      "categories": 10,
+      "conditional_level": false,
+      "count_parameterization": "conditional",
+      "factor_parameterization": "anchored",
+      "factors": 2,
+      "gaussian_solver": "block",
+      "kernel": false,
+      "known_auxiliary_coefficients": false,
+      "level_parameterization": "joint_conditional",
+      "level_settings": {
+        "amplitude_multiplier": 1.0,
+        "anchor": 3.5030238822606967,
+        "candidate": "primary",
+        "fallback_anchor": null,
+        "fallback_index": null,
+        "hyper_sd": 1.0,
+        "known_indices": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "scale_sd": 1.0,
+        "scale_upper": 2.0,
+        "training_months": 108
+      },
+      "mass_matrix": "diagonal",
+      "months": 108,
+      "prior_candidate": "primary",
+      "prior_id": "anchored_levels_v2",
+      "regimes": 1,
+      "residual": "none",
+      "scenario": "representative",
+      "seed": 7101,
+      "severity_factors": 0
+    },
+    "original_truth_sha256": "9fca1f6c6e33992fe0a0bb22a0599a87ac6aa677385e5b6873808e7e12fd3eec",
+    "result_sha256": "0807e1bfca52ab66d1ef6c8a1765fbc9d4cad10f6b054120c6d1577956d2dbac",
+    "scenario": "representative",
+    "seed": 7101,
+    "source_control": {
+      "dirty": true,
+      "revision": "9ed9081635f8c534e2952178583ec0bd3d91cdb7",
+      "status": "available"
+    },
+    "status": "failed_diagnostic_gate",
+    "truth_sha256": "92e92d139ba48feaf06569b34db715a2fc9c58870b6aeb5a6dbc76f3628945af"
+  }
+}

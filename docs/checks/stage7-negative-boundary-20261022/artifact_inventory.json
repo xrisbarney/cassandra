@@ -1,0 +1,27 @@
+{
+  "files": {
+    "audit.json": "66ce71e488ee782fd84988c954554cb21aa76f540214f54ad1319c6e09f8a269",
+    "selection.json": "75dfa445142476b9be8bebe3b058f165b1f67e09b0fc6f052fb74adfc455e1ab",
+    "visited_point.npz": "ea47761262bb0f7c58637793313953b5d8f0e8648d3450b3462cf51b0662e5bc"
+  },
+  "model_source_sha256": {
+    "src/cyber_threat_modelling/models/__init__.py": "15a3242e7279d76725844a5491ee8391e4c15f024c5330277a0dae4e61ad495a",
+    "src/cyber_threat_modelling/models/ar1_transform.py": "5b6c601f0f94efd542411dd154ee41e5143ea8eeb30ed5276fff8c4d3727d53b",
+    "src/cyber_threat_modelling/models/bayesian_controls.py": "19c4bdaae4e5c5bd74537e757a1deb6e7f1b12c4f644fcc8e44ac621b1a75717",
+    "src/cyber_threat_modelling/models/block_gaussian.py": "b497916c36ec5a78586674f6abaff50f19a7f811937628e183de36fb0823f980",
+    "src/cyber_threat_modelling/models/boundaries.py": "eb736f0645d0abc91d908943ff6f499df1ae32b75c7cb9ae6891542b95bb84b6",
+    "src/cyber_threat_modelling/models/compiler_warnings.py": "934928337a6b14c99339c7fe538b32d8863df189ff0ec65a9d0ce2dcc36a46da",
+    "src/cyber_threat_modelling/models/components.py": "039507ed3f80c10313285cf0fdc68818a0b25b2f28d23fd207af86e0ea9782ff",
+    "src/cyber_threat_modelling/models/control_priors.py": "1fdb2b76fff3dbb3480c6145206a5c124bc719d889c327bc827ae3ee738039e5",
+    "src/cyber_threat_modelling/models/count_baselines.py": "377431a8a70fdc84ef285b7a33ff63d40a067f7926c628779a4ed29d41338a1e",
+    "src/cyber_threat_modelling/models/gaussian_coordinates.py": "2da2668117d7c13b3605ac1dcb806bb733c562034d242747bfc5fc458a5735cb",
+    "src/cyber_threat_modelling/models/independent_controls.py": "68727fab54c8bdcace227142fb80d20575f440156f36410bafc59392c3ff6e63",
+    "src/cyber_threat_modelling/models/independent_geometry.py": "6c9efbb84e36ed3a6c74e2e548245e256d78305c3ad62dfc7807d6080f108b27",
+    "src/cyber_threat_modelling/models/joint_coordinates.py": "57dc09dc2def8195ecf2b3df37ce59ee1296d9c53a75e10071b7aaa100de819f",
+    "src/cyber_threat_modelling/models/observation_nb.py": "d799afd5ca58178c0581962fa2ad96ed80b6498a8dcf0c8a5b64500306a5f664",
+    "src/cyber_threat_modelling/models/ordering.py": "8469f3e7ae2f4dab5df7c21b15a428518078a41bb9ee0c92812a38e5f78aea91",
+    "src/cyber_threat_modelling/models/stage7_priors.py": "89b8e2d4166c84c0f3742a799daf75f1bf77b2688c9616236e08b7427f7ef381",
+    "src/cyber_threat_modelling/models/synthetic_state_space.py": "f5320dfdf45ed0b7e578e82067c579d83525148d05320927110a504e663e949e"
+  },
+  "source_directory": "artifacts/stage7/negative-boundary-numerics-20261022"
+}
