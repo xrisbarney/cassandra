@@ -42,3 +42,12 @@ called a fully failed schedule. If the replacement is not admitted, the dense
 metric still requires its own complete schedule with the verified faster
 implementation before the metric comparison can be closed. No posterior
 recovery score is consulted for this computational decision.
+
+Scheduling follow-up: the verified scalar dense-metric alternative may start
+concurrently when the early `dispersion_dense/7101` case releases its fit slot.
+This avoids waiting for a fully failed diagonal schedule before beginning the
+already required fallback. The preference remains diagonal upon admission,
+otherwise dense only after its own complete admission/exhaustion schedule.
+If diagonal adaptation is admitted while the dense alternative is unfinished,
+stop that alternative with an explicit interruption record. Do not classify
+the interrupted alternative as a diagnostic failure or use its recovery scores.
