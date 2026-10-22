@@ -2,8 +2,9 @@
 
 Status, 2026-10-22: **posterior campaign in progress; not yet complete**.
 The active laws are `anchored_levels_v2`. The primary prior-plausibility gates
-pass, and 208 distinct tests pass across the full run and targeted gate checks. The remaining work is the full posterior
-campaign, sensitivity analysis and final component decisions. No real-data
+pass. A fresh full-suite run passes all 222 tests across 29 files with unchanged
+source hashes. The remaining work is completion of the posterior campaign,
+sensitivity analysis and final component decisions. No real-data
 proposed-model fitting or January 2024--December 2025 scoring has started.
 
 ## Scope and evidence
@@ -189,25 +190,32 @@ is distinct from its underlying NB-component intensity.
 
 ## Verification and limits
 
-The [full test record](checks/stage7-full-tests-v5-20261022/audit.json) contains
-190 passing tests across 24 files, each in a fresh process, with unchanged
-source hashes throughout. The [targeted follow-up](checks/stage7-compiler-warning-20261022/grid_followup.json)
-adds ten distinct tests for the narrowly classified cache warning and synthetic
-grid entry guards. The [batch-identity follow-up](checks/stage7-compiler-warning-20261022/batch_identity_followup.json)
-adds two more. Six [hosted-execution guard tests](checks/stage7-hosted-guards-20261022/audit.json)
-then pass locally. Eight [checkpoint integrity tests](checks/stage7-checkpoint-20261022/audit.json)
-and two continuation integration cases bring the total to 218 distinct passing tests; four further canonical-input cases bring the total to 222. The hosted OPT3 verification passed. Eight pending cases are activated for
-hosted execution using exact canonical fixtures, subject to a fresh verification
-gate on the execution commit. Four local OPT0 fits continue. See the
-[hosted decision](decisions/STAGE7_HOSTED_PENDING_20261022.md) for the preserved
-OPT0 regeneration-hash failure and separate regeneration comparisons.
-The repeated seven-test
-warning-only run is not added again. The subsequent changes concern warning
-classification, compiler metadata and synthetic scheduling; the verified model
-algebra and generator remain unchanged. Interrupted test invocations are not
-counted as passing.
+The [fresh full-suite record](checks/stage7-final-tests-20261022/audit.json)
+contains 222 passing tests across 29 files, each in a fresh process with no
+deselection and unchanged source hashes. It includes the warning classifier,
+checkpoint integrity, continuation and canonical-input guards. Earlier full and
+targeted test records remain preserved; repeated runs are not additional tests.
+
+The [hosted verification](checks/stage7-hosted-execution-verification-20261022/audit.json)
+passes all 32 selected execution checks on the exact hosted fitting commit.
+Eight pending cases use exact canonical synthetic fixtures under OPT3. Two
+local OPT0 fits continue; two others exhausted their diagnostic schedules and
+failed mixing. See the [hosted decision](decisions/STAGE7_HOSTED_PENDING_20261022.md)
+for the preserved OPT0 regeneration-hash failure and separate regeneration
+comparisons. Compiler-profile changes preserve the verified model algebra and
+generator. Interrupted test invocations are not counted as passing.
 The test result is software verification, not evidence that every posterior
 converges or every component is identified.
+
+Three outcomes are kept separate throughout this record. A verified density,
+gradient and simulator establish implementation consistency for the checked
+inputs. Passing the posterior diagnostics establishes the recorded sampling
+criteria for a particular fit, subject to review of previously observed
+unexplored regions. Recovery then compares that admitted fit with its known
+synthetic truth. None of these substitutes for the others, and failed or
+excluded cases stay in the experiment's denominators. In particular, completing
+the declared retry schedule with a failed diagnostic gate is a completed
+experiment, not a validated model extension.
 
 Final lint, freeze/provenance checks and the completion audit remain to be
 recorded alongside the completed posterior tables. The original Stage 2 freeze,
