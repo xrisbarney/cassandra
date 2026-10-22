@@ -1,0 +1,7 @@
+{
+  "parent_routing_sha256": "df6c48fad890d7866d78d0e97ff2c35edbfe78b404784802102b2a760e93c5fe",
+  "routing_sha256": "d3175159fc1e6dd3a30991b14dd795da980caa2b0a3ec33fba3f8c1eaa168135",
+  "grid_selection_sha256": "2531aca70c406502befef2acf73af095357d1d3245aec8124106f41c05e7e6b2",
+  "decision": "docs/decisions/STAGE7_SYNTHETIC_GRID_COMPLETION_20261022.md",
+  "held_out_scoring_enabled": false
+}

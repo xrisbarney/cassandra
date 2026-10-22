@@ -1,0 +1,17 @@
+{
+  "passed": 10,
+  "new_distinct_tests": 10,
+  "parent_full_suite_passed": 190,
+  "total_distinct_tests_passed": 200,
+  "exit_code": 0,
+  "log": "artifacts/stage7-final-gate-tests.log",
+  "log_sha256": "fd72a0d400ebed462ff7fbaa8831563b93e3b06c25673c03e07dabb3b403e3be",
+  "source_sha256": {
+    "tests/test_stage7_grid_gate.py": "187a01e623c6f04275fe61472e6dcbc20832de34c6db207f2bd04897e0b50448",
+    "tests/test_compiler_warnings.py": "28a3e5a474889e2b0357a99dee90d6118c4633d1e8732d5d5bb0c1551bae2633",
+    "scripts/stage7_rank_two.py": "438ece1d8455a25cefab9ae3b0694f0e670b4b092af13f2eed19e0034a25ca01",
+    "scripts/run_stage7.py": "44aaf6cd75e474adf22155c268817169a4299a1a840a34ce8154b3548555c08d",
+    "src/cyber_threat_modelling/models/compiler_warnings.py": "934928337a6b14c99339c7fe538b32d8863df189ff0ec65a9d0ce2dcc36a46da"
+  },
+  "scope": "Full suite 190 plus the 10 tests here; the earlier 7-warning-only run is repeated here and not added again."
+}
