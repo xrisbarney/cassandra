@@ -1,0 +1,18 @@
+{
+  "github_run_id": 39830813971,
+  "head_sha": "e164dd753c00e3af79a76e37687be17063a8773d",
+  "url": "https://github.com/xrisbarney/cassandra/actions/runs/39830813971",
+  "created_at": "2026-10-22T18:22:45Z",
+  "activation_sha256": "2ffc0319b1f29aa5828b5550e9b24b9225989cb1fe471c5e9df5ea629a4ca2d7",
+  "case_directories": {
+    "masked_fallback": "artifacts/stage7/supplement-v1/masked_fallback",
+    "reduced_representative": "artifacts/stage7/supplement-v1/reduced_representative",
+    "reduced_fallback": "artifacts/stage7/supplement-v1/reduced_fallback",
+    "matched_one_factor_fallback": "artifacts/stage7/supplement-v1/matched_one_factor_fallback"
+  },
+  "one_dispatch_only": true,
+  "sampler_attempts_per_case": 1,
+  "local_fits_started": false,
+  "held_out_scoring_enabled": false,
+  "stage8_enabled": false
+}
