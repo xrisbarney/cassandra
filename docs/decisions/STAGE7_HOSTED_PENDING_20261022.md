@@ -4,6 +4,17 @@ Prepared 2026-10-22. **Verification only; fitting is not yet activated.**
 The corresponding [plan](STAGE7_HOSTED_PENDING_20261022.json) refuses fitting
 until its status is explicitly changed after successful hosted verification.
 
+The first Windows verification, run 39747925041 at commit db53e40, passed all
+16 coordinate/guard tests, all eight fixture byte hashes and complete native/
+Numba target comparisons. Its [record](../checks/stage7-hosted-verification-20261022/verification.json)
+and original plan are preserved. Repeated fused evaluations took about 0.031
+seconds on that host, substantially slower than the local measurement. Before
+activation, compare NUMBA_OPT=0 and 3 on the same declared full-size deterministic
+checks. This extends the earlier compiler-profile investigation to the hosted
+environment; no profile can be selected by posterior acceptance or recovery.
+Both profiles must pass the original numerical tolerances. The four active
+local fits keep their existing compiler configuration and sampling schedules.
+
 Eight cases from the existing 43-primary/12-sensitivity design have not started
 locally: primary fallback seed 7103; representative and fallback seed 7101 for
 `level_tight`, `level_wide` and `dynamics_tight`; and the `dynamics_wide`
@@ -36,6 +47,16 @@ statistical failure is still a completed experiment, not an execution error.
 The sampling step has a 320-minute execution limit inside a 355-minute job,
 leaving time to upload partial evidence if execution times out. Such a case
 remains unfinished and cannot be counted as an exhausted diagnostic schedule.
+To avoid making the total three-attempt duration a single-job requirement,
+hosted fitting is prepared as three successive jobs per case, one prescribed
+attempt per job. Only a fully completed unsuccessful nonfinal attempt can be
+sealed. Continuation verifies all artifact/source hashes, options, generated
+fixtures and budgets, then starts the next original retry with its original
+seed. It does not resume a partial Markov chain. Accepted or fully exhausted
+cases are carried forward without refitting. Original run metadata and each
+continuation's host metadata are retained; graph/preflight compilation costs
+are counted once per execution process. A within-attempt timeout still requires
+explicit preservation and resolution and cannot become a diagnostic failure.
 Admitted saved posteriors are independently checked on the runner and again
 after local transfer. Artifact hashes and actual host provenance are retained.
 

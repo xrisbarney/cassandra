@@ -24,7 +24,13 @@ env:
 jobs:
   verify:
     runs-on: windows-2022
-    timeout-minutes: 45
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        opt: ['0', '3']
+    env:
+      NUMBA_OPT: ${{ matrix.opt }}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
@@ -43,7 +49,7 @@ jobs:
         shell: pwsh
         run: |
           . ./scripts/Use-Compiler.ps1
-          .venv/Scripts/python.exe -m pytest tests/test_stage7_joint_coordinates.py tests/test_stage7_block_coordinates.py tests/test_stage7_hosted.py -q
+          .venv/Scripts/python.exe -m pytest tests/test_stage7_joint_coordinates.py tests/test_stage7_block_coordinates.py tests/test_stage7_hosted.py tests/test_stage7_checkpoint.py -q
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           .venv/Scripts/python.exe scripts/ci_stage7.py verify --output artifacts/stage7/hosted-verification
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
@@ -51,60 +57,31 @@ jobs:
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: stage7-hosted-verification
+          name: stage7-hosted-verification-opt${{ matrix.opt }}
           path: artifacts/stage7/hosted-verification
           retention-days: 1
           if-no-files-found: warn
 
-  fit:
+  attempt0:
     needs: verify
     if: ${{ inputs.execute }}
-    runs-on: windows-2022
-    timeout-minutes: 355
-    strategy:
-      fail-fast: false
-      max-parallel: 8
-      matrix:
-        include:
-          - {key: primary-fallback_zero-7103, candidate: primary, case: fallback_zero-7103}
-          - {key: level_tight-representative-7101, candidate: level_tight, case: representative-7101}
-          - {key: level_tight-fallback_zero-7101, candidate: level_tight, case: fallback_zero-7101}
-          - {key: level_wide-representative-7101, candidate: level_wide, case: representative-7101}
-          - {key: level_wide-fallback_zero-7101, candidate: level_wide, case: fallback_zero-7101}
-          - {key: dynamics_tight-representative-7101, candidate: dynamics_tight, case: representative-7101}
-          - {key: dynamics_tight-fallback_zero-7101, candidate: dynamics_tight, case: fallback_zero-7101}
-          - {key: dynamics_wide-representative-7101, candidate: dynamics_wide, case: representative-7101}
-    steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
-      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
-        with:
-          python-version: '3.12.0'
-      - name: Install locked environment and pinned compiler
-        shell: pwsh
-        run: |
-          python -m pip install --disable-pip-version-check uv==0.13.4
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          uv sync --locked --extra science --group dev --python 3.12.0
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          .venv/Scripts/python.exe scripts/setup_compiler.py
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-      - name: Run declared case and independently verify saved diagnostics
-        timeout-minutes: 320
-        shell: pwsh
-        env:
-          STAGE7_CASE_KEY: ${{ matrix.key }}
-        run: |
-          . ./scripts/Use-Compiler.ps1
-          .venv/Scripts/python.exe -u scripts/ci_stage7.py fit --case $env:STAGE7_CASE_KEY --output "artifacts/stage7/hosted-audits/$env:STAGE7_CASE_KEY"
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-      - name: Preserve complete or partial synthetic evidence
-        if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
-        with:
-          name: stage7-${{ matrix.key }}
-          path: |
-            artifacts/stage7/rank-two-joint-v1/${{ matrix.candidate }}/${{ matrix.case }}
-            artifacts/stage7/hosted-audits/${{ matrix.key }}
-          retention-days: 1
-          compression-level: 6
-          if-no-files-found: warn
+    uses: ./.github/workflows/stage7-attempt.yml
+    with:
+      attempt: 0
+      previous: -1
+
+  attempt1:
+    needs: attempt0
+    if: ${{ inputs.execute }}
+    uses: ./.github/workflows/stage7-attempt.yml
+    with:
+      attempt: 1
+      previous: 0
+
+  attempt2:
+    needs: attempt1
+    if: ${{ inputs.execute }}
+    uses: ./.github/workflows/stage7-attempt.yml
+    with:
+      attempt: 2
+      previous: 1

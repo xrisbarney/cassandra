@@ -1,0 +1,19 @@
+{
+  "correction": "Initial runner integration failed two mocked runpy tests because a sibling-script import was unavailable. Checkpoint helper moved into the package; all 26 affected checks then passed. The first source-bound audit is retained as historical evidence.",
+  "date": "2026-10-22",
+  "files": [
+    "tests/test_synthetic_runner.py",
+    "tests/test_stage7_checkpoint.py",
+    "tests/test_stage7_hosted.py",
+    "tests/test_stage7_grid_gate.py",
+    "tests/test_stage7_batch_identity.py",
+    "tests/test_stage7_campaign_audit.py"
+  ],
+  "result": "26 passed in 19.55s",
+  "sources": {
+    "scripts/run_stage7.py": "de58b1659d738a85fce2acfc649d30a53f324e93e72fab0388c703c455d0e43a",
+    "src/cyber_threat_modelling/evaluation/synthetic_checkpoint.py": "12307252c237d96ba1d2bfc95965c8a748a945771a3d0a6e8b5d1fcaf2d13cf8",
+    "tests/test_stage7_checkpoint.py": "c96513a9b5dc3499620a2ee1babae496678a8f9671e413e0fc7de597be0b4eed"
+  },
+  "tool": "582b36"
+}

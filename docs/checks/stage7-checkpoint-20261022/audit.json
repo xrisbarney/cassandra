@@ -1,0 +1,18 @@
+{
+  "combined_result": "14 passed in 3.42s",
+  "date": "2026-10-22",
+  "new_test_result": "8 passed in 0.47s",
+  "new_tests": 8,
+  "new_tests_passed": 8,
+  "repeated_hosted_tests": 6,
+  "scope": "Checkpoint integrity, budgets and source guards; not posterior convergence.",
+  "sources": {
+    "scripts/run_stage7.py": "420861e68c612b7d073e9f9cbbc82624971c128a8897563abc901d74b53d7134",
+    "scripts/stage7_checkpoint.py": "12307252c237d96ba1d2bfc95965c8a748a945771a3d0a6e8b5d1fcaf2d13cf8",
+    "tests/test_stage7_checkpoint.py": "9d97864fb5465c21c13c7650cc40d253fe7059c9e51457bc6a4cc30cc9804984"
+  },
+  "tools": [
+    "a63205",
+    "806218"
+  ]
+}

@@ -15,8 +15,9 @@ from cyber_threat_modelling.models import synthetic_state_space
 
 
 @pytest.mark.parametrize('reason', ['divergence', 'depth'])
+@pytest.mark.parametrize('paused', [False, True])
 def test_failed_retained_draw_saves_checkpoint_and_never_becomes_a_posterior(
-    tmp_path, monkeypatch, reason
+    tmp_path, monkeypatch, reason, paused
 ):
     script = Path(__file__).resolve().parents[1]/'scripts/run_stage7.py'
     runner = runpy.run_path(str(script))
@@ -27,7 +28,14 @@ def test_failed_retained_draw_saves_checkpoint_and_never_becomes_a_posterior(
     monkeypatch.setattr(pm, 'NUTS', lambda **kwargs: object())
     monkeypatch.setattr(pytensor.config, 'cxx', 'compiler-detection-only-in-this-mocked-test')
 
+    seeds = []
+
     def sample(**kwargs):
+        seeds.append(kwargs['random_seed'])
+        retry = len(seeds) - 1
+        expected = np.random.default_rng(7101 + retry * 100)
+        for initial in kwargs['initvals']:
+            np.testing.assert_array_equal(initial['state'], expected.normal(0, .1, size=(1,)))
         warnings.warn('fixture numerical warning', RuntimeWarning, stacklevel=1)
         # Warmup violations must be ignored. The retained event is irreversible.
         for tuning, index in [(True, 0), (False, kwargs['tune'])]:
@@ -42,9 +50,17 @@ def test_failed_retained_draw_saves_checkpoint_and_never_becomes_a_posterior(
 
     monkeypatch.setattr(pm, 'sample', sample)
     output = tmp_path/'case'
-    monkeypatch.setattr(sys, 'argv', [str(script), '--scenario', 'independent',
-                                    '--seed', '7101', '--output', str(output)])
-    runner['main']()
+    command = [str(script), '--scenario', 'independent', '--seed', '7101',
+               '--output', str(output)]
+    if paused:
+        command.append('--pause-after-attempt')
+    for retry in range(3 if paused else 1):
+        monkeypatch.setattr(sys, 'argv', command + (['--resume-attempts'] if retry else []))
+        runner['main']()
+        if paused and retry < 2:
+            assert not (output / 'result.json').exists()
+            assert (output / f'checkpoint_{retry}.json').exists()
+    assert seeds == [7101, 7102, 7103]
     record = json.loads((output/'result.json').read_text())
     assert record['status'] == 'failed_diagnostic_gate'
     assert len(record['attempts']) == 3

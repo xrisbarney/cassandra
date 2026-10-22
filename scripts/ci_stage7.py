@@ -59,10 +59,12 @@ def fixture(case):
     return data, truth, options
 
 
-def environment(plan):
+def environment(plan, fitting=False):
     if platform.python_version() != plan['python_version'] or sys.platform != 'win32':
         raise ValueError('Hosted work requires the declared Windows/Python environment.')
-    if os.environ.get('NUMBA_OPT') != plan['numba_opt']:
+    allowed = ([plan['numba_opt']] if fitting else
+               plan.get('verification_numba_profiles', [plan['numba_opt']]))
+    if os.environ.get('NUMBA_OPT') not in allowed:
         raise ValueError('Unexpected Numba optimization profile.')
     import pytensor
 
@@ -133,12 +135,13 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('mode', choices=['verify', 'fit'])
     parser.add_argument('--case')
+    parser.add_argument('--attempt', type=int, choices=[0, 1, 2])
     parser.add_argument('--output', type=Path, required=True)
     args = parser.parse_args()
     root = Path.cwd()
     plan = checked_plan(root, fitting=args.mode == 'fit')
     activation = verify_activation(root, CURRENT_PRIOR_ID)
-    host = environment(plan)
+    host = environment(plan, fitting=args.mode == 'fit')
     args.output.mkdir(parents=True, exist_ok=False)
     write_json(args.output / 'host.json', host)
     if args.mode == 'verify':
@@ -149,20 +152,48 @@ def main():
         raise ValueError('Case is outside the declared hosted grid.')
     case = matches[0]
     fixture(case)
+    if args.attempt is None:
+        raise ValueError('Hosted fitting requires its prescribed attempt index.')
+    folder = Path(case['directory'])
+    from audit_stage7_campaign import checked_run
+
+    from cyber_threat_modelling.evaluation.synthetic_checkpoint import restore
+
+    if (folder / 'result.json').exists():
+        record = checked_run(folder, case['candidate'], case['scenario'], case['seed'],
+                             activation, recompute=True)
+        write_json(args.output / 'completion.json', {
+            'case': record, 'plan_sha256': file_hash(PLAN), 'environment': host,
+            'case_is_terminal': True, 'already_completed_no_refit': True})
+        return
+    if args.attempt:
+        _, attempts, _ = restore(folder, root)
+        if len(attempts) != args.attempt:
+            raise ValueError('Hosted attempt does not follow its sealed predecessor.')
+    elif folder.exists():
+        raise ValueError('Initial hosted case directory already exists.')
     command = [sys.executable, '-u', 'scripts/run_stage7.py', '--scenario', case['scenario'],
                '--seed', str(case['seed']), '--prior-candidate', case['candidate'],
-               '--output', case['directory'], *plan['fit_flags']]
+               '--output', case['directory'], *plan['fit_flags'], '--pause-after-attempt']
+    if args.attempt:
+        command.append('--resume-attempts')
     process = subprocess.run(command, check=False)
-    folder = Path(case['directory'])
-    if process.returncode or not (folder / 'result.json').exists():
+    if process.returncode:
         raise RuntimeError('Hosted fit did not finish; preserve partial files.')
+    if not (folder / 'result.json').exists():
+        _, attempts, digest = restore(folder, root)
+        if len(attempts) != args.attempt + 1:
+            raise ValueError('Hosted pause did not complete exactly one prescribed attempt.')
+        write_json(args.output / 'completion.json', {
+            'plan_sha256': file_hash(PLAN), 'environment': host, 'case_is_terminal': False,
+            'completed_attempt': args.attempt, 'checkpoint_sha256': digest,
+            'interpretation': 'Completed failed attempt; the next prescribed attempt is pending.'})
+        return
     for name, key in [('data.npz', 'data_sha256'), ('truth.npz', 'truth_sha256'),
                       ('truth_original_coordinates.npz', 'truth_original_coordinates_sha256')]:
         if file_hash(folder / name) != case[key]:
             raise ValueError('Completed hosted fit used a different synthetic fixture.')
     # Recompute diagnostics independently from saved posterior files before transfer.
-    from audit_stage7_campaign import checked_run
-
     record = checked_run(folder, case['candidate'], case['scenario'], case['seed'], activation,
                          recompute=True)
     write_json(args.output / 'completion.json', {

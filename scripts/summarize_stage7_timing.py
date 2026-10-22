@@ -31,26 +31,34 @@ def main():
                 if file_hash(folder / name) != digest:
                     raise ValueError(f'Changed timing source: {folder / name}')
             attempts = result['attempts']
-            graph = attempts[0]['graph_seconds']
-            if any(a['graph_seconds'] != graph for a in attempts):
-                raise ValueError(f'Graph timing changed between retries: {folder}')
+            graph_builds = {}
+            for attempt in attempts:
+                build = attempt.get('graph_build_retry', 0)
+                graph = attempt['graph_seconds']
+                if build in graph_builds and graph_builds[build] != graph:
+                    raise ValueError(f'Graph timing changed within one process: {folder}')
+                graph_builds[build] = graph
             row = {'directory': folder.as_posix(), 'scenario': case['scenario'],
                    'seed': case['seed'], 'candidate': result['options']['prior_candidate'],
                    'status': case['status'], 'attempts': len(attempts),
-                   'graph_seconds_once': graph,
+                   'graph_seconds_once_per_process': sum(graph_builds.values()),
+                   'graph_builds': len(graph_builds),
                    'result_sha256': file_hash(result_path)}
             for key in ('step_compile_seconds', 'sample_call_seconds',
                         'diagnostic_seconds', 'serialization_seconds'):
                 row[key] = sum(a[key] for a in attempts)
-            preflight = folder / 'gradient_timing.json'
-            if preflight.exists():
+            preflights = sorted(folder.glob('gradient_timing*.json'))
+            row['preflight_compile_seconds'] = 0.
+            row['preflight_first_call_seconds'] = 0.
+            for preflight in preflights:
                 timing = json.loads(preflight.read_text(encoding='utf-8'))
-                row['preflight_compile_seconds'] = timing['function_compile_seconds']
-                row['preflight_first_call_seconds'] = timing[
+                row['preflight_compile_seconds'] += timing['function_compile_seconds']
+                row['preflight_first_call_seconds'] += timing[
                     'first_call_including_deferred_jit_seconds']
-                row['preflight_median_repeat_seconds'] = timing['median_repeated_call_seconds']
+                row[preflight.stem + '_median_repeat_seconds'] = timing[
+                    'median_repeated_call_seconds']
             row['recorded_component_seconds'] = sum(row[key] for key in (
-                'graph_seconds_once', 'step_compile_seconds', 'sample_call_seconds',
+                'graph_seconds_once_per_process', 'step_compile_seconds', 'sample_call_seconds',
                 'diagnostic_seconds', 'serialization_seconds')) + sum(
                     row.get(key, 0) for key in
                     ('preflight_compile_seconds', 'preflight_first_call_seconds'))
@@ -76,7 +84,8 @@ def main():
         'recorded_component_job_seconds': sum(r['recorded_component_seconds'] for r in cases),
         'interpretation': 'Components are measured within individual concurrent processes; '
         'their sum is job-seconds, not campaign elapsed time. Graph construction is counted '
-        'once per run. Sample-call time includes warmup, retained draws and internal setup, '
+        'once per execution process, including checkpoint continuations. Sample-call time '
+        'includes warmup, retained draws and internal setup, '
         'including deferred JIT; chain phase sums are breakdowns, not additional costs. '
         'Preflight repeat medians are descriptive and not added to totals. Python/import '
         'startup, post-admission forecast/recovery and outer coordinator overhead were not '

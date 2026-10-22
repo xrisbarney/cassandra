@@ -1,0 +1,18 @@
+{
+  "date": "2026-10-22",
+  "distinct_project_tests": 218,
+  "new_tests_total": 10,
+  "result": "4 passed in 13.16s; 14 passed in 3.37s; Ruff clean",
+  "scope": "Two additional mocked end-to-end continuation cases preserve retry initialization arrays, seeds and irreversible failure handling across three separate invocations. Eight checkpoint integrity tests. Six hosted guard tests repeated, not added again. This does not demonstrate posterior convergence.",
+  "sources": {
+    "scripts/ci_stage7.py": "1001ed3df573c14d87ab0a73cbffde16c0f0a0806027073549d97213d906e045",
+    "scripts/run_stage7.py": "de58b1659d738a85fce2acfc649d30a53f324e93e72fab0388c703c455d0e43a",
+    "src/cyber_threat_modelling/evaluation/synthetic_checkpoint.py": "12307252c237d96ba1d2bfc95965c8a748a945771a3d0a6e8b5d1fcaf2d13cf8",
+    "tests/test_stage7_checkpoint.py": "07b39779ad0f6d3607f1aecc7977ebfdca53f24d44b2dd4d4ae863e075f251b8",
+    "tests/test_synthetic_runner.py": "901e1a44bb16476a3b8bdc90d330bd330d01420fa2e0ac81456c73fe9df20216"
+  },
+  "tools": [
+    "db72b2",
+    "f8cd2b"
+  ]
+}

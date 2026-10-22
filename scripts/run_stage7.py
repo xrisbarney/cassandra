@@ -81,7 +81,11 @@ def main():
     parser.add_argument('--sign-anchor', type=int, choices=[3])
     parser.add_argument('--joint-levels', action='store_true')
     parser.add_argument('--block-coordinates', action='store_true')
+    parser.add_argument('--pause-after-attempt', action='store_true')
+    parser.add_argument('--resume-attempts', action='store_true')
     args = parser.parse_args()
+    if args.resume_attempts and not args.pause_after_attempt:
+        parser.error('Checkpoint continuation requires one-attempt execution.')
     if args.joint_levels and (args.scenario not in {'representative', 'fallback_zero'}
                               or not args.conditional_counts or not args.block_coordinates
                               or args.dense_mass):
@@ -104,9 +108,15 @@ def main():
     # The candidate grid is predeclared; wide cases may fail plausibility and
     # still run as explicitly labelled sensitivity stress comparisons.
     folder = args.output.resolve()
-    folder.mkdir(parents=True, exist_ok=False)
+    from cyber_threat_modelling.evaluation.synthetic_checkpoint import restore, seal
+
+    attempts, checkpoint_hash, previous_run = [], None, None
+    if args.resume_attempts:
+        previous_run, attempts, checkpoint_hash = restore(folder, root)
+    else:
+        folder.mkdir(parents=True, exist_ok=False)
     data, truth, options = generate(args.scenario, args.seed)
-    np.savez_compressed(folder / 'truth_original_coordinates.npz', **truth)
+    original_truth = truth
     truth = stationary_truth(truth, options)
     options['prior_id'] = CURRENT_PRIOR_ID
     options['prior_candidate'] = args.prior_candidate
@@ -129,10 +139,23 @@ def main():
     if args.scenario == 'effort_proxy':
         data['effort'], effort = fitted_effort(data['N'], data['mask_N'].all(axis=1))
     options['level_settings'] = level_settings(data, options)
-    np.savez_compressed(folder / 'data.npz', **data)
-    np.savez_compressed(folder / 'truth.npz', **truth)
+    fixtures = {'data.npz': data, 'truth.npz': truth,
+                'truth_original_coordinates.npz': original_truth}
+    if previous_run is not None:
+        if previous_run['options'] != options:
+            raise ValueError('Checkpoint model options differ from requested options.')
+        for name, values in fixtures.items():
+            with np.load(folder / name) as saved:
+                if set(saved.files) != set(values) or any(
+                    not np.array_equal(saved[k], values[k], equal_nan=True) for k in values
+                ):
+                    raise ValueError('Checkpoint generating fixture changed.')
+    else:
+        for name, values in fixtures.items():
+            np.savez_compressed(folder / name, **values)
     files = list((root / 'src').rglob('*.py')) + [Path(__file__), root / 'uv.lock',
-             root / 'docs/STAGE7_DESIGN.md', root / 'docs/STAGE2_FREEZE.json']
+             root / 'docs/STAGE7_DESIGN.md', root / 'docs/STAGE2_FREEZE.json',
+             root / 'src/cyber_threat_modelling/evaluation/synthetic_checkpoint.py']
     if args.anchor_factors:
         files.append(root/'docs/decisions/STAGE7_AMPLITUDE_COORDINATES_20261021.md')
     if args.conditional_severity:
@@ -153,7 +176,7 @@ def main():
 
     from cyber_threat_modelling.models.compiler_warnings import is_dynamic_global_cache_warning
 
-    write_json(folder / 'run.json', {
+    execution_record = {
         'source_control': git_revision(root), 'options': options, 'effort_fit': effort,
         'pid': os.getpid(), 'source_sha256': {
             p.relative_to(root).as_posix(): file_hash(p) for p in files
@@ -172,7 +195,13 @@ def main():
         },
         'compute_thread_policy': 'One native numerical thread per sequential-chain fit process.',
         'truth_original_coordinates_sha256': file_hash(folder/'truth_original_coordinates.npz'),
-    })
+    }
+    if previous_run is None:
+        write_json(folder / 'run.json', execution_record)
+    else:
+        execution_record['checkpoint_sha256'] = checkpoint_hash
+        execution_record['next_retry'] = len(attempts)
+        write_json(folder / f'resume_{len(attempts)}.json', execution_record)
     import pymc as pm
 
     from cyber_threat_modelling.evaluation.synthetic_recovery import summarize
@@ -199,7 +228,9 @@ def main():
             start = time.perf_counter()
             gradient(point)
             repeats.append(time.perf_counter() - start)
-        write_json(folder / 'gradient_timing.json', {
+        timing_name = (f'gradient_timing_retry{len(attempts)}.json' if attempts
+                       else 'gradient_timing.json')
+        write_json(folder / timing_name, {
             'graph_seconds': graph_seconds, 'function_compile_seconds': compile_seconds,
             'first_call_including_deferred_jit_seconds': first_call,
             'median_repeated_call_seconds': float(np.median(repeats)),
@@ -208,8 +239,10 @@ def main():
             'fit_follows_this_preflight': True,
         })
     budgets = [(1000, 1000, .95, 12), (2000, 1000, .99, 15), (2000, 2000, .99, 15)]
-    attempts = []
+    first_retry = len(attempts)
     for retry, (warmup, draws, accept, depth) in enumerate(budgets):
+        if retry < first_retry:
+            continue
         timing, failure = {}, {}
         with model, warnings.catch_warnings(record=True) as caught:
             warnings.simplefilter('always')
@@ -341,6 +374,7 @@ def main():
             'diagnostics': {k: v if not isinstance(v, float) or np.isfinite(v) else None
                             for k, v in diagnostics.items()},
             'graph_seconds': graph_seconds, 'step_compile_seconds': compile_seconds,
+            'graph_build_retry': first_retry,
             'sample_call_seconds': sample_seconds, 'chain_wall_markers': timing,
             'diagnostic_seconds': diagnostic_seconds, 'serialization_seconds': serialization,
             'peak_working_set_bytes': peak_memory_bytes(),
@@ -361,6 +395,9 @@ def main():
             np.savez_compressed(folder / 'future.npz', counts=paths)
             write_json(folder / 'recovery.json', report)
             break
+        if args.pause_after_attempt and retry < len(budgets) - 1:
+            seal(folder, attempts)
+            return
     write_json(folder / 'result.json', {
         'status': 'accepted' if accepted else 'failed_diagnostic_gate',
         'options': options, 'attempts': attempts,

@@ -2,7 +2,7 @@
 
 Status, 2026-10-22: **posterior campaign in progress; not yet complete**.
 The active laws are `anchored_levels_v2`. The primary prior-plausibility gates
-pass, and 202 distinct tests pass across the full run and targeted gate checks. The remaining work is the full posterior
+pass, and 208 distinct tests pass across the full run and targeted gate checks. The remaining work is the full posterior
 campaign, sensitivity analysis and final component decisions. No real-data
 proposed-model fitting or January 2024--December 2025 scoring has started.
 
@@ -194,7 +194,12 @@ The [full test record](checks/stage7-full-tests-v5-20261022/audit.json) contains
 source hashes throughout. The [targeted follow-up](checks/stage7-compiler-warning-20261022/grid_followup.json)
 adds ten distinct tests for the narrowly classified cache warning and synthetic
 grid entry guards. The [batch-identity follow-up](checks/stage7-compiler-warning-20261022/batch_identity_followup.json)
-adds two more: 202 distinct passing tests in total. Its repeated seven-test
+adds two more. Six [hosted-execution guard tests](checks/stage7-hosted-guards-20261022/audit.json)
+then pass locally. Eight [checkpoint integrity tests](checks/stage7-checkpoint-20261022/audit.json)
+and two continuation integration cases bring the total to 218 distinct passing tests. The first hosted environment
+verification passed; additional compiler profiling is pending and hosted fitting
+has not been activated.
+The repeated seven-test
 warning-only run is not added again. The subsequent changes concern warning
 classification, compiler metadata and synthetic scheduling; the verified model
 algebra and generator remain unchanged. Interrupted test invocations are not
