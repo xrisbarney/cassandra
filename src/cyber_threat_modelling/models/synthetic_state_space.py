@@ -85,6 +85,10 @@ def build_model(data, options, conditional=None):
     multiplier = settings['amplitude_multiplier'] if settings else 1.
     t, k = data["N"].shape
     r, rank = options["regimes"], options["factors"]
+    conditional_iid = options.get('residual_parameterization') == 'conditional'
+    if conditional_iid and (not revised or options['residual'] != 'iid' or rank or r != 1
+                            or options['kernel'] or not options['conditional_level']):
+        raise ValueError('Conditional iid coordinates require the isolated noise-separation model.')
     with pm.Model() as model:
         if options["conditional_level"]:
             m = pt.as_tensor_variable(np.asarray(conditional["m"]))
@@ -132,7 +136,13 @@ def build_model(data, options, conditional=None):
                    if revised else
                    pm.Deterministic("tau", 0.01 + pm.HalfNormal("tau_excess", 1, shape=k)))
             if options["residual"] == "iid":
-                u = pm.Normal("u_raw", 0, 1, shape=(t, k)) * tau
+                if conditional_iid:
+                    from .gaussian_coordinates import iid_count_states
+
+                    u = iid_count_states(tau, psi, base, data['N'], data['mask_N'],
+                                         data['effort'])
+                else:
+                    u = pm.Normal("u_raw", 0, 1, shape=(t, k)) * tau
             else:
                 phi_u = pm.Uniform("phi_u", -1, 1, shape=k, initval=np.full(k, 0.4))
                 if options.get('factor_parameterization') == 'anchored' and revised:

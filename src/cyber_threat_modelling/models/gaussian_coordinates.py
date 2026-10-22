@@ -11,6 +11,20 @@ import pytensor.tensor as pt
 from scipy.special import logit
 
 
+def iid_count_states(tau, psi, base, counts, mask, effort):
+    """Exact working-conditional transform of iid standard-Normal innovations."""
+    observed = np.where(mask, counts, 0).astype(float)
+    adjusted = observed + .5
+    weight = pt.where(mask, adjusted*psi/(adjusted+psi), 0.)
+    variance = 1/(1+tau**2*weight)
+    location = tau*weight*(np.log(adjusted)-np.asarray(effort)[:, None]-base)*variance
+    z = pm.Flat('u_whitened', shape=observed.shape, initval=np.zeros_like(observed))
+    innovation = location+pt.sqrt(variance)*z
+    pm.Potential('u_state_prior', pm.logp(pm.Normal.dist(0, 1), innovation).sum()
+                 + .5*pt.log(variance).sum())
+    return tau*innovation
+
+
 def _small_cholesky(matrix, rank):
     if rank == 1:
         return pt.sqrt(matrix)

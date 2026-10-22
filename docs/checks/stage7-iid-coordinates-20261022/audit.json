@@ -1,0 +1,29 @@
+{
+  "passed": 16,
+  "new_tests": 2,
+  "regression_tests": 14,
+  "seconds": 645.06,
+  "log": "artifacts/stage7-iid-coordinate-tests.log",
+  "log_sha256": "8223b975fdec17c2b8cef0e8f45aab61e74276722e188928c04819cd6439d6f7",
+  "source_sha256": {
+    "src/cyber_threat_modelling/models/gaussian_coordinates.py": "a78e5f0c24eac0fdfdf5f7dab671fac57f7bafb88e1b143720b156d0e1908486",
+    "src/cyber_threat_modelling/models/synthetic_state_space.py": "30f2019c05d940a41cd097086735805e356bc86112a08e3b07a13b90d3b64e01",
+    "scripts/run_stage7.py": "df1b0800801844ff48faf7e5cfed832b8dd8385ec124d2aa30619165430ab1c3",
+    "scripts/stage7_batch.py": "83c48add1d6ae1b099684073216d2ec908ef60e7665ad9523243930d5fdb9c7a",
+    "tests/test_stage7_iid_coordinates.py": "5e227d0c692717b528b339f2f7aca48b73012873398a00a723641ddb163f1e03",
+    "tests/test_stage7_amended.py": "655e680f766d7bd5c65784cd2310cb9d2e552ed39cf17a4602b188ead3b5cb75",
+    "tests/test_synthetic_runner.py": "6824db77d523a340196b8d21b4b5c7a237c17bd640ed626d68414f3888592465",
+    "docs/decisions/STAGE7_IID_COORDINATES_20261022.md": "2c0ff14e272ab60df2941a363a01bc1a0802ba254b544957bae1f9b52bba07f0"
+  },
+  "checks": [
+    "complete old/new posterior density and Jacobian equality",
+    "independent Gaussian precision algebra",
+    "native and fused Numba values/gradients",
+    "finite differences for every free coordinate",
+    "observed zeros, missing counts, small noise scale",
+    "unsupported-combination rejection",
+    "amended-model and runner regressions"
+  ],
+  "warning": "Known native PyTensor BLAS performance warning; no numerical warnings.",
+  "interpretation": "Exact-coordinate verification; posterior admission remains required."
+}

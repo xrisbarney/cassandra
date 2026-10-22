@@ -30,6 +30,7 @@ def main():
     coordinates.add_argument('--anchor-factors', action='store_true')
     parser.add_argument('--dense-mass', action='store_true')
     parser.add_argument('--conditional-counts', action='store_true')
+    parser.add_argument('--conditional-iid', action='store_true')
     parser.add_argument('--block-coordinates', action='store_true')
     args = parser.parse_args()
     args.root.mkdir(parents=True, exist_ok=True)
@@ -58,6 +59,9 @@ def main():
             if record['options'].get('count_parameterization') != (
                     'conditional' if args.conditional_counts else None):
                 raise ValueError(f'Existing run has different count coordinates: {folder}')
+            if record['options'].get('residual_parameterization') != (
+                    'conditional' if args.conditional_iid else None):
+                raise ValueError(f'Existing run has different iid coordinates: {folder}')
             solver = 'block' if args.block_coordinates else 'dense'
             if record['options'].get('gaussian_solver', 'dense') != solver:
                 raise ValueError(f'Existing run has a different Gaussian solver: {folder}')
@@ -80,6 +84,8 @@ def main():
                 command.append('--dense-mass')
             if args.conditional_counts:
                 command.append('--conditional-counts')
+            if args.conditional_iid:
+                command.append('--conditional-iid')
             if args.block_coordinates:
                 command.append('--block-coordinates')
             process = subprocess.run(command, stdout=stream, stderr=subprocess.STDOUT)

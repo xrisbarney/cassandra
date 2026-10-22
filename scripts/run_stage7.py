@@ -77,10 +77,13 @@ def main():
     parser.add_argument('--prior-candidate', choices=CANDIDATES, default='primary')
     parser.add_argument('--conditional-severity', action='store_true')
     parser.add_argument('--conditional-counts', action='store_true')
+    parser.add_argument('--conditional-iid', action='store_true')
     parser.add_argument('--block-coordinates', action='store_true')
     args = parser.parse_args()
     if args.conditional_severity and args.scenario != 'severity_missing':
         parser.error('Conditional severity coordinates apply only to the severity fixture.')
+    if args.conditional_iid and args.scenario not in {'dispersion_dense', 'dispersion_sparse'}:
+        parser.error('Conditional iid coordinates apply only to the noise-separation fixtures.')
     root = Path(__file__).resolve().parents[1]
     activation = verify_activation(root, CURRENT_PRIOR_ID)
     audit_path = root/'docs/checks/stage7-levels-20261021/audit.json'
@@ -102,6 +105,8 @@ def main():
         options['severity_parameterization'] = 'conditional'
     if args.conditional_counts:
         options['count_parameterization'] = 'conditional'
+    if args.conditional_iid:
+        options['residual_parameterization'] = 'conditional'
     if args.block_coordinates:
         options['gaussian_solver'] = 'block'
     options['factor_parameterization'] = ('anchored' if args.anchor_factors else
@@ -119,6 +124,8 @@ def main():
         files.append(root/'docs/decisions/STAGE7_AMPLITUDE_COORDINATES_20261021.md')
     if args.conditional_severity:
         files.append(root/'docs/decisions/STAGE7_SEVERITY_COORDINATES_20261021.md')
+    if args.conditional_iid:
+        files.append(root/'docs/decisions/STAGE7_IID_COORDINATES_20261022.md')
     if args.conditional_counts:
         files.append(root/'docs/decisions/STAGE7_COUNT_COORDINATES_20261021.md')
         if args.scenario in {'effort_oracle', 'effort_none', 'factors_sparse'}:
