@@ -1,0 +1,141 @@
+{
+  "case": "artifacts/stage7/recovery-v6/kernel_present-7101",
+  "attempts": [
+    {
+      "retry": 0,
+      "posterior_sha256": "dc232c4dedb45c45b2ead7329e26103c241b1784f423c14a1eeaf97ede1b18ad",
+      "free_loading_chain_means": [
+        [
+          0.5921724757188989,
+          0.6106450728758229,
+          0.4995499799296857
+        ],
+        [
+          -0.09097435325153728,
+          -0.6304302661948353,
+          -0.7479718069593949
+        ],
+        [
+          0.5871946469254543,
+          0.6006308849213361,
+          0.4964910075334433
+        ],
+        [
+          0.5902886776160625,
+          0.6079626483907971,
+          0.5041024610742101
+        ]
+      ],
+      "positive_orientation_fraction": [
+        1.0,
+        0.0,
+        1.0,
+        1.0
+      ],
+      "orientation_changes": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "anchor_chain_means": [
+        0.6263186414751674,
+        0.08413297905608931,
+        0.6221106787829354,
+        0.6261336160143701
+      ],
+      "numerical_admission": false
+    },
+    {
+      "retry": 1,
+      "posterior_sha256": "e323ddda82618c439e6f71f66992ac70935958f8d7fefd71ceba6e6099bdb11d",
+      "free_loading_chain_means": [
+        [
+          0.6002275805980123,
+          0.6190671736199339,
+          0.5090384104777691
+        ],
+        [
+          0.5977459434086396,
+          0.6199098322667465,
+          0.5106468950108302
+        ],
+        [
+          0.5872501512802926,
+          0.6083206523033892,
+          0.5010937814028986
+        ],
+        [
+          0.59979017447919,
+          0.6119127712529444,
+          0.49948963112680045
+        ]
+      ],
+      "positive_orientation_fraction": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "orientation_changes": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "anchor_chain_means": [
+        0.6356480882590213,
+        0.6298709199585468,
+        0.6219618018443065,
+        0.637249904242743
+      ],
+      "numerical_admission": false
+    },
+    {
+      "retry": 2,
+      "posterior_sha256": "81144d65eb1e975c7162f3c4f656fd1f8fd499192f0925ff05e6d9fe0461ed66",
+      "free_loading_chain_means": [
+        [
+          0.6026746951209194,
+          0.6202763738504452,
+          0.5224642339034616
+        ],
+        [
+          0.5972430437291847,
+          0.6130714934596858,
+          0.5058294974385431
+        ],
+        [
+          0.5896536803144454,
+          0.6034776947339412,
+          0.49204701977135984
+        ],
+        [
+          0.5946554149082635,
+          0.6143109016240468,
+          0.5026391215342753
+        ]
+      ],
+      "positive_orientation_fraction": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "orientation_changes": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "anchor_chain_means": [
+        0.6366834533358086,
+        0.6315042127783291,
+        0.6244439583978526,
+        0.6319268430436016
+      ],
+      "numerical_admission": true
+    }
+  ],
+  "interpretation": "Earlier chains found a second orientation; later numerical admission stays in one. Global exploration unresolved. Exclude this mode-conditional recovery from validated recovery summaries; preserve all attempts. Chain initialization frequencies are not posterior mode weights."
+}

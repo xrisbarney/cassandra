@@ -1,0 +1,291 @@
+{
+  "accepted": 6,
+  "artifacts": {
+    "diagnostics.csv": "36b13bb10ed5d86c86b8e5d931206162cc8db9b576360f2dc8a5014be429bec9",
+    "parameters.csv": "25f0da3b70d47582ac432f2b53b2b1a814ac8a33efa81082f8d8ad10ddbd76d8",
+    "recovery.csv": "478cde2532ab4decf153fd3b94da506beb088fd454461ed1bc9c4d5e8418670e"
+  },
+  "expected_cases": 6,
+  "held_out_scoring_enabled": false,
+  "interpretation": "Fixed-truth stress/recovery cases; not SBC or real-data validation. Same-seed effort variants reuse observations, so the case count is not a count of independent replications.",
+  "real_data_read": false,
+  "routing_sha256": "dd85fe1801b2af149cc9d76ad01499d2aa5e02348f59d59afd7ae5d6ec4a0a07",
+  "runs": [
+    {
+      "data_sha256": "643433a57070e5b72171625dfb28f6a23522efb7c37d1cdd122add662220d1d8",
+      "directory": "artifacts/stage7/iid-conditional-v1/dispersion_dense-7101",
+      "options": {
+        "categories": 1,
+        "conditional_level": true,
+        "factor_parameterization": "anchored",
+        "factors": 0,
+        "kernel": false,
+        "known_auxiliary_coefficients": false,
+        "level_settings": {
+          "amplitude_multiplier": 1.0,
+          "anchor": 3.7780682427718975,
+          "candidate": "primary",
+          "fallback_anchor": null,
+          "fallback_index": null,
+          "hyper_sd": 1.0,
+          "known_indices": [
+            0
+          ],
+          "scale_sd": 1.0,
+          "scale_upper": 2.0,
+          "training_months": 108
+        },
+        "mass_matrix": "dense",
+        "months": 192,
+        "prior_candidate": "primary",
+        "prior_id": "anchored_levels_v2",
+        "regimes": 1,
+        "residual": "iid",
+        "residual_parameterization": "conditional",
+        "scenario": "dispersion_dense",
+        "seed": 7101,
+        "severity_factors": 0
+      },
+      "result_sha256": "9d71a8f1ce7b3142969dc74ac6c35b2f961b2424e988dbfd34c572257b920c39",
+      "scenario": "dispersion_dense",
+      "seed": 7101,
+      "source_control": {
+        "dirty": false,
+        "revision": "ee6e694c0ac270072b38cfee23496620251d0a43",
+        "status": "available"
+      },
+      "status": "accepted",
+      "truth_sha256": "161ec04ea54720835c56b6d9faf7e9a5280e9574d0f6439dea6393adba3c1940"
+    },
+    {
+      "data_sha256": "da103a36c2216621b15c961d0add2fda41e24fa17ad330c2d95e16a68bceeab1",
+      "directory": "artifacts/stage7/iid-conditional-v1/dispersion_dense-7102",
+      "options": {
+        "categories": 1,
+        "conditional_level": true,
+        "factor_parameterization": "anchored",
+        "factors": 0,
+        "kernel": false,
+        "known_auxiliary_coefficients": false,
+        "level_settings": {
+          "amplitude_multiplier": 1.0,
+          "anchor": 3.7942399697717626,
+          "candidate": "primary",
+          "fallback_anchor": null,
+          "fallback_index": null,
+          "hyper_sd": 1.0,
+          "known_indices": [
+            0
+          ],
+          "scale_sd": 1.0,
+          "scale_upper": 2.0,
+          "training_months": 108
+        },
+        "mass_matrix": "dense",
+        "months": 192,
+        "prior_candidate": "primary",
+        "prior_id": "anchored_levels_v2",
+        "regimes": 1,
+        "residual": "iid",
+        "residual_parameterization": "conditional",
+        "scenario": "dispersion_dense",
+        "seed": 7102,
+        "severity_factors": 0
+      },
+      "result_sha256": "1d7b19e7f0c1d1651e87637578643f3ff133b2975a4d338bcfea2d927cd7d67c",
+      "scenario": "dispersion_dense",
+      "seed": 7102,
+      "source_control": {
+        "dirty": true,
+        "revision": "74ac71e038bc05e62636907022077984e124ecc3",
+        "status": "available"
+      },
+      "status": "accepted",
+      "truth_sha256": "0f7c7f7cfddc52d509785f0a19d9e9e957f0e8e24fd1e1a33e4caf52734170b7"
+    },
+    {
+      "data_sha256": "d5f2a20dde97830ed7b752ec24863498b83065be42a00b22b8060af47e9b9d65",
+      "directory": "artifacts/stage7/iid-conditional-v1/dispersion_dense-7103",
+      "options": {
+        "categories": 1,
+        "conditional_level": true,
+        "factor_parameterization": "anchored",
+        "factors": 0,
+        "kernel": false,
+        "known_auxiliary_coefficients": false,
+        "level_settings": {
+          "amplitude_multiplier": 1.0,
+          "anchor": 3.7162784283020507,
+          "candidate": "primary",
+          "fallback_anchor": null,
+          "fallback_index": null,
+          "hyper_sd": 1.0,
+          "known_indices": [
+            0
+          ],
+          "scale_sd": 1.0,
+          "scale_upper": 2.0,
+          "training_months": 108
+        },
+        "mass_matrix": "dense",
+        "months": 192,
+        "prior_candidate": "primary",
+        "prior_id": "anchored_levels_v2",
+        "regimes": 1,
+        "residual": "iid",
+        "residual_parameterization": "conditional",
+        "scenario": "dispersion_dense",
+        "seed": 7103,
+        "severity_factors": 0
+      },
+      "result_sha256": "f3c4d231f361c97f389a1ae923c80314bdbd767c7b186a06a559ee814adc6032",
+      "scenario": "dispersion_dense",
+      "seed": 7103,
+      "source_control": {
+        "dirty": false,
+        "revision": "2587dc5a78d1b7d6e643e497329b4102bb5799e0",
+        "status": "available"
+      },
+      "status": "accepted",
+      "truth_sha256": "04aae480f479020a7dc5e9d6da2c166578ea7ff8c7a78628a5995213f112e20d"
+    },
+    {
+      "data_sha256": "2c9da41b96a1dacbb05dee12408b29a6ea764759d5957866d6cbbf5965ba28d4",
+      "directory": "artifacts/stage7/iid-conditional-v1/dispersion_sparse-7101",
+      "options": {
+        "categories": 1,
+        "conditional_level": true,
+        "factor_parameterization": "anchored",
+        "factors": 0,
+        "kernel": false,
+        "known_auxiliary_coefficients": false,
+        "level_settings": {
+          "amplitude_multiplier": 1.0,
+          "anchor": 0.2946025152963547,
+          "candidate": "primary",
+          "fallback_anchor": null,
+          "fallback_index": null,
+          "hyper_sd": 1.0,
+          "known_indices": [
+            0
+          ],
+          "scale_sd": 1.0,
+          "scale_upper": 2.0,
+          "training_months": 108
+        },
+        "mass_matrix": "dense",
+        "months": 192,
+        "prior_candidate": "primary",
+        "prior_id": "anchored_levels_v2",
+        "regimes": 1,
+        "residual": "iid",
+        "residual_parameterization": "conditional",
+        "scenario": "dispersion_sparse",
+        "seed": 7101,
+        "severity_factors": 0
+      },
+      "result_sha256": "f8771bef9210045b0a40975c949919d63d140f935d79268c3b160051d7c5d789",
+      "scenario": "dispersion_sparse",
+      "seed": 7101,
+      "source_control": {
+        "dirty": false,
+        "revision": "2587dc5a78d1b7d6e643e497329b4102bb5799e0",
+        "status": "available"
+      },
+      "status": "accepted",
+      "truth_sha256": "6117d342d214bfc936f4cccba34814db619c1cbdc22f9d020161ef83f25fed4d"
+    },
+    {
+      "data_sha256": "e4f6e7be1351a99b1ee5e2f2dfb1894a41376fd325c6385606ef6d2d888aa8a8",
+      "directory": "artifacts/stage7/iid-conditional-v1/dispersion_sparse-7102",
+      "options": {
+        "categories": 1,
+        "conditional_level": true,
+        "factor_parameterization": "anchored",
+        "factors": 0,
+        "kernel": false,
+        "known_auxiliary_coefficients": false,
+        "level_settings": {
+          "amplitude_multiplier": 1.0,
+          "anchor": 0.287682072451781,
+          "candidate": "primary",
+          "fallback_anchor": null,
+          "fallback_index": null,
+          "hyper_sd": 1.0,
+          "known_indices": [
+            0
+          ],
+          "scale_sd": 1.0,
+          "scale_upper": 2.0,
+          "training_months": 108
+        },
+        "mass_matrix": "dense",
+        "months": 192,
+        "prior_candidate": "primary",
+        "prior_id": "anchored_levels_v2",
+        "regimes": 1,
+        "residual": "iid",
+        "residual_parameterization": "conditional",
+        "scenario": "dispersion_sparse",
+        "seed": 7102,
+        "severity_factors": 0
+      },
+      "result_sha256": "fb6a247dab3af14483fb63ac8e306d7a3dacc68c21e0ec36b83d16174940051c",
+      "scenario": "dispersion_sparse",
+      "seed": 7102,
+      "source_control": {
+        "dirty": false,
+        "revision": "2587dc5a78d1b7d6e643e497329b4102bb5799e0",
+        "status": "available"
+      },
+      "status": "accepted",
+      "truth_sha256": "c2302e21aa1c7faf3e2e3302c39e3309c4e4ec67d99ba7b3d8082ace8cf9f248"
+    },
+    {
+      "data_sha256": "8e0a65f87ab6c1abc779acc1658f1d4ff85798e90965e01ece4e101624d34c66",
+      "directory": "artifacts/stage7/iid-conditional-v1/dispersion_sparse-7103",
+      "options": {
+        "categories": 1,
+        "conditional_level": true,
+        "factor_parameterization": "anchored",
+        "factors": 0,
+        "kernel": false,
+        "known_auxiliary_coefficients": false,
+        "level_settings": {
+          "amplitude_multiplier": 1.0,
+          "anchor": 0.13005312824819776,
+          "candidate": "primary",
+          "fallback_anchor": null,
+          "fallback_index": null,
+          "hyper_sd": 1.0,
+          "known_indices": [
+            0
+          ],
+          "scale_sd": 1.0,
+          "scale_upper": 2.0,
+          "training_months": 108
+        },
+        "mass_matrix": "dense",
+        "months": 192,
+        "prior_candidate": "primary",
+        "prior_id": "anchored_levels_v2",
+        "regimes": 1,
+        "residual": "iid",
+        "residual_parameterization": "conditional",
+        "scenario": "dispersion_sparse",
+        "seed": 7103,
+        "severity_factors": 0
+      },
+      "result_sha256": "8961d5d80fe8629e6c3699d393282c56e625ed8fba6ea2b459c07d23a4aea9f8",
+      "scenario": "dispersion_sparse",
+      "seed": 7103,
+      "source_control": {
+        "dirty": false,
+        "revision": "2587dc5a78d1b7d6e643e497329b4102bb5799e0",
+        "status": "available"
+      },
+      "status": "accepted",
+      "truth_sha256": "b81fc6ddcef86d3d7fc48745ffcaddf766bcad8526a40298ac2aead08cc69171"
+    }
+  ]
+}

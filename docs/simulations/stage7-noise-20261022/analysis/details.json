@@ -1,0 +1,85 @@
+{
+  "analysis_source_sha256": "24bfa1e08396e86ce35f55bc850c1d68fdabba20372c7b37f5536e9d7628d67d",
+  "artifacts": {
+    "contraction.csv": "7655eeeb70fbdc57c66802377dce38919d1ed50e1adb86220846caa49a734b7f",
+    "covariance.csv": "1d6fad55765d65ef0ca297adb1be05a496c0d043d6f56c5f74687f7a44c1c9ad"
+  },
+  "audit_sha256": "b4e97306f8a3445522643b68480555673042037bd82d9a38d23382698309d7ad",
+  "cases": [
+    {
+      "scenario": "dispersion_dense",
+      "seed": 7101,
+      "tau_logpsi_correlation": [
+        0.7570371074671287
+      ],
+      "upper_support_edge_probability": {
+        "tau": [
+          0.0
+        ]
+      }
+    },
+    {
+      "scenario": "dispersion_dense",
+      "seed": 7102,
+      "tau_logpsi_correlation": [
+        0.7490239021919296
+      ],
+      "upper_support_edge_probability": {
+        "tau": [
+          0.0
+        ]
+      }
+    },
+    {
+      "scenario": "dispersion_dense",
+      "seed": 7103,
+      "tau_logpsi_correlation": [
+        0.8121804781539669
+      ],
+      "upper_support_edge_probability": {
+        "tau": [
+          0.0
+        ]
+      }
+    },
+    {
+      "scenario": "dispersion_sparse",
+      "seed": 7101,
+      "tau_logpsi_correlation": [
+        0.29376133733108883
+      ],
+      "upper_support_edge_probability": {
+        "tau": [
+          0.0
+        ]
+      }
+    },
+    {
+      "scenario": "dispersion_sparse",
+      "seed": 7102,
+      "tau_logpsi_correlation": [
+        0.4364280382551137
+      ],
+      "upper_support_edge_probability": {
+        "tau": [
+          0.0
+        ]
+      }
+    },
+    {
+      "scenario": "dispersion_sparse",
+      "seed": 7103,
+      "tau_logpsi_correlation": [
+        0.1318886399589777
+      ],
+      "upper_support_edge_probability": {
+        "tau": [
+          0.0
+        ]
+      }
+    }
+  ],
+  "contraction": "Posterior SD divided by the matching recorded marginal prior SD.",
+  "covariance_target": "Stationary log-state covariance conditional on regime and effort.",
+  "interpretation": "Descriptive accepted-fit summaries; no new admission thresholds."
+}
