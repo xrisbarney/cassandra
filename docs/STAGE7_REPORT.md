@@ -3,8 +3,8 @@
 Status, 2026-10-22: **posterior campaign in progress; not yet complete**.
 The active laws are `anchored_levels_v2`. The primary prior-plausibility gates
 pass. A fresh full-suite run passes all 222 tests across 29 files with unchanged
-source hashes. Forty-seven of the 55 declared cases are complete; eight hosted
-cases are on their final prescribed attempts. The remaining work is completion
+source hashes. Forty-eight of the 55 declared cases are complete; seven hosted
+sensitivity cases are on their final prescribed attempts. The remaining work is completion
 of those fits, sensitivity analysis and final component decisions. No real-data
 proposed-model fitting or January 2024--December 2025 scoring has started.
 
@@ -163,8 +163,11 @@ termination after an irreversible retained violation preserves the partial
 attempt and advances only through the prescribed schedule. Partial counts
 are lower bounds and partial chains are not recovery evidence.
 
-**Final case counts, recovery tables, sensitivity findings and component
-admission decisions are pending completion of the declared fits.** A numerical
+The [complete primary campaign](simulations/stage7-primary-complete-20261022/README.md)
+contains all 43 primary cases: 28 numerical passes, 25 recovery-eligible fits,
+15 diagnostic failures and three exploration exclusions. The representative
+fixture and all three fallback fixtures fail. **Final sensitivity findings and
+the combined campaign audit remain pending.** A numerical
 diagnostic pass with unresolved warnings does not count as an admitted fit.
 Interrupted engineering trials and execution errors remain separate from
 fully exhausted diagnostic schedules. The final audit must independently
@@ -205,7 +208,9 @@ targeted test records remain preserved; repeated runs are not additional tests.
 
 The [hosted verification](checks/stage7-hosted-execution-verification-20261022/audit.json)
 passes all 32 selected execution checks on the exact hosted fitting commit.
-Eight pending cases use exact canonical synthetic fixtures under OPT3. All
+Eight hosted cases use exact canonical synthetic fixtures under OPT3; the
+primary fallback case is now verified and imported, with seven sensitivity
+cases still on their final attempts. All
 local OPT0 fits are complete; the four final rank-two local cases exhausted
 their diagnostic schedules unsuccessfully. See the
 [hosted decision](decisions/STAGE7_HOSTED_PENDING_20261022.md)

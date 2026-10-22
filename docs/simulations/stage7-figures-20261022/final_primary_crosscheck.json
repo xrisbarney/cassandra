@@ -1,0 +1,7 @@
+{
+  "cases": 4,
+  "complete_primary_audit_sha256": "5a840cfd44327ad11027ae608973962444ad501b550266f98bd82f833a30624c",
+  "figure_audit_sha256": "12b39aed85cc401c3fd88346e1f4d6f4f4d45929ecebcea1cf313310c6fa3bf1",
+  "meaning": "All four plotted results and eligibility decisions match the completed 43-case primary campaign.",
+  "verified": true
+}

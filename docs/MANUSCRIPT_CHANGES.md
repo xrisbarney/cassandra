@@ -211,10 +211,11 @@ fits from preserved earlier attempts. Do not add duplicate verification of the
 same severity files to the number of fitted cases.
 
 Separate numerical correctness, convergence, fixed-truth recovery and predictive
-calibration. The 202 distinct passing software tests (190 full-run plus twelve targeted gate
-tests) establish the first category only.
-Only complete, warning-free posteriors passing all prescribed gates contribute
-to recovery summaries. Failed or interrupted chains cannot substantiate a
+calibration. The [fresh full suite](checks/stage7-final-tests-20261022/audit.json)
+passes 222 tests across 29 files; it establishes the first category only.
+Only complete posteriors passing all prescribed gates with no unresolved
+warnings contribute to recovery summaries. Recorded, recognized performance
+warnings are distinct from unresolved warnings. Failed or interrupted chains cannot substantiate a
 component's benefit, and three fixed-truth seeds are not SBC. Retain failure
 denominators in tables rather than reporting only admitted fits.
 
