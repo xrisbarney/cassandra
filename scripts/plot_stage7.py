@@ -12,20 +12,40 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.stats import lognorm
 
+from cyber_threat_modelling.data.store import write_json
 from cyber_threat_modelling.evaluation.synthetic_recovery import posterior_array
+from cyber_threat_modelling.provenance import file_hash
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--runs', type=Path, required=True)
+    parser.add_argument('--audit', type=Path,
+                        help='Use the routed primary summary instead of original folders.')
     parser.add_argument('--output', type=Path, required=True)
     args = parser.parse_args()
     args.output.mkdir(parents=True, exist_ok=False)
     fig, axes = plt.subplots(2, 2, figsize=(11, 7), constrained_layout=True)
     scenarios = ['factors_sparse', 'regimes', 'dispersion_dense', 'kernel_present']
+    routed = ({(r['scenario'], r['seed']): r
+               for r in json.loads(args.audit.read_text())['runs']} if args.audit else {})
+    plotted = []
     for ax, scenario in zip(axes.flat, scenarios, strict=True):
-        folder = args.runs / f'{scenario}-7101'
+        record = routed[scenario, 7101] if args.audit else None
+        folder = Path(record['directory']) if record else args.runs / f'{scenario}-7101'
+        if not folder.resolve().is_relative_to(Path.cwd().resolve()):
+            raise ValueError(f'Run directory escapes project: {folder}')
+        if record and file_hash(folder/'result.json') != record['result_sha256']:
+            raise ValueError(f'Changed routed result: {folder}')
         result = json.loads((folder/'result.json').read_text())
+        if result['options']['scenario'] != scenario or result['options']['seed'] != 7101:
+            raise ValueError(f'Wrong plotted case: {folder}')
+        for relative, digest in result['artifacts'].items():
+            if file_hash(folder/relative) != digest:
+                raise ValueError(f'Changed plotted artifact: {folder/relative}')
+        plotted.append({'scenario': scenario, 'seed': 7101, 'directory': folder.as_posix(),
+                        'status': result['status'],
+                        'result_sha256': file_hash(folder/'result.json')})
         ax.set_title(scenario.replace('_', ' ') + ' (seed 7101)')
         if result['status'] != 'accepted':
             ax.text(.5, .5, 'No admitted posterior\nDiagnostic gate failed',
@@ -67,6 +87,12 @@ def main():
     fig.savefig(args.output/'synthetic_recovery.png', dpi=180)
     fig.savefig(args.output/'synthetic_recovery.pdf')
     plt.close(fig)
+    write_json(args.output/'audit.json', {
+        'cases': plotted, 'source_sha256': file_hash(Path(__file__)),
+        'summary_audit_sha256': file_hash(args.audit) if args.audit else None,
+        'artifacts': {p.name: file_hash(p) for p in args.output.iterdir() if p.is_file()},
+        'selection': 'Predeclared seed 7101; failed posteriors are shown as failures.',
+    })
 
 
 if __name__ == '__main__':

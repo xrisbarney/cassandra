@@ -1,0 +1,19 @@
+{
+  "time_utc": "2026-10-22T00:39:19.303771+00:00",
+  "coordinator_pid": 27380,
+  "action": "Stopped only verified recovery-v6 coordinator; its three fit processes remain running.",
+  "active_cases": [
+    "kernel_present-7101",
+    "kernel_present-7103",
+    "kernel_absent-7101"
+  ],
+  "fit_process_ids": [
+    30032,
+    21820,
+    23432
+  ],
+  "interrupted_fits": [],
+  "resume": "After all three result files exist, resume recovery-v6 with --exclude representative fallback_zero, original anchored coordinates, dense metric, three workers and NUMBA_OPT=3.",
+  "purpose": "Prevent duplicate rank-two cases; those follow the separately recorded metric decision. No probability laws, seeds, budgets or diagnostic thresholds changed.",
+  "held_out_scoring_enabled": false
+}
