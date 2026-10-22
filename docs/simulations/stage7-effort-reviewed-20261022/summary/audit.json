@@ -1,0 +1,499 @@
+{
+  "accepted": 8,
+  "artifacts": {
+    "diagnostics.csv": "7d793bd5e82f0e42402f2f2027dfdc968a49047c69901d225592f1877df132ff",
+    "parameters.csv": "320552453e8aefdbc7d93f7553dcf4308a33bb1fff844fae155362c1b1caad44",
+    "recovery.csv": "3cad4cae5f1f0e631d5ebacbb9535e8c2013ab313e0a9f21f981f088aca83994"
+  },
+  "expected_cases": 9,
+  "held_out_scoring_enabled": false,
+  "interpretation": "Fixed-truth stress/recovery cases; not SBC or real-data validation. Same-seed effort variants reuse observations, so the case count is not a count of independent replications.",
+  "real_data_read": false,
+  "recovery_eligible": 6,
+  "routing_sha256": "df6c48fad890d7866d78d0e97ff2c35edbfe78b404784802102b2a760e93c5fe",
+  "runs": [
+    {
+      "data_sha256": "764d2e6d26f0541bd1cab1c4c01a6c872c25be8aeee724faeabda6403f035b2c",
+      "directory": "artifacts/stage7/sign-chart-v1/effort_proxy-7101",
+      "options": {
+        "categories": 4,
+        "conditional_level": false,
+        "count_parameterization": "conditional",
+        "factor_parameterization": "anchored",
+        "factors": 1,
+        "gaussian_solver": "block",
+        "kernel": false,
+        "known_auxiliary_coefficients": false,
+        "level_settings": {
+          "amplitude_multiplier": 1.0,
+          "anchor": 4.35195663408439,
+          "candidate": "primary",
+          "fallback_anchor": null,
+          "fallback_index": null,
+          "hyper_sd": 1.0,
+          "known_indices": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "scale_sd": 1.0,
+          "scale_upper": 2.0,
+          "training_months": 96
+        },
+        "mass_matrix": "dense",
+        "months": 96,
+        "prior_candidate": "primary",
+        "prior_id": "anchored_levels_v2",
+        "regimes": 1,
+        "residual": "none",
+        "scenario": "effort_proxy",
+        "seed": 7101,
+        "severity_factors": 0,
+        "working_sign_anchor": 3
+      },
+      "recovery_eligible": false,
+      "recovery_exclusion": {
+        "directory": "artifacts/stage7/sign-chart-v1/effort_proxy-7101",
+        "evidence": "docs/checks/stage7-sign-exploration-20261022/seed7101.json",
+        "evidence_sha256": "b1c5b20549bd6906bb44c42fb926a67169d9a1ca5d2ce409cfb50db41f856782",
+        "reason": "A retained opposite orientation was found in attempt 0; numerically admitted attempt 1 has no crossings in any chain. Global exploration remains unresolved after the exact sign-chart change.",
+        "result_sha256": "7c864e7ee3faf99411d894b4601c30d147c206bc456fc73bf49a1a221bf6ca84"
+      },
+      "result_sha256": "7c864e7ee3faf99411d894b4601c30d147c206bc456fc73bf49a1a221bf6ca84",
+      "scenario": "effort_proxy",
+      "seed": 7101,
+      "source_control": {
+        "dirty": true,
+        "revision": "52b96a9a7979c8c4e52ce97ff00b1da531125c80",
+        "status": "available"
+      },
+      "status": "accepted",
+      "truth_sha256": "7100a323810afc6fc49ec9be3d76f10023a2ebf536b3569c40ae4336b067f96a"
+    },
+    {
+      "data_sha256": "832d7cb1c1091c4209119805bd44f8dc1e0b5b029167c737da0a5b79a7073dc0",
+      "directory": "artifacts/stage7/sign-chart-v1/effort_proxy-7102",
+      "options": {
+        "categories": 4,
+        "conditional_level": false,
+        "count_parameterization": "conditional",
+        "factor_parameterization": "anchored",
+        "factors": 1,
+        "gaussian_solver": "block",
+        "kernel": false,
+        "known_auxiliary_coefficients": false,
+        "level_settings": {
+          "amplitude_multiplier": 1.0,
+          "anchor": 4.365682862385978,
+          "candidate": "primary",
+          "fallback_anchor": null,
+          "fallback_index": null,
+          "hyper_sd": 1.0,
+          "known_indices": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "scale_sd": 1.0,
+          "scale_upper": 2.0,
+          "training_months": 96
+        },
+        "mass_matrix": "dense",
+        "months": 96,
+        "prior_candidate": "primary",
+        "prior_id": "anchored_levels_v2",
+        "regimes": 1,
+        "residual": "none",
+        "scenario": "effort_proxy",
+        "seed": 7102,
+        "severity_factors": 0,
+        "working_sign_anchor": 3
+      },
+      "recovery_eligible": true,
+      "recovery_exclusion": null,
+      "result_sha256": "600a601b87ee92330c325c22e5dbce00f40e899ad9c70d4373449ab0d0789e75",
+      "scenario": "effort_proxy",
+      "seed": 7102,
+      "source_control": {
+        "dirty": true,
+        "revision": "f7a9ee346c1567d0a18af49beb303e10667eb0e6",
+        "status": "available"
+      },
+      "status": "accepted",
+      "truth_sha256": "165bcd2cc13d529b6c37b8672b8614d777c5769ea2bb2db5e2e95d8bb1340dac"
+    },
+    {
+      "data_sha256": "0f6a665fef2ab8d039005ddea1e8a355bd3ff46fdcc71c99af275dc165b7ff9a",
+      "directory": "artifacts/stage7/sign-chart-v1/effort_proxy-7103",
+      "options": {
+        "categories": 4,
+        "conditional_level": false,
+        "count_parameterization": "conditional",
+        "factor_parameterization": "anchored",
+        "factors": 1,
+        "gaussian_solver": "block",
+        "kernel": false,
+        "known_auxiliary_coefficients": false,
+        "level_settings": {
+          "amplitude_multiplier": 1.0,
+          "anchor": 4.142390401831675,
+          "candidate": "primary",
+          "fallback_anchor": null,
+          "fallback_index": null,
+          "hyper_sd": 1.0,
+          "known_indices": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "scale_sd": 1.0,
+          "scale_upper": 2.0,
+          "training_months": 96
+        },
+        "mass_matrix": "dense",
+        "months": 96,
+        "prior_candidate": "primary",
+        "prior_id": "anchored_levels_v2",
+        "regimes": 1,
+        "residual": "none",
+        "scenario": "effort_proxy",
+        "seed": 7103,
+        "severity_factors": 0,
+        "working_sign_anchor": 3
+      },
+      "recovery_eligible": false,
+      "recovery_exclusion": {
+        "directory": "artifacts/stage7/sign-chart-v1/effort_proxy-7103",
+        "evidence": "docs/checks/stage7-sign-exploration-20261022/pattern_audit.json",
+        "evidence_sha256": "1562957d1265c0ddab10a8983df9c0282e20ca0f0459337adefb984a8e35b655",
+        "reason": "Numerically admitted retry never visits the documented alternative canonical loading-sign region (+,+,-), despite finding it in the earlier retained attempt. Rare row-zero sign crossings visit a different region and do not resolve it.",
+        "result_sha256": "d52eae7bf56f98f15b5542356e6677769957779df84be3edbd9dac9b52a496d4"
+      },
+      "result_sha256": "d52eae7bf56f98f15b5542356e6677769957779df84be3edbd9dac9b52a496d4",
+      "scenario": "effort_proxy",
+      "seed": 7103,
+      "source_control": {
+        "dirty": false,
+        "revision": "2cc8959e4199f5423af415537bd687f6ddd02fb4",
+        "status": "available"
+      },
+      "status": "accepted",
+      "truth_sha256": "fcc15c01eb7f92c1c2690852632565bb7c37327447a5dcec534bf4ae908e3ba9"
+    },
+    {
+      "data_sha256": "db66bc255fe03085a1bfaac67ff3cb6ff3efa22f3a393adf653b08599457c302",
+      "directory": "artifacts/stage7/count-matched-v1/primary/effort_oracle-7101",
+      "options": {
+        "categories": 4,
+        "conditional_level": false,
+        "count_parameterization": "conditional",
+        "factor_parameterization": "anchored",
+        "factors": 1,
+        "gaussian_solver": "block",
+        "kernel": false,
+        "known_auxiliary_coefficients": false,
+        "level_settings": {
+          "amplitude_multiplier": 1.0,
+          "anchor": 4.35195663408439,
+          "candidate": "primary",
+          "fallback_anchor": null,
+          "fallback_index": null,
+          "hyper_sd": 1.0,
+          "known_indices": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "scale_sd": 1.0,
+          "scale_upper": 2.0,
+          "training_months": 96
+        },
+        "mass_matrix": "dense",
+        "months": 96,
+        "prior_candidate": "primary",
+        "prior_id": "anchored_levels_v2",
+        "regimes": 1,
+        "residual": "none",
+        "scenario": "effort_oracle",
+        "seed": 7101,
+        "severity_factors": 0
+      },
+      "recovery_eligible": true,
+      "recovery_exclusion": null,
+      "result_sha256": "a3ccadaad36ef59ea27b9500cb0e6787773d8a509dfc9d7ddaf36ae790442a9f",
+      "scenario": "effort_oracle",
+      "seed": 7101,
+      "source_control": {
+        "dirty": false,
+        "revision": "8fff92fa888b834367700168b89c73c17b50ff48",
+        "status": "available"
+      },
+      "status": "accepted",
+      "truth_sha256": "7100a323810afc6fc49ec9be3d76f10023a2ebf536b3569c40ae4336b067f96a"
+    },
+    {
+      "data_sha256": "bb47b1c29521ecefbb9cfdd1cba3b0c4676f943229ebca05908aee52c564fa5b",
+      "directory": "artifacts/stage7/count-matched-v1/primary/effort_oracle-7102",
+      "options": {
+        "categories": 4,
+        "conditional_level": false,
+        "count_parameterization": "conditional",
+        "factor_parameterization": "anchored",
+        "factors": 1,
+        "gaussian_solver": "block",
+        "kernel": false,
+        "known_auxiliary_coefficients": false,
+        "level_settings": {
+          "amplitude_multiplier": 1.0,
+          "anchor": 4.365682862385978,
+          "candidate": "primary",
+          "fallback_anchor": null,
+          "fallback_index": null,
+          "hyper_sd": 1.0,
+          "known_indices": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "scale_sd": 1.0,
+          "scale_upper": 2.0,
+          "training_months": 96
+        },
+        "mass_matrix": "dense",
+        "months": 96,
+        "prior_candidate": "primary",
+        "prior_id": "anchored_levels_v2",
+        "regimes": 1,
+        "residual": "none",
+        "scenario": "effort_oracle",
+        "seed": 7102,
+        "severity_factors": 0
+      },
+      "recovery_eligible": true,
+      "recovery_exclusion": null,
+      "result_sha256": "ad25a3a0243a77d170b2655a2ab46f9483c2d9eab01d7262773555380c89f3d2",
+      "scenario": "effort_oracle",
+      "seed": 7102,
+      "source_control": {
+        "dirty": false,
+        "revision": "8fff92fa888b834367700168b89c73c17b50ff48",
+        "status": "available"
+      },
+      "status": "accepted",
+      "truth_sha256": "165bcd2cc13d529b6c37b8672b8614d777c5769ea2bb2db5e2e95d8bb1340dac"
+    },
+    {
+      "data_sha256": "48d7e478f25c575362fead0d46c05b463751b02e18d11cfa9d23a30cf97a1551",
+      "directory": "artifacts/stage7/count-matched-v1/primary/effort_oracle-7103",
+      "options": {
+        "categories": 4,
+        "conditional_level": false,
+        "count_parameterization": "conditional",
+        "factor_parameterization": "anchored",
+        "factors": 1,
+        "gaussian_solver": "block",
+        "kernel": false,
+        "known_auxiliary_coefficients": false,
+        "level_settings": {
+          "amplitude_multiplier": 1.0,
+          "anchor": 4.142390401831675,
+          "candidate": "primary",
+          "fallback_anchor": null,
+          "fallback_index": null,
+          "hyper_sd": 1.0,
+          "known_indices": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "scale_sd": 1.0,
+          "scale_upper": 2.0,
+          "training_months": 96
+        },
+        "mass_matrix": "dense",
+        "months": 96,
+        "prior_candidate": "primary",
+        "prior_id": "anchored_levels_v2",
+        "regimes": 1,
+        "residual": "none",
+        "scenario": "effort_oracle",
+        "seed": 7103,
+        "severity_factors": 0
+      },
+      "recovery_eligible": false,
+      "recovery_exclusion": null,
+      "result_sha256": "e7eee23ca456cdd6832a2f57bbafbcf6d48cdaffeb42872ef17930b660eb4b2f",
+      "scenario": "effort_oracle",
+      "seed": 7103,
+      "source_control": {
+        "dirty": false,
+        "revision": "bc61ee6980c70c8f0c3e2e705284869bd507858d",
+        "status": "available"
+      },
+      "status": "failed_diagnostic_gate",
+      "truth_sha256": "fcc15c01eb7f92c1c2690852632565bb7c37327447a5dcec534bf4ae908e3ba9"
+    },
+    {
+      "data_sha256": "4df770f9c0dc5add5079eb59ca18a6c4ce6034cf77cbf3e02104f9d0ecef2cd4",
+      "directory": "artifacts/stage7/count-matched-v1/primary/effort_none-7101",
+      "options": {
+        "categories": 4,
+        "conditional_level": false,
+        "count_parameterization": "conditional",
+        "factor_parameterization": "anchored",
+        "factors": 1,
+        "gaussian_solver": "block",
+        "kernel": false,
+        "known_auxiliary_coefficients": false,
+        "level_settings": {
+          "amplitude_multiplier": 1.0,
+          "anchor": 4.35195663408439,
+          "candidate": "primary",
+          "fallback_anchor": null,
+          "fallback_index": null,
+          "hyper_sd": 1.0,
+          "known_indices": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "scale_sd": 1.0,
+          "scale_upper": 2.0,
+          "training_months": 96
+        },
+        "mass_matrix": "dense",
+        "months": 96,
+        "prior_candidate": "primary",
+        "prior_id": "anchored_levels_v2",
+        "regimes": 1,
+        "residual": "none",
+        "scenario": "effort_none",
+        "seed": 7101,
+        "severity_factors": 0
+      },
+      "recovery_eligible": true,
+      "recovery_exclusion": null,
+      "result_sha256": "cdbee4ba46404dbca73824bed0a6af548a99cb9f4e596d15256b7b72486ad03d",
+      "scenario": "effort_none",
+      "seed": 7101,
+      "source_control": {
+        "dirty": false,
+        "revision": "3b4f294c3edb9ed498eb6ab469ada9a0a6c0bae2",
+        "status": "available"
+      },
+      "status": "accepted",
+      "truth_sha256": "7100a323810afc6fc49ec9be3d76f10023a2ebf536b3569c40ae4336b067f96a"
+    },
+    {
+      "data_sha256": "211b33fabbad4f83236ca6749c1e6c98bb68202948228b17fbd8e19917a36222",
+      "directory": "artifacts/stage7/count-matched-v1/primary/effort_none-7102",
+      "options": {
+        "categories": 4,
+        "conditional_level": false,
+        "count_parameterization": "conditional",
+        "factor_parameterization": "anchored",
+        "factors": 1,
+        "gaussian_solver": "block",
+        "kernel": false,
+        "known_auxiliary_coefficients": false,
+        "level_settings": {
+          "amplitude_multiplier": 1.0,
+          "anchor": 4.365682862385978,
+          "candidate": "primary",
+          "fallback_anchor": null,
+          "fallback_index": null,
+          "hyper_sd": 1.0,
+          "known_indices": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "scale_sd": 1.0,
+          "scale_upper": 2.0,
+          "training_months": 96
+        },
+        "mass_matrix": "dense",
+        "months": 96,
+        "prior_candidate": "primary",
+        "prior_id": "anchored_levels_v2",
+        "regimes": 1,
+        "residual": "none",
+        "scenario": "effort_none",
+        "seed": 7102,
+        "severity_factors": 0
+      },
+      "recovery_eligible": true,
+      "recovery_exclusion": null,
+      "result_sha256": "790f6b36b1c15627265782417d0d25bb7353bfb18c3399a176ec9aba45b07f86",
+      "scenario": "effort_none",
+      "seed": 7102,
+      "source_control": {
+        "dirty": false,
+        "revision": "dc682441b4e41211eb1cc35c4546a0b1a200c2cc",
+        "status": "available"
+      },
+      "status": "accepted",
+      "truth_sha256": "165bcd2cc13d529b6c37b8672b8614d777c5769ea2bb2db5e2e95d8bb1340dac"
+    },
+    {
+      "data_sha256": "fdb11bb72fa940459f97d8646c9c395395dd008ab7504f9c871faa95fe4f2c64",
+      "directory": "artifacts/stage7/count-matched-v1/primary/effort_none-7103",
+      "options": {
+        "categories": 4,
+        "conditional_level": false,
+        "count_parameterization": "conditional",
+        "factor_parameterization": "anchored",
+        "factors": 1,
+        "gaussian_solver": "block",
+        "kernel": false,
+        "known_auxiliary_coefficients": false,
+        "level_settings": {
+          "amplitude_multiplier": 1.0,
+          "anchor": 4.142390401831675,
+          "candidate": "primary",
+          "fallback_anchor": null,
+          "fallback_index": null,
+          "hyper_sd": 1.0,
+          "known_indices": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "scale_sd": 1.0,
+          "scale_upper": 2.0,
+          "training_months": 96
+        },
+        "mass_matrix": "dense",
+        "months": 96,
+        "prior_candidate": "primary",
+        "prior_id": "anchored_levels_v2",
+        "regimes": 1,
+        "residual": "none",
+        "scenario": "effort_none",
+        "seed": 7103,
+        "severity_factors": 0
+      },
+      "recovery_eligible": true,
+      "recovery_exclusion": null,
+      "result_sha256": "d8b9ebf8e34c0ebd1321b2b28039eb94739f9ad54771cd73f940f60d2ea341a6",
+      "scenario": "effort_none",
+      "seed": 7103,
+      "source_control": {
+        "dirty": true,
+        "revision": "3be1caa26882c75ed6b74ab9049ce7865ee9d3c8",
+        "status": "available"
+      },
+      "status": "accepted",
+      "truth_sha256": "fcc15c01eb7f92c1c2690852632565bb7c37327447a5dcec534bf4ae908e3ba9"
+    }
+  ]
+}

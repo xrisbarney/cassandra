@@ -1,4 +1,4 @@
-﻿# Stage 7 synthetic validation record
+ï»¿# Stage 7 synthetic validation record
 
 Status, 2026-10-22: **posterior campaign in progress; not yet complete**.
 The active laws are `anchored_levels_v2`. The primary prior-plausibility gates
@@ -90,8 +90,10 @@ finite differences and native/Numba complete-target comparisons verify both
 count and severity transformations.
 
 A block-tridiagonal implementation and scalar rank-one/rank-two specialization
-remove unnecessary dense operations and small-array allocations. No jitter,
-fast-math approximation or statistical tolerance was added. Near-unit
+remove unnecessary dense operations and small-array allocations. No jitter or statistical tolerance was added. The custom block kernels use
+fastmath=False; generated PyTensor functions retain the installed default
+selected fast-math flags. This is not a claim that the whole graph disables
+fast-math. Native/compiled complete-target and gradient comparisons are retained. Near-unit
 persistence and non-contiguous arrays are tested. The first representative
 full-gradient preflight improved from about 0.00252 to 0.00111 seconds under
 concurrent load; this is not an end-to-end sampling speedup estimate.
@@ -131,17 +133,14 @@ Interrupted engineering trials and execution errors remain separate from
 fully exhausted diagnostic schedules. The final audit must independently
 recompute diagnostics from each admitted saved posterior.
 
-The [matched effort analysis](simulations/stage7-effort-20261022/README.md) is
-complete: eight of nine cases are admitted, with oracle seed 7103 failing its
-schedule. The count-derived proxy's pointwise 90% intervals cover about 23--27%
-of the generating physical log-intensity values across its three seeds, despite
-improved expected-count RMSE relative to no offset. These are latent-trajectory
-recovery measurements, not held-out forecast calibration. They do not support
-a claim that smoothing publication counts identifies physical reporting effort.
-The later [mode audit](checks/stage7-proxy-mode-20261022/audit.json) limits these
-old proxy results further: an admitted retry stayed in one known orientation.
-Those recovery numbers are mode-conditional pending the exact working-sign
-coordinate check and replacement analysis; low R-hat alone did not resolve it.
+The [reviewed effort analysis](simulations/stage7-effort-reviewed-20261022/README.md)
+contains nine cases, eight numerical passes and six recovery-eligible fits.
+Only proxy seed 7102 explores its documented alternative loading region;
+seeds 7101 and 7103 remain excluded despite numerical passes. In the one
+eligible proxy case, generating physical log-intensity 90% coverage is 0.266,
+versus operational coverage 0.695. The identical count likelihood admits
+reporting-shift and threat-shift interpretations. This does not support a
+claim that smoothing publication counts identifies physical reporting effort.
 
 The [mode diagnostic](checks/stage7-mode-diagnostic-20261022/audit.json) documents
 opposite loading/decomposition regions in unsuccessful factor/kernel attempts.

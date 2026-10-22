@@ -1,0 +1,23 @@
+{
+  "passed": 6,
+  "seconds": 458.06,
+  "numba_optimization": 0,
+  "source_control": {
+    "revision": "9ed9081635f8c534e2952178583ec0bd3d91cdb7",
+    "dirty": false,
+    "status": "available"
+  },
+  "log": "artifacts/stage7-joint-integration-tests.log",
+  "log_sha256": "93e158a2ef4240910986cc334be6e4cb858d67d7f6251d7de2f1de103fc6c13d",
+  "source_sha256": {
+    "src/cyber_threat_modelling/models/joint_coordinates.py": "57dc09dc2def8195ecf2b3df37ce59ee1296d9c53a75e10071b7aaa100de819f",
+    "src/cyber_threat_modelling/models/synthetic_state_space.py": "f5320dfdf45ed0b7e578e82067c579d83525148d05320927110a504e663e949e",
+    "tests/test_stage7_joint_coordinates.py": "933559473fbdc9b76517999ada91a23a722e3c44af157b31e5817986231381d2",
+    "scripts/run_stage7.py": "0337d6e2c6a59bc9abbc1420574b557b6d822a0bcc0ea91365548eff730c1666",
+    "scripts/stage7_batch.py": "b0d523cd31f310b353dc2b89cef91e9bfa1e8d05e474aa37d091574bb9bb9705",
+    "scripts/stage7_rank_two.py": "e80fd7d3990311b5ec6824248dd020cd97d076994abc72bfa30383537830280c",
+    "docs/decisions/STAGE7_JOINT_LEVEL_COORDINATES_20261022.md": "1e298c9e45833f2ae3fdeb5935c6ca80c829ba93af30471aca12543ca76bb5ce"
+  },
+  "scope": "Both complete candidate checks plus direct model-builder density and native-gradient equality, and four unsupported-configuration guards.",
+  "warning": "Known native BLAS performance warning only."
+}

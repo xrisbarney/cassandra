@@ -1,0 +1,205 @@
+{
+  "analysis_source_sha256": "f51355b2c60718c536a22c4674b3478dee9183e3b17cff99a4a798e889b5e698",
+  "artifacts": {
+    "contraction.csv": "1d9c066b74c1d455b54a7ebdd45c9aa0f0a50ef2db8e9fc65d409fa852fd7ad6",
+    "covariance.csv": "105ad465bd784f1a2ddb1200ab4a01e2a9b3f0d2fccecbb58c35abba4053694f"
+  },
+  "audit_sha256": "2a35fff396f8ddff1df6bebf1881f086f79cbd379823649f0a7575a10c815689",
+  "cases": [
+    {
+      "paired_effort_interpretations": {
+        "interpretation": "Identical count likelihood under a reporting shift or equal log-intensity shift; these are alternative physical truths, not independent datasets.",
+        "reporting_shift_eta": {
+          "coverage_50": 0.14322916666666666,
+          "coverage_90": 0.265625,
+          "rmse": 0.8888169661769825,
+          "width_50": 0.2636007609120236,
+          "width_90": 0.6466083491064939
+        },
+        "threat_shift_eta": {
+          "coverage_50": 0.08072916666666667,
+          "coverage_90": 0.1640625,
+          "rmse": 1.0245074214264045,
+          "width_50": 0.2636007609120236,
+          "width_90": 0.6466083491064939
+        }
+      },
+      "scenario": "effort_proxy",
+      "seed": 7102,
+      "upper_support_edge_probability": {
+        "f_diag": [
+          0.0
+        ],
+        "f_free": [
+          0.0,
+          0.0,
+          0.04275
+        ],
+        "m_sd": 0.066
+      }
+    },
+    {
+      "paired_effort_interpretations": {
+        "interpretation": "Identical count likelihood under a reporting shift or equal log-intensity shift; these are alternative physical truths, not independent datasets.",
+        "reporting_shift_eta": {
+          "coverage_50": 0.4791666666666667,
+          "coverage_90": 0.90625,
+          "rmse": 0.16449124940529514,
+          "width_50": 0.20066169724415817,
+          "width_90": 0.5083562981038859
+        },
+        "threat_shift_eta": {
+          "coverage_50": 0.21354166666666666,
+          "coverage_90": 0.4557291666666667,
+          "rmse": 0.8709190299749466,
+          "width_50": 0.20066169724415817,
+          "width_90": 0.5083562981038859
+        }
+      },
+      "scenario": "effort_oracle",
+      "seed": 7101,
+      "upper_support_edge_probability": {
+        "f_diag": [
+          0.0
+        ],
+        "f_free": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "m_sd": 0.09325
+      }
+    },
+    {
+      "paired_effort_interpretations": {
+        "interpretation": "Identical count likelihood under a reporting shift or equal log-intensity shift; these are alternative physical truths, not independent datasets.",
+        "reporting_shift_eta": {
+          "coverage_50": 0.4453125,
+          "coverage_90": 0.8125,
+          "rmse": 0.19851097956724964,
+          "width_50": 0.19600765509513715,
+          "width_90": 0.48923643779386544
+        },
+        "threat_shift_eta": {
+          "coverage_50": 0.22395833333333334,
+          "coverage_90": 0.4036458333333333,
+          "rmse": 0.8938825629920093,
+          "width_50": 0.19600765509513715,
+          "width_90": 0.48923643779386544
+        }
+      },
+      "scenario": "effort_oracle",
+      "seed": 7102,
+      "upper_support_edge_probability": {
+        "f_diag": [
+          0.00125
+        ],
+        "f_free": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "m_sd": 0.0865
+      }
+    },
+    {
+      "paired_effort_interpretations": {
+        "interpretation": "Identical count likelihood under a reporting shift or equal log-intensity shift; these are alternative physical truths, not independent datasets.",
+        "reporting_shift_eta": {
+          "coverage_50": 0.11979166666666667,
+          "coverage_90": 0.3255208333333333,
+          "rmse": 0.9226323272792624,
+          "width_50": 0.22835889887929292,
+          "width_90": 0.5607615436425274
+        },
+        "threat_shift_eta": {
+          "coverage_50": 0.296875,
+          "coverage_90": 0.6744791666666666,
+          "rmse": 0.3407894935011158,
+          "width_50": 0.22835889887929292,
+          "width_90": 0.5607615436425274
+        }
+      },
+      "scenario": "effort_none",
+      "seed": 7101,
+      "upper_support_edge_probability": {
+        "f_diag": [
+          0.00025
+        ],
+        "f_free": [
+          0.00025,
+          0.0,
+          0.0
+        ],
+        "m_sd": 0.0785
+      }
+    },
+    {
+      "paired_effort_interpretations": {
+        "interpretation": "Identical count likelihood under a reporting shift or equal log-intensity shift; these are alternative physical truths, not independent datasets.",
+        "reporting_shift_eta": {
+          "coverage_50": 0.1484375,
+          "coverage_90": 0.3151041666666667,
+          "rmse": 0.8967107249128238,
+          "width_50": 0.2252671937101928,
+          "width_90": 0.5523628687070988
+        },
+        "threat_shift_eta": {
+          "coverage_50": 0.2890625,
+          "coverage_90": 0.6432291666666666,
+          "rmse": 0.3687774707530554,
+          "width_50": 0.2252671937101928,
+          "width_90": 0.5523628687070988
+        }
+      },
+      "scenario": "effort_none",
+      "seed": 7102,
+      "upper_support_edge_probability": {
+        "f_diag": [
+          0.0045
+        ],
+        "f_free": [
+          0.0005,
+          0.0,
+          0.0
+        ],
+        "m_sd": 0.07025
+      }
+    },
+    {
+      "paired_effort_interpretations": {
+        "interpretation": "Identical count likelihood under a reporting shift or equal log-intensity shift; these are alternative physical truths, not independent datasets.",
+        "reporting_shift_eta": {
+          "coverage_50": 0.12760416666666666,
+          "coverage_90": 0.2890625,
+          "rmse": 0.9723829295041885,
+          "width_50": 0.23498133024761594,
+          "width_90": 0.5757769175385565
+        },
+        "threat_shift_eta": {
+          "coverage_50": 0.3177083333333333,
+          "coverage_90": 0.6380208333333334,
+          "rmse": 0.40595556883844774,
+          "width_50": 0.23498133024761594,
+          "width_90": 0.5757769175385565
+        }
+      },
+      "scenario": "effort_none",
+      "seed": 7103,
+      "upper_support_edge_probability": {
+        "f_diag": [
+          0.00025
+        ],
+        "f_free": [
+          0.00025,
+          0.0,
+          0.0
+        ],
+        "m_sd": 0.056
+      }
+    }
+  ],
+  "contraction": "Posterior SD divided by the matching recorded marginal prior SD.",
+  "covariance_target": "Stationary log-state covariance conditional on regime and effort.",
+  "interpretation": "Descriptive accepted-fit summaries; no new admission thresholds."
+}

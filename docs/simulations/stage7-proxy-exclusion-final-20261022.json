@@ -1,0 +1,13 @@
+{
+  "parent_routing_sha256": "56745ec6512e10d7c294b4f29f0b19eea896c6393eab814a757f1d6cd85a9da8",
+  "recovery_exclusions": [
+    {
+      "directory": "artifacts/stage7/sign-chart-v1/effort_proxy-7103",
+      "result_sha256": "d52eae7bf56f98f15b5542356e6677769957779df84be3edbd9dac9b52a496d4",
+      "evidence": "docs/checks/stage7-sign-exploration-20261022/pattern_audit.json",
+      "evidence_sha256": "1562957d1265c0ddab10a8983df9c0282e20ca0f0459337adefb984a8e35b655",
+      "reason": "Numerically admitted retry never visits the documented alternative canonical loading-sign region (+,+,-), despite finding it in the earlier retained attempt. Rare row-zero sign crossings visit a different region and do not resolve it."
+    }
+  ],
+  "decision": "docs/decisions/STAGE7_RECOVERY_ELIGIBILITY_20261022.md"
+}

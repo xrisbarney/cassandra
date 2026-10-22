@@ -65,7 +65,10 @@ final optimization of the fused density/gradient graph. Check NUMBA_OPT=0 on
 the same equations and on the integrated model-builder target. Use that setting
 for the joint representative and dependent grid only if all integrated checks
 pass. Record it with every run and retain the representative's full-gradient
-preflight. Neither setting enables fast-math or changes the numerical gates.
+preflight. Neither NUMBA_OPT setting changes the existing fast-math configuration or
+the numerical gates. PyTensor generated functions retain their default selected
+fast-math flags; the custom block kernels use fastmath=False. See the separate
+compiler-warning/settings clarification.
 These overlapping checks have different cache histories; their wall times are
 not a controlled compiler-speed comparison. The unfinished standalone OPT0
 test was explicitly superseded by the integrated six-test run, which includes

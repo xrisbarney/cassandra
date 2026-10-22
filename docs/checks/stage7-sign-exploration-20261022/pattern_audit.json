@@ -1,0 +1,71 @@
+{
+  "cases": [
+    {
+      "seed": 7101,
+      "posterior_sha256": "f239b33c9f79c6de65deab9eefe2d26fd9f7eb50ade5ac20cff1e9e757e559d2",
+      "known_alternative_sign_pattern": [
+        1,
+        1,
+        -1
+      ],
+      "region_fractions": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "region_changes": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "all_chains_visit_known_region": false
+    },
+    {
+      "seed": 7102,
+      "posterior_sha256": "4540751412f206bfe922f984b1a8f59a94b7aede398b71db58c14e87765aa3fd",
+      "known_alternative_sign_pattern": [
+        -1,
+        -1,
+        -1
+      ],
+      "region_fractions": [
+        0.021,
+        0.018,
+        0.025,
+        0.025
+      ],
+      "region_changes": [
+        42,
+        34,
+        46,
+        46
+      ],
+      "all_chains_visit_known_region": true
+    },
+    {
+      "seed": 7103,
+      "posterior_sha256": "1df039cc480b15feca927da8f6a5bfed415da81b702d45c9b77f13a3ea6e9737",
+      "known_alternative_sign_pattern": [
+        1,
+        1,
+        -1
+      ],
+      "region_fractions": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "region_changes": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "all_chains_visit_known_region": false
+    }
+  ],
+  "interpretation": "Canonical free-loading signs distinguish the actual documented alternative regions. A negative working row-zero loading alone can mark a different region. Patterns use retained earlier attempts, never truth or recovery scores."
+}
