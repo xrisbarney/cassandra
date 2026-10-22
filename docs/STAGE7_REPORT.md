@@ -138,6 +138,10 @@ of the generating physical log-intensity values across its three seeds, despite
 improved expected-count RMSE relative to no offset. These are latent-trajectory
 recovery measurements, not held-out forecast calibration. They do not support
 a claim that smoothing publication counts identifies physical reporting effort.
+The later [mode audit](checks/stage7-proxy-mode-20261022/audit.json) limits these
+old proxy results further: an admitted retry stayed in one known orientation.
+Those recovery numbers are mode-conditional pending the exact working-sign
+coordinate check and replacement analysis; low R-hat alone did not resolve it.
 
 The [mode diagnostic](checks/stage7-mode-diagnostic-20261022/audit.json) documents
 opposite loading/decomposition regions in unsuccessful factor/kernel attempts.

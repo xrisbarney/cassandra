@@ -1,0 +1,111 @@
+{
+  "case": "artifacts/stage7/count-block-v3/primary/effort_proxy-7102",
+  "attempts": [
+    {
+      "retry": 0,
+      "posterior_sha256": "9dcae4a5cd0f1896d7b9f0afb479b56bec0e6283c9948872177f12f0f5d4f651",
+      "free_loading_chain_means": [
+        [
+          0.5497677229332729,
+          0.8752647407497962,
+          1.2971232696773483
+        ],
+        [
+          -0.5435821668904669,
+          -0.8735489217214629,
+          -1.3158057220762889
+        ],
+        [
+          0.5639574256660657,
+          0.9048429823343244,
+          1.3347257374731616
+        ],
+        [
+          0.5549510228995491,
+          0.885736284456864,
+          1.3116110230981153
+        ]
+      ],
+      "positive_orientation_fraction": [
+        1.0,
+        0.0,
+        1.0,
+        1.0
+      ],
+      "retained_orientation_changes": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "positive_anchor_chain_means": [
+        [
+          0.08435179273783897
+        ],
+        [
+          0.015327280552599923
+        ],
+        [
+          0.08967291924515579
+        ],
+        [
+          0.08708633860119847
+        ]
+      ]
+    },
+    {
+      "retry": 1,
+      "posterior_sha256": "0c6392db1a245672e42bd832b2f948c61be9df3229d43572aac37a930da1c194",
+      "free_loading_chain_means": [
+        [
+          0.5524584857196712,
+          0.879288382800283,
+          1.311800951823782
+        ],
+        [
+          0.5446773338230012,
+          0.860680930575782,
+          1.283773385294925
+        ],
+        [
+          0.5569503179652247,
+          0.8909099064224811,
+          1.3273059068632016
+        ],
+        [
+          0.5552417161138196,
+          0.8934277308282624,
+          1.3229253804501244
+        ]
+      ],
+      "positive_orientation_fraction": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "retained_orientation_changes": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "positive_anchor_chain_means": [
+        [
+          0.08567765392583924
+        ],
+        [
+          0.08306799316217064
+        ],
+        [
+          0.08699540985410412
+        ],
+        [
+          0.08743297932456082
+        ]
+      ]
+    }
+  ],
+  "finding": "Attempt 1 passes frozen numerical thresholds but every chain remains in the positive orientation. Attempt 0 documents a separate negative-orientation region. Neither the four-chain split nor relative mean log density estimates its posterior probability. Treat the published old recovery as mode-conditional until a sampler crossing the known regions is verified.",
+  "held_out_scoring_enabled": false
+}

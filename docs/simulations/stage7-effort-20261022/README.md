@@ -1,5 +1,14 @@
 ﻿# Completed matched effort comparison
 
+**Superseded interpretation, 2026-10-22:** the subsequent
+[mode audit](../../checks/stage7-proxy-mode-20261022/audit.json) found that the
+accepted proxy seed 7102 retry stayed in one of two documented orientations.
+The numerical gate counts below remain accurate, but its recovery values must
+be read as mode-conditional until the
+[working sign anchor](../../decisions/STAGE7_SIGN_GAUGE_20261022.md) is validated.
+The data and original summaries are preserved; they are not full-posterior
+evidence for that case. The analytic nonidentification argument still applies.
+
 These nine scenario/seed cases reuse three observed count panels, one per seed.
 They are not nine independent datasets. The explicit routes were recorded before
 final recovery analysis. `summary/audit.json` records the source, data and result
