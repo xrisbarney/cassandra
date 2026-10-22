@@ -68,6 +68,7 @@ def main():
     parser.add_argument('--draws', type=int, choices=[2000, 8000], default=2000)
     parser.add_argument('--candidate', choices=CANDIDATES)
     parser.add_argument('--pilot-only', action='store_true')
+    parser.add_argument('--factors', type=int, choices=[1, 2], default=2)
     args = parser.parse_args()
     root = Path(__file__).resolve().parents[1]
     activation = verify_activation(root, CURRENT_PRIOR_ID)
@@ -83,9 +84,10 @@ def main():
     data, _, options = generate('representative', 7101)
     data.update(N=counts, mask_N=np.ones_like(counts, dtype=bool), effort=np.zeros(108))
     options.update(prior_id=CURRENT_PRIOR_ID, factor_parameterization='innovations',
-                   fallback_index=9)
+                   fallback_index=9, factors=args.factors)
     np.savez_compressed(args.output/'training_prefix.npz', N=counts, effort=effort)
     source = {'prior_activation': activation, 'source_control': git_revision(root),
+              'factors': args.factors,
               'source_sha256': {p.relative_to(root).as_posix(): file_hash(p)
                                for p in [Path(__file__), *list((root/'src').rglob('*.py'))]},
               'real_data_read': '2010-01 through 2018-12 counts only',

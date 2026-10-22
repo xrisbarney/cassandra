@@ -1,0 +1,42 @@
+{
+  "cases": [
+    {
+      "files_sha256": {
+        "docs/fixtures/stage7-supplement/masked_fallback/data.npz": "86907fe2f966c2a191606da1290d20172696bf7f96d964fc77a90766f2b3deb1",
+        "docs/fixtures/stage7-supplement/masked_fallback/level_reference.npz": "c6d23bdf858acc4fe9141915fa9d6bbb3314c60843c8e18e1f070bdb26d438cc",
+        "docs/fixtures/stage7-supplement/masked_fallback/options.json": "e1b5c01dd928c6c905a77b68ef8b14f850f1f46d3e8a550e8fec87a38609ef78",
+        "docs/fixtures/stage7-supplement/masked_fallback/truth.npz": "dac3654db20054410876005868f2f268d33d9d7901bc4a2949a8f4039fd5aafb"
+      },
+      "id": "masked_fallback"
+    },
+    {
+      "files_sha256": {
+        "docs/fixtures/stage7-supplement/reduced_representative/data.npz": "2f16c14da6f108731a36c429e2d532a6c4f7ab343a4e989a3cda9c5473faef19",
+        "docs/fixtures/stage7-supplement/reduced_representative/level_reference.npz": "2f16c14da6f108731a36c429e2d532a6c4f7ab343a4e989a3cda9c5473faef19",
+        "docs/fixtures/stage7-supplement/reduced_representative/options.json": "ca9e70108322f9d8a32335315d876053ecf0ff77ab6d2f98138286b205b264c9",
+        "docs/fixtures/stage7-supplement/reduced_representative/truth.npz": "92e92d139ba48feaf06569b34db715a2fc9c58870b6aeb5a6dbc76f3628945af"
+      },
+      "id": "reduced_representative"
+    },
+    {
+      "files_sha256": {
+        "docs/fixtures/stage7-supplement/reduced_fallback/data.npz": "c6d23bdf858acc4fe9141915fa9d6bbb3314c60843c8e18e1f070bdb26d438cc",
+        "docs/fixtures/stage7-supplement/reduced_fallback/level_reference.npz": "c6d23bdf858acc4fe9141915fa9d6bbb3314c60843c8e18e1f070bdb26d438cc",
+        "docs/fixtures/stage7-supplement/reduced_fallback/options.json": "119049aeb89b9e951fd0900634104fd1d85c5a67071028d166b25f477adfc366",
+        "docs/fixtures/stage7-supplement/reduced_fallback/truth.npz": "dac3654db20054410876005868f2f268d33d9d7901bc4a2949a8f4039fd5aafb"
+      },
+      "id": "reduced_fallback"
+    },
+    {
+      "files_sha256": {
+        "docs/fixtures/stage7-supplement/matched_one_factor_fallback/data.npz": "7659b66297994ca2397349ee355cbb157269c1fd65a52d66485d916f0486a910",
+        "docs/fixtures/stage7-supplement/matched_one_factor_fallback/level_reference.npz": "7659b66297994ca2397349ee355cbb157269c1fd65a52d66485d916f0486a910",
+        "docs/fixtures/stage7-supplement/matched_one_factor_fallback/options.json": "6259dc4cb462b0bdf5ef2116635abf50d188ed4fa67ff9f227f1642956cfd293",
+        "docs/fixtures/stage7-supplement/matched_one_factor_fallback/truth.npz": "7af1c6722aade15786332176397302b3cc7dcdfedf853b09e8151787a72595a0"
+      },
+      "id": "matched_one_factor_fallback"
+    }
+  ],
+  "declaration_sha256": "6e1b063212d39f449b1c1f0596c9df38cf415ae79d94ff584205b385ebc382bc",
+  "held_out_scoring_enabled": false
+}

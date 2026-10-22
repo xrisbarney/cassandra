@@ -95,9 +95,17 @@ def hierarchical_level(prefix, categories, center, hyper_sd, scale_sd, init, rev
     return pm.MvNormal(prefix, mu=np.full(categories, center), cov=covariance, initval=init)
 
 
-def build_model(data, options, conditional=None):
+def build_model(data, options, conditional=None, *, level_reference=None):
     revised = amended(options)
-    settings = (level_settings(data, options)
+    if level_reference is not None:
+        fallback = options.get('fallback_index')
+        if fallback is None or not np.array_equal(data['N'], level_reference['N']):
+            raise ValueError('A masked prior reference must preserve the original counts.')
+        expected_mask = np.array(level_reference['mask_N'], copy=True)
+        expected_mask[:, fallback] = False
+        if not np.array_equal(data['mask_N'], expected_mask):
+            raise ValueError('Only the declared fallback count likelihood may be masked.')
+    settings = (level_settings(level_reference if level_reference is not None else data, options)
                 if options.get('prior_id') == CURRENT_PRIOR_ID else None)
     multiplier = settings['amplitude_multiplier'] if settings else 1.
     t, k = data["N"].shape
