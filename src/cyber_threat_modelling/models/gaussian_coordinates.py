@@ -91,7 +91,7 @@ def block_conditional(diagonal, off_diagonal, natural, whitened, rank):
 
 
 def gaussian_states(prefix, months, rank, phi, loading, level, variance, proxy, mask,
-                    solver='dense'):
+                    solver='dense', record_orientation=None):
     """Whiten a working Gaussian conditional, retaining the exact prior/Jacobian."""
     dimension = (months+1)*rank
     innovation_var = 1-phi**2
@@ -131,7 +131,13 @@ def gaussian_states(prefix, months, rank, phi, loading, level, variance, proxy, 
         log_jacobian = -pt.sum(pt.log(pt.diag(cholesky)))
     else:
         raise ValueError('Unknown conditional Gaussian solver.')
-    states = pm.Deterministic(prefix+'_states', states)
+    if record_orientation is None:
+        states = pm.Deterministic(prefix+'_states', states)
+    else:
+        # Canonical sign convention is for storage only. Keep the sampling
+        # target smooth in the working chart, including a zero crossing.
+        states = pm.Deterministic(prefix+'_working_states', states)
+        pm.Deterministic(prefix+'_states', record_orientation*states)
     log_prior = pm.logp(pm.Normal.dist(0, 1), states[0]).sum()
     log_prior += pm.logp(pm.Normal.dist(phi*states[:-1], pt.sqrt(innovation_var)),
                          states[1:]).sum()
@@ -147,11 +153,11 @@ def severity_states(months, rank, phi, loading, level, noise, marks, mask, solve
 
 
 def count_states(months, rank, phi, loading, level, dispersion, counts, mask, effort,
-                 solver='dense'):
+                 solver='dense', record_orientation=None):
     # A variance-stabilizing working approximation defines coordinates only.
     # The caller still uses the exact NB likelihood, including observed zeros.
     adjusted = np.where(mask, counts, 0).astype(float)+.5
     proxy = np.log(adjusted)
     variance = 1/adjusted+1/dispersion[None, :]
     return gaussian_states('f', months, rank, phi, loading, level+effort[:, None],
-                           variance, proxy, mask, solver)
+                           variance, proxy, mask, solver, record_orientation)

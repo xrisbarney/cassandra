@@ -65,7 +65,7 @@ def main():
         for name, digest in result['artifacts'].items():
             if file_hash(folder/name) != digest:
                 raise ValueError(f'Changed artifact: {folder/name}')
-        if case['status'] != 'accepted':
+        if not case.get('recovery_eligible', case['status'] == 'accepted'):
             continue
         options = case['options']
         revised = amended(options)

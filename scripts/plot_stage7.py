@@ -45,10 +45,17 @@ def main():
                 raise ValueError(f'Changed plotted artifact: {folder/relative}')
         plotted.append({'scenario': scenario, 'seed': 7101, 'directory': folder.as_posix(),
                         'status': result['status'],
+                        'recovery_eligible': (record.get('recovery_eligible', True)
+                                              if record else result['status'] == 'accepted'),
                         'result_sha256': file_hash(folder/'result.json')})
         ax.set_title(scenario.replace('_', ' ') + ' (seed 7101)')
         if result['status'] != 'accepted':
             ax.text(.5, .5, 'No admitted posterior\nDiagnostic gate failed',
+                    ha='center', va='center', transform=ax.transAxes)
+            ax.set_axis_off()
+            continue
+        if record and not record.get('recovery_eligible', True):
+            ax.text(.5, .5, 'Numerical gates passed\nKnown posterior modes unresolved',
                     ha='center', va='center', transform=ax.transAxes)
             ax.set_axis_off()
             continue

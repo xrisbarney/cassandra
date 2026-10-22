@@ -9,6 +9,7 @@ from pathlib import Path
 import numpy as np
 
 from cyber_threat_modelling.data.store import write_json
+from cyber_threat_modelling.evaluation.recovery_eligibility import recovery_eligibility
 from cyber_threat_modelling.evaluation.synthetic import SCENARIOS
 from cyber_threat_modelling.models.stage7_priors import (
     CANDIDATES,
@@ -180,6 +181,8 @@ def main():
             record['campaign'] = 'severity_coordinates'
             records.append(record)
     for record in records:
+        record.update(recovery_eligibility(record['directory'], record['status'],
+                                           routing, Path.cwd()))
         reference = primary[record['scenario'], record['seed']]
         for key in ['data_sha256', 'truth_sha256', 'original_truth_sha256']:
             if record[key] != reference[key]:

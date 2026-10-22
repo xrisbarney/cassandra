@@ -78,8 +78,12 @@ def main():
     parser.add_argument('--conditional-severity', action='store_true')
     parser.add_argument('--conditional-counts', action='store_true')
     parser.add_argument('--conditional-iid', action='store_true')
+    parser.add_argument('--sign-anchor', type=int, choices=[3])
     parser.add_argument('--block-coordinates', action='store_true')
     args = parser.parse_args()
+    if args.sign_anchor is not None and (args.scenario != 'effort_proxy'
+                                         or not args.conditional_counts):
+        parser.error('The declared working sign chart applies to conditional proxy fits only.')
     if args.conditional_severity and args.scenario != 'severity_missing':
         parser.error('Conditional severity coordinates apply only to the severity fixture.')
     if args.conditional_iid and args.scenario not in {'dispersion_dense', 'dispersion_sparse'}:
@@ -105,6 +109,8 @@ def main():
         options['severity_parameterization'] = 'conditional'
     if args.conditional_counts:
         options['count_parameterization'] = 'conditional'
+    if args.sign_anchor is not None:
+        options['working_sign_anchor'] = args.sign_anchor
     if args.conditional_iid:
         options['residual_parameterization'] = 'conditional'
     if args.block_coordinates:
@@ -126,6 +132,8 @@ def main():
         files.append(root/'docs/decisions/STAGE7_SEVERITY_COORDINATES_20261021.md')
     if args.conditional_iid:
         files.append(root/'docs/decisions/STAGE7_IID_COORDINATES_20261022.md')
+    if args.sign_anchor is not None:
+        files.append(root/'docs/decisions/STAGE7_SIGN_GAUGE_20261022.md')
     if args.conditional_counts:
         files.append(root/'docs/decisions/STAGE7_COUNT_COORDINATES_20261021.md')
         if args.scenario in {'effort_oracle', 'effort_none', 'factors_sparse'}:

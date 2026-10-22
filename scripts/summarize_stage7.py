@@ -8,6 +8,7 @@ import numpy as np
 import pandas as pd
 
 from cyber_threat_modelling.data.store import write_json
+from cyber_threat_modelling.evaluation.recovery_eligibility import recovery_eligibility
 from cyber_threat_modelling.evaluation.synthetic import SCENARIOS
 from cyber_threat_modelling.provenance import file_hash
 
@@ -48,7 +49,9 @@ def main():
             if file_hash(folder / relative) != digest:
                 raise ValueError(f'Changed artifact: {folder / relative}')
         run = json.loads((folder / 'run.json').read_text())
+        eligibility = recovery_eligibility(folder, record['status'], routing, Path.cwd())
         audit.append({'scenario': name, 'seed': seed, 'status': record['status'],
+                      **eligibility,
                       'directory': folder.as_posix(), 'result_sha256': file_hash(path),
                       'options': record['options'],
                       'source_control': run['source_control'],
@@ -58,6 +61,7 @@ def main():
             measured = bool(markers) and all('warmup_perf_counter_diff_sum' in m for m in markers)
             diagnostics.append({
                 'scenario': name, 'seed': seed, 'retry': attempt['retry'],
+                'case_recovery_eligible': eligibility['recovery_eligible'],
                 **attempt['diagnostics'], 'accepted': attempt['accepted'],
                 **{k: v for k, v in attempt.items() if k.endswith('_seconds')},
                 'unresolved_warnings': json.dumps(attempt['unresolved_warnings']),
@@ -75,7 +79,7 @@ def main():
                     m.get('retained_draws_completed', 0) for m in markers
                 ) if markers and all('retained_draws_completed' in m for m in markers) else None,
             })
-        if record['status'] != 'accepted':
+        if not eligibility['recovery_eligible']:
             continue
         recovery = json.loads((folder / 'recovery.json').read_text())
         for quantity in ['eta_operational', 'eta_generating_interpretation',
@@ -101,6 +105,7 @@ def main():
     write_json(args.output/'audit.json', {
         'runs': audit, 'expected_cases': len(expected),
         'accepted': sum(r['status'] == 'accepted' for r in audit),
+        'recovery_eligible': sum(r['recovery_eligible'] for r in audit),
         'held_out_scoring_enabled': False, 'real_data_read': False,
         'routing_sha256': file_hash(args.routing) if args.routing else None,
         'interpretation': 'Fixed-truth stress/recovery cases; not SBC or real-data validation. '

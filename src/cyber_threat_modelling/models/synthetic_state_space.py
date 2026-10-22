@@ -28,6 +28,23 @@ def loading_matrix(prefix, categories, rank, revised=False, amplitude=1.):
     return pt.set_subtensor(matrix[rows, cols], free)
 
 
+def working_rank_one_loading(categories, anchor, amplitude):
+    """Exact sign chart; canonical deterministics never enter the target."""
+    bound = 2*amplitude
+    positive = pm.TruncatedNormal('f_working_positive', 0, amplitude, lower=0,
+                                   upper=bound, shape=1, initval=np.array([.3]))
+    rows = np.delete(np.arange(categories), anchor)
+    free = pm.TruncatedNormal('f_working_free', 0, amplitude, lower=-bound,
+                              upper=bound, shape=categories-1,
+                              initval=np.zeros(categories-1))
+    matrix = pt.set_subtensor(pt.zeros((categories, 1))[anchor, 0], positive[0])
+    matrix = pt.set_subtensor(matrix[rows, 0], free)
+    orientation = pt.where(matrix[0, 0] >= 0, 1., -1.)
+    pm.Deterministic('f_diag', pt.abs(matrix[0]))
+    pm.Deterministic('f_free', orientation*matrix[1:, 0])
+    return matrix, orientation
+
+
 def factors(prefix, categories, rank, months, parameterization='innovations', revised=False,
             multiplier=1.):
     phi = pm.Uniform(prefix + "_phi", -1, 1, shape=rank, initval=np.full(rank, 0.4))
@@ -85,6 +102,12 @@ def build_model(data, options, conditional=None):
     multiplier = settings['amplitude_multiplier'] if settings else 1.
     t, k = data["N"].shape
     r, rank = options["regimes"], options["factors"]
+    sign_anchor = options.get('working_sign_anchor')
+    if sign_anchor is not None and (
+            not revised or rank != 1 or r != 1 or options['residual'] != 'none'
+            or options['kernel'] or options.get('count_parameterization') != 'conditional'
+            or not isinstance(sign_anchor, int) or not 0 < sign_anchor < k):
+        raise ValueError('Working sign anchor requires the revised rank-one conditional model.')
     conditional_iid = options.get('residual_parameterization') == 'conditional'
     if conditional_iid and (not revised or options['residual'] != 'iid' or rank or r != 1
                             or options['kernel'] or not options['conditional_level']):
@@ -122,10 +145,14 @@ def build_model(data, options, conditional=None):
             from .gaussian_coordinates import count_states
 
             phi_f = pm.Uniform('f_phi', -1, 1, shape=rank, initval=np.full(rank, .4))
-            matrix_f = loading_matrix('f', k, rank, revised, multiplier)
+            orientation = None
+            if sign_anchor is None:
+                matrix_f = loading_matrix('f', k, rank, revised, multiplier)
+            else:
+                matrix_f, orientation = working_rank_one_loading(k, sign_anchor, multiplier)
             base = base + count_states(t, rank, phi_f, matrix_f, m, psi,
                                        data['N'], data['mask_N'], data['effort'],
-                                       options.get('gaussian_solver', 'dense'))
+                                       options.get('gaussian_solver', 'dense'), orientation)
         elif rank:
             base = base + factors("f", k, rank, t,
                                   options.get('factor_parameterization', 'innovations'), revised,
