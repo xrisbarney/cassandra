@@ -3,7 +3,7 @@
 Status, 2026-10-22: **posterior campaign in progress; not yet complete**.
 The active laws are `anchored_levels_v2`. The primary prior-plausibility gates
 pass. A fresh full-suite run passes all 222 tests across 29 files with unchanged
-source hashes. Forty-eight of the 55 declared cases are complete; seven hosted
+source hashes. Fifty of the 55 declared cases are complete; five hosted
 sensitivity cases are on their final prescribed attempts. The remaining work is completion
 of those fits, sensitivity analysis and final component decisions. No real-data
 proposed-model fitting or January 2024--December 2025 scoring has started.
@@ -209,8 +209,8 @@ targeted test records remain preserved; repeated runs are not additional tests.
 The [hosted verification](checks/stage7-hosted-execution-verification-20261022/audit.json)
 passes all 32 selected execution checks on the exact hosted fitting commit.
 Eight hosted cases use exact canonical synthetic fixtures under OPT3; the
-primary fallback case is now verified and imported, with seven sensitivity
-cases still on their final attempts. All
+primary fallback and two sensitivity cases are now verified and imported, with
+five sensitivity cases still on their final attempts. All
 local OPT0 fits are complete; the four final rank-two local cases exhausted
 their diagnostic schedules unsuccessfully. See the
 [hosted decision](decisions/STAGE7_HOSTED_PENDING_20261022.md)

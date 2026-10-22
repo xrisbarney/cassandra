@@ -1,0 +1,9 @@
+{
+  "created_utc": "2026-10-22T12:31:47.238456+00:00",
+  "command": ".tools/Scripts/uv.exe build",
+  "exit_code": 0,
+  "artifacts": {
+    "dist/cyber_threat_modelling-0.1.0-py3-none-any.whl": "da7c3eb6ea5dd003c823c99012e823af0c21f79b8ed5047c024c37efc2164d8f",
+    "dist/cyber_threat_modelling-0.1.0.tar.gz": "f610dd6d350e5285f9586347c93afca1672941c836da1b367f91a3785f42caa5"
+  }
+}

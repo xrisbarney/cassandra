@@ -1,0 +1,13 @@
+{
+  "artifacts": {
+    "cases.csv": "a4300100f88a13c744d42facdff7545bfef33f52ccd710e06a48f649e87ae7a8",
+    "chains.csv": "b9345f6b9cafd10557ddce9020678ea94622a7aad83c175663c58b4724149a28"
+  },
+  "cases": 43,
+  "input_audits": {
+    "docs/simulations/stage7-primary-complete-20261022/summary/audit.json": "5a840cfd44327ad11027ae608973962444ad501b550266f98bd82f833a30624c"
+  },
+  "interpretation": "Components are measured within individual concurrent processes; their sum is job-seconds, not campaign elapsed time. Graph construction is counted once per execution process, including checkpoint continuations. Sample-call time includes warmup, retained draws and internal setup, including deferred JIT; chain phase sums are breakdowns, not additional costs. Preflight repeat medians are descriptive and not added to totals. Python/import startup, post-admission forecast/recovery and outer coordinator overhead were not timed. Four chains were sequential; no four-process startup benchmark is implied. These are synthetic costs, not a production rolling-refit budget.",
+  "recorded_component_job_seconds": 159923.4099652,
+  "source_sha256": "4d0d62c04886a0f99af5d5c9dae38e235f5d8cfbcb36e8ed744aca9d130d8535"
+}

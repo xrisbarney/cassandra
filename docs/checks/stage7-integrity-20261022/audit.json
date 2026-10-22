@@ -1,0 +1,79 @@
+{
+  "activation": {
+    "authority": "User: okay, treat all and proceed; take stage 7 to the end",
+    "files": [
+      {
+        "path": "docs/amendments/STATE_SPACE_LEVELS_20261021.md",
+        "sha256": "7b3c340989576750de28504503af52e86db317e4df7f372914ea2d4e70c99d16"
+      },
+      {
+        "path": "docs/amendments/STATE_SPACE_PRIORS_ACTIVATION_20261021.json",
+        "sha256": "8aeecc526dee9dfd86c7c51037f7d35117cdefbaaa682cff70fe92e4c5895e39"
+      }
+    ],
+    "held_out_scoring_enabled": false,
+    "parent_freeze_sha256": "7597b76276b837f8db9bc2baff63cb035e14cdfa8656885c782795d38cb598e7",
+    "path": "docs/amendments/STATE_SPACE_LEVELS_20261021.json",
+    "prior_id": "anchored_levels_v2",
+    "sha256": "9aeaa185fdfffd4cca9589236a9154fccac5a85a1d9c28c47e4ff6915f39b7ec",
+    "status": "active"
+  },
+  "all_tested_source_files_still_unchanged": true,
+  "checked_utc": "2026-10-22T12:14:42.257499+00:00",
+  "checks": {
+    "configuration": {
+      "command": [
+        ".venv/Scripts/ctm.exe",
+        "validate",
+        "configs/pilot.toml"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "{\n  \"status\": \"valid\",\n  \"configuration_sha256\": \"ba6fcc8c86ed71907472a22d1550a7ea2d458e08c234b7bfcf508632c092d751\",\n  \"evaluation_origin_counts\": {\n    \"1\": 24,\n    \"3\": 22,\n    \"6\": 19,\n    \"12\": 13\n  },\n  \"development_origin_counts\": {\n    \"1\": 60,\n    \"3\": 58,\n    \"6\": 55,\n    \"12\": 49\n  }\n}\n"
+    },
+    "lock": {
+      "command": [
+        ".tools/Scripts/uv.exe",
+        "lock",
+        "--check"
+      ],
+      "exit_code": 0,
+      "stderr": "Resolved 56 packages in 1ms\n",
+      "stdout": ""
+    },
+    "panel_integrity": {
+      "command": [
+        ".venv/Scripts/ctm.exe",
+        "verify-panels",
+        "docs/panels/stage5-20261020/panel_manifest.json"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "{\n  \"status\": \"verified\",\n  \"panel_id\": \"stage5-20261020\",\n  \"primary_count_panel_ready\": true,\n  \"scoring_ready\": false,\n  \"sha256\": \"0448a3eb7f6d4a17d3808b98ad7a315105ed2cc72974cf7828afb4c3d5515840\"\n}\n"
+    },
+    "ruff": {
+      "command": [
+        ".venv/Scripts/ruff.exe",
+        "check",
+        "."
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "All checks passed!\n"
+    }
+  },
+  "held_out_scoring_enabled": false,
+  "interpretation": "Technical integrity checks only; the separate posterior campaign still requires its remaining terminal results.",
+  "passed": true,
+  "source_control": {
+    "dirty": true,
+    "revision": "fb3bb8052ef3b678bca7df07d2f5dc81910b67b2",
+    "status": "available"
+  },
+  "test_audit_sha256": "7003529d65c4930cb7ba52db7f62d8aacd70a6584d0e5328f0a988750ab08785",
+  "unchanged_parent_hashes": {
+    "docs/STAGE2_FREEZE.json": "7597b76276b837f8db9bc2baff63cb035e14cdfa8656885c782795d38cb598e7",
+    "docs/panels/stage5-20261020/panel_manifest.json": "0448a3eb7f6d4a17d3808b98ad7a315105ed2cc72974cf7828afb4c3d5515840",
+    "uv.lock": "78085a93261539225f90e8e6a2595b71b0f9ae0a46fc9822d93bbe550cbbf05a"
+  }
+}
