@@ -1,0 +1,126 @@
+{
+  "complete_targets": [
+    {
+      "candidate": "level_tight",
+      "errors": [
+        {
+          "gradient_max_abs_error": 4.416815357899395e-08,
+          "logp_abs_error": 2.2737367544323206e-12
+        },
+        {
+          "gradient_max_abs_error": 6.295497279040774e-08,
+          "logp_abs_error": 9.549694368615746e-12
+        },
+        {
+          "gradient_max_abs_error": 4.416826904218851e-08,
+          "logp_abs_error": 2.7284841053187847e-12
+        }
+      ],
+      "median_fused_seconds": 0.002001350000000457,
+      "scenario": "representative"
+    },
+    {
+      "candidate": "level_tight",
+      "errors": [
+        {
+          "gradient_max_abs_error": 4.416779830762607e-08,
+          "logp_abs_error": 3.637978807091713e-12
+        },
+        {
+          "gradient_max_abs_error": 6.271729624529598e-08,
+          "logp_abs_error": 7.73070496506989e-12
+        },
+        {
+          "gradient_max_abs_error": 4.4167933310745866e-08,
+          "logp_abs_error": 5.002220859751105e-12
+        }
+      ],
+      "median_fused_seconds": 0.0019968000000289976,
+      "scenario": "fallback_zero"
+    }
+  ],
+  "environment": {
+    "compiler": {
+      "compiler": "GCC 14.2.0, MinGW-w64 12.0.0, x86_64 POSIX SEH UCRT",
+      "compiler_bin": "C:\\Users\\runneradmin\\AppData\\Local\\Programs\\CassandraToolchain\\14.2.0posix-12.0.0-ucrt-r3\\mingw64\\bin",
+      "compiler_binary_sha256": "f45f8fd915aecbf8a15692089dee8ebef0f210148f13ea5c1642e55376dd234c",
+      "compiler_path": "C:\\Users\\runneradmin\\AppData\\Local\\Programs\\CassandraToolchain\\14.2.0posix-12.0.0-ucrt-r3\\mingw64\\bin\\g++.exe",
+      "release": "14.2.0posix-12.0.0-ucrt-r3",
+      "sha256": "88868d745b807f083a117ff69348d8bc021ad7389aa503379dbed1866efcaeb9",
+      "url": "https://github.com/brechtsanders/winlibs_mingw/releases/download/14.2.0posix-12.0.0-ucrt-r3/winlibs-x86_64-posix-seh-gcc-14.2.0-mingw-w64ucrt-12.0.0-r3.zip",
+      "version_output": "g++.exe (MinGW-W64 x86_64-ucrt-posix-seh, built by Brecht Sanders, r3) 14.2.0"
+    },
+    "github_run_id": "39752106959",
+    "github_sha": "29f210f46f978741e696082596d021ba0ff2b577",
+    "numba_cache": true,
+    "numba_fastmath": true,
+    "numba_opt": "3",
+    "platform": "Windows-2022Server-10.0.20348-SP0",
+    "processor": "AMD64 Family 25 Model 1 Stepping 1, AuthenticAMD",
+    "python": "3.12.0 (tags/v3.12.0:0fb18b0, Oct  2 2023, 13:03:39) [MSC v.1935 64 bit (AMD64)]"
+  },
+  "fixtures": [
+    {
+      "data_sha256": "6556b3fb7258acda4ba1e969af026ce8c54cd2ddbd4f051ac375e6ccc37da112",
+      "key": "primary-fallback_zero-7103",
+      "matched": true,
+      "truth_original_coordinates_sha256": "67d2efbf6cff1817eee11a71db6d758dd0d05e0e49ec706cb8df94250fae9def",
+      "truth_sha256": "3c0b8a27d8ebd4fdb5fb204d4e367d2d16b871916566d2935ac3e88401243328"
+    },
+    {
+      "data_sha256": "2f16c14da6f108731a36c429e2d532a6c4f7ab343a4e989a3cda9c5473faef19",
+      "key": "level_tight-representative-7101",
+      "matched": true,
+      "truth_original_coordinates_sha256": "9fca1f6c6e33992fe0a0bb22a0599a87ac6aa677385e5b6873808e7e12fd3eec",
+      "truth_sha256": "92e92d139ba48feaf06569b34db715a2fc9c58870b6aeb5a6dbc76f3628945af"
+    },
+    {
+      "data_sha256": "c6d23bdf858acc4fe9141915fa9d6bbb3314c60843c8e18e1f070bdb26d438cc",
+      "key": "level_tight-fallback_zero-7101",
+      "matched": true,
+      "truth_original_coordinates_sha256": "b48cdc70e3dff4635810daf06d6b1910d3e03c43d9db27b1745919cdc1186b2a",
+      "truth_sha256": "dac3654db20054410876005868f2f268d33d9d7901bc4a2949a8f4039fd5aafb"
+    },
+    {
+      "data_sha256": "2f16c14da6f108731a36c429e2d532a6c4f7ab343a4e989a3cda9c5473faef19",
+      "key": "level_wide-representative-7101",
+      "matched": true,
+      "truth_original_coordinates_sha256": "9fca1f6c6e33992fe0a0bb22a0599a87ac6aa677385e5b6873808e7e12fd3eec",
+      "truth_sha256": "92e92d139ba48feaf06569b34db715a2fc9c58870b6aeb5a6dbc76f3628945af"
+    },
+    {
+      "data_sha256": "c6d23bdf858acc4fe9141915fa9d6bbb3314c60843c8e18e1f070bdb26d438cc",
+      "key": "level_wide-fallback_zero-7101",
+      "matched": true,
+      "truth_original_coordinates_sha256": "b48cdc70e3dff4635810daf06d6b1910d3e03c43d9db27b1745919cdc1186b2a",
+      "truth_sha256": "dac3654db20054410876005868f2f268d33d9d7901bc4a2949a8f4039fd5aafb"
+    },
+    {
+      "data_sha256": "2f16c14da6f108731a36c429e2d532a6c4f7ab343a4e989a3cda9c5473faef19",
+      "key": "dynamics_tight-representative-7101",
+      "matched": true,
+      "truth_original_coordinates_sha256": "9fca1f6c6e33992fe0a0bb22a0599a87ac6aa677385e5b6873808e7e12fd3eec",
+      "truth_sha256": "92e92d139ba48feaf06569b34db715a2fc9c58870b6aeb5a6dbc76f3628945af"
+    },
+    {
+      "data_sha256": "c6d23bdf858acc4fe9141915fa9d6bbb3314c60843c8e18e1f070bdb26d438cc",
+      "key": "dynamics_tight-fallback_zero-7101",
+      "matched": true,
+      "truth_original_coordinates_sha256": "b48cdc70e3dff4635810daf06d6b1910d3e03c43d9db27b1745919cdc1186b2a",
+      "truth_sha256": "dac3654db20054410876005868f2f268d33d9d7901bc4a2949a8f4039fd5aafb"
+    },
+    {
+      "data_sha256": "2f16c14da6f108731a36c429e2d532a6c4f7ab343a4e989a3cda9c5473faef19",
+      "key": "dynamics_wide-representative-7101",
+      "matched": true,
+      "truth_original_coordinates_sha256": "9fca1f6c6e33992fe0a0bb22a0599a87ac6aa677385e5b6873808e7e12fd3eec",
+      "truth_sha256": "92e92d139ba48feaf06569b34db715a2fc9c58870b6aeb5a6dbc76f3628945af"
+    }
+  ],
+  "held_out_scoring_enabled": false,
+  "interpretation": "Environment/fixture/numerical verification only; no posterior admission.",
+  "passed": true,
+  "plan_sha256": "0b616c5256b05c9fcb9acd73cf4b7d392379cd883951fbc8c60979a8fa10bb07",
+  "real_data_read": false,
+  "source_sha256": "1001ed3df573c14d87ab0a73cbffde16c0f0a0806027073549d97213d906e045"
+}

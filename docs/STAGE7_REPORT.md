@@ -196,9 +196,11 @@ adds ten distinct tests for the narrowly classified cache warning and synthetic
 grid entry guards. The [batch-identity follow-up](checks/stage7-compiler-warning-20261022/batch_identity_followup.json)
 adds two more. Six [hosted-execution guard tests](checks/stage7-hosted-guards-20261022/audit.json)
 then pass locally. Eight [checkpoint integrity tests](checks/stage7-checkpoint-20261022/audit.json)
-and two continuation integration cases bring the total to 218 distinct passing tests. The first hosted environment
-verification passed; additional compiler profiling is pending and hosted fitting
-has not been activated.
+and two continuation integration cases bring the total to 218 distinct passing tests; four further canonical-input cases bring the total to 222. The hosted OPT3 verification passed. Eight pending cases are activated for
+hosted execution using exact canonical fixtures, subject to a fresh verification
+gate on the execution commit. Four local OPT0 fits continue. See the
+[hosted decision](decisions/STAGE7_HOSTED_PENDING_20261022.md) for the preserved
+OPT0 regeneration-hash failure and separate regeneration comparisons.
 The repeated seven-test
 warning-only run is not added again. The subsequent changes concern warning
 classification, compiler metadata and synthetic scheduling; the verified model

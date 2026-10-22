@@ -1,8 +1,9 @@
 # Hosted execution of pending synthetic cases
 
-Prepared 2026-10-22. **Verification only; fitting is not yet activated.**
-The corresponding [plan](STAGE7_HOSTED_PENDING_20261022.json) refuses fitting
-until its status is explicitly changed after successful hosted verification.
+Prepared and activated 2026-10-22 after full hosted OPT3 verification.
+The corresponding [plan](STAGE7_HOSTED_PENDING_20261022.json) binds the exact
+pending cases and inputs. A fresh verification job on the execution commit
+must also pass before its fitting jobs can start.
 
 The first Windows verification, run 39747925041 at commit db53e40, passed all
 16 coordinate/guard tests, all eight fixture byte hashes and complete native/
@@ -15,6 +16,23 @@ environment; no profile can be selected by posterior acceptance or recovery.
 Both profiles must pass the original numerical tolerances. The four active
 local fits keep their existing compiler configuration and sampling schedules.
 
+The [profile review](../checks/stage7-hosted-profile-20261022/selection.json)
+selects OPT3 for the eight pending hosted cases. Its full-size median fused
+evaluation is about 0.002 seconds; maximum absolute gradient discrepancy is
+6.30e-8. These measurements used different fresh hosts and cache histories,
+so they are not a controlled speedup estimate. The local OPT0 fits continue.
+The second OPT0 job passed 23 checks but failed the exact regenerated transformed
+truth hash for fallback seed 7103; no fitting ran. The OPT3 job passed all 24
+checks and all original hashes. That mismatch is preserved, not overwritten.
+
+Canonical local NPZ files are now committed for the three distinct datasets
+used by these eight cases. Every fit reads these exact pinned observations and
+truths, with their original hashes. Independent host regeneration is reported
+separately: integer/bool arrays must be exact, floats agree to 1e-14 relative/
+absolute tolerance, and every maximum difference is retained. Regenerated
+floating-point arrays never replace the canonical fitting or recovery inputs.
+This prevents machine-dependent generator rounding from changing an experiment.
+
 Eight cases from the existing 43-primary/12-sensitivity design have not started
 locally: primary fallback seed 7103; representative and fallback seed 7101 for
 `level_tight`, `level_wide` and `dynamics_tight`; and the `dynamics_wide`
@@ -24,7 +42,7 @@ selection grid. The four active local cases continue their prescribed schedules.
 The repository is public and Actions is enabled. The prepared workflow uses
 standard `windows-2022` runners, CPython 3.12.0 matching the local interpreter,
 uv 0.13.4, the unchanged lock, and the same checksum-pinned MinGW 14.2 compiler.
-It uses NUMBA_OPT=0, one numerical thread, four sequential chains, joint level
+It uses NUMBA_OPT=3, one numerical thread, four sequential chains, joint level
 coordinates, the block solver and a diagonal metric. Priors, seeds, budgets,
 observations, diagnostic thresholds and recovery requirements are unchanged.
 Hardware and OS build differences will be recorded; timing comparisons must
@@ -37,7 +55,8 @@ and native/Numba complete-target and gradient comparisons on full-size count
 and fallback fixtures, including near-unit persistence. The numerical source,
 lock, compiler specification and original freeze hashes are pinned in the plan.
 No real data, credentials from the local environment or held-out targets are
-transferred. Actions receive only the repository and generate synthetic fixtures.
+transferred. Actions receive only the repository, including the pinned synthetic
+fixtures, and independently regenerate them for comparison.
 
 The workflow has read-only repository permission and no automatic push/PR
 trigger. The first dispatch is verification-only. If activated, each case must

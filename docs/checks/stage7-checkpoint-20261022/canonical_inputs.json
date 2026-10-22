@@ -1,0 +1,15 @@
+{
+  "additional_distinct_tests": 4,
+  "project_tests": 222,
+  "result": "8 runner cases passed in 18.29s; 18 related tests passed in 16.85s",
+  "scope": "Mocked uninterrupted and paused canonical-input runs retain exact NPZ byte hashes, retry seeds, initialization arrays and failure handling. No posterior convergence claim.",
+  "sources": {
+    "scripts/ci_stage7.py": "af9cdc37cf4a8b3e717053a1af64ea1c42a5afb0b22e23dae47f2cb4912997f4",
+    "scripts/run_stage7.py": "8a9e408ec1ab883d5dab45a4e5449ee662e655084f83b780612388d2faffcfc5",
+    "tests/test_synthetic_runner.py": "f6497ee77b7651987350ab337f64939adcd43c4b3f31385cf349e1e196d06eab"
+  },
+  "tools": [
+    "5d6b68",
+    "0870be"
+  ]
+}

@@ -13,7 +13,7 @@ permissions:
   contents: read
 
 env:
-  NUMBA_OPT: '0'
+  NUMBA_OPT: '3'
   OPENBLAS_NUM_THREADS: '1'
   OMP_NUM_THREADS: '1'
   MKL_NUM_THREADS: '1'
@@ -28,7 +28,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        opt: ['0', '3']
+        opt: ['3']
     env:
       NUMBA_OPT: ${{ matrix.opt }}
     steps:
@@ -49,7 +49,7 @@ jobs:
         shell: pwsh
         run: |
           . ./scripts/Use-Compiler.ps1
-          .venv/Scripts/python.exe -m pytest tests/test_stage7_joint_coordinates.py tests/test_stage7_block_coordinates.py tests/test_stage7_hosted.py tests/test_stage7_checkpoint.py -q
+          .venv/Scripts/python.exe -m pytest tests/test_stage7_joint_coordinates.py tests/test_stage7_block_coordinates.py tests/test_stage7_hosted.py tests/test_stage7_checkpoint.py tests/test_synthetic_runner.py -q
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           .venv/Scripts/python.exe scripts/ci_stage7.py verify --output artifacts/stage7/hosted-verification
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }

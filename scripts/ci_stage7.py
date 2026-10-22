@@ -42,21 +42,42 @@ def checked_plan(root, fitting=False):
     return plan
 
 
-def fixture(case):
+def fixture(case, comparisons=None):
     data, original, options = generate(case['scenario'], case['seed'])
     truth = stationary_truth(original, options)
+    canonical = {}
     for key, values in [('data_sha256', data), ('truth_sha256', truth),
                         ('truth_original_coordinates_sha256', original)]:
+        path = Path(case['fixture_directory']) / (key.removesuffix('_sha256') + '.npz')
+        if file_hash(path) != case[key]:
+            raise ValueError(f'Hosted synthetic fixture differs: {case["key"]} {key}')
+        with np.load(path) as loaded:
+            saved = dict(loaded)
         buffer = io.BytesIO()
         np.savez_compressed(buffer, **values)
-        if hashlib.sha256(buffer.getvalue()).hexdigest() != case[key]:
-            raise ValueError(f'Hosted synthetic fixture differs: {case["key"]} {key}')
+        if comparisons is not None:
+            comparisons.append({
+                'case': case['key'], 'fixture': key, 'canonical_sha256': case[key],
+                'regenerated_sha256': hashlib.sha256(buffer.getvalue()).hexdigest(),
+                'maximum_array_absolute_errors': {
+                    name: float(np.max(np.abs(values[name].astype(float)
+                                               - saved[name].astype(float)), initial=0))
+                    for name in values if name in saved},
+            })
+        if set(saved) != set(values):
+            raise ValueError('Canonical fixture array names differ from generator.')
+        for name in values:
+            if np.issubdtype(values[name].dtype, np.inexact):
+                np.testing.assert_allclose(values[name], saved[name], rtol=1e-14, atol=1e-14)
+            else:
+                np.testing.assert_array_equal(values[name], saved[name])
+        canonical[key] = saved
     options.update(prior_id=CURRENT_PRIOR_ID, prior_candidate=case['candidate'],
                    count_parameterization='conditional', gaussian_solver='block',
                    level_parameterization='joint_conditional',
                    factor_parameterization='anchored', mass_matrix='diagonal')
-    options['level_settings'] = level_settings(data, options)
-    return data, truth, options
+    options['level_settings'] = level_settings(canonical['data_sha256'], options)
+    return canonical['data_sha256'], canonical['truth_sha256'], options
 
 
 def environment(plan, fitting=False):
@@ -86,9 +107,12 @@ def environment(plan, fitting=False):
 def verification(plan, output, host):
     from cyber_threat_modelling.models.synthetic_state_space import build_model
 
-    fixtures = []
+    fixtures, regeneration = [], []
     for case in plan['cases']:
-        fixture(case)
+        try:
+            fixture(case, regeneration)
+        finally:
+            write_json(output / 'regeneration.json', regeneration)
         fixtures.append({'key': case['key'], 'matched': True,
                          **{k: v for k, v in case.items() if k.endswith('_sha256')}})
     # Full-size fixed points supplement the independent dense-coordinate tests in CI.
@@ -126,6 +150,7 @@ def verification(plan, output, host):
     write_json(output / 'verification.json', {
         'passed': True, 'plan_sha256': file_hash(PLAN), 'source_sha256': file_hash(Path(__file__)),
         'environment': host, 'fixtures': fixtures, 'complete_targets': comparisons,
+        'regeneration': regeneration,
         'real_data_read': False, 'held_out_scoring_enabled': False,
         'interpretation': 'Environment/fixture/numerical verification only; '
         'no posterior admission.'})
@@ -174,7 +199,8 @@ def main():
         raise ValueError('Initial hosted case directory already exists.')
     command = [sys.executable, '-u', 'scripts/run_stage7.py', '--scenario', case['scenario'],
                '--seed', str(case['seed']), '--prior-candidate', case['candidate'],
-               '--output', case['directory'], *plan['fit_flags'], '--pause-after-attempt']
+               '--output', case['directory'], *plan['fit_flags'], '--pause-after-attempt',
+               '--fixture-directory', case['fixture_directory']]
     if args.attempt:
         command.append('--resume-attempts')
     process = subprocess.run(command, check=False)

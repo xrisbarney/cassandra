@@ -83,6 +83,7 @@ def main():
     parser.add_argument('--block-coordinates', action='store_true')
     parser.add_argument('--pause-after-attempt', action='store_true')
     parser.add_argument('--resume-attempts', action='store_true')
+    parser.add_argument('--fixture-directory', type=Path)
     args = parser.parse_args()
     if args.resume_attempts and not args.pause_after_attempt:
         parser.error('Checkpoint continuation requires one-attempt execution.')
@@ -118,6 +119,26 @@ def main():
     data, truth, options = generate(args.scenario, args.seed)
     original_truth = truth
     truth = stationary_truth(truth, options)
+    canonical_files = []
+    if args.fixture_directory:
+        fixture_root = root / 'docs/fixtures/stage7' / f'{args.scenario}-{args.seed}'
+        if args.fixture_directory.resolve() != fixture_root.resolve() or not args.joint_levels:
+            raise ValueError('Only the declared canonical rank-two fixture is permitted.')
+        hosted_plan = json.loads((root / 'docs/decisions/STAGE7_HOSTED_PENDING_20261022.json')
+                                 .read_text(encoding='utf-8'))
+        matching = [c for c in hosted_plan['cases'] if c['scenario'] == args.scenario
+                    and c['seed'] == args.seed and c['candidate'] == args.prior_candidate]
+        if len(matching) != 1:
+            raise ValueError('Canonical fixture is outside the declared hosted cases.')
+        values = []
+        for name in ('data', 'truth', 'truth_original_coordinates'):
+            path = fixture_root / f'{name}.npz'
+            if file_hash(path) != matching[0][name + '_sha256']:
+                raise ValueError('Changed canonical synthetic fixture.')
+            with np.load(path) as loaded:
+                values.append(dict(loaded))
+            canonical_files.append(path)
+        data, truth, original_truth = values
     options['prior_id'] = CURRENT_PRIOR_ID
     options['prior_candidate'] = args.prior_candidate
     if args.conditional_severity:
@@ -156,6 +177,7 @@ def main():
     files = list((root / 'src').rglob('*.py')) + [Path(__file__), root / 'uv.lock',
              root / 'docs/STAGE7_DESIGN.md', root / 'docs/STAGE2_FREEZE.json',
              root / 'src/cyber_threat_modelling/evaluation/synthetic_checkpoint.py']
+    files.extend(canonical_files)
     if args.anchor_factors:
         files.append(root/'docs/decisions/STAGE7_AMPLITUDE_COORDINATES_20261021.md')
     if args.conditional_severity:

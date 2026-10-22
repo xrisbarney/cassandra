@@ -16,8 +16,9 @@ from cyber_threat_modelling.models import synthetic_state_space
 
 @pytest.mark.parametrize('reason', ['divergence', 'depth'])
 @pytest.mark.parametrize('paused', [False, True])
+@pytest.mark.parametrize('canonical', [False, True])
 def test_failed_retained_draw_saves_checkpoint_and_never_becomes_a_posterior(
-    tmp_path, monkeypatch, reason, paused
+    tmp_path, monkeypatch, reason, paused, canonical
 ):
     script = Path(__file__).resolve().parents[1]/'scripts/run_stage7.py'
     runner = runpy.run_path(str(script))
@@ -29,11 +30,12 @@ def test_failed_retained_draw_saves_checkpoint_and_never_becomes_a_posterior(
     monkeypatch.setattr(pytensor.config, 'cxx', 'compiler-detection-only-in-this-mocked-test')
 
     seeds = []
+    seed = 7103 if canonical else 7101
 
     def sample(**kwargs):
         seeds.append(kwargs['random_seed'])
         retry = len(seeds) - 1
-        expected = np.random.default_rng(7101 + retry * 100)
+        expected = np.random.default_rng(seed + retry * 100)
         for initial in kwargs['initvals']:
             np.testing.assert_array_equal(initial['state'], expected.normal(0, .1, size=(1,)))
         warnings.warn('fixture numerical warning', RuntimeWarning, stacklevel=1)
@@ -50,8 +52,13 @@ def test_failed_retained_draw_saves_checkpoint_and_never_becomes_a_posterior(
 
     monkeypatch.setattr(pm, 'sample', sample)
     output = tmp_path/'case'
-    command = [str(script), '--scenario', 'independent', '--seed', '7101',
+    command = [str(script), '--scenario', 'fallback_zero' if canonical else 'independent',
+               '--seed', str(seed),
                '--output', str(output)]
+    if canonical:
+        command.extend(['--joint-levels', '--conditional-counts', '--block-coordinates',
+                        '--anchor-factors', '--fixture-directory',
+                        'docs/fixtures/stage7/fallback_zero-7103'])
     if paused:
         command.append('--pause-after-attempt')
     for retry in range(3 if paused else 1):
@@ -60,7 +67,13 @@ def test_failed_retained_draw_saves_checkpoint_and_never_becomes_a_posterior(
         if paused and retry < 2:
             assert not (output / 'result.json').exists()
             assert (output / f'checkpoint_{retry}.json').exists()
-    assert seeds == [7101, 7102, 7103]
+    assert seeds == [seed, seed + 1, seed + 2]
+    if canonical:
+        from cyber_threat_modelling.provenance import file_hash
+
+        for name in ('data', 'truth', 'truth_original_coordinates'):
+            assert file_hash(output / f'{name}.npz') == file_hash(
+                Path('docs/fixtures/stage7/fallback_zero-7103') / f'{name}.npz')
     record = json.loads((output/'result.json').read_text())
     assert record['status'] == 'failed_diagnostic_gate'
     assert len(record['attempts']) == 3

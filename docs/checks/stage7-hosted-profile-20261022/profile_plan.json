@@ -1,0 +1,116 @@
+{
+  "cases": [
+    {
+      "candidate": "primary",
+      "data_sha256": "6556b3fb7258acda4ba1e969af026ce8c54cd2ddbd4f051ac375e6ccc37da112",
+      "directory": "artifacts/stage7/rank-two-joint-v1/primary/fallback_zero-7103",
+      "key": "primary-fallback_zero-7103",
+      "scenario": "fallback_zero",
+      "seed": 7103,
+      "truth_original_coordinates_sha256": "67d2efbf6cff1817eee11a71db6d758dd0d05e0e49ec706cb8df94250fae9def",
+      "truth_sha256": "3c0b8a27d8ebd4fdb5fb204d4e367d2d16b871916566d2935ac3e88401243328"
+    },
+    {
+      "candidate": "level_tight",
+      "data_sha256": "2f16c14da6f108731a36c429e2d532a6c4f7ab343a4e989a3cda9c5473faef19",
+      "directory": "artifacts/stage7/rank-two-joint-v1/level_tight/representative-7101",
+      "key": "level_tight-representative-7101",
+      "scenario": "representative",
+      "seed": 7101,
+      "truth_original_coordinates_sha256": "9fca1f6c6e33992fe0a0bb22a0599a87ac6aa677385e5b6873808e7e12fd3eec",
+      "truth_sha256": "92e92d139ba48feaf06569b34db715a2fc9c58870b6aeb5a6dbc76f3628945af"
+    },
+    {
+      "candidate": "level_tight",
+      "data_sha256": "c6d23bdf858acc4fe9141915fa9d6bbb3314c60843c8e18e1f070bdb26d438cc",
+      "directory": "artifacts/stage7/rank-two-joint-v1/level_tight/fallback_zero-7101",
+      "key": "level_tight-fallback_zero-7101",
+      "scenario": "fallback_zero",
+      "seed": 7101,
+      "truth_original_coordinates_sha256": "b48cdc70e3dff4635810daf06d6b1910d3e03c43d9db27b1745919cdc1186b2a",
+      "truth_sha256": "dac3654db20054410876005868f2f268d33d9d7901bc4a2949a8f4039fd5aafb"
+    },
+    {
+      "candidate": "level_wide",
+      "data_sha256": "2f16c14da6f108731a36c429e2d532a6c4f7ab343a4e989a3cda9c5473faef19",
+      "directory": "artifacts/stage7/rank-two-joint-v1/level_wide/representative-7101",
+      "key": "level_wide-representative-7101",
+      "scenario": "representative",
+      "seed": 7101,
+      "truth_original_coordinates_sha256": "9fca1f6c6e33992fe0a0bb22a0599a87ac6aa677385e5b6873808e7e12fd3eec",
+      "truth_sha256": "92e92d139ba48feaf06569b34db715a2fc9c58870b6aeb5a6dbc76f3628945af"
+    },
+    {
+      "candidate": "level_wide",
+      "data_sha256": "c6d23bdf858acc4fe9141915fa9d6bbb3314c60843c8e18e1f070bdb26d438cc",
+      "directory": "artifacts/stage7/rank-two-joint-v1/level_wide/fallback_zero-7101",
+      "key": "level_wide-fallback_zero-7101",
+      "scenario": "fallback_zero",
+      "seed": 7101,
+      "truth_original_coordinates_sha256": "b48cdc70e3dff4635810daf06d6b1910d3e03c43d9db27b1745919cdc1186b2a",
+      "truth_sha256": "dac3654db20054410876005868f2f268d33d9d7901bc4a2949a8f4039fd5aafb"
+    },
+    {
+      "candidate": "dynamics_tight",
+      "data_sha256": "2f16c14da6f108731a36c429e2d532a6c4f7ab343a4e989a3cda9c5473faef19",
+      "directory": "artifacts/stage7/rank-two-joint-v1/dynamics_tight/representative-7101",
+      "key": "dynamics_tight-representative-7101",
+      "scenario": "representative",
+      "seed": 7101,
+      "truth_original_coordinates_sha256": "9fca1f6c6e33992fe0a0bb22a0599a87ac6aa677385e5b6873808e7e12fd3eec",
+      "truth_sha256": "92e92d139ba48feaf06569b34db715a2fc9c58870b6aeb5a6dbc76f3628945af"
+    },
+    {
+      "candidate": "dynamics_tight",
+      "data_sha256": "c6d23bdf858acc4fe9141915fa9d6bbb3314c60843c8e18e1f070bdb26d438cc",
+      "directory": "artifacts/stage7/rank-two-joint-v1/dynamics_tight/fallback_zero-7101",
+      "key": "dynamics_tight-fallback_zero-7101",
+      "scenario": "fallback_zero",
+      "seed": 7101,
+      "truth_original_coordinates_sha256": "b48cdc70e3dff4635810daf06d6b1910d3e03c43d9db27b1745919cdc1186b2a",
+      "truth_sha256": "dac3654db20054410876005868f2f268d33d9d7901bc4a2949a8f4039fd5aafb"
+    },
+    {
+      "candidate": "dynamics_wide",
+      "data_sha256": "2f16c14da6f108731a36c429e2d532a6c4f7ab343a4e989a3cda9c5473faef19",
+      "directory": "artifacts/stage7/rank-two-joint-v1/dynamics_wide/representative-7101",
+      "key": "dynamics_wide-representative-7101",
+      "scenario": "representative",
+      "seed": 7101,
+      "truth_original_coordinates_sha256": "9fca1f6c6e33992fe0a0bb22a0599a87ac6aa677385e5b6873808e7e12fd3eec",
+      "truth_sha256": "92e92d139ba48feaf06569b34db715a2fc9c58870b6aeb5a6dbc76f3628945af"
+    }
+  ],
+  "checkpoint_execution": "One complete prescribed attempt per job; sealed failed attempts continue with the next original retry seed. Partial chains cannot resume.",
+  "date": "2026-10-22",
+  "files_sha256": {
+    "configs/windows_compiler.json": "61606400e44dec7b33349674846c4f7e9938ee68753c787a239d2c6294682514",
+    "docs/STAGE2_FREEZE.json": "7597b76276b837f8db9bc2baff63cb035e14cdfa8656885c782795d38cb598e7",
+    "scripts/run_stage7.py": "de58b1659d738a85fce2acfc649d30a53f324e93e72fab0388c703c455d0e43a",
+    "src/cyber_threat_modelling/evaluation/synthetic.py": "a43f4183345762257e92b38f393676651ce9bdd36d127930977088f1a608bf51",
+    "src/cyber_threat_modelling/evaluation/synthetic_checkpoint.py": "12307252c237d96ba1d2bfc95965c8a748a945771a3d0a6e8b5d1fcaf2d13cf8",
+    "src/cyber_threat_modelling/models/block_gaussian.py": "b497916c36ec5a78586674f6abaff50f19a7f811937628e183de36fb0823f980",
+    "src/cyber_threat_modelling/models/gaussian_coordinates.py": "2da2668117d7c13b3605ac1dcb806bb733c562034d242747bfc5fc458a5735cb",
+    "src/cyber_threat_modelling/models/joint_coordinates.py": "57dc09dc2def8195ecf2b3df37ce59ee1296d9c53a75e10071b7aaa100de819f",
+    "src/cyber_threat_modelling/models/stage7_priors.py": "89b8e2d4166c84c0f3742a799daf75f1bf77b2688c9616236e08b7427f7ef381",
+    "src/cyber_threat_modelling/models/synthetic_state_space.py": "f5320dfdf45ed0b7e578e82067c579d83525148d05320927110a504e663e949e",
+    "uv.lock": "78085a93261539225f90e8e6a2595b71b0f9ae0a46fc9822d93bbe550cbbf05a"
+  },
+  "fit_flags": [
+    "--anchor-factors",
+    "--conditional-counts",
+    "--block-coordinates",
+    "--joint-levels"
+  ],
+  "held_out_scoring_enabled": false,
+  "numba_opt": "0",
+  "python_version": "3.12.0",
+  "real_data_read": false,
+  "runner": "windows-2022",
+  "scope": "Eight previously declared cases not started locally. No statistical law, budget, diagnostic gate or seed changes. Four running local cases continue. Remote fitting requires a later active plan and successful CI verification.",
+  "status": "prepared_verification_only",
+  "verification_numba_profiles": [
+    "0",
+    "3"
+  ]
+}

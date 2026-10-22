@@ -1,0 +1,15 @@
+{
+  "maximum_gradient_error": 6.295497279040774e-08,
+  "no_sampling_gate_changed": true,
+  "opt0_failure_log_sha256": "09c68d4313fa43b69b523fb7a489810ab75559766d56d3ecfc0ef1dde5469b80",
+  "opt0_first_successful_run": 39747925041,
+  "opt0_followup_status": "23 of 24 tests passed; regenerated fallback7103 transformed truth NPZ differed from pinned bytes. No fits ran. Canonical fixtures now supplied exactly; regeneration measured separately.",
+  "prior_profile": 0,
+  "rationale": "OPT3 passes full native/Numba target checks, with repeated fused time about .002 seconds versus .031 in earlier hosted OPT0. Different fresh hosts/cache histories; not a controlled speedup estimate. No posterior results used. Four local runs remain OPT0.",
+  "selected_numba_opt": 3,
+  "verification_head": "29f210f46f978741e696082596d021ba0ff2b577",
+  "verification_run": 39752106959,
+  "verified_records": {
+    "opt3_verification.json": "99b17c7a847ab8872f259fc8b5fc4dac4303b855a33165a1946ba412a6ae6de5"
+  }
+}

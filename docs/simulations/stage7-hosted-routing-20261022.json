@@ -1,0 +1,16 @@
+{
+  "cases": [
+    "primary-fallback_zero-7103",
+    "level_tight-representative-7101",
+    "level_tight-fallback_zero-7101",
+    "level_wide-representative-7101",
+    "level_wide-fallback_zero-7101",
+    "dynamics_tight-representative-7101",
+    "dynamics_tight-fallback_zero-7101",
+    "dynamics_wide-representative-7101"
+  ],
+  "decision": "Execution host/profile only; canonical directories unchanged, before any of these cases starts. Four local cases continue.",
+  "plan_sha256": "f52a86c3b022bc5bb099e89fb6e4c0a484ac57cb70b2c70ca60b43fb8df64cf3",
+  "previous_routing_sha256": "25960736b769906b51a8e09c0a4edcaf1b119a05685c2ca0b939e1915dc5e365",
+  "routing_sha256": "a23cfc9d55c2dfafc862f5047b5bb07191b816e6764d1c82bb9375f8b7460218"
+}

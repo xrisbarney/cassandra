@@ -1,0 +1,20 @@
+{
+  "compiler": {
+    "compiler": "GCC 14.2.0, MinGW-w64 12.0.0, x86_64 POSIX SEH UCRT",
+    "compiler_bin": "C:\\Users\\runneradmin\\AppData\\Local\\Programs\\CassandraToolchain\\14.2.0posix-12.0.0-ucrt-r3\\mingw64\\bin",
+    "compiler_binary_sha256": "f45f8fd915aecbf8a15692089dee8ebef0f210148f13ea5c1642e55376dd234c",
+    "compiler_path": "C:\\Users\\runneradmin\\AppData\\Local\\Programs\\CassandraToolchain\\14.2.0posix-12.0.0-ucrt-r3\\mingw64\\bin\\g++.exe",
+    "release": "14.2.0posix-12.0.0-ucrt-r3",
+    "sha256": "88868d745b807f083a117ff69348d8bc021ad7389aa503379dbed1866efcaeb9",
+    "url": "https://github.com/brechtsanders/winlibs_mingw/releases/download/14.2.0posix-12.0.0-ucrt-r3/winlibs-x86_64-posix-seh-gcc-14.2.0-mingw-w64ucrt-12.0.0-r3.zip",
+    "version_output": "g++.exe (MinGW-W64 x86_64-ucrt-posix-seh, built by Brecht Sanders, r3) 14.2.0"
+  },
+  "github_run_id": "39752106959",
+  "github_sha": "29f210f46f978741e696082596d021ba0ff2b577",
+  "numba_cache": true,
+  "numba_fastmath": true,
+  "numba_opt": "3",
+  "platform": "Windows-2022Server-10.0.20348-SP0",
+  "processor": "AMD64 Family 25 Model 1 Stepping 1, AuthenticAMD",
+  "python": "3.12.0 (tags/v3.12.0:0fb18b0, Oct  2 2023, 13:03:39) [MSC v.1935 64 bit (AMD64)]"
+}
