@@ -1,0 +1,16 @@
+{
+  "changes": [
+    {
+      "file": "docs/decisions/STAGE7_SYNTHETIC_GRID_COMPLETION_20261022.md",
+      "before_sha256": "6d355aa3797efa5493202f577c79d6b8c5c0004c548088a5f5be0cad5835f356",
+      "after_sha256": "dd4dec320251774314338f69d9a57ef4724ff18c2a3d3d2695f010e992b036cb"
+    },
+    {
+      "file": "docs/simulations/stage7-effort-reviewed-20261022/README.md",
+      "before_sha256": "bada5f8659c589fdf22b8d5f0e2998135e8ebcc51992e70d2a08c788c36165fc",
+      "after_sha256": "f597cd39bda637f1bfe68a2b6ad382905ae70dcb94d0ea1dc0e00c8b7c4022fc"
+    }
+  ],
+  "interpretation": "Documentation punctuation only: shell input converted seven en dashes to question marks. Replace them with ASCII range dashes. Old source-bound decision content remains in Git commit 9500e77 and earlier; no date, numeric value, prior, gate or execution choice changes.",
+  "frozen_protocol_modified": false
+}

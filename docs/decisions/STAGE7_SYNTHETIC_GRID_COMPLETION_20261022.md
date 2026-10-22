@@ -43,5 +43,5 @@ schedule in a fresh directory before final completion. This is a computational
 replacement, not selection of a posterior by its statistical results.
 
 This follow-up keeps all 43 primary and 12 sensitivity cases. It changes neither
-the frozen historical split nor any held-out evaluation rule. January 2024?
+the frozen historical split nor any held-out evaluation rule. January 2024--
 December 2025 remains unscored.

@@ -21,8 +21,8 @@ remain historical, mode-conditional outputs and are superseded for recovery.
 
 | Eligible configuration | Cases | Generating log-intensity 90% coverage | Log-intensity RMSE | Expected-count RMSE |
 | --- | ---: | ---: | ---: | ---: |
-| No offset | 3/3 | 0.289?0.326 | 0.897?0.972 | 56.09?82.33 |
-| Oracle offset | 2/3 | 0.813?0.906 | 0.164?0.199 | 41.06?51.33 |
+| No offset | 3/3 | 0.289-0.326 | 0.897-0.972 | 56.09-82.33 |
+| Oracle offset | 2/3 | 0.813-0.906 | 0.164-0.199 | 41.06-51.33 |
 | Count-derived proxy | 1/3 | 0.266 | 0.889 | 39.50 |
 
 These are pointwise summaries across dependent category-month cells in each
