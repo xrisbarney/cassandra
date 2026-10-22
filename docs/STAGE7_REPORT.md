@@ -89,6 +89,15 @@ and censored mark likelihoods remain unchanged. Dense independent calculations,
 finite differences and native/Numba complete-target comparisons verify both
 count and severity transformations.
 
+An additional [saved-state review](checks/stage7-saved-state-numerics-20261022/README.md)
+found a small-step finite-difference discrepancy near unit persistence. Independent
+60-digit reconstruction agreed with the analytic persistence gradient within
+6.49e-10, identifying cancellation in that difference check. The original failure
+is preserved. The [fixed-step-grid follow-up](checks/stage7-saved-state-numerics-v2-20261022/README.md)
+also passes for the two fallback checkpoints. These are local numerical checks;
+the saved states need not be the rejected leapfrog proposals, and their passing
+does not waive any sampling divergence or establish posterior exploration.
+
 A block-tridiagonal implementation and scalar rank-one/rank-two specialization
 remove unnecessary dense operations and small-array allocations. No jitter or statistical tolerance was added. The custom block kernels use
 fastmath=False; generated PyTensor functions retain the installed default

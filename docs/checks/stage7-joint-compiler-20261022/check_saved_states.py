@@ -18,7 +18,10 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--runs', nargs='+', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--difference-steps', nargs='+', type=float, default=[1e-5])
     args = parser.parse_args()
+    if any(step <= 0 for step in args.difference_steps):
+        raise ValueError('Difference steps must be positive.')
     args.output.mkdir(parents=True, exist_ok=False)
     records = []
     for folder in args.runs:
@@ -46,22 +49,36 @@ def main():
                 # Both factor coefficients, and first/last entries of each other block.
                 indices = sorted({0, point[name].size - 1})
                 for index in indices:
-                    delta = np.zeros_like(point[name])
-                    delta.flat[index] = 1e-5
-                    plus, minus = dict(point), dict(point)
-                    plus[name], minus[name] = point[name] + delta, point[name] - delta
-                    fd = float((native(plus)[0] - native(minus)[0]) / 2e-5)
                     analytic = float(b[1][offset + index])
-                    np.testing.assert_allclose(fd, analytic, rtol=5e-5, atol=5e-5,
-                                               err_msg=f'{folder}: {name}[{index}]')
+                    estimates = []
+                    for step in args.difference_steps:
+                        delta = np.zeros_like(point[name])
+                        delta.flat[index] = step
+                        plus, minus = dict(point), dict(point)
+                        plus[name], minus[name] = point[name] + delta, point[name] - delta
+                        fd = float((native(plus)[0] - native(minus)[0]) / (2 * step))
+                        estimates.append({'step': step, 'finite_difference': fd,
+                                          'absolute_error': abs(fd - analytic),
+                                          'passed': bool(np.isclose(fd, analytic,
+                                                                   rtol=5e-5, atol=5e-5))})
+                    if len(estimates) == 1:
+                        passed = estimates[0]['passed']
+                    else:
+                        passed = any(
+                            left['passed'] and right['passed'] and np.isclose(
+                                left['finite_difference'], right['finite_difference'],
+                                rtol=5e-5, atol=5e-5)
+                            for left, right in zip(estimates[:-1], estimates[1:], strict=True)
+                        )
                     differences.append({'variable': name, 'index': index,
-                                        'finite_difference': fd, 'analytic': analytic,
-                                        'absolute_error': abs(fd - analytic)})
+                                        'analytic': analytic, 'estimates': estimates,
+                                        'passed': bool(passed)})
                 offset += point[name].size
             record = {'directory': folder.as_posix(), 'checkpoint': path.name,
                       'checkpoint_sha256': file_hash(path),
                       'run_sha256': file_hash(folder / 'run.json'),
-                      'passed': True, 'logp_abs_error': float(abs(a[0] - b[0])),
+                      'passed': all(d['passed'] for d in differences),
+                      'logp_abs_error': float(abs(a[0] - b[0])),
                       'gradient_max_abs_error': float(np.max(abs(a[1] - b[1]))),
                       'finite_differences': differences}
             records.append(record)
@@ -71,17 +88,24 @@ def main():
     if not records:
         raise ValueError('No saved failure checkpoints were checked.')
     write_json(args.output / 'audit.json', {
-        'passed': True, 'source_sha256': file_hash(Path(__file__)),
+        'passed': all(r['passed'] for r in records),
+        'source_sha256': file_hash(Path(__file__)),
         'model_source_sha256': {p.as_posix(): file_hash(p)
                                 for p in Path('src/cyber_threat_modelling/models').glob('*.py')},
         'numba_opt': os.environ.get('NUMBA_OPT'),
         'numba_fastmath': bool(pytensor.config.numba__fastmath),
         'checkpoints': len(records), 'real_data_read': False,
+        'difference_steps': args.difference_steps,
+        'difference_rule': 'Original 5e-5 absolute/relative tolerance. If a step grid is '
+        'requested, two adjacent estimates must agree with each other and the analytic '
+        'gradient. All estimates, including failures, are retained.',
         'interpretation': 'Complete target and gradient at saved visited states, with selected '
         'finite differences. A rejected leapfrog proposal may differ from the saved state; '
         'passing these checks neither explains nor waives a divergence.',
         'artifacts': {p.name: file_hash(p) for p in args.output.iterdir() if p.is_file()},
     })
+    if not all(r['passed'] for r in records):
+        raise RuntimeError('A saved-state numerical check remains unresolved; see audit.')
 
 
 if __name__ == '__main__':
