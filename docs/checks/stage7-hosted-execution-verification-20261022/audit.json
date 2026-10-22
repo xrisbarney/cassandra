@@ -1,0 +1,16 @@
+{
+  "head": "72ea2b3ed387a8a17b4f157973b7a5b90fefe6ad",
+  "interpretation": "Fresh hosted verification passed; eight first attempts started. This is not posterior admission or Stage 7 completion. Prior OPT0 hash mismatch remains unexplained because that job retained no regenerated arrays.",
+  "log_sha256": "0b414aef28bbf613fdaa5450e03b519051d4b95b6447ad12591e186c76b2f177",
+  "records": {
+    "host.json": "ce463a544ad98fa601e32a681bfcd5be7b89f77f435e297ff9b1b7dab94a3d93",
+    "regeneration.json": "94a02adf21f06532c297a55c067cd65deff959b820fd609d0f040358e00f1fc2",
+    "verification.json": "10d3fc6d26997b8b5cd73dd7fb53209d4bde61a479b19f6d0a9207803139deb0"
+  },
+  "regenerated_array_max_absolute_error": 0.0,
+  "regenerated_byte_mismatches": 0,
+  "run_id": 39754804660,
+  "test_wall_seconds": 675.73,
+  "test_warnings": 5,
+  "tests_passed": 32
+}

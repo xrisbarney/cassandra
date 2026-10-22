@@ -1,0 +1,11 @@
+{
+  "check": "Attempted to import actual nonterminal hosted checkpoint dynamics_wide-representative-7101 retry0",
+  "expected_result": "Rejected before publishing a result or creating the import audit directory",
+  "observed_result": "Rejected; canonical directory still contains only remote_reservation.json; audit output absent",
+  "scope": "Nonterminal transfer guard only. Complete posterior transfer must still pass independent diagnostics and all identity/hash checks.",
+  "source_sha256": "f7ac9c7cfd2e2c646f14a3a06e9d6543a9059586e391798b807227152c35ccfc",
+  "tools": [
+    "3e3bac",
+    "1ed95e"
+  ]
+}
