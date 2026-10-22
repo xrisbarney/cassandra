@@ -1,0 +1,25 @@
+{
+  "source_control": {
+    "revision": "f7a9ee346c1567d0a18af49beb303e10667eb0e6",
+    "dirty": false,
+    "status": "available"
+  },
+  "passed": 5,
+  "log": "artifacts/stage7-sign-coordinate-tests.log",
+  "log_sha256": "3f1c2612a907076a0b906f19713bd8df2b2344185b2fe48b52bea99200af01f0",
+  "source_sha256": {
+    "src/cyber_threat_modelling/models/gaussian_coordinates.py": "2da2668117d7c13b3605ac1dcb806bb733c562034d242747bfc5fc458a5735cb",
+    "src/cyber_threat_modelling/models/synthetic_state_space.py": "79c490c2f173734c0533ca5bb9c5d6066dffb3e14e2aefef193a0fab0b7c1ac5",
+    "tests/test_stage7_sign_coordinates.py": "3bb04078b4a21c6364fc2181dcc40a6d5d8b5b61f5dc85bbc138c4fb2c4d613d",
+    "scripts/run_stage7.py": "30eef45f02b7e68734107f251bb72cdc1436912d869817e330849d6bd00d023b",
+    "docs/decisions/STAGE7_SIGN_GAUGE_20261022.md": "c0ce94eaf0f1e486de1e3b4d94a398c451d7e73420e470132248db8e0819ec36"
+  },
+  "checks": [
+    "Full density equality in both orientations",
+    "Native and fused NUMBA density/gradient equality",
+    "Finite differences including zero crossing",
+    "Canonical trajectory and conditional forecast mean/covariance equality",
+    "Reject unsupported models"
+  ],
+  "warning": "Known PyTensor native BLAS performance warning; no numerical warning."
+}
