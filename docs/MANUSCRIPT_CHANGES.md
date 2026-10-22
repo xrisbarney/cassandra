@@ -200,3 +200,34 @@ The [metric comparison](decisions/STAGE7_WHITENED_METRIC_20261022.md) changes on
 mass adaptation after whitening and must be reported with its actual outcomes.
 Timing evidence separates compilation, warmup and retained sampling, records
 compiler optimization and concurrency, and is not a real-data rolling-fit budget.
+
+### Simulation denominators and interpretation (2026-10-22)
+
+Describe the current design as 43 primary scenario/seed cases and 12 sensitivity
+cases, not 43 independent datasets. The effort variants deliberately share
+observed counts, and coordinate retries reuse both observations and generating
+truth. The final audit fingerprints observed panels and distinguishes canonical
+fits from preserved earlier attempts. Do not add duplicate verification of the
+same severity files to the number of fitted cases.
+
+Separate numerical correctness, convergence, fixed-truth recovery and predictive
+calibration. The 175 passing software tests establish the first category only.
+Only complete, warning-free posteriors passing all prescribed gates contribute
+to recovery summaries. Failed or interrupted chains cannot substantiate a
+component's benefit, and three fixed-truth seeds are not SBC. Retain failure
+denominators in tables rather than reporting only admitted fits.
+
+The real-data anchor uses the known categories in 2010--2018; it is empirical-
+Bayes regularization. The wide-level prior fails its plausibility gate and the
+wide-dynamics prior remains unresolved after its declared repeat. Label their
+posterior comparisons as sensitivity stress cases, not additional admitted
+priors. Report all sensitivity outcomes without choosing the best recovery seed
+or candidate. Final posterior findings belong in the completed Stage 7 report.
+
+Counts alone identify the sum of log intensity and reporting effort, not their
+physical decomposition. A count-derived effort estimate supplies a reference
+scale; convergence and count accuracy do not prove that it separates actual
+malicious activity from disclosure throughput. Similarly, fitted regime
+probabilities using the complete synthetic history are retrospective and do not
+validate an early-warning claim. Preserve these distinctions in the abstract,
+methodology and eventual evaluation discussion.
