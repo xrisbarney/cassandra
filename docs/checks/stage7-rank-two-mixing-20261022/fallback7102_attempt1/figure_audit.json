@@ -1,0 +1,13 @@
+{
+  "source_sha256": "8bad7d5a7680f8d53a1f37973ac46d1f77613c7199759f71d8bcc2b5fcece922",
+  "posterior_sha256": "bea373ca8a91ccad1b68b8260fa183224cfc2ccfd8270512b8deb29f688e5814",
+  "attempt_sha256": "7332dec38eab058c41001d0b2ee0292bbe39b05c30efae93d10fa5ec2b8df777",
+  "chains": 4,
+  "retained_draws_per_chain": 1000,
+  "recovery_evidence": false,
+  "artifacts": {
+    "chain_mixing.png": "4e8c8a76eea2651726108b531e7556cae08d40716393092abdac6226bbc46931",
+    "chain_mixing.pdf": "42d8f61169b524d9bb9a9e0f61cadd8b36c3ce16ac875268b2169ff643b7f6c9"
+  },
+  "interpretation": "Failed numerical gates. Plots diagnose persistence, level and state-mean mixing; they are not an admitted posterior or a truth-recovery result."
+}

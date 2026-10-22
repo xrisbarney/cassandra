@@ -16,11 +16,15 @@ def main():
     parser.add_argument("--run", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
-    reference = Path("artifacts/stage7/rank-two-joint-v1/primary/fallback_zero-7101")
     run = json.loads((args.run / "run.json").read_text(encoding="utf-8"))
     options = run["options"]
-    if options["scenario"] != "fallback_zero" or options["seed"] != 7101:
-        raise ValueError("These markers were declared for fallback seed 7101 only.")
+    if options["scenario"] != "fallback_zero" or options["seed"] not in (7101, 7102):
+        raise ValueError("These markers were recorded for fallback seeds 7101 and 7102 only.")
+    reference = Path('artifacts/stage7/rank-two-joint-v1/primary') / (
+        f"fallback_zero-{options['seed']}")
+    marker_record = Path(__file__).with_name("README.md")
+    if options['seed'] == 7102:
+        marker_record = Path(__file__).parent / 'fallback7102_attempt1' / 'README.md'
     if file_hash(args.run / "data.npz") != file_hash(reference / "data.npz"):
         raise ValueError("The observations differ from the diagnosed dataset.")
     if run["real_data_read"] or run["held_out_scoring_enabled"]:
@@ -67,7 +71,8 @@ def main():
         attempts.append(entry)
     record = {"directory": args.run.as_posix(), "candidate": options["prior_candidate"],
               "source_sha256": file_hash(Path(__file__)),
-              "marker_record_sha256": file_hash(Path(__file__).with_name("README.md")),
+              "marker_record": marker_record.as_posix(),
+              "marker_record_sha256": file_hash(marker_record),
               "run_sha256": file_hash(args.run / "run.json"),
               "data_sha256": file_hash(args.run / "data.npz"),
               "attempts": attempts,
