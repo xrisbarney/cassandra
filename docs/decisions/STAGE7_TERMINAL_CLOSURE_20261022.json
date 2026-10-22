@@ -1,0 +1,27 @@
+{
+  "authority": "User requested a bounded final convergence sequence and terminal outcome",
+  "automatic_retries_permitted": false,
+  "candidate_validation_fits": 0,
+  "convergence_repair_closed_for_this_experiment": true,
+  "files_sha256": {
+    "docs/STAGE7_TERMINAL_REPORT.md": "450910a3f7c12141bb1e5711cb5f189d995eed9fe81aa9260ca2edeb68842e48",
+    "docs/decisions/STAGE7_TERMINAL_DIAGNOSTICS_20261022.json": "92ce812e8763a8a08657f3a15b7c8f546f6199b4bc75579641cc2204003f388b",
+    "docs/simulations/stage7-terminal-20261022/diagnostics.json": "70d274050f9a43b954578bd3b04a3a25fc8a9d65dc90969ac0b33cfb4104f109",
+    "docs/simulations/stage7-terminal-20261022/final-checks.json": "3c1053c131fa0ee6033b70fd50723620d6d545a3f38152183e69f5ee77dedd38"
+  },
+  "held_out_scoring_enabled": false,
+  "joint_coordinate_verification_passed": true,
+  "limit_selected_before_refits": true,
+  "maximum_attempts": 5,
+  "next_work": "Complete outstanding named comparators and development validation, then record final comparison roster; no proposed forecast row admitted",
+  "per_attempt_wall_seconds": 1200,
+  "persistence_prior_amended": false,
+  "posterior_attempts_complete": 0,
+  "posterior_attempts_started": 2,
+  "posterior_convergence": "unresolved; no four-chain posterior",
+  "saved_state_audit_passed": true,
+  "stage8_enabled": false,
+  "status": "terminal_not_admitted_resource_limited",
+  "timeouts_are_not_statistical_nonconvergence_verdicts": true,
+  "unused_attempt_slots": 3
+}

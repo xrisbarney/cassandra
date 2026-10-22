@@ -293,3 +293,16 @@ divergences; the reduced representative fails tail ESS, and the reduced fallback
 fails R-hat and bulk ESS. No production-pilot amendment follows. The original
 campaign totals above remain unchanged. Stage 8 stays closed and this repair
 round has ended without additional retries.
+
+The subsequent [terminal diagnostic effort](STAGE7_TERMINAL_REPORT.md) followed
+the user's final bounded sequence. Saved-state audits and full-size one-factor
+joint-coordinate checks passed. The two diagnostic attempts reached the
+predeclared 20-minute caps during their second chains; neither supplies a
+four-chain posterior or a statistical convergence verdict. No persistence prior
+was changed and no validation-seed fits were started. The terminal outcome is
+not admitted under the frozen gates and bounded resources. Convergence repair
+ends here, with the remaining named comparator work and comparison-roster
+amendment required before held-out scoring. Original campaign totals stay intact.
+Without an admitted proposed forecast, the frozen proposed-versus-baseline
+comparisons are not estimable. Do not substitute a winning control into the
+proposed-model slot or silently redefine the confirmatory comparison family.

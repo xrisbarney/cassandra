@@ -1,0 +1,22 @@
+{
+  "activation_sha256": "92ce812e8763a8a08657f3a15b7c8f546f6199b4bc75579641cc2204003f388b",
+  "attempt_count": 1,
+  "case": "joint_fixed",
+  "chains": 4,
+  "draws": 2000,
+  "fixed_phi": [
+    0.65
+  ],
+  "held_out_scoring_enabled": false,
+  "initialization_seed": 7301,
+  "max_treedepth": 15,
+  "sampler_seed": 7103,
+  "source_control": {
+    "dirty": false,
+    "revision": "471a4ee59669e2c2007ec3bc8fe21dbf4989f64e",
+    "status": "available"
+  },
+  "stage8_enabled": false,
+  "target_accept": 0.99,
+  "warmup": 2000
+}

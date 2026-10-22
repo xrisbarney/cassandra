@@ -225,7 +225,13 @@ The [original 55-case campaign is complete](docs/simulations/stage7-complete-202
 unvalidated. The [bounded convergence supplement](docs/STAGE7_SUPPLEMENT_REPORT.md)
 is also complete: all four single-attempt cases failed the unchanged diagnostic
 gates. No one-factor pilot amendment is admitted. Stage 8 and held-out scoring
-remain closed; no further repair round has been launched.
+remain closed. The [final diagnostic effort](docs/STAGE7_TERMINAL_REPORT.md)
+verified saved-state calculations and one-factor joint coordinates, but both
+diagnostic fits exhausted their 20-minute caps before four complete chains.
+They are incomplete attempts, not demonstrated statistical failures. Convergence
+repair is now closed for this experiment; the proposed model is not admitted
+under the frozen gates and bounded resources. Remaining comparison work uses
+validated controls and requires the outstanding named baselines before scoring.
 
 The historical campaign's control cases used a diagonal metric, as recorded in
 the geometry decision. `scripts/summarize_stage7.py --controls-from` preserves

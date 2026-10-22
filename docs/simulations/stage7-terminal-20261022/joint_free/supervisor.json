@@ -1,0 +1,11 @@
+{
+  "attempt_count": 1,
+  "case": "joint_free",
+  "finished_utc": "2026-10-22T20:08:05.020089+00:00",
+  "global_deadline_utc": "2026-10-22T21:31:00+00:00",
+  "partial_evidence_preserved": true,
+  "retry_permitted": false,
+  "returncode": null,
+  "timed_out": true,
+  "timeout_seconds": 1200.0
+}

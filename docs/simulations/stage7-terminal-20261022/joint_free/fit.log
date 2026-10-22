@@ -1,0 +1,15 @@
+Sequential sampling (4 chains in 1 job)
+NUTS: [m_sd, psi, f_phi, f_diag, f_free, joint_level_whitened, f_whitened_states]
+joint_free 0 500 164.3
+joint_free 0 1000 240.7
+joint_free 0 1500 351.5
+joint_free 0 2000 432.6
+joint_free 0 2500 505.9
+joint_free 0 3000 578.0
+joint_free 0 3500 650.1
+joint_free 0 4000 719.0
+joint_free 1 500 817.3
+joint_free 1 1000 890.1
+joint_free 1 1500 981.1
+joint_free 1 2000 1052.6
+joint_free 1 2500 1125.0

@@ -1,0 +1,67 @@
+{
+  "checked_utc": "2026-10-22 20:11:21 UTC",
+  "passed": true,
+  "checks": [
+    {
+      "name": "ruff",
+      "cmd": ".venv/Scripts/ruff.exe check .",
+      "chunk_id": "54aeb1",
+      "wall_time_seconds": 0.4419668,
+      "exit_code": 0,
+      "original_token_count": 5,
+      "output": "All checks passed!\n"
+    },
+    {
+      "name": "lock",
+      "cmd": ".tools/Scripts/uv.exe lock --check",
+      "chunk_id": "f73a21",
+      "wall_time_seconds": 0.4112784,
+      "exit_code": 0,
+      "original_token_count": 7,
+      "output": "Resolved 56 packages in 9ms\n"
+    },
+    {
+      "name": "configuration",
+      "cmd": ".venv/Scripts/ctm.exe validate configs/pilot.toml",
+      "chunk_id": "20aed7",
+      "wall_time_seconds": 0.6400882,
+      "exit_code": 0,
+      "original_token_count": 79,
+      "output": "{\r\n  \"status\": \"valid\",\r\n  \"configuration_sha256\": \"ba6fcc8c86ed71907472a22d1550a7ea2d458e08c234b7bfcf508632c092d751\",\r\n  \"evaluation_origin_counts\": {\r\n    \"1\": 24,\r\n    \"3\": 22,\r\n    \"6\": 19,\r\n    \"12\": 13\r\n  },\r\n  \"development_origin_counts\": {\r\n    \"1\": 60,\r\n    \"3\": 58,\r\n    \"6\": 55,\r\n    \"12\": 49\r\n  }\r\n}\r\n"
+    },
+    {
+      "name": "panel_integrity",
+      "cmd": ".venv/Scripts/ctm.exe verify-panels docs/panels/stage5-20261020/panel_manifest.json",
+      "chunk_id": "a6c1bc",
+      "wall_time_seconds": 3.9137047000000003,
+      "exit_code": 0,
+      "original_token_count": 53,
+      "output": "{\r\n  \"status\": \"verified\",\r\n  \"panel_id\": \"stage5-20261020\",\r\n  \"primary_count_panel_ready\": true,\r\n  \"scoring_ready\": false,\r\n  \"sha256\": \"0448a3eb7f6d4a17d3808b98ad7a315105ed2cc72974cf7828afb4c3d5515840\"\r\n}\r\n"
+    },
+    {
+      "name": "activations",
+      "cmd": ".venv/Scripts/python.exe -c \"import json; from pathlib import Path; from cyber_threat_modelling.evaluation.stage7_supplement import verify_fit_authority; from cyber_threat_modelling.provenance import file_hash; r=Path.cwd(); a=verify_fit_authority(r,'matched_one_factor_fallback'); b=json.loads((r/'docs/decisions/STAGE7_TERMINAL_DIAGNOSTICS_20261022.json').read_text()); assert all(file_hash(r/p)==h for p,h in b['files_sha256'].items()); print('Supplement activation:',len(a['files_sha256']),'unchanged files; terminal activation:',len(b['files_sha256']),'matching files')\"",
+      "chunk_id": "c60f7b",
+      "wall_time_seconds": 2.001144,
+      "exit_code": 0,
+      "original_token_count": 21,
+      "output": "Supplement activation: 86 unchanged files; terminal activation: 23 matching files\r\n"
+    },
+    {
+      "name": "whitespace",
+      "cmd": "git -c core.whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol diff --check",
+      "chunk_id": "004809",
+      "wall_time_seconds": 0.4824887,
+      "exit_code": 0,
+      "original_token_count": 0,
+      "output": ""
+    }
+  ],
+  "guard_tests": {
+    "command": ".venv/Scripts/python.exe -m pytest tests/test_stage7_terminal_guards.py -q",
+    "distinct_tests": 3,
+    "passed": 3,
+    "last_execution_seconds": 4.35
+  },
+  "scope": "All fits stopped. Original sources unchanged. No posterior diagnostics computed for incomplete attempts."
+}

@@ -324,3 +324,28 @@ Preserve the diagnostic plots as failed-chain evidence, without assigning
 posterior region weights or declaring a unique cause. The prior-predictive and
 software checks passed, but production-pilot posterior validation remains
 unresolved. No Stage 8 fit or held-out score is available.
+
+### Final bounded diagnostic effort and terminal outcome (2026-10-22)
+
+The [terminal report](STAGE7_TERMINAL_REPORT.md) separates implementation
+verification from posterior admission. Audits at two preserved divergence
+callback points and nearby perturbations found no discrepancy against an
+independent dense SciPy target/finite differences. Full-size one-factor joint
+coordinates were then verified. These checks do not certify entire divergent
+trajectories. The matched point has level scale 0.00335 and persistence 0.96518;
+there is no basis for attributing its failure exclusively to memory longer
+than the 108-month window. Proper priors give positive curvature along the
+likelihood's constant-shift direction, so do not claim an exactly flat posterior.
+
+Free-persistence and fixed-true-persistence diagnostic fits each exhausted a
+20-minute wall limit before completing four chains. Record them as resource-
+incomplete attempts, not demonstrated failures of the joint parameterization.
+No admitted posterior, recovery score or persistence-prior amendment follows.
+The terminal plan ends convergence repair for this experiment and leaves the
+proposed forecast row not admitted under the frozen gates and bounded resources.
+Remaining comparisons use validated controls and any independently qualified
+reduced structure, with the outstanding named baselines and final roster still
+required. Small-fixture successes and a conditioned diagnostic cannot substitute
+for a validated proposed model. The original negative findings remain visible;
+no claim of proposed-model forecast superiority or calibrated economic loss is
+supported by this effort. Stage 8 and 2024-2025 scoring remain closed.
