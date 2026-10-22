@@ -1,0 +1,234 @@
+{
+  "assessment": "The effort-proxy chain with reversed free loadings also has a near-zero positive anchor. In the kernel case, the separated chain uses a much smaller first kernel loading and a larger factor loading. These are signs of alternative fitted decompositions. They are not exact sign relabellings under the fixed-positive-anchor constraint, and unmixed chains cannot estimate their posterior weights. Do not remove a chain or manufacture recovery evidence from these unaccepted attempts.",
+  "interpretation": "Failed-fit chain diagnostics only. No recovery, truth comparison, or forecast score is computed. Separated chain means motivate retaining the mixing failure; this does not establish posterior mode probabilities.",
+  "records": [
+    {
+      "attempt_sha256": "1c95712f54f1e06628189f8efcf44d721f0419a1b223049f0a9f6114d79aee4e",
+      "directory": "artifacts/stage7/count-block-v3/primary/effort_proxy-7102",
+      "parameters": {
+        "f_diag": {
+          "chain_means": [
+            [
+              0.08435179273783897
+            ],
+            [
+              0.015327280552599923
+            ],
+            [
+              0.08967291924515579
+            ],
+            [
+              0.08708633860119847
+            ]
+          ],
+          "chain_sds": [
+            [
+              0.041363985086694165
+            ],
+            [
+              0.015336103055616482
+            ],
+            [
+              0.04343174343981266
+            ],
+            [
+              0.04655399828662298
+            ]
+          ]
+        },
+        "f_free": {
+          "chain_means": [
+            [
+              0.5497677229332729,
+              0.8752647407497962,
+              1.2971232696773483
+            ],
+            [
+              -0.5435821668904669,
+              -0.8735489217214629,
+              -1.3158057220762889
+            ],
+            [
+              0.5639574256660657,
+              0.9048429823343244,
+              1.3347257374731616
+            ],
+            [
+              0.5549510228995491,
+              0.885736284456864,
+              1.3116110230981153
+            ]
+          ],
+          "chain_sds": [
+            [
+              0.14047197390842892,
+              0.22167149897808125,
+              0.30460129267443503
+            ],
+            [
+              0.12610093295527502,
+              0.2013709575827969,
+              0.2862836150142139
+            ],
+            [
+              0.13573343581150488,
+              0.22573801943199132,
+              0.2988010321110229
+            ],
+            [
+              0.13413549057221777,
+              0.2212613679426685,
+              0.2933686196881162
+            ]
+          ]
+        },
+        "f_phi": {
+          "chain_means": [
+            [
+              0.8943055708223423
+            ],
+            [
+              0.8784458309831905
+            ],
+            [
+              0.903160513981796
+            ],
+            [
+              0.8973896698735454
+            ]
+          ],
+          "chain_sds": [
+            [
+              0.05502865745962163
+            ],
+            [
+              0.05811370294964153
+            ],
+            [
+              0.05143852517843404
+            ],
+            [
+              0.052443010165535583
+            ]
+          ]
+        }
+      },
+      "posterior_sha256": "9dcae4a5cd0f1896d7b9f0afb479b56bec0e6283c9948872177f12f0f5d4f651",
+      "result_status": "retry_0_unaccepted",
+      "run_sha256": "764f54bd9e276b9f0b5ff449b47bb113d8d8c073d4f6dca4ba48a80c3eae1801"
+    },
+    {
+      "attempt_sha256": "153e3be078bdbc8c58e1959c5ffd46e92c4a292f76e4dbd7c08db7c5b8488e37",
+      "directory": "artifacts/stage7/recovery-v6/kernel_present-7101",
+      "parameters": {
+        "a_first": {
+          "chain_means": [
+            0.6263186414751674,
+            0.08413297905608931,
+            0.6221106787829354,
+            0.6261336160143701
+          ],
+          "chain_sds": [
+            0.15477866495934062,
+            0.08558356722069103,
+            0.1481160317260182,
+            0.15173526624879852
+          ]
+        },
+        "a_remaining": {
+          "chain_means": [
+            [
+              0.5921724757188989,
+              0.6106450728758229,
+              0.4995499799296857
+            ],
+            [
+              -0.09097435325153728,
+              -0.6304302661948353,
+              -0.7479718069593949
+            ],
+            [
+              0.5871946469254543,
+              0.6006308849213361,
+              0.4964910075334433
+            ],
+            [
+              0.5902886776160625,
+              0.6079626483907971,
+              0.5041024610742101
+            ]
+          ],
+          "chain_sds": [
+            [
+              0.1347941837772467,
+              0.13012966925348335,
+              0.15049956203274095
+            ],
+            [
+              0.10646921629120203,
+              0.1403390045821843,
+              0.15504250353871604
+            ],
+            [
+              0.13348765151658581,
+              0.1305462491659845,
+              0.15368504066935493
+            ],
+            [
+              0.13405537640651896,
+              0.13066355080398345,
+              0.1535715478066797
+            ]
+          ]
+        },
+        "f_diag": {
+          "chain_means": [
+            [
+              0.542869324071384
+            ],
+            [
+              1.0101573659836025
+            ],
+            [
+              0.5400133520431513
+            ],
+            [
+              0.5308997026676927
+            ]
+          ],
+          "chain_sds": [
+            [
+              0.07360220812763754
+            ],
+            [
+              0.26046163974974995
+            ],
+            [
+              0.07582920114360586
+            ],
+            [
+              0.07618129061807738
+            ]
+          ]
+        },
+        "width": {
+          "chain_means": [
+            9.824063047243515,
+            10.053320559236338,
+            10.005518648586087,
+            9.96357135868599
+          ],
+          "chain_sds": [
+            1.465151286490584,
+            1.6955743513236454,
+            1.7241696085508016,
+            1.7870013690193614
+          ]
+        }
+      },
+      "posterior_sha256": "dc232c4dedb45c45b2ead7329e26103c241b1784f423c14a1eeaf97ede1b18ad",
+      "result_status": "retry_0_unaccepted",
+      "run_sha256": "fed1691fb25ceec8e2deeb306b19e81dbc9f9dd5cd9c01ac4cdb83937e4b538a"
+    }
+  ]
+}
