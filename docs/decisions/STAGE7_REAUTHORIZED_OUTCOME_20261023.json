@@ -1,0 +1,70 @@
+{
+  "additional_seed_fits": 0,
+  "authority": "User: go for it; exactly two reauthorized diagnostics with realistic caps",
+  "automatic_retries_permitted": false,
+  "cases": [
+    {
+      "case": "joint_free",
+      "diagnostics": {
+        "accepted": true,
+        "all_diagnostics_finite": true,
+        "divergences": 0,
+        "max_rhat": 1.0052853599815634,
+        "min_bfmi": 0.9015034155128572,
+        "min_bulk_ess": 581.8336362250587,
+        "min_tail_ess": 1064.5472071029562,
+        "tree_depth_saturations": 0
+      },
+      "status": "accepted"
+    },
+    {
+      "case": "joint_fixed",
+      "diagnostics": {
+        "accepted": false,
+        "all_diagnostics_finite": true,
+        "divergences": 0,
+        "max_rhat": 1.0112205080998717,
+        "min_bfmi": 0.9789474482120897,
+        "min_bulk_ess": 354.2193970824191,
+        "min_tail_ess": 618.8708633734788,
+        "tree_depth_saturations": 0
+      },
+      "status": "failed_diagnostics"
+    }
+  ],
+  "closed_utc": "2026-10-23T15:15:08.833267+00:00",
+  "completed_chain_checkpoints": 8,
+  "evaluation_roster_amended": false,
+  "files_sha256": {
+    "docs/STAGE7_REAUTHORIZED_REPORT.md": "e02bb9c172847f7ca489cc1804395215b72125eeb55a0f2bd516eeb657d20a07",
+    "docs/decisions/STAGE7_DIAGNOSTIC_REAUTHORIZATION_20261023.json": "44ded7a3a38a6d22b7aa79ab7aa6ecc7a8a5c5530c48476fd8ba9642f7cb4ef5",
+    "docs/simulations/stage7-reauthorized-20261023/README.md": "acdb5a6ef920d20e36f7cdc4746e00f825c90003611459f3bf18af2f4b2f971d",
+    "docs/simulations/stage7-reauthorized-20261023/diagnostics.json": "5f24ad8ae600026daf1c024304494437c8938195d4bd6e3144a100c92ee9d459",
+    "docs/simulations/stage7-reauthorized-20261023/exploration.json": "8da5d93a3e6b8cbe091ac858066a1780b28c8e827c103cf119e762770e1f6f1b",
+    "docs/simulations/stage7-reauthorized-20261023/final-checks.json": "2544774e1f052064e35a6d8a008cc815fff28c06bf4b0b62a8645f54b5e05f22",
+    "docs/simulations/stage7-reauthorized-20261023/joint_fixed-chains.png": "0fb75e6a787f2659aab4d585459cba4518f3714ea6d5ec9e73e5f1faf2138065",
+    "docs/simulations/stage7-reauthorized-20261023/joint_free-chains.png": "84c7d9dbd5251e92af3990b02fab0d5d9995ab78754e84f4e178cd90bccce890",
+    "docs/simulations/stage7-reauthorized-20261023/recovery-check.json": "32f4fc454f5475ba7e0e179e665cb63b257d64483a43cf1795e3279edabd0be8",
+    "docs/simulations/stage7-reauthorized-20261023/recovery.json": "53d772c1983b61c7352839e14669c4cbfe40ca94779155b98f469c4159a11014",
+    "docs/simulations/stage7-reauthorized-20261023/review-decision.json": "2cc60a85365b4f14d8be3666b3d0450b63a03b8bf1524be54cb0b27f7d526072",
+    "scripts/audit_stage7_reauthorized.py": "7806fc1ea8d5010126a4b643c7c7d08b57017fc38a188daffbaab11e21079e0b",
+    "scripts/recover_stage7_reauthorized.py": "bcf4d7103f13550df6357df5e760ee0feed80f24aaaefe3e6ed333dd863b649c",
+    "scripts/review_stage7_reauthorized.py": "e3e4fa94d49d7182daaab5e71283a1738d9e1b89d4ab1a4d7a289ebe0139896e"
+  },
+  "fixed_is_conditional_only": true,
+  "fixed_persistence_admitted": false,
+  "free_fixture_exploration_review": "No additional within-run exclusion; not proof of global exploration",
+  "free_fixture_numerically_admitted": true,
+  "held_out_scoring_enabled": false,
+  "next_work": "Any further model validation requires a separately bounded declaration addressing structural recovery; six named comparators and final roster also remain outstanding.",
+  "persistence_prior_amended": false,
+  "posterior_attempts_complete": 2,
+  "posterior_attempts_started": 2,
+  "production_model_admitted": false,
+  "production_pilot_amended": false,
+  "proposed_real_data_forecast_row_admitted": false,
+  "recovery": "Known-category log intensities reasonably recovered on one fixture; persistence, covariance and fallback rate poorly recovered",
+  "stage8_enabled": false,
+  "status": "closed_two_attempts_complete_free_numerical_pass_recovery_limited",
+  "timeouts": 0
+}

@@ -1,0 +1,42 @@
+{
+  "active_reauthorized_fit_or_supervisor_processes_after_completion": 0,
+  "audit_serialization_exception": "All eight checkpoints retain an entirely missing-valued warning column omitted by pm.sample defaults; every final posterior variable and sampler statistic matches exactly.",
+  "checked_utc": "2026-10-23T15:15:08.819308+00:00",
+  "checks_input_hashes": {
+    "configs/pilot.toml": "0b302e72acc6b86330aaba64810696ddf699bf3e7e2e8d6ebcd5b45ed4c23339",
+    "docs/panels/stage5-20261020/panel_manifest.json": "0448a3eb7f6d4a17d3808b98ad7a315105ed2cc72974cf7828afb4c3d5515840",
+    "uv.lock": "78085a93261539225f90e8e6a2595b71b0f9ae0a46fc9822d93bbe550cbbf05a"
+  },
+  "configuration_validation": {
+    "development_origins": [
+      60,
+      58,
+      55,
+      49
+    ],
+    "evaluation_origins": [
+      24,
+      22,
+      19,
+      13
+    ],
+    "status": "valid"
+  },
+  "distinct_new_preflight_tests_passed": 7,
+  "exploration_review_completed": true,
+  "full_test_suite_repeated_this_round": false,
+  "git_diff_whitespace_check": "passed",
+  "held_out_scoring_enabled": false,
+  "independent_diagnostic_and_checkpoint_audit_sha256": "5f24ad8ae600026daf1c024304494437c8938195d4bd6e3144a100c92ee9d459",
+  "panel_verification": {
+    "panel_id": "stage5-20261020",
+    "primary_count_panel_ready": true,
+    "scoring_ready": false,
+    "status": "verified"
+  },
+  "preflight_sha256": "9634b2a691d1d7030212cfce7266178d8c430dd099c53cf57b3c6ef9a5c15a8f",
+  "ruff_check_all": "passed",
+  "selected_recovery_recheck_sha256": "32f4fc454f5475ba7e0e179e665cb63b257d64483a43cf1795e3279edabd0be8",
+  "stage8_enabled": false,
+  "uv_lock_check": "passed earlier this turn; lock unchanged"
+}

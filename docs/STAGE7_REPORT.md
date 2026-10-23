@@ -1,5 +1,14 @@
 # Stage 7 synthetic validation record
 
+Latest status, 2026-10-23: the [reauthorized two-diagnostic round](STAGE7_REAUTHORIZED_REPORT.md)
+completed both four-chain fits. Free persistence passes numerical admission on
+the matched one-factor fixture; fixed persistence fails R-hat and bulk ESS.
+Recovery of persistence, covariance and the fallback rate remains poor despite
+90.64% known-category log-intensity coverage at the 90% level. This one-fixture
+result does not validate the two-factor production pilot or authorize Stage 8.
+The round is closed; all original campaign and supplement totals below remain
+separate, and January 2024-December 2025 remains unscored.
+
 Status, 2026-10-22: **original 55-case campaign complete; pilot validation failed;
 bounded repair supplement activated; Stage 8 closed**.
 The active laws are `anchored_levels_v2`. The primary prior-plausibility gates
@@ -299,9 +308,11 @@ the user's final bounded sequence. Saved-state audits and full-size one-factor
 joint-coordinate checks passed. The two diagnostic attempts reached the
 predeclared 20-minute caps during their second chains; neither supplies a
 four-chain posterior or a statistical convergence verdict. No persistence prior
-was changed and no validation-seed fits were started. The terminal outcome is
-not admitted under the frozen gates and bounded resources. Convergence repair
-ends here, with the remaining named comparator work and comparison-roster
+was changed and no validation-seed fits were started. The historical terminal
+outcome was not admitted under the frozen gates and bounded resources. That
+closure was subsequently reopened only for the two diagnostics described in
+the latest status above; the original timeout record remains unchanged.
+The remaining named comparator work and comparison-roster
 amendment required before held-out scoring. Original campaign totals stay intact.
 Without an admitted proposed forecast, the frozen proposed-versus-baseline
 comparisons are not estimable. Do not substitute a winning control into the

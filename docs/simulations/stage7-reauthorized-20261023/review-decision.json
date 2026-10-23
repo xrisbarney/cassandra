@@ -1,0 +1,18 @@
+{
+  "concerns": [
+    "Free fit concentrates at high persistence and large anchor loadings, with a positive factor time mean; compare to generating truth only in the subsequent recovery summary.",
+    "Fixed fit fails frozen R-hat and bulk ESS gates; visual overlap does not override failure.",
+    "Previous divergent callback points and the differently conditioned fixed fit cannot establish relative posterior mode weights."
+  ],
+  "exploration_sha256": "8da5d93a3e6b8cbe091ac858066a1780b28c8e827c103cf119e762770e1f6f1b",
+  "fixed_persistence_admitted": false,
+  "free_persistence_exploration_clear": true,
+  "held_out_scoring_enabled": false,
+  "meaning": "No additional exclusion from inspected within-run traces, chain distributions and loading orientation summaries; not proof of global exploration.",
+  "reviewed_figures": [
+    "docs/simulations/stage7-reauthorized-20261023/joint_free-chains.png",
+    "docs/simulations/stage7-reauthorized-20261023/joint_fixed-chains.png"
+  ],
+  "scope": "One matched fixed-truth seed; no production-model or general-calibration admission.",
+  "stage8_enabled": false
+}

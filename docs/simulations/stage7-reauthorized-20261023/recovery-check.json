@@ -1,0 +1,23 @@
+{
+  "method": "Direct xarray/NumPy calculation, without interval_metrics helper; no additional sampling.",
+  "seals": {
+    "STAGE7_DIAGNOSTIC_REAUTHORIZATION_20261023.json": {
+      "sha256": "44ded7a3a38a6d22b7aa79ab7aa6ecc7a8a5c5530c48476fd8ba9642f7cb4ef5",
+      "verified_files": 11
+    },
+    "STAGE7_REPAIR_ACTIVATION_20261022.json": {
+      "sha256": "2ffc0319b1f29aa5828b5550e9b24b9225989cb1fe471c5e9df5ea629a4ca2d7",
+      "verified_files": 86
+    },
+    "STAGE7_TERMINAL_CLOSURE_20261022.json": {
+      "sha256": "ebc74c692faa66a28d876740dd088cf5ee764ca0f9a6e73a90d745a72f88ff33",
+      "verified_files": 4
+    },
+    "STAGE7_TERMINAL_DIAGNOSTICS_20261022.json": {
+      "sha256": "92ce812e8763a8a08657f3a15b7c8f546f6199b4bc75579641cc2204003f388b",
+      "verified_files": 23
+    }
+  },
+  "selected_recovery_quantiles_and_coverage_independently_verified": true,
+  "synthetic_future_paths_verified": true
+}

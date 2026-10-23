@@ -349,3 +349,26 @@ required. Small-fixture successes and a conditioned diagnostic cannot substitute
 for a validated proposed model. The original negative findings remain visible;
 no claim of proposed-model forecast superiority or calibrated economic loss is
 supported by this effort. Stage 8 and 2024-2025 scoring remain closed.
+
+### Reauthorized diagnostics: numerical admission and recovery limits (2026-10-23)
+
+The [new report](STAGE7_REAUTHORIZED_REPORT.md) supersedes the historical
+resource-closure status after exactly two user-authorized fresh attempts. Both
+completed four chains within 90-minute limits, preserving all eight checkpoints.
+The free-persistence matched one-factor fixture passes the unchanged numerical
+gates: maximum R-hat 1.005285, minimum bulk/tail ESS 581.834/1064.547, minimum
+BFMI 0.901503, zero divergences and depth saturations. The fixed-persistence
+diagnostic fails R-hat and bulk ESS; it remains failed despite zero divergences.
+No prior or sampling-budget law was changed, and all fallback zeros were included.
+
+Do not convert this numerical result into a claim of structural recovery.
+Known-category 90% log-intensity coverage is 90.64% on one fixed-truth fixture,
+but persistence has mean 0.96716 and 90% interval [0.95053, 0.97934] when truth
+is 0.65. Category-level parameter coverage is 10%, fallback log-intensity
+coverage is zero, and lagged covariance coverage is only 18-19%. These descriptive
+fractions are not general calibration estimates. Chain overlap does not prove
+global exploration. The result supports numerical admission of this fixture
+and continued scrutiny of the level/factor decomposition, not an amendment
+admitting the production pilot. No proposed real-data forecast row, incident
+model, economic calibration, or held-out score follows. This two-attempt round
+is closed, with any future work requiring a separately bounded declaration.

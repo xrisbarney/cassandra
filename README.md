@@ -228,10 +228,16 @@ gates. No one-factor pilot amendment is admitted. Stage 8 and held-out scoring
 remain closed. The [final diagnostic effort](docs/STAGE7_TERMINAL_REPORT.md)
 verified saved-state calculations and one-factor joint coordinates, but both
 diagnostic fits exhausted their 20-minute caps before four complete chains.
-They are incomplete attempts, not demonstrated statistical failures. Convergence
-repair is now closed for this experiment; the proposed model is not admitted
-under the frozen gates and bounded resources. Remaining comparison work uses
-validated controls and requires the outstanding named baselines before scoring.
+They are incomplete attempts, not demonstrated statistical failures. The user
+then [reauthorized exactly those two diagnostics](docs/STAGE7_REAUTHORIZED_REPORT.md)
+with 90-minute caps and completed-chain checkpoints. Both completed: free
+persistence passes the numerical gates, while fixed persistence fails R-hat and
+bulk ESS. The free fit recovers known-category log intensities reasonably on this
+one fixture but misses generating persistence, covariance and the fallback rate.
+This bounded round is closed. The two-factor pilot remains unvalidated, no
+one-factor production amendment is adopted, and no proposed real-data forecast
+row is admitted. Stage 8 and held-out scoring remain closed. Remaining comparison
+work requires the outstanding named baselines and the final roster before scoring.
 
 The historical campaign's control cases used a diagonal metric, as recorded in
 the geometry decision. `scripts/summarize_stage7.py --controls-from` preserves
