@@ -1,0 +1,32 @@
+{
+  "checked_utc": "2026-10-23T14:14:25.515083+00:00",
+  "installed_versions_match_lock": {
+    "arviz": "0.23.4",
+    "numba": "0.63.1",
+    "numpy": "2.3.5",
+    "pandas": "2.3.3",
+    "pymc": "5.28.5",
+    "pytensor": "2.38.3",
+    "pytest": "9.1.1",
+    "ruff": "0.17.1",
+    "scipy": "1.18.1",
+    "xarray": "2026.9.0"
+  },
+  "python": "3.12.0 (tags/v3.12.0:0fb18b0, Oct  2 2023, 13:03:39) [MSC v.1935 64 bit (AMD64)]",
+  "ruff": "passed",
+  "sampling_model_changed": false,
+  "tests": [
+    {
+      "file": "tests/test_stage7_chain_checkpoint.py",
+      "passed": 3,
+      "seconds": 110.08
+    },
+    {
+      "file": "tests/test_stage7_reauthorization_guards.py",
+      "passed": 4,
+      "seconds": 7.88
+    }
+  ],
+  "unchanged_supplement_files": 86,
+  "unchanged_terminal_files": 23
+}

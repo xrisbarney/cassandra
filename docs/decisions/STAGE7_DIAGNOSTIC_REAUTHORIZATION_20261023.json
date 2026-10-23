@@ -1,0 +1,35 @@
+{
+  "attempt_limit": 2,
+  "attempts_per_case": 1,
+  "authority": "User: go for it; exactly the same two unfinished diagnostics once with realistic caps and checkpointing",
+  "cases": [
+    "joint_free",
+    "joint_fixed"
+  ],
+  "chains": 4,
+  "draws": 2000,
+  "files_sha256": {
+    "docs/STAGE7_DIAGNOSTIC_REAUTHORIZATION_20261023.md": "4a81159adfda651f90400fd5d422c41a5322025e701b64d39638a508fb28b775",
+    "docs/checks/stage7-reauthorized-20261023/preflight.json": "9634b2a691d1d7030212cfce7266178d8c430dd099c53cf57b3c6ef9a5c15a8f",
+    "docs/decisions/STAGE7_TERMINAL_CLOSURE_20261022.json": "ebc74c692faa66a28d876740dd088cf5ee764ca0f9a6e73a90d745a72f88ff33",
+    "docs/decisions/STAGE7_TERMINAL_DIAGNOSTICS_20261022.json": "92ce812e8763a8a08657f3a15b7c8f546f6199b4bc75579641cc2204003f388b",
+    "scripts/Use-Compiler.ps1": "840a3b7ee88f2a6748f1125d33a97edf5549ae901805ae8859a8f14aa60b8eb5",
+    "scripts/launch_stage7_reauthorized.py": "a7759743eea249a0383b9d4decd956b6d87df79f86d35335a38c6c11120e7bf3",
+    "scripts/run_stage7_reauthorized.py": "e73d90c129ded9a80b7a725c03e9067695a47a69f2284d83ace372ddb150e614",
+    "scripts/stage7_chain_checkpoint.py": "f5e922132efd993e5791d476841111da10561f5dd01a631437c36e0623e30545",
+    "tests/test_stage7_chain_checkpoint.py": "77c6d488d8115338ca5e237436e0e1e84b1d0cedeea0caab59b90e570fe46b36",
+    "tests/test_stage7_reauthorization_guards.py": "47951bf3e8bd2c2539f57266980f4162ad3327bde321ef492513fff0eb6f40d9",
+    "uv.lock": "78085a93261539225f90e8e6a2595b71b0f9ae0a46fc9822d93bbe550cbbf05a"
+  },
+  "global_deadline_utc": "2026-10-23T16:14:25.516734+00:00",
+  "global_launch_window_start_utc": "2026-10-23T14:14:25.516734+00:00",
+  "held_out_scoring_enabled": false,
+  "initialization_seed": 7301,
+  "max_treedepth": 15,
+  "per_attempt_wall_seconds": 5400,
+  "sampler_seed": 7103,
+  "stage8_enabled": false,
+  "status": "active",
+  "target_accept": 0.99,
+  "warmup": 2000
+}
